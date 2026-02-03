@@ -52,3 +52,4 @@ pnpm prisma generate
 4️⃣ Rode o seed novamente
 
 pnpm exec tsx prisma/seed.ts
+# servix
