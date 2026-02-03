@@ -30,6 +30,10 @@ yarn-error.log*
 .env.development
 .env.production
 
+# Permitir apenas arquivo de exemplo
+!.env.example
+!.env.enc.example
+
 # Vercel
 .vercel
 
