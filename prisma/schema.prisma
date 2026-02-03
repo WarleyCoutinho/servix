@@ -1,0 +1,312 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// =====================
+// ENUMS
+// =====================
+
+enum UserRole {
+  OWNER
+  PROFESSIONAL
+  CLIENT
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  INCOMPLETE
+  TRIALING
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+  CANCELED
+}
+
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+enum StripeAccountStatus {
+  PENDING
+  ONBOARDING
+  ACTIVE
+  RESTRICTED
+  DISABLED
+}
+
+// =====================
+// USER & AUTH
+// =====================
+
+model User {
+  id               String    @id
+  name             String
+  email            String
+  emailVerified    Boolean   @default(false)
+  image            String?
+  role             UserRole  @default(CLIENT)
+  stripeCustomerId String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  sessions        Session[]
+  accounts        Account[]
+  bookings        Booking[]
+  ownedBarbershop Barbershop?   @relation("BarbershopOwner")
+  professional    Professional?
+
+  @@unique([email])
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+// =====================
+// BARBERSHOP
+// =====================
+
+model Barbershop {
+  id          String   @id @default(uuid())
+  name        String
+  address     String
+  description String
+  imageUrl    String
+  phones      String[]
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  ownerId String? @unique
+  owner   User?   @relation("BarbershopOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+
+  services       BarbershopService[]
+  bookings       Booking[]
+  professionals  Professional[]
+  operatingHours OperatingHours[]
+  subscription   Subscription?
+}
+
+// =====================
+// PROFESSIONAL
+// =====================
+
+model Professional {
+  id                       String              @id @default(uuid())
+  cpf                      String              @unique
+  displayName              String?
+  bio                      String?
+  imageUrl                 String?
+  isActive                 Boolean             @default(true)
+  acceptsPix               Boolean             @default(false)
+  acceptsCard              Boolean             @default(true)
+  stripeAccountId          String?             @unique
+  stripeAccountStatus      StripeAccountStatus @default(PENDING)
+  stripeOnboardingComplete Boolean             @default(false)
+  createdAt                DateTime            @default(now())
+  updatedAt                DateTime            @updatedAt
+
+  userId       String @unique
+  user         User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  barbershopId String
+  barbershop   Barbershop @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
+
+  schedules ProfessionalSchedule[]
+  bookings  Booking[]
+  payments  Payment[]
+
+  @@index([barbershopId])
+  @@index([cpf])
+}
+
+// =====================
+// SUBSCRIPTION (Owner)
+// =====================
+
+model Subscription {
+  id                   String             @id @default(uuid())
+  stripeSubscriptionId String             @unique
+  stripePriceId        String
+  stripeProductId      String
+  status               SubscriptionStatus @default(INCOMPLETE)
+  currentPeriodStart   DateTime           @db.Timestamptz()
+  currentPeriodEnd     DateTime           @db.Timestamptz()
+  cancelAtPeriodEnd    Boolean            @default(false)
+  canceledAt           DateTime?          @db.Timestamptz()
+  createdAt            DateTime           @default(now()) @db.Timestamptz()
+  updatedAt            DateTime           @updatedAt @db.Timestamptz()
+
+  barbershopId String     @unique
+  barbershop   Barbershop @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
+}
+
+// =====================
+// OPERATING HOURS (Barbershop)
+// =====================
+
+model OperatingHours {
+  id        String    @id @default(uuid())
+  dayOfWeek DayOfWeek
+  openTime  String
+  closeTime String
+  isClosed  Boolean   @default(false)
+
+  barbershopId String
+  barbershop   Barbershop @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
+
+  @@unique([barbershopId, dayOfWeek])
+}
+
+// =====================
+// PROFESSIONAL SCHEDULE
+// =====================
+
+model ProfessionalSchedule {
+  id          String    @id @default(uuid())
+  dayOfWeek   DayOfWeek
+  startTime   String
+  endTime     String
+  isAvailable Boolean   @default(true)
+
+  professionalId String
+  professional   Professional @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+
+  @@unique([professionalId, dayOfWeek])
+}
+
+// =====================
+// BARBERSHOP SERVICE
+// =====================
+
+model BarbershopService {
+  id              String     @id @default(uuid())
+  name            String
+  description     String
+  imageUrl        String
+  priceInCents    Int
+  durationMinutes Int        @default(30)
+  barbershopId    String
+  barbershop      Barbershop @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
+  bookings        Booking[]
+  deletedAt       DateTime?
+}
+
+// =====================
+// BOOKING
+// =====================
+
+model Booking {
+  id          String    @id @default(uuid())
+  date        DateTime  @db.Timestamptz()
+  cancelledAt DateTime? @db.Timestamptz()
+  createdAt   DateTime  @default(now()) @db.Timestamptz()
+  updatedAt   DateTime  @updatedAt @db.Timestamptz()
+
+  barbershopId   String
+  barbershop     Barbershop        @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
+  serviceId      String
+  service        BarbershopService @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  professionalId String?
+  professional   Professional?     @relation(fields: [professionalId], references: [id], onDelete: SetNull)
+
+  payment Payment?
+
+  @@index([barbershopId, date])
+  @@index([professionalId, date])
+}
+
+// =====================
+// PAYMENT
+// =====================
+
+model Payment {
+  id                    String        @id @default(uuid())
+  amountInCents         Int
+  applicationFeeInCents Int
+  status                PaymentStatus @default(PENDING)
+  paymentMethod         String?
+  stripePaymentIntentId String?       @unique
+  stripeChargeId        String?       @unique
+  stripeTransferId      String?
+  refundedAt            DateTime?     @db.Timestamptz()
+  createdAt             DateTime      @default(now()) @db.Timestamptz()
+  updatedAt             DateTime      @updatedAt @db.Timestamptz()
+
+  bookingId      String   @unique
+  booking        Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  professionalId String?
+  professional   Professional? @relation(fields: [professionalId], references: [id], onDelete: SetNull)
+
+  @@index([professionalId])
+  @@index([status])
+}

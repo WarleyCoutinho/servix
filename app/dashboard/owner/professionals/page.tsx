@@ -1,0 +1,144 @@
+import { headers } from "next/headers";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { redirect } from "next/navigation";
+import { getAllProfessionalsByBarbershop } from "@/data/professionals";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Plus, UserCheck, UserX, CreditCard } from "lucide-react";
+import Link from "next/link";
+import { StripeAccountStatus } from "@/generated/prisma/enums";
+
+function getStripeStatusBadge(status: StripeAccountStatus) {
+  switch (status) {
+    case StripeAccountStatus.ACTIVE:
+      return <Badge variant="default">Stripe Ativo</Badge>;
+    case StripeAccountStatus.ONBOARDING:
+      return <Badge variant="secondary">Configurando Stripe</Badge>;
+    case StripeAccountStatus.PENDING:
+      return <Badge variant="outline">Stripe Pendente</Badge>;
+    case StripeAccountStatus.RESTRICTED:
+      return <Badge variant="destructive">Stripe Restrito</Badge>;
+    case StripeAccountStatus.DISABLED:
+      return <Badge variant="destructive">Stripe Desativado</Badge>;
+    default:
+      return null;
+  }
+}
+
+export default async function ProfessionalsPage() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session?.user) {
+    redirect("/");
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    include: { ownedBarbershop: true },
+  });
+
+  if (!user?.ownedBarbershop) {
+    redirect("/");
+  }
+
+  const professionals = await getAllProfessionalsByBarbershop(
+    user.ownedBarbershop.id,
+  );
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Profissionais</h1>
+          <p className="text-muted-foreground">
+            Gerencie os profissionais da sua barbearia
+          </p>
+        </div>
+        <Button asChild>
+          <Link href="/dashboard/owner/professionals/new">
+            <Plus className="mr-2 h-4 w-4" />
+            Adicionar Profissional
+          </Link>
+        </Button>
+      </div>
+
+      {professionals.length === 0 ? (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <p className="mb-4 text-muted-foreground">
+              Nenhum profissional cadastrado ainda.
+            </p>
+            <Button asChild>
+              <Link href="/dashboard/owner/professionals/new">
+                <Plus className="mr-2 h-4 w-4" />
+                Adicionar Primeiro Profissional
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {professionals.map((professional) => (
+            <Card key={professional.id}>
+              <CardHeader className="flex flex-row items-center gap-4">
+                <Avatar className="h-12 w-12">
+                  <AvatarImage
+                    src={professional.imageUrl ?? professional.user.image ?? ""}
+                  />
+                  <AvatarFallback>
+                    {(professional.displayName ?? professional.user.name)
+                      .slice(0, 2)
+                      .toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                  <CardTitle className="text-lg">
+                    {professional.displayName ?? professional.user.name}
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    {professional.user.email}
+                  </p>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex flex-wrap gap-2">
+                  {professional.isActive ? (
+                    <Badge variant="default" className="gap-1">
+                      <UserCheck className="h-3 w-3" />
+                      Ativo
+                    </Badge>
+                  ) : (
+                    <Badge variant="destructive" className="gap-1">
+                      <UserX className="h-3 w-3" />
+                      Bloqueado
+                    </Badge>
+                  )}
+                  {getStripeStatusBadge(professional.stripeAccountStatus)}
+                </div>
+
+                <div className="text-sm">
+                  <p className="text-muted-foreground">
+                    CPF: {professional.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4")}
+                  </p>
+                </div>
+
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" asChild className="flex-1">
+                    <Link href={`/dashboard/owner/professionals/${professional.id}`}>
+                      Gerenciar
+                    </Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}

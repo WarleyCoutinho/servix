@@ -1,0 +1,204 @@
+# Dependencies
+node_modules/
+/.pnp
+.pnp.js
+
+# Testing
+/coverage
+
+# Next.js
+/.next/
+/out/
+
+# Production
+/build
+/dist
+
+# Misc
+.DS_Store
+*.pem
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Local env files
+.env
+.env*.local
+.env.development
+.env.production
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Prisma
+prisma/*.db
+prisma/*.db-journal
+prisma/migrations/**/*.sql
+
+# Uploads
+public/uploads/
+uploads/
+
+# Backups
+backups/
+*.sql
+*.sql.gz
+*.dump
+*.backup
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.fleet/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# OS
+Thumbs.db
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# ============================================
+# Docker & Database Volumes
+# ============================================
+# Docker volumes - dados persistentes locais
+docker/volumes/
+docker/volumes/postgres/
+docker/volumes/redis/
+docker/volumes/backups/
+
+# PostgreSQL dumps e exports
+*.pgdump
+*.pgsql
+pg_dump_*.sql
+
+# Docker override files (personalizações locais)
+docker-compose.override.yml
+docker-compose.local.yml
+
+# ============================================
+# Database & Cache
+# ============================================
+# Redis
+dump.rdb
+
+# SQLite (se usar em dev)
+*.sqlite
+*.sqlite3
+
+# ============================================
+# Certificates & Keys (Segurança)
+# ============================================
+*.key
+*.pem
+*.cert
+*.crt
+secrets/
+.secrets/
+
+# ============================================
+# Temporary files
+# ============================================
+tmp/
+temp/
+*.tmp
+.cache/
+
+# ============================================
+# Package managers
+# ============================================
+.yarn/
+.pnpm-store/
+package-lock.json
+yarn.lock# Dependencies
+node_modules/
+/.pnp
+.pnp.js
+
+# Testing
+/coverage
+
+# Next.js
+/.next/
+/out/
+
+# Production
+/build
+/dist
+
+# Misc
+.DS_Store
+*.pem
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Local env files
+.env
+.env*.local
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Prisma
+prisma/*.db
+prisma/*.db-journal
+
+# Uploads
+public/uploads/
+uploads/
+
+# Backups
+backups/
+*.sql
+*.sql.gz
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+logs/
+*.log
+
+# OS
+Thumbs.db
+.DS_Store
+pnpm-lock.yaml
+
+# ============================================
+# Project specific
+# ============================================
+# Mantenha arquivos de exemplo
+!.env.example
+!docker-compose.example.yml
+
+# Ignore mas mantenha a estrutura de diretórios
+docker/volumes/.gitkeep
+logs/.gitkeep
