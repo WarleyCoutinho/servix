@@ -1,8 +1,8 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { admin } from "better-auth/plugins";
+import { ac, clientRole, ownerRole, professionalRole } from "./permissions";
 import { prisma } from "./prisma";
-import { ac, ownerRole, professionalRole, clientRole } from "./permissions";
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {

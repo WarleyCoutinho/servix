@@ -1,23 +1,205 @@
-import { BotMessageSquare } from "lucide-react";
+"use client";
+
+import { authClient } from "@/lib/auth-client";
+import {
+  BotMessageSquare,
+  CalendarDays,
+  ChevronDown,
+  Home,
+  LayoutDashboard,
+  LogIn,
+  LogOut,
+  Scissors,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 import MenuSheet from "./menu-sheet";
+import { toast } from "sonner";
+
+const categories = [
+  { label: "Cabelo", search: "cabelo" },
+  { label: "Barba", search: "barba" },
+  { label: "Acabamento", search: "acabamento" },
+  { label: "Sobrancelha", search: "sobrancelha" },
+  { label: "Massagem", search: "massagem" },
+  { label: "Hidratacao", search: "hidratacao" },
+];
 
 const Header = () => {
+  const { data: session } = authClient.useSession();
+  const isLoggedIn = !!session?.user;
+
+  const handleLogin = async () => {
+    const { error } = await authClient.signIn.social({
+      provider: "google",
+    });
+    if (error) {
+      toast.error(error.message);
+    }
+  };
+
+  const handleLogout = async () => {
+    const { error } = await authClient.signOut();
+    if (error) {
+      toast.error(error.message);
+    }
+  };
+
   return (
-    <header className="bg-background flex items-center justify-between px-5 py-6">
-      <Link href="/">
-        <Image src="/logo.svg" alt="Aparatus" width={91} height={24} />
-      </Link>
-      <div className="flex items-center gap-2">
-        <Link href="/chat">
-          <Button variant="outline" size="icon">
-            <BotMessageSquare className="size-5" />
+    <header className="bg-background border-border sticky top-0 z-40 border-b">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center gap-6">
+          <Link href="/" className="flex-shrink-0">
+            <Image src="/logo.svg" alt="Aparatus" width={91} height={24} />
+          </Link>
+
+          <nav className="hidden items-center gap-1 md:flex">
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/">
+                <Home className="mr-2 size-4" />
+                Início
+              </Link>
+            </Button>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm">
+                  Categorias
+                  <ChevronDown className="ml-1 size-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-48">
+                {categories.map((category) => (
+                  <DropdownMenuItem key={category.search} asChild>
+                    <Link href={`/barbershops?search=${category.search}`}>
+                      {category.label}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {isLoggedIn && (
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/bookings">
+                  <CalendarDays className="mr-2 size-4" />
+                  Agendamentos
+                </Link>
+              </Button>
+            )}
+
+            {session?.user?.role === "owner" && (
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/dashboard/owner">
+                  <LayoutDashboard className="mr-2 size-4" />
+                  Painel
+                </Link>
+              </Button>
+            )}
+
+            {session?.user?.role === "professional" && (
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/dashboard/professional">
+                  <Scissors className="mr-2 size-4" />
+                  Painel
+                </Link>
+              </Button>
+            )}
+          </nav>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="icon" asChild className="hidden sm:flex">
+            <Link href="/chat">
+              <BotMessageSquare className="size-5" />
+            </Link>
           </Button>
-        </Link>
-        <MenuSheet />
+
+          <div className="hidden md:block">
+            {isLoggedIn ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="relative h-9 w-9 rounded-full"
+                  >
+                    <Avatar className="size-9">
+                      <AvatarImage
+                        src={session.user.image ?? ""}
+                        alt={session.user.name}
+                      />
+                      <AvatarFallback>
+                        {session.user.name.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium">{session.user.name}</p>
+                      <p className="text-muted-foreground text-xs">
+                        {session.user.email}
+                      </p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/bookings">
+                      <CalendarDays className="mr-2 size-4" />
+                      Meus Agendamentos
+                    </Link>
+                  </DropdownMenuItem>
+                  {session.user.role === "owner" && (
+                    <DropdownMenuItem asChild>
+                      <Link href="/dashboard/owner">
+                        <LayoutDashboard className="mr-2 size-4" />
+                        Painel do Proprietário
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
+                  {session.user.role === "professional" && (
+                    <DropdownMenuItem asChild>
+                      <Link href="/dashboard/professional">
+                        <Scissors className="mr-2 size-4" />
+                        Painel do Profissional
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut className="mr-2 size-4" />
+                    Sair da conta
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button size="sm" onClick={handleLogin}>
+                <LogIn className="mr-2 size-4" />
+                Entrar
+              </Button>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2 md:hidden">
+            <Button variant="ghost" size="icon" asChild>
+              <Link href="/chat">
+                <BotMessageSquare className="size-5" />
+              </Link>
+            </Button>
+            <MenuSheet />
+          </div>
+        </div>
       </div>
     </header>
   );

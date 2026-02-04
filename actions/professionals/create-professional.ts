@@ -56,11 +56,11 @@ export const createProfessional = subscribedOwnerActionClient
           id: crypto.randomUUID(),
           email: parsedInput.email,
           name: parsedInput.displayName,
-          role: "PROFESSIONAL",
+          role: "professional",
         },
       });
     } else {
-      if (user.role !== "CLIENT") {
+      if (user.role !== "client") {
         returnValidationErrors(inputSchema, {
           email: {
             _errors: [
@@ -72,7 +72,7 @@ export const createProfessional = subscribedOwnerActionClient
 
       await prisma.user.update({
         where: { id: user.id },
-        data: { role: "PROFESSIONAL" },
+        data: { role: "professional" },
       });
     }
 

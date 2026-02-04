@@ -56,7 +56,7 @@ export const removeProfessional = subscribedOwnerActionClient
 
     await prisma.user.update({
       where: { id: professional.userId },
-      data: { role: "CLIENT" },
+      data: { role: "client" },
     });
 
     revalidatePath("/dashboard/owner/professionals");

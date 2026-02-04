@@ -43,7 +43,7 @@ export default async function ProfessionalDashboardLayout({
     },
   });
 
-  if (user?.role !== UserRole.PROFESSIONAL || !user.professional) {
+  if (user?.role !== UserRole.professional || !user.professional) {
     redirect("/");
   }
 
