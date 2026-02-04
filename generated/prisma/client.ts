@@ -99,3 +99,8 @@ export type Booking = Prisma.BookingModel
  * 
  */
 export type Payment = Prisma.PaymentModel
+/**
+ * Model StripeEvent
+ * 
+ */
+export type StripeEvent = Prisma.StripeEventModel

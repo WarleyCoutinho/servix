@@ -1,16 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useAction } from "next-safe-action/hooks";
 import { updateProfessionalSchedule } from "@/actions/schedules/update-professional-schedule";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { toast } from "sonner";
-import { Loader2, Save } from "lucide-react";
 import { DayOfWeek } from "@/generated/prisma/enums";
-import { DAY_OF_WEEK_ORDER, DAY_OF_WEEK_LABELS } from "@/lib/day-of-week";
+import { DAY_OF_WEEK_LABELS, DAY_OF_WEEK_ORDER } from "@/lib/day-of-week";
+import { Loader2, Save } from "lucide-react";
+import { useAction } from "next-safe-action/hooks";
+import { useState } from "react";
+import { toast } from "sonner";
 
 type DaySchedule = {
   dayOfWeek: DayOfWeek;

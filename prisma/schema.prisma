@@ -313,3 +313,17 @@ model Payment {
   @@index([professionalId])
   @@index([status])
 }
+
+// =====================
+// STRIPE EVENTS (Idempotência)
+// =====================
+
+model StripeEvent {
+  id            String   @id @default(uuid())
+  stripeEventId String   @unique
+  eventType     String
+  processedAt   DateTime @default(now()) @db.Timestamptz()
+
+  @@index([stripeEventId])
+  @@map("stripe_event")
+}

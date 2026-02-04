@@ -62,7 +62,8 @@ export const ModelName = {
   ProfessionalSchedule: 'ProfessionalSchedule',
   BarbershopService: 'BarbershopService',
   Booking: 'Booking',
-  Payment: 'Payment'
+  Payment: 'Payment',
+  StripeEvent: 'StripeEvent'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -269,6 +270,16 @@ export const PaymentScalarFieldEnum = {
 } as const
 
 export type PaymentScalarFieldEnum = (typeof PaymentScalarFieldEnum)[keyof typeof PaymentScalarFieldEnum]
+
+
+export const StripeEventScalarFieldEnum = {
+  id: 'id',
+  stripeEventId: 'stripeEventId',
+  eventType: 'eventType',
+  processedAt: 'processedAt'
+} as const
+
+export type StripeEventScalarFieldEnum = (typeof StripeEventScalarFieldEnum)[keyof typeof StripeEventScalarFieldEnum]
 
 
 export const SortOrder = {
