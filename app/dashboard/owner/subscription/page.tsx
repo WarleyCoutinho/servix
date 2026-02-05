@@ -1,26 +1,37 @@
 "use client";
 
-import { useAction } from "next-safe-action/hooks";
 import { createSubscriptionCheckout } from "@/actions/subscriptions/create-subscription-checkout";
 import { getCustomerPortalUrl } from "@/actions/subscriptions/get-customer-portal-url";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { toast } from "sonner";
-import { Loader2, CreditCard, ExternalLink, Check } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Check, CreditCard, ExternalLink, Loader2 } from "lucide-react";
+import { useAction } from "next-safe-action/hooks";
 import { useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useRef } from "react";
+import { toast } from "sonner";
 
 export default function SubscriptionPage() {
   const searchParams = useSearchParams();
-  const [showSuccess, setShowSuccess] = useState(false);
+  const toastShownRef = useRef(false);
+
+  const showSuccess = useMemo(
+    () => searchParams.get("success") === "true",
+    [searchParams]
+  );
 
   useEffect(() => {
-    if (searchParams.get("success") === "true") {
-      setShowSuccess(true);
+    if (showSuccess && !toastShownRef.current) {
+      toastShownRef.current = true;
       toast.success("Assinatura ativada com sucesso!");
     }
-  }, [searchParams]);
+  }, [showSuccess]);
 
   const { execute: subscribe, isPending: isSubscribing } = useAction(
     createSubscriptionCheckout,
@@ -55,7 +66,7 @@ export default function SubscriptionPage() {
       <div>
         <h1 className="text-3xl font-bold">Assinatura</h1>
         <p className="text-muted-foreground">
-          Gerencie sua assinatura do Aparatus
+          Gerencie sua assinatura da Servix
         </p>
       </div>
 

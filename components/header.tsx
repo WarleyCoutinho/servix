@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import {
   BotMessageSquare,
@@ -13,6 +14,9 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { toast } from "sonner";
+import LoginModal from "./login-modal";
+import MenuSheet from "./menu-sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import {
@@ -23,8 +27,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import MenuSheet from "./menu-sheet";
-import { toast } from "sonner";
 
 const categories = [
   { label: "Cabelo", search: "cabelo" },
@@ -36,17 +38,9 @@ const categories = [
 ];
 
 const Header = () => {
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
   const { data: session } = authClient.useSession();
   const isLoggedIn = !!session?.user;
-
-  const handleLogin = async () => {
-    const { error } = await authClient.signIn.social({
-      provider: "google",
-    });
-    if (error) {
-      toast.error(error.message);
-    }
-  };
 
   const handleLogout = async () => {
     const { error } = await authClient.signOut();
@@ -59,8 +53,8 @@ const Header = () => {
     <header className="bg-background border-border sticky top-0 z-40 border-b">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-6">
-          <Link href="/" className="flex-shrink-0">
-            <Image src="/logo.svg" alt="Aparatus" width={91} height={24} />
+          <Link href="/" className="shrink-0">
+            <Image src="/logo.svg" alt="Servix" width={91} height={24} />
           </Link>
 
           <nav className="hidden items-center gap-1 md:flex">
@@ -119,7 +113,12 @@ const Header = () => {
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" asChild className="hidden sm:flex">
+          <Button
+            variant="ghost"
+            size="icon"
+            asChild
+            className="hidden sm:flex"
+          >
             <Link href="/chat">
               <BotMessageSquare className="size-5" />
             </Link>
@@ -184,7 +183,7 @@ const Header = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button size="sm" onClick={handleLogin}>
+              <Button size="sm" onClick={() => setLoginModalOpen(true)}>
                 <LogIn className="mr-2 size-4" />
                 Entrar
               </Button>
@@ -197,10 +196,12 @@ const Header = () => {
                 <BotMessageSquare className="size-5" />
               </Link>
             </Button>
-            <MenuSheet />
+            <MenuSheet onLoginClick={() => setLoginModalOpen(true)} />
           </div>
         </div>
       </div>
+
+      <LoginModal open={loginModalOpen} onOpenChange={setLoginModalOpen} />
     </header>
   );
 };

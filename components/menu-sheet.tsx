@@ -33,7 +33,11 @@ const categories = [
   { label: "Hidratacao", search: "hidratacao" },
 ];
 
-const MenuSheet = () => {
+interface MenuSheetProps {
+  onLoginClick: () => void;
+}
+
+const MenuSheet = ({ onLoginClick }: MenuSheetProps) => {
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const { data: session } = authClient.useSession();
@@ -43,13 +47,9 @@ const MenuSheet = () => {
     router.push(href);
   };
 
-  const handleLogin = async () => {
-    const { error } = await authClient.signIn.social({
-      provider: "google",
-    });
-    if (error) {
-      toast.error(error.message);
-    }
+  const handleLogin = () => {
+    setOpen(false);
+    onLoginClick();
   };
 
   const handleLogout = async () => {
@@ -74,7 +74,7 @@ const MenuSheet = () => {
         side="left"
         className="flex w-[85vw] max-w-sm flex-col overflow-hidden p-0"
       >
-        <SheetHeader className="border-border flex-shrink-0 border-b px-4 py-4 text-left sm:px-6">
+        <SheetHeader className="border-border shrink-0 border-b px-4 py-4 text-left sm:px-6">
           <SheetTitle className="text-lg">Menu</SheetTitle>
         </SheetHeader>
 
@@ -108,7 +108,7 @@ const MenuSheet = () => {
                   </p>
                   <Button
                     size="sm"
-                    className="flex-shrink-0 gap-2"
+                    className="shrink-0 gap-2"
                     onClick={handleLogin}
                   >
                     <LogIn className="size-4" />
@@ -126,7 +126,7 @@ const MenuSheet = () => {
                 onClick={() => handleNavigation("/")}
                 className="hover:bg-accent flex items-center gap-3 px-4 py-3 text-left text-sm font-medium transition-colors sm:px-6"
               >
-                <Home className="size-4 flex-shrink-0" />
+                <Home className="size-4 shrink-0" />
                 Início
               </button>
 
@@ -136,7 +136,7 @@ const MenuSheet = () => {
                   onClick={() => handleNavigation("/dashboard/owner")}
                   className="hover:bg-accent flex items-center gap-3 px-4 py-3 text-left text-sm font-medium transition-colors sm:px-6"
                 >
-                  <LayoutDashboard className="size-4 flex-shrink-0" />
+                  <LayoutDashboard className="size-4 shrink-0" />
                   Painel do Proprietário
                 </button>
               )}
@@ -147,7 +147,7 @@ const MenuSheet = () => {
                   onClick={() => handleNavigation("/dashboard/professional")}
                   className="hover:bg-accent flex items-center gap-3 px-4 py-3 text-left text-sm font-medium transition-colors sm:px-6"
                 >
-                  <Scissors className="size-4 flex-shrink-0" />
+                  <Scissors className="size-4 shrink-0" />
                   Painel do Profissional
                 </button>
               )}
@@ -158,7 +158,7 @@ const MenuSheet = () => {
                   onClick={() => handleNavigation("/bookings")}
                   className="hover:bg-accent flex items-center gap-3 px-4 py-3 text-left text-sm font-medium transition-colors sm:px-6"
                 >
-                  <CalendarDays className="size-4 flex-shrink-0" />
+                  <CalendarDays className="size-4 shrink-0" />
                   Meus Agendamentos
                 </button>
               )}
@@ -168,7 +168,7 @@ const MenuSheet = () => {
                 onClick={() => handleNavigation("/chat")}
                 className="hover:bg-accent flex items-center gap-3 px-4 py-3 text-left text-sm font-medium transition-colors sm:px-6"
               >
-                <Sparkles className="size-4 flex-shrink-0" />
+                <Sparkles className="size-4 shrink-0" />
                 Assistente IA
               </button>
             </nav>
@@ -198,7 +198,7 @@ const MenuSheet = () => {
         </div>
 
         {isLoggedIn && (
-          <div className="border-border flex-shrink-0 border-t p-4 sm:p-6">
+          <div className="border-border shrink-0 border-t p-4 sm:p-6">
             <Button
               variant="outline"
               className="w-full justify-start"
