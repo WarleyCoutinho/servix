@@ -93,3 +93,24 @@ export const subscribedOwnerActionClient = ownerActionClient.use(
     });
   },
 );
+
+export const adminActionClient = protectedActionClient.use(
+  async ({ next, ctx }) => {
+    const user = await prisma.user.findUnique({
+      where: { id: ctx.user.id },
+    });
+
+    if (user?.role !== UserRole.admin) {
+      throw new Error(
+        "Acesso negado. Apenas administradores podem acessar este recurso.",
+      );
+    }
+
+    return next({
+      ctx: {
+        ...ctx,
+        user,
+      },
+    });
+  },
+);

@@ -5,6 +5,7 @@ import { subscribedOwnerActionClient } from "@/lib/action-client";
 import { returnValidationErrors } from "next-safe-action";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { checkProfessionalLimit } from "@/lib/plan-limits";
 
 const cpfRegex = /^\d{11}$/;
 
@@ -26,6 +27,11 @@ const inputSchema = z.object({
 export const createProfessional = subscribedOwnerActionClient
   .inputSchema(inputSchema)
   .action(async ({ parsedInput, ctx: { barbershop } }) => {
+    const limitCheck = await checkProfessionalLimit(barbershop.id);
+    if (!limitCheck.allowed) {
+      throw new Error(limitCheck.message);
+    }
+
     const existingProfessional = await prisma.professional.findUnique({
       where: { cpf: parsedInput.cpf },
     });

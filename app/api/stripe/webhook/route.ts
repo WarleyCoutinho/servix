@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import z from "zod";
-import { PaymentStatus } from "@/generated/prisma/enums";
+import { PaymentStatus, SubscriptionPlan } from "@/generated/prisma/enums";
 import { syncSubscriptionFromStripe } from "@/lib/stripe-subscriptions";
 import { verifyStripeWebhook } from "@/lib/stripe-webhook";
 
@@ -17,6 +17,7 @@ const bookingMetadataSchema = z.object({
 
 const subscriptionMetadataSchema = z.object({
   barbershopId: z.uuid(),
+  plan: z.enum(["BASIC", "PROFESSIONAL", "ENTERPRISE"]).optional(),
 });
 
 export const POST = async (request: Request) => {
@@ -66,12 +67,15 @@ export const POST = async (request: Request) => {
 
             const subscription =
               await stripe.subscriptions.retrieve(subscriptionId);
+
+            const plan = metadata.data.plan as SubscriptionPlan | undefined;
             await syncSubscriptionFromStripe(
               subscription,
               metadata.data.barbershopId,
+              plan,
             );
             console.log(
-              `Subscription ${subscriptionId} created for barbershop ${metadata.data.barbershopId}`,
+              `Subscription ${subscriptionId} created for barbershop ${metadata.data.barbershopId} with plan ${plan || "BASIC"}`,
             );
           }
         } else if (session.mode === "payment") {
@@ -129,11 +133,12 @@ export const POST = async (request: Request) => {
       case "customer.subscription.updated": {
         const subscription = event.data.object;
         const barbershopId = subscription.metadata?.barbershopId;
+        const plan = subscription.metadata?.plan as SubscriptionPlan | undefined;
 
         if (barbershopId) {
-          await syncSubscriptionFromStripe(subscription, barbershopId);
+          await syncSubscriptionFromStripe(subscription, barbershopId, plan);
           console.log(
-            `Subscription ${subscription.id} ${event.type === "customer.subscription.created" ? "created" : "updated"} for barbershop ${barbershopId}`,
+            `Subscription ${subscription.id} ${event.type === "customer.subscription.created" ? "created" : "updated"} for barbershop ${barbershopId} with plan ${plan || "BASIC"}`,
           );
         }
         break;
@@ -142,9 +147,10 @@ export const POST = async (request: Request) => {
       case "customer.subscription.deleted": {
         const subscription = event.data.object;
         const barbershopId = subscription.metadata?.barbershopId;
+        const plan = subscription.metadata?.plan as SubscriptionPlan | undefined;
 
         if (barbershopId) {
-          await syncSubscriptionFromStripe(subscription, barbershopId);
+          await syncSubscriptionFromStripe(subscription, barbershopId, plan);
           console.log(
             `Subscription ${subscription.id} deleted for barbershop ${barbershopId}`,
           );
@@ -166,9 +172,10 @@ export const POST = async (request: Request) => {
           const subscription =
             await stripe.subscriptions.retrieve(subscriptionId);
           const barbershopId = subscription.metadata?.barbershopId;
+          const plan = subscription.metadata?.plan as SubscriptionPlan | undefined;
 
           if (barbershopId) {
-            await syncSubscriptionFromStripe(subscription, barbershopId);
+            await syncSubscriptionFromStripe(subscription, barbershopId, plan);
             console.log(`Invoice ${invoice.id} paid for subscription ${subscriptionId}`);
           }
         }
@@ -189,9 +196,10 @@ export const POST = async (request: Request) => {
           const subscription =
             await stripe.subscriptions.retrieve(subscriptionId);
           const barbershopId = subscription.metadata?.barbershopId;
+          const plan = subscription.metadata?.plan as SubscriptionPlan | undefined;
 
           if (barbershopId) {
-            await syncSubscriptionFromStripe(subscription, barbershopId);
+            await syncSubscriptionFromStripe(subscription, barbershopId, plan);
             console.log(
               `Invoice ${invoice.id} payment failed for subscription ${subscriptionId}`,
             );

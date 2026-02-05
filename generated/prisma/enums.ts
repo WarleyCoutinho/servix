@@ -10,6 +10,7 @@
 */
 
 export const UserRole = {
+  admin: 'admin',
   owner: 'owner',
   professional: 'professional',
   client: 'client'
@@ -27,6 +28,15 @@ export const SubscriptionStatus = {
 } as const
 
 export type SubscriptionStatus = (typeof SubscriptionStatus)[keyof typeof SubscriptionStatus]
+
+
+export const SubscriptionPlan = {
+  BASIC: 'BASIC',
+  PROFESSIONAL: 'PROFESSIONAL',
+  ENTERPRISE: 'ENTERPRISE'
+} as const
+
+export type SubscriptionPlan = (typeof SubscriptionPlan)[keyof typeof SubscriptionPlan]
 
 
 export const PaymentStatus = {

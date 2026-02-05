@@ -57,6 +57,7 @@ export const ModelName = {
   Verification: 'Verification',
   Barbershop: 'Barbershop',
   Professional: 'Professional',
+  PlanConfig: 'PlanConfig',
   Subscription: 'Subscription',
   OperatingHours: 'OperatingHours',
   ProfessionalSchedule: 'ProfessionalSchedule',
@@ -182,11 +183,31 @@ export const ProfessionalScalarFieldEnum = {
 export type ProfessionalScalarFieldEnum = (typeof ProfessionalScalarFieldEnum)[keyof typeof ProfessionalScalarFieldEnum]
 
 
+export const PlanConfigScalarFieldEnum = {
+  id: 'id',
+  plan: 'plan',
+  name: 'name',
+  description: 'description',
+  priceInCents: 'priceInCents',
+  stripePriceId: 'stripePriceId',
+  maxBarbershops: 'maxBarbershops',
+  maxProfessionals: 'maxProfessionals',
+  maxServices: 'maxServices',
+  features: 'features',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PlanConfigScalarFieldEnum = (typeof PlanConfigScalarFieldEnum)[keyof typeof PlanConfigScalarFieldEnum]
+
+
 export const SubscriptionScalarFieldEnum = {
   id: 'id',
   stripeSubscriptionId: 'stripeSubscriptionId',
   stripePriceId: 'stripePriceId',
   stripeProductId: 'stripeProductId',
+  plan: 'plan',
   status: 'status',
   currentPeriodStart: 'currentPeriodStart',
   currentPeriodEnd: 'currentPeriodEnd',

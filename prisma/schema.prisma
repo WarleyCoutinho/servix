@@ -18,6 +18,7 @@ datasource db {
 // =====================
 
 enum UserRole {
+  admin
   owner
   professional
   client
@@ -29,6 +30,12 @@ enum SubscriptionStatus {
   CANCELED
   INCOMPLETE
   TRIALING
+}
+
+enum SubscriptionPlan {
+  BASIC
+  PROFESSIONAL
+  ENTERPRISE
 }
 
 enum PaymentStatus {
@@ -191,6 +198,28 @@ model Professional {
 }
 
 // =====================
+// PLAN CONFIG
+// =====================
+
+model PlanConfig {
+  id               String           @id @default(uuid())
+  plan             SubscriptionPlan @unique
+  name             String
+  description      String
+  priceInCents     Int
+  stripePriceId    String           @unique
+  maxBarbershops   Int
+  maxProfessionals Int
+  maxServices      Int?
+  features         String[]
+  isActive         Boolean          @default(true)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  @@map("plan_config")
+}
+
+// =====================
 // SUBSCRIPTION (Owner)
 // =====================
 
@@ -199,6 +228,7 @@ model Subscription {
   stripeSubscriptionId String             @unique
   stripePriceId        String
   stripeProductId      String
+  plan                 SubscriptionPlan   @default(BASIC)
   status               SubscriptionStatus @default(INCOMPLETE)
   currentPeriodStart   DateTime           @db.Timestamptz()
   currentPeriodEnd     DateTime           @db.Timestamptz()

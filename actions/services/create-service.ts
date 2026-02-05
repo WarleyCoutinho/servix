@@ -4,6 +4,7 @@ import { z } from "zod";
 import { subscribedOwnerActionClient } from "@/lib/action-client";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { checkServiceLimit } from "@/lib/plan-limits";
 
 const inputSchema = z.object({
   name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
@@ -16,6 +17,11 @@ const inputSchema = z.object({
 export const createService = subscribedOwnerActionClient
   .inputSchema(inputSchema)
   .action(async ({ parsedInput, ctx: { barbershop } }) => {
+    const limitCheck = await checkServiceLimit(barbershop.id);
+    if (!limitCheck.allowed) {
+      throw new Error(limitCheck.message);
+    }
+
     const service = await prisma.barbershopService.create({
       data: {
         name: parsedInput.name,

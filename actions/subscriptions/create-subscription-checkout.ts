@@ -1,15 +1,21 @@
 "use server";
 
+import { z } from "zod";
 import { ownerActionClient } from "@/lib/action-client";
 import {
   getOrCreateCustomer,
   createSubscriptionCheckoutSession,
 } from "@/lib/stripe-subscriptions";
 import { prisma } from "@/lib/prisma";
-import { SubscriptionStatus } from "@/generated/prisma/enums";
+import { SubscriptionPlan, SubscriptionStatus } from "@/generated/prisma/enums";
 
-export const createSubscriptionCheckout = ownerActionClient.action(
-  async ({ ctx: { user, barbershop } }) => {
+const inputSchema = z.object({
+  plan: z.nativeEnum(SubscriptionPlan),
+});
+
+export const createSubscriptionCheckout = ownerActionClient
+  .inputSchema(inputSchema)
+  .action(async ({ parsedInput: { plan }, ctx: { user, barbershop } }) => {
     const existingSubscription = await prisma.subscription.findUnique({
       where: { barbershopId: barbershop.id },
     });
@@ -21,11 +27,15 @@ export const createSubscriptionCheckout = ownerActionClient.action(
       throw new Error("Você já possui uma assinatura ativa.");
     }
 
-    const customer = await getOrCreateCustomer(
-      user.id,
-      user.email,
-      user.name,
-    );
+    const planConfig = await prisma.planConfig.findUnique({
+      where: { plan },
+    });
+
+    if (!planConfig || !planConfig.stripePriceId) {
+      throw new Error("Plano não encontrado ou não configurado.");
+    }
+
+    const customer = await getOrCreateCustomer(user.id, user.email, user.name);
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL;
     if (!appUrl) {
@@ -38,10 +48,11 @@ export const createSubscriptionCheckout = ownerActionClient.action(
     const checkoutSession = await createSubscriptionCheckoutSession(
       customer.id,
       barbershop.id,
+      planConfig.stripePriceId,
+      plan,
       successUrl,
       cancelUrl,
     );
 
     return { url: checkoutSession.url };
-  },
-);
+  });

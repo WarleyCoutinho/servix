@@ -1,6 +1,6 @@
 import { stripe } from "./stripe";
 import { prisma } from "./prisma";
-import { SubscriptionStatus } from "@/generated/prisma/enums";
+import { SubscriptionPlan, SubscriptionStatus } from "@/generated/prisma/enums";
 import type Stripe from "stripe";
 
 export async function createCustomer(
@@ -46,14 +46,11 @@ export async function getOrCreateCustomer(
 export async function createSubscriptionCheckoutSession(
   customerId: string,
   barbershopId: string,
+  priceId: string,
+  plan: SubscriptionPlan,
   successUrl: string,
   cancelUrl: string,
 ): Promise<Stripe.Checkout.Session> {
-  const priceId = process.env.STRIPE_SUBSCRIPTION_PRICE_ID;
-  if (!priceId) {
-    throw new Error("STRIPE_SUBSCRIPTION_PRICE_ID is not set");
-  }
-
   return stripe.checkout.sessions.create({
     customer: customerId,
     mode: "subscription",
@@ -68,10 +65,12 @@ export async function createSubscriptionCheckoutSession(
     cancel_url: cancelUrl,
     metadata: {
       barbershopId,
+      plan,
     },
     subscription_data: {
       metadata: {
         barbershopId,
+        plan,
       },
     },
   });
@@ -114,6 +113,7 @@ export function mapStripeStatusToSubscriptionStatus(
 export async function syncSubscriptionFromStripe(
   stripeSubscription: Stripe.Subscription,
   barbershopId: string,
+  planFromMetadata?: SubscriptionPlan,
 ): Promise<void> {
   const sub = stripeSubscription as unknown as {
     id: string;
@@ -123,6 +123,7 @@ export async function syncSubscriptionFromStripe(
     current_period_end: number;
     cancel_at_period_end: boolean;
     canceled_at: number | null;
+    metadata?: { plan?: string };
   };
 
   const status = mapStripeStatusToSubscriptionStatus(sub.status);
@@ -132,6 +133,11 @@ export async function syncSubscriptionFromStripe(
       ? sub.items.data[0].price.product
       : sub.items.data[0].price.product.id;
 
+  const plan =
+    planFromMetadata ||
+    (sub.metadata?.plan as SubscriptionPlan) ||
+    SubscriptionPlan.BASIC;
+
   await prisma.subscription.upsert({
     where: { barbershopId },
     create: {
@@ -139,6 +145,7 @@ export async function syncSubscriptionFromStripe(
       stripeSubscriptionId: sub.id,
       stripePriceId: priceId,
       stripeProductId: productId,
+      plan,
       status,
       currentPeriodStart: new Date(sub.current_period_start * 1000),
       currentPeriodEnd: new Date(sub.current_period_end * 1000),
@@ -149,6 +156,7 @@ export async function syncSubscriptionFromStripe(
       stripeSubscriptionId: sub.id,
       stripePriceId: priceId,
       stripeProductId: productId,
+      plan,
       status,
       currentPeriodStart: new Date(sub.current_period_start * 1000),
       currentPeriodEnd: new Date(sub.current_period_end * 1000),

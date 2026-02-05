@@ -70,6 +70,11 @@ export type Barbershop = Prisma.BarbershopModel
  */
 export type Professional = Prisma.ProfessionalModel
 /**
+ * Model PlanConfig
+ * 
+ */
+export type PlanConfig = Prisma.PlanConfigModel
+/**
  * Model Subscription
  * 
  */

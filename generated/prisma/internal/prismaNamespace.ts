@@ -390,6 +390,7 @@ export const ModelName = {
   Verification: 'Verification',
   Barbershop: 'Barbershop',
   Professional: 'Professional',
+  PlanConfig: 'PlanConfig',
   Subscription: 'Subscription',
   OperatingHours: 'OperatingHours',
   ProfessionalSchedule: 'ProfessionalSchedule',
@@ -412,7 +413,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "account" | "verification" | "barbershop" | "professional" | "subscription" | "operatingHours" | "professionalSchedule" | "barbershopService" | "booking" | "payment" | "stripeEvent"
+    modelProps: "user" | "session" | "account" | "verification" | "barbershop" | "professional" | "planConfig" | "subscription" | "operatingHours" | "professionalSchedule" | "barbershopService" | "booking" | "payment" | "stripeEvent"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -857,6 +858,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.ProfessionalCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.ProfessionalCountAggregateOutputType> | number
+        }
+      }
+    }
+    PlanConfig: {
+      payload: Prisma.$PlanConfigPayload<ExtArgs>
+      fields: Prisma.PlanConfigFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PlanConfigFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlanConfigPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PlanConfigFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlanConfigPayload>
+        }
+        findFirst: {
+          args: Prisma.PlanConfigFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlanConfigPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PlanConfigFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlanConfigPayload>
+        }
+        findMany: {
+          args: Prisma.PlanConfigFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlanConfigPayload>[]
+        }
+        create: {
+          args: Prisma.PlanConfigCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlanConfigPayload>
+        }
+        createMany: {
+          args: Prisma.PlanConfigCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PlanConfigCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlanConfigPayload>[]
+        }
+        delete: {
+          args: Prisma.PlanConfigDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlanConfigPayload>
+        }
+        update: {
+          args: Prisma.PlanConfigUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlanConfigPayload>
+        }
+        deleteMany: {
+          args: Prisma.PlanConfigDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PlanConfigUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PlanConfigUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlanConfigPayload>[]
+        }
+        upsert: {
+          args: Prisma.PlanConfigUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlanConfigPayload>
+        }
+        aggregate: {
+          args: Prisma.PlanConfigAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePlanConfig>
+        }
+        groupBy: {
+          args: Prisma.PlanConfigGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PlanConfigGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PlanConfigCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PlanConfigCountAggregateOutputType> | number
         }
       }
     }
@@ -1517,11 +1592,31 @@ export const ProfessionalScalarFieldEnum = {
 export type ProfessionalScalarFieldEnum = (typeof ProfessionalScalarFieldEnum)[keyof typeof ProfessionalScalarFieldEnum]
 
 
+export const PlanConfigScalarFieldEnum = {
+  id: 'id',
+  plan: 'plan',
+  name: 'name',
+  description: 'description',
+  priceInCents: 'priceInCents',
+  stripePriceId: 'stripePriceId',
+  maxBarbershops: 'maxBarbershops',
+  maxProfessionals: 'maxProfessionals',
+  maxServices: 'maxServices',
+  features: 'features',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PlanConfigScalarFieldEnum = (typeof PlanConfigScalarFieldEnum)[keyof typeof PlanConfigScalarFieldEnum]
+
+
 export const SubscriptionScalarFieldEnum = {
   id: 'id',
   stripeSubscriptionId: 'stripeSubscriptionId',
   stripePriceId: 'stripePriceId',
   stripeProductId: 'stripeProductId',
+  plan: 'plan',
   status: 'status',
   currentPeriodStart: 'currentPeriodStart',
   currentPeriodEnd: 'currentPeriodEnd',
@@ -1711,6 +1806,34 @@ export type ListEnumStripeAccountStatusFieldRefInput<$PrismaModel> = FieldRefInp
 
 
 /**
+ * Reference to a field of type 'SubscriptionPlan'
+ */
+export type EnumSubscriptionPlanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SubscriptionPlan'>
+    
+
+
+/**
+ * Reference to a field of type 'SubscriptionPlan[]'
+ */
+export type ListEnumSubscriptionPlanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SubscriptionPlan[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Int'
+ */
+export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+    
+
+
+/**
+ * Reference to a field of type 'Int[]'
+ */
+export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+/**
  * Reference to a field of type 'SubscriptionStatus'
  */
 export type EnumSubscriptionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SubscriptionStatus'>
@@ -1735,20 +1858,6 @@ export type EnumDayOfWeekFieldRefInput<$PrismaModel> = FieldRefInputType<$Prisma
  * Reference to a field of type 'DayOfWeek[]'
  */
 export type ListEnumDayOfWeekFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DayOfWeek[]'>
-    
-
-
-/**
- * Reference to a field of type 'Int'
- */
-export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
-    
-
-
-/**
- * Reference to a field of type 'Int[]'
- */
-export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
     
 
 
@@ -1880,6 +1989,7 @@ export type GlobalOmitConfig = {
   verification?: Prisma.VerificationOmit
   barbershop?: Prisma.BarbershopOmit
   professional?: Prisma.ProfessionalOmit
+  planConfig?: Prisma.PlanConfigOmit
   subscription?: Prisma.SubscriptionOmit
   operatingHours?: Prisma.OperatingHoursOmit
   professionalSchedule?: Prisma.ProfessionalScheduleOmit

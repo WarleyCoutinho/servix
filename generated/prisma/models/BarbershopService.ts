@@ -487,14 +487,6 @@ export type BarbershopServiceUncheckedUpdateManyWithoutBarbershopNestedInput = {
   deleteMany?: Prisma.BarbershopServiceScalarWhereInput | Prisma.BarbershopServiceScalarWhereInput[]
 }
 
-export type IntFieldUpdateOperationsInput = {
-  set?: number
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type BarbershopServiceCreateNestedOneWithoutBookingsInput = {
   create?: Prisma.XOR<Prisma.BarbershopServiceCreateWithoutBookingsInput, Prisma.BarbershopServiceUncheckedCreateWithoutBookingsInput>
   connectOrCreate?: Prisma.BarbershopServiceCreateOrConnectWithoutBookingsInput
