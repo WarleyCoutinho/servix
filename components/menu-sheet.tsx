@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import {
   CalendarDays,
@@ -13,6 +12,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
@@ -29,10 +29,17 @@ const categories = [
   { label: "Barba", search: "barba" },
   { label: "Acabamento", search: "acabamento" },
   { label: "Sobrancelha", search: "sobrancelha" },
+  { label: "Pézinho", search: "pézinho" },
+  { label: "Progressiva", search: "progressiva" },
+  { label: "Coloração", search: "coloração" },
+  { label: "Hidratação", search: "hidratação" },
+  { label: "Manicure", search: "manicure" },
+  { label: "Pedicure", search: "pedicure" },
+  { label: "Depilação", search: "depilação" },
+  { label: "Limpeza de Pele", search: "limpeza de pele" },
   { label: "Massagem", search: "massagem" },
-  { label: "Hidratacao", search: "hidratacao" },
+  { label: "Design de Sobrancelha", search: "design de sobrancelha" },
 ];
-
 interface MenuSheetProps {
   onLoginClick: () => void;
 }

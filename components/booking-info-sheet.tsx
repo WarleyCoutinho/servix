@@ -1,9 +1,14 @@
 "use client";
 
+import { cancelBooking } from "@/actions/cancel-booking";
+import CopyButton from "@/app/barbershops/[id]/_components/copy-button";
+import { BookingWithRelations } from "@/data/bookings";
+import { getBookingStatus } from "@/lib/booking-status";
+import { Loader2, Smartphone } from "lucide-react";
+import { useAction } from "next-safe-action/hooks";
 import Image from "next/image";
-import { SheetContent, SheetHeader, SheetTitle } from "./ui/sheet";
-import { Button } from "./ui/button";
-import { Badge } from "./ui/badge";
+import { toast } from "sonner";
+import BookingSummary from "./booking-summary";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,15 +20,10 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "./ui/alert-dialog";
-import { BookingWithRelations } from "@/data/bookings";
-import { getBookingStatus } from "@/lib/booking-status";
-import BookingSummary from "./booking-summary";
-import CopyButton from "@/app/barbershops/[id]/_components/copy-button";
 import { Avatar, AvatarImage } from "./ui/avatar";
-import { Smartphone, X, Loader2 } from "lucide-react";
-import { cancelBooking } from "@/actions/cancel-booking";
-import { useAction } from "next-safe-action/hooks";
-import { toast } from "sonner";
+import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
+import { SheetContent, SheetHeader, SheetTitle } from "./ui/sheet";
 
 interface BookingInfoSheetProps {
   booking: BookingWithRelations;

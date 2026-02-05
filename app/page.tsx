@@ -1,6 +1,6 @@
 import BookingItem from "@/components/booking-item";
 import Header from "@/components/header";
-import banner from "@/public/banner.png";
+import banner from "@/public/logo-marca.png";
 import Image from "next/image";
 
 import BarbershopItem from "@/components/barbershop-item";

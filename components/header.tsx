@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
+import logo from "@/public/logo-sem-fundo.png";
 import {
   BotMessageSquare,
   CalendarDays,
@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 import { toast } from "sonner";
 import LoginModal from "./login-modal";
 import MenuSheet from "./menu-sheet";
@@ -33,8 +34,16 @@ const categories = [
   { label: "Barba", search: "barba" },
   { label: "Acabamento", search: "acabamento" },
   { label: "Sobrancelha", search: "sobrancelha" },
+  { label: "Pézinho", search: "pézinho" },
+  { label: "Progressiva", search: "progressiva" },
+  { label: "Coloração", search: "coloração" },
+  { label: "Hidratação", search: "hidratação" },
+  { label: "Manicure", search: "manicure" },
+  { label: "Pedicure", search: "pedicure" },
+  { label: "Depilação", search: "depilação" },
+  { label: "Limpeza de Pele", search: "limpeza de pele" },
   { label: "Massagem", search: "massagem" },
-  { label: "Hidratacao", search: "hidratacao" },
+  { label: "Design de Sobrancelha", search: "design de sobrancelha" },
 ];
 
 const Header = () => {
@@ -53,8 +62,17 @@ const Header = () => {
     <header className="bg-background border-border sticky top-0 z-40 border-b">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-6">
-          <Link href="/" className="shrink-0">
+          {/* <Link href="/" className="shrink-0">
             <Image src="/logo.svg" alt="Servix" width={91} height={24} />
+          </Link> */}
+          <Link href="/" className="shrink-0">
+            <Image
+              src={logo}
+              alt="logo marca para negócios de beleza"
+              width={150}
+              height={28}
+              priority
+            />
           </Link>
 
           <nav className="hidden items-center gap-1 md:flex">
