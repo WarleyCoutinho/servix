@@ -1,41 +1,23 @@
 import { NextResponse } from "next/server";
-import Stripe from "stripe";
+import type Stripe from "stripe";
 import { updateProfessionalStripeStatus } from "@/lib/stripe-connect";
 import { prisma } from "@/lib/prisma";
 import { StripeAccountStatus } from "@/generated/prisma/enums";
+import { verifyStripeWebhook } from "@/lib/stripe-webhook";
 
 export const POST = async (request: Request) => {
-  if (
-    !process.env.STRIPE_SECRET_KEY ||
-    !process.env.STRIPE_CONNECT_WEBHOOK_SECRET
-  ) {
-    console.error(
-      "STRIPE_SECRET_KEY or STRIPE_CONNECT_WEBHOOK_SECRET is not set",
-    );
-    return NextResponse.error();
+  const verification = await verifyStripeWebhook(
+    request,
+    process.env.STRIPE_CONNECT_WEBHOOK_SECRET,
+    "STRIPE_SECRET_KEY",
+    "STRIPE_CONNECT_WEBHOOK_SECRET"
+  );
+
+  if (!verification.success) {
+    return verification.response;
   }
 
-  const signature = request.headers.get("stripe-signature");
-  if (!signature) {
-    return NextResponse.json({ error: "No signature" }, { status: 400 });
-  }
-
-  const body = await request.text();
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: "2025-07-30.basil",
-  });
-
-  let event: Stripe.Event;
-  try {
-    event = stripe.webhooks.constructEvent(
-      body,
-      signature,
-      process.env.STRIPE_CONNECT_WEBHOOK_SECRET,
-    );
-  } catch (err) {
-    console.error("Connect webhook signature verification failed", err);
-    return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
-  }
+  const { event } = verification;
 
   switch (event.type) {
     case "account.updated": {

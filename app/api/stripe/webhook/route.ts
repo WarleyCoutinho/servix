@@ -1,9 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
-import Stripe from "stripe";
 import z from "zod";
 import { PaymentStatus } from "@/generated/prisma/enums";
 import { syncSubscriptionFromStripe } from "@/lib/stripe-subscriptions";
+import { verifyStripeWebhook } from "@/lib/stripe-webhook";
 
 const bookingMetadataSchema = z.object({
   serviceId: z.uuid(),
@@ -20,38 +20,18 @@ const subscriptionMetadataSchema = z.object({
 });
 
 export const POST = async (request: Request) => {
-  if (
-    !process.env.STRIPE_SECRET_KEY ||
-    !process.env.STRIPE_WEBHOOK_SECRET_KEY
-  ) {
-    console.error("STRIPE_SECRET_KEY or STRIPE_WEBHOOK_SECRET is not set");
-    return NextResponse.json(
-      { error: "Server configuration error" },
-      { status: 500 }
-    );
+  const verification = await verifyStripeWebhook(
+    request,
+    process.env.STRIPE_WEBHOOK_SECRET_KEY,
+    "STRIPE_SECRET_KEY",
+    "STRIPE_WEBHOOK_SECRET_KEY"
+  );
+
+  if (!verification.success) {
+    return verification.response;
   }
 
-  const signature = request.headers.get("stripe-signature");
-  if (!signature) {
-    return NextResponse.json({ error: "Missing signature" }, { status: 400 });
-  }
-
-  const body = await request.text();
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: "2025-07-30.basil",
-  });
-
-  let event: Stripe.Event;
-  try {
-    event = stripe.webhooks.constructEvent(
-      body,
-      signature,
-      process.env.STRIPE_WEBHOOK_SECRET_KEY,
-    );
-  } catch (err) {
-    console.error("Webhook signature verification failed", err);
-    return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
-  }
+  const { event, stripe } = verification;
 
   // Idempotência: verificar se evento já foi processado
   const existingEvent = await prisma.stripeEvent.findUnique({
@@ -109,7 +89,7 @@ export const POST = async (request: Request) => {
           );
 
           const paymentIntent =
-            expandedSession.payment_intent as Stripe.PaymentIntent;
+            expandedSession.payment_intent as import("stripe").Stripe.PaymentIntent;
           const chargeId =
             typeof paymentIntent.latest_charge === "string"
               ? paymentIntent.latest_charge

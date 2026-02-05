@@ -1,19 +1,19 @@
-import Header from "@/components/header";
-import Image from "next/image";
-import banner from "@/public/banner.png";
 import BookingItem from "@/components/booking-item";
+import Header from "@/components/header";
+import banner from "@/public/banner.png";
+import Image from "next/image";
 
-import { getBarbershops, getPopularBarbershops } from "@/data/barbershops";
-import { getUserBookings } from "@/data/bookings";
 import BarbershopItem from "@/components/barbershop-item";
+import Footer from "@/components/footer";
+import QuickSearch from "@/components/quick-search";
 import {
   PageContainer,
   PageSectionContent,
   PageSectionScroller,
   PageSectionTitle,
 } from "@/components/ui/page";
-import Footer from "@/components/footer";
-import QuickSearch from "@/components/quick-search";
+import { getBarbershops, getPopularBarbershops } from "@/data/barbershops";
+import { getUserBookings } from "@/data/bookings";
 
 export default async function Home() {
   const barbershops = await getBarbershops();
@@ -27,7 +27,7 @@ export default async function Home() {
         <QuickSearch />
         <Image
           src={banner}
-          alt="Agende nos melhores com a Aparatus"
+          alt="Agende nos melhores com a Servix"
           sizes="100vw"
           className="h-auto w-full"
         />

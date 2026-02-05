@@ -1,15 +1,15 @@
-import { headers } from "next/headers";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getAllProfessionalsByBarbershop } from "@/data/professionals";
+import { StripeAccountStatus } from "@/generated/prisma/enums";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { redirect } from "next/navigation";
-import { getAllProfessionalsByBarbershop } from "@/data/professionals";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Plus, UserCheck, UserX, CreditCard } from "lucide-react";
+import { Plus, UserCheck, UserX } from "lucide-react";
+import { headers } from "next/headers";
 import Link from "next/link";
-import { StripeAccountStatus } from "@/generated/prisma/enums";
+import { redirect } from "next/navigation";
 
 function getStripeStatusBadge(status: StripeAccountStatus) {
   switch (status) {
@@ -123,13 +123,24 @@ export default async function ProfessionalsPage() {
 
                 <div className="text-sm">
                   <p className="text-muted-foreground">
-                    CPF: {professional.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4")}
+                    CPF:{" "}
+                    {professional.cpf.replace(
+                      /(\d{3})(\d{3})(\d{3})(\d{2})/,
+                      "$1.$2.$3-$4",
+                    )}
                   </p>
                 </div>
 
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm" asChild className="flex-1">
-                    <Link href={`/dashboard/owner/professionals/${professional.id}`}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    asChild
+                    className="flex-1"
+                  >
+                    <Link
+                      href={`/dashboard/owner/professionals/${professional.id}`}
+                    >
                       Gerenciar
                     </Link>
                   </Button>

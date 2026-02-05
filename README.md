@@ -52,4 +52,15 @@ pnpm prisma generate
 4️⃣ Rode o seed novamente
 
 pnpm exec tsx prisma/seed.ts
+
 # servix
+
+Descrição comercial para o site (versão principal)
+
+Essa é a descrição que você pode usar logo na home ou na landing page:
+
+Servix é uma plataforma SaaS desenvolvida para simplificar e profissionalizar a gestão de barbearias, salões de beleza e negócios de estética.
+
+Com o Servix, você centraliza agenda, clientes, profissionais, serviços e pagamentos em um único sistema, ganhando mais controle, organização e eficiência no dia a dia.
+
+Criado para quem quer crescer, o Servix oferece uma experiência moderna, segura e intuitiva, permitindo que você foque no que realmente importa: seus clientes e o sucesso do seu negócio.
