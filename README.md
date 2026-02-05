@@ -64,3 +64,15 @@ Servix é uma plataforma SaaS desenvolvida para simplificar e profissionalizar a
 Com o Servix, você centraliza agenda, clientes, profissionais, serviços e pagamentos em um único sistema, ganhando mais controle, organização e eficiência no dia a dia.
 
 Criado para quem quer crescer, o Servix oferece uma experiência moderna, segura e intuitiva, permitindo que você foque no que realmente importa: seus clientes e o sucesso do seu negócio.
+
+# EXECULTAR SCRIPTS SO MUDAR O SCRIPT
+
+pnpm tsx scripts/set-admin.ts seu-email@exemplo.com
+
+A única configuração específica para Neon é o channel_binding=require que já estava na sua URL de conexão. Os parâmetros connect_timeout e  
+ pool_timeout que adicionei são padrões do PostgreSQL e funcionam em qualquer provedor.
+
+Se quiser ajustar os timeouts para outro provedor, basta alterar em lib/prisma.ts:12-13:
+
+url.searchParams.set("connect_timeout", "10"); // segundos  
+ url.searchParams.set("pool_timeout", "10"); // segundos

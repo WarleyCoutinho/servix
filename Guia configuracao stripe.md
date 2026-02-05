@@ -275,7 +275,7 @@ import { stripe } from "../src/lib/stripe";
 import { prisma } from "../src/lib/prisma";
 
 const PLANS = [
-  {
+  {Serviços ilimitados
     key: "BASIC",
     name: "Básico",
     price: 49.9,

@@ -3,8 +3,24 @@ import { headers } from "next/headers";
 import { auth } from "./auth";
 import { prisma } from "./prisma";
 import { SubscriptionStatus, UserRole } from "@/generated/prisma/enums";
+import { getUserFriendlyMessage, isConnectionError } from "./db-error";
 
-export const actionClient = createSafeActionClient();
+export const actionClient = createSafeActionClient({
+  handleServerError: (error) => {
+    if (isConnectionError(error)) {
+      console.error("[Database Connection Error]", error);
+      return getUserFriendlyMessage(error);
+    }
+
+    console.error("[Server Action Error]", error);
+
+    if (error instanceof Error) {
+      return error.message;
+    }
+
+    return "Ocorreu um erro inesperado. Por favor, tente novamente.";
+  },
+});
 
 export const protectedActionClient = actionClient.use(async ({ next }) => {
   const session = await auth.api.getSession({
