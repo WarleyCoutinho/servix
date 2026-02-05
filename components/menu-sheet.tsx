@@ -24,27 +24,17 @@ import {
   SheetTrigger,
 } from "./ui/sheet";
 
-const categories = [
-  { label: "Cabelo", search: "cabelo" },
-  { label: "Barba", search: "barba" },
-  { label: "Acabamento", search: "acabamento" },
-  { label: "Sobrancelha", search: "sobrancelha" },
-  { label: "Pézinho", search: "pézinho" },
-  { label: "Progressiva", search: "progressiva" },
-  { label: "Coloração", search: "coloração" },
-  { label: "Hidratação", search: "hidratação" },
-  { label: "Manicure", search: "manicure" },
-  { label: "Pedicure", search: "pedicure" },
-  { label: "Depilação", search: "depilação" },
-  { label: "Limpeza de Pele", search: "limpeza de pele" },
-  { label: "Massagem", search: "massagem" },
-  { label: "Design de Sobrancelha", search: "design de sobrancelha" },
-];
+interface Category {
+  label: string;
+  search: string;
+}
+
 interface MenuSheetProps {
+  categories?: Category[];
   onLoginClick: () => void;
 }
 
-const MenuSheet = ({ onLoginClick }: MenuSheetProps) => {
+const MenuSheet = ({ categories = [], onLoginClick }: MenuSheetProps) => {
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const { data: session } = authClient.useSession();

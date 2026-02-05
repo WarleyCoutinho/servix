@@ -29,24 +29,16 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 
-const categories = [
-  { label: "Cabelo", search: "cabelo" },
-  { label: "Barba", search: "barba" },
-  { label: "Acabamento", search: "acabamento" },
-  { label: "Sobrancelha", search: "sobrancelha" },
-  { label: "Pézinho", search: "pézinho" },
-  { label: "Progressiva", search: "progressiva" },
-  { label: "Coloração", search: "coloração" },
-  { label: "Hidratação", search: "hidratação" },
-  { label: "Manicure", search: "manicure" },
-  { label: "Pedicure", search: "pedicure" },
-  { label: "Depilação", search: "depilação" },
-  { label: "Limpeza de Pele", search: "limpeza de pele" },
-  { label: "Massagem", search: "massagem" },
-  { label: "Design de Sobrancelha", search: "design de sobrancelha" },
-];
+interface Category {
+  label: string;
+  search: string;
+}
 
-const Header = () => {
+interface HeaderProps {
+  categories?: Category[];
+}
+
+const Header = ({ categories = [] }: HeaderProps) => {
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const { data: session } = authClient.useSession();
   const isLoggedIn = !!session?.user;
@@ -83,23 +75,27 @@ const Header = () => {
               </Link>
             </Button>
 
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm">
-                  Categorias
-                  <ChevronDown className="ml-1 size-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-48">
-                {categories.map((category) => (
-                  <DropdownMenuItem key={category.search} asChild>
-                    <Link href={`/barbershops?search=${category.search}`}>
-                      {category.label}
-                    </Link>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {categories.length > 0 && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm">
+                    Categorias
+                    <ChevronDown className="ml-1 size-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-48">
+                  {categories.map((category) => (
+                    <DropdownMenuItem key={category.search} asChild>
+                      <Link
+                        href={`/barbershops?search=${encodeURIComponent(category.search)}`}
+                      >
+                        {category.label}
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
 
             {isLoggedIn && (
               <Button variant="ghost" size="sm" asChild>
@@ -214,7 +210,10 @@ const Header = () => {
                 <BotMessageSquare className="size-5" />
               </Link>
             </Button>
-            <MenuSheet onLoginClick={() => setLoginModalOpen(true)} />
+            <MenuSheet
+              categories={categories}
+              onLoginClick={() => setLoginModalOpen(true)}
+            />
           </div>
         </div>
       </div>

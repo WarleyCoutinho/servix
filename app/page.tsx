@@ -14,17 +14,22 @@ import {
 } from "@/components/ui/page";
 import { getBarbershops, getPopularBarbershops } from "@/data/barbershops";
 import { getUserBookings } from "@/data/bookings";
+import { getServiceCategories } from "@/data/services";
 
 export default async function Home() {
-  const barbershops = await getBarbershops();
-  const popularBarbershops = await getPopularBarbershops();
-  const { confirmedBookings } = await getUserBookings();
+  const [barbershops, popularBarbershops, { confirmedBookings }, categories] =
+    await Promise.all([
+      getBarbershops(),
+      getPopularBarbershops(),
+      getUserBookings(),
+      getServiceCategories(),
+    ]);
 
   return (
     <div>
-      <Header />
+      <Header categories={categories} />
       <PageContainer>
-        <QuickSearch />
+        <QuickSearch categories={categories} />
         <Image
           src={banner}
           alt="Agende nos melhores com a Servix"

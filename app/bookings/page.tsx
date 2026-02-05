@@ -2,6 +2,7 @@ import Header from "@/components/header";
 import Footer from "@/components/footer";
 import BookingItem from "@/components/booking-item";
 import { getUserBookings } from "@/data/bookings";
+import { getServiceCategories } from "@/data/services";
 import {
   PageContainer,
   PageSectionContent,
@@ -9,11 +10,12 @@ import {
 } from "@/components/ui/page";
 
 const BookingsPage = async () => {
-  const { confirmedBookings, finishedBookings } = await getUserBookings();
+  const [{ confirmedBookings, finishedBookings }, categories] =
+    await Promise.all([getUserBookings(), getServiceCategories()]);
 
   return (
     <div>
-      <Header />
+      <Header categories={categories} />
       <PageContainer>
         <h1 className="text-xl font-bold">Agendamentos</h1>
 

@@ -2,6 +2,7 @@ import Header from "@/components/header";
 import Footer from "@/components/footer";
 import BarbershopItem from "@/components/barbershop-item";
 import { getBarbershopsByServiceName } from "@/data/barbershops";
+import { getServiceCategories } from "@/data/services";
 import {
   PageContainer,
   PageSectionContent,
@@ -16,11 +17,14 @@ interface BarbershopsPageProps {
 
 const BarbershopsPage = async ({ searchParams }: BarbershopsPageProps) => {
   const { search } = await searchParams;
-  const barbershops = search ? await getBarbershopsByServiceName(search) : [];
+  const [barbershops, categories] = await Promise.all([
+    search ? getBarbershopsByServiceName(search) : Promise.resolve([]),
+    getServiceCategories(),
+  ]);
 
   return (
     <div>
-      <Header />
+      <Header categories={categories} />
       <PageContainer>
         <PageSectionContent>
           <PageSectionTitle>
