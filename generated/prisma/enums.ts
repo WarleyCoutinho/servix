@@ -32,6 +32,7 @@ export type SubscriptionStatus = (typeof SubscriptionStatus)[keyof typeof Subscr
 
 export const SubscriptionPlan = {
   BASIC: 'BASIC',
+  STANDARD: 'STANDARD',
   PROFESSIONAL: 'PROFESSIONAL',
   ENTERPRISE: 'ENTERPRISE'
 } as const

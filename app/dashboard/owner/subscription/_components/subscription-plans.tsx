@@ -54,6 +54,9 @@ export function SubscriptionPlans({ plans }: SubscriptionPlansProps) {
     }
   }, [showSuccess]);
 
+  console.log("Plans data:", plans);
+  console.log("Plans length:", plans?.length);
+
   const { execute: subscribe, isPending: isSubscribing } = useAction(
     createSubscriptionCheckout,
     {
@@ -93,7 +96,9 @@ export function SubscriptionPlans({ plans }: SubscriptionPlansProps) {
   };
 
   const getButtonVariant = (plan: SubscriptionPlan) => {
-    return plan === RECOMMENDED_PLAN ? ("default" as const) : ("outline" as const);
+    return plan === RECOMMENDED_PLAN
+      ? ("default" as const)
+      : ("outline" as const);
   };
 
   const getButtonText = (plan: SubscriptionPlan) => {

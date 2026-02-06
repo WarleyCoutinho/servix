@@ -34,6 +34,7 @@ enum SubscriptionStatus {
 
 enum SubscriptionPlan {
   BASIC
+  STANDARD
   PROFESSIONAL
   ENTERPRISE
 }
@@ -184,8 +185,8 @@ model Professional {
   createdAt                DateTime            @default(now())
   updatedAt                DateTime            @updatedAt
 
-  userId       String @unique
-  user         User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String     @unique
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   barbershopId String
   barbershop   Barbershop @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
 
@@ -335,8 +336,8 @@ model Payment {
   createdAt             DateTime      @default(now()) @db.Timestamptz()
   updatedAt             DateTime      @updatedAt @db.Timestamptz()
 
-  bookingId      String   @unique
-  booking        Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  bookingId      String        @unique
+  booking        Booking       @relation(fields: [bookingId], references: [id], onDelete: Cascade)
   professionalId String?
   professional   Professional? @relation(fields: [professionalId], references: [id], onDelete: SetNull)
 

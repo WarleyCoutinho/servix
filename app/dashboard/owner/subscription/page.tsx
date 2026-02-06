@@ -1,5 +1,5 @@
 import { getAllPlans, type PlanConfig } from "@/data/plans";
-import { SubscriptionPlans } from "./subscription-plans";
+import { SubscriptionPlans } from "./_components/subscription-plans";
 
 export default async function SubscriptionPage() {
   const plans = await getAllPlans();
