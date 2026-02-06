@@ -39,7 +39,10 @@ export const ownerActionClient = protectedActionClient.use(
       include: { ownedBarbershop: true },
     });
 
-    if (user?.role !== UserRole.owner || !user.ownedBarbershop) {
+    if (
+      (user?.role !== UserRole.owner && user?.role !== UserRole.owner_professional) ||
+      !user.ownedBarbershop
+    ) {
       throw new Error(
         "Acesso negado. Apenas proprietários podem acessar este recurso.",
       );
@@ -66,7 +69,10 @@ export const professionalActionClient = protectedActionClient.use(
       },
     });
 
-    if (user?.role !== UserRole.professional || !user.professional) {
+    if (
+      (user?.role !== UserRole.professional && user?.role !== UserRole.owner_professional) ||
+      !user.professional
+    ) {
       throw new Error(
         "Acesso negado. Apenas profissionais podem acessar este recurso.",
       );

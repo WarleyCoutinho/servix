@@ -80,27 +80,37 @@ export default function OwnerOnboardingPage() {
       return;
     }
 
-    const pendingAccountType = localStorage.getItem("pendingAccountType");
+    const checkOwnerStatus = async () => {
+      try {
+        const response = await fetch("/api/user/profile");
+        const profile = await response.json();
 
-    if (session.user.role === "owner") {
-      localStorage.removeItem("pendingAccountType");
-      router.replace("/dashboard/owner");
-      return;
-    }
+        if (profile.role === "owner" && profile.hasOwnedBarbershop) {
+          localStorage.removeItem("pendingAccountType");
+          router.replace("/dashboard/owner");
+          return;
+        }
 
-    if (session.user.role === "professional") {
-      localStorage.removeItem("pendingAccountType");
-      toast.error("Profissionais não podem se tornar proprietários.");
-      router.replace("/");
-      return;
-    }
+        if (profile.role === "professional") {
+          localStorage.removeItem("pendingAccountType");
+          toast.error("Profissionais não podem se tornar proprietários.");
+          router.replace("/");
+          return;
+        }
 
-    if (pendingAccountType !== "owner") {
-      router.replace("/");
-      return;
-    }
+        const pendingAccountType = localStorage.getItem("pendingAccountType");
+        if (profile.role === "client" && pendingAccountType !== "owner") {
+          router.replace("/");
+          return;
+        }
 
-    setIsChecking(false);
+        setIsChecking(false);
+      } catch {
+        router.replace("/");
+      }
+    };
+
+    checkOwnerStatus();
   }, [session, isSessionLoading, router]);
 
   const onSubmit = (data: FormData) => {

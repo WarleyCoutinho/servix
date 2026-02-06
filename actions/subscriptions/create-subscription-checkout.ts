@@ -5,8 +5,10 @@ import { ownerActionClient } from "@/lib/action-client";
 import {
   getOrCreateCustomer,
   createSubscriptionCheckoutSession,
+  syncSubscriptionFromStripe,
 } from "@/lib/stripe-subscriptions";
 import { prisma } from "@/lib/prisma";
+import { stripe } from "@/lib/stripe";
 import { SubscriptionPlan, SubscriptionStatus } from "@/generated/prisma/enums";
 
 const inputSchema = z.object({
@@ -24,7 +26,41 @@ export const createSubscriptionCheckout = ownerActionClient
       existingSubscription &&
       existingSubscription.status === SubscriptionStatus.ACTIVE
     ) {
-      throw new Error("Você já possui uma assinatura ativa.");
+      if (existingSubscription.plan === plan) {
+        throw new Error("Você já possui este plano ativo.");
+      }
+      throw new Error(
+        "Você já possui uma assinatura ativa. Use o portal do cliente para alterar seu plano.",
+      );
+    }
+
+    const customer = await getOrCreateCustomer(user.id, user.email, user.name);
+
+    const stripeSubscriptions = await stripe.subscriptions.list({
+      customer: customer.id,
+      status: "active",
+      limit: 10,
+    });
+
+    if (stripeSubscriptions.data.length > 0) {
+      const activeSubscription = stripeSubscriptions.data[0];
+
+      await syncSubscriptionFromStripe(
+        activeSubscription,
+        barbershop.id,
+        activeSubscription.metadata?.plan as SubscriptionPlan | undefined,
+      );
+
+      const currentPlan = activeSubscription.metadata?.plan;
+      if (currentPlan === plan) {
+        throw new Error(
+          "Você já possui este plano ativo. Sua assinatura foi sincronizada.",
+        );
+      }
+
+      throw new Error(
+        "Você já possui uma assinatura ativa no Stripe. Use o portal do cliente para alterar seu plano.",
+      );
     }
 
     const planConfig = await prisma.planConfig.findUnique({
@@ -34,8 +70,6 @@ export const createSubscriptionCheckout = ownerActionClient
     if (!planConfig || !planConfig.stripePriceId) {
       throw new Error("Plano não encontrado ou não configurado.");
     }
-
-    const customer = await getOrCreateCustomer(user.id, user.email, user.name);
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL;
     if (!appUrl) {

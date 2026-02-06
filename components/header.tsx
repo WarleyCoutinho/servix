@@ -11,11 +11,13 @@ import {
   LogIn,
   LogOut,
   Scissors,
+  User,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
+import ChatSheet from "./chat-sheet";
 import LoginModal from "./login-modal";
 import MenuSheet from "./menu-sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
@@ -106,20 +108,20 @@ const Header = ({ categories = [] }: HeaderProps) => {
               </Button>
             )}
 
-            {session?.user?.role === "owner" && (
+            {(session?.user?.role === "owner" || session?.user?.role === "owner_professional") && (
               <Button variant="ghost" size="sm" asChild>
                 <Link href="/dashboard/owner">
                   <LayoutDashboard className="mr-2 size-4" />
-                  Painel
+                  Estabelecimento
                 </Link>
               </Button>
             )}
 
-            {session?.user?.role === "professional" && (
+            {(session?.user?.role === "professional" || session?.user?.role === "owner_professional") && (
               <Button variant="ghost" size="sm" asChild>
                 <Link href="/dashboard/professional">
                   <Scissors className="mr-2 size-4" />
-                  Painel
+                  Profissional
                 </Link>
               </Button>
             )}
@@ -127,16 +129,7 @@ const Header = ({ categories = [] }: HeaderProps) => {
         </div>
 
         <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            asChild
-            className="hidden sm:flex"
-          >
-            <Link href="/chat">
-              <BotMessageSquare className="size-5" />
-            </Link>
-          </Button>
+          <ChatSheet triggerClassName="hidden sm:flex" iconOnly />
 
           <div className="hidden md:block">
             {isLoggedIn ? (
@@ -173,19 +166,27 @@ const Header = ({ categories = [] }: HeaderProps) => {
                       Meus Agendamentos
                     </Link>
                   </DropdownMenuItem>
-                  {session.user.role === "owner" && (
+                  {(session.user.role === "owner" || session.user.role === "owner_professional") && (
                     <DropdownMenuItem asChild>
                       <Link href="/dashboard/owner">
                         <LayoutDashboard className="mr-2 size-4" />
-                        Painel do Proprietário
+                        Painel do Estabelecimento
                       </Link>
                     </DropdownMenuItem>
                   )}
-                  {session.user.role === "professional" && (
+                  {(session.user.role === "professional" || session.user.role === "owner_professional") && (
                     <DropdownMenuItem asChild>
                       <Link href="/dashboard/professional">
                         <Scissors className="mr-2 size-4" />
-                        Painel do Profissional
+                        Painel Profissional
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
+                  {session.user.role === "client" && (
+                    <DropdownMenuItem asChild>
+                      <Link href="/dashboard/client">
+                        <User className="mr-2 size-4" />
+                        Meu Painel
                       </Link>
                     </DropdownMenuItem>
                   )}
@@ -205,11 +206,7 @@ const Header = ({ categories = [] }: HeaderProps) => {
           </div>
 
           <div className="flex items-center gap-2 md:hidden">
-            <Button variant="ghost" size="icon" asChild>
-              <Link href="/chat">
-                <BotMessageSquare className="size-5" />
-              </Link>
-            </Button>
+            <ChatSheet iconOnly />
             <MenuSheet
               categories={categories}
               onLoginClick={() => setLoginModalOpen(true)}

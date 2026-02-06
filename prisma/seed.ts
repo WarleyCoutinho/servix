@@ -16,9 +16,27 @@ async function seedPlanConfigs() {
       plan: SubscriptionPlan.BASIC,
       name: "Básico",
       description: "Ideal para começar seu negócio",
-      priceInCents: 4990,
+      priceInCents: 2990,
       stripePriceId:
         process.env.STRIPE_PRICE_BASIC || "price_placeholder_basic",
+      maxBarbershops: 1,
+      maxProfessionals: 1,
+      maxServices: 5,
+      features: [
+        "1 Estabelecimento",
+        "1 Profissional",
+        "Até 5 Serviços",
+        "Agendamento online",
+        "Suporte por email",
+      ],
+    },
+    {
+      plan: SubscriptionPlan.STANDARD,
+      name: "Padrão",
+      description: "Para pequenos negócios em crescimento",
+      priceInCents: 4990,
+      stripePriceId:
+        process.env.STRIPE_PRICE_STANDARD || "price_placeholder_standard",
       maxBarbershops: 1,
       maxProfessionals: 3,
       maxServices: 10,

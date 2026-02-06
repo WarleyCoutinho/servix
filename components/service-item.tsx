@@ -17,11 +17,13 @@ import { ptBR } from "date-fns/locale";
 import { useState } from "react";
 import { useAction } from "next-safe-action/hooks";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, User } from "lucide-react";
 import { useGetDateAvailableTimeSlots } from "@/hooks/data/use-get-date-availabe-time-slots";
+import { useGetBarbershopProfessionals } from "@/hooks/data/use-get-barbershop-professionals";
 import BookingSummary from "./booking-summary";
 import { createBookingCheckoutSession } from "@/actions/create-booking-checkout-session";
 import { loadStripe } from "@stripe/stripe-js";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 interface ServiceItemProps {
   service: BarbershopService;
@@ -30,19 +32,34 @@ interface ServiceItemProps {
 
 const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [selectedProfessional, setSelectedProfessional] = useState<
+    string | undefined
+  >(undefined);
   const [selectedTime, setSelectedTime] = useState<string | undefined>(
     undefined,
   );
   const [sheetIsOpen, setSheetIsOpen] = useState(false);
   const { executeAsync: executeCreateBooking, isPending: isCreatingBooking } =
     useAction(createBookingCheckoutSession);
-  const { data: availableTimeSlots } = useGetDateAvailableTimeSlots({
-    barbershopId: barbershop.id,
-    date: selectedDate,
-  });
+
+  const { data: professionals, isLoading: isLoadingProfessionals } =
+    useGetBarbershopProfessionals(barbershop.id);
+
+  const { data: availableTimeSlots, isLoading: isLoadingSlots } =
+    useGetDateAvailableTimeSlots({
+      barbershopId: barbershop.id,
+      professionalId: selectedProfessional,
+      date: selectedDate,
+    });
 
   const handleDateSelect = (date: Date | undefined) => {
     setSelectedDate(date);
+    setSelectedProfessional(undefined);
+    setSelectedTime(undefined);
+  };
+
+  const handleProfessionalSelect = (professionalId: string) => {
+    setSelectedProfessional(professionalId);
     setSelectedTime(undefined);
   };
 
@@ -62,6 +79,7 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
     const result = await executeCreateBooking({
       date,
       serviceId: service.id,
+      professionalId: selectedProfessional,
     });
     if (result.validationErrors) {
       return toast.error(result.validationErrors._errors?.[0]);
@@ -95,8 +113,13 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
     });
     setSheetIsOpen(false);
     setSelectedDate(undefined);
+    setSelectedProfessional(undefined);
     setSelectedTime(undefined);
   };
+
+  const selectedProfessionalData = professionals?.data?.find(
+    (p) => p.id === selectedProfessional,
+  );
 
   return (
     <div className="border-border bg-card flex gap-3 rounded-2xl border p-3">
@@ -160,29 +183,103 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
                 />
               </div>
 
-              {/* Time Selection */}
+              {/* Professional Selection */}
               {selectedDate && (
-                <div className="border-border flex gap-3 overflow-x-auto border-b px-5 py-6 [&::-webkit-scrollbar]:hidden">
-                  {availableTimeSlots?.data?.map((time) => (
-                    <Button
-                      key={time}
-                      variant={selectedTime === time ? "default" : "outline"}
-                      className="rounded-full"
-                      onClick={() => handleTimeSelect(time)}
-                    >
-                      {time}
-                    </Button>
-                  ))}
+                <div className="border-border border-b px-5 py-6">
+                  <p className="text-muted-foreground mb-3 text-sm font-medium">
+                    Selecione o profissional
+                  </p>
+                  {isLoadingProfessionals ? (
+                    <div className="flex justify-center py-4">
+                      <Loader2 className="size-5 animate-spin" />
+                    </div>
+                  ) : professionals?.data && professionals.data.length > 0 ? (
+                    <div className="flex gap-3 overflow-x-auto [&::-webkit-scrollbar]:hidden">
+                      {professionals.data.map((professional) => (
+                        <button
+                          key={professional.id}
+                          type="button"
+                          onClick={() =>
+                            handleProfessionalSelect(professional.id)
+                          }
+                          className={`flex min-w-[5rem] flex-col items-center gap-2 rounded-lg border p-3 transition-colors ${
+                            selectedProfessional === professional.id
+                              ? "border-primary bg-primary/10"
+                              : "border-border hover:bg-muted"
+                          }`}
+                        >
+                          <Avatar className="size-12">
+                            <AvatarImage
+                              src={professional.user.image ?? undefined}
+                              alt={
+                                professional.displayName ??
+                                professional.user.name ??
+                                "Profissional"
+                              }
+                            />
+                            <AvatarFallback>
+                              <User className="size-5" />
+                            </AvatarFallback>
+                          </Avatar>
+                          <span className="text-xs font-medium">
+                            {professional.displayName ?? professional.user.name}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-muted-foreground py-4 text-center text-sm">
+                      Nenhum profissional disponível
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* Time Selection */}
+              {selectedDate && selectedProfessional && (
+                <div className="border-border border-b px-5 py-6">
+                  <p className="text-muted-foreground mb-3 text-sm font-medium">
+                    Selecione o horário
+                  </p>
+                  {isLoadingSlots ? (
+                    <div className="flex justify-center py-4">
+                      <Loader2 className="size-5 animate-spin" />
+                    </div>
+                  ) : availableTimeSlots?.data?.slots &&
+                    availableTimeSlots.data.slots.length > 0 ? (
+                    <div className="flex gap-3 overflow-x-auto [&::-webkit-scrollbar]:hidden">
+                      {availableTimeSlots.data.slots.map((time) => (
+                        <Button
+                          key={time}
+                          variant={selectedTime === time ? "default" : "outline"}
+                          className="rounded-full"
+                          onClick={() => handleTimeSelect(time)}
+                        >
+                          {time}
+                        </Button>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-muted-foreground py-4 text-center text-sm">
+                      {availableTimeSlots?.data?.message ??
+                        "Nenhum horário disponível"}
+                    </p>
+                  )}
                 </div>
               )}
 
               {/* Booking Summary */}
-              {selectedDate && selectedTime && (
+              {selectedDate && selectedProfessional && selectedTime && (
                 <div className="px-5 py-6">
                   <BookingSummary
                     serviceName={service.name}
                     servicePrice={service.priceInCents}
                     barbershopName={barbershop.name}
+                    professionalName={
+                      selectedProfessionalData?.displayName ??
+                      selectedProfessionalData?.user.name ??
+                      undefined
+                    }
                     date={selectedDate}
                     time={selectedTime}
                   />
@@ -192,7 +289,12 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
               <SheetFooter className="px-5 pb-6">
                 <Button
                   className="w-full"
-                  disabled={!selectedDate || !selectedTime || isCreatingBooking}
+                  disabled={
+                    !selectedDate ||
+                    !selectedProfessional ||
+                    !selectedTime ||
+                    isCreatingBooking
+                  }
                   onClick={handleConfirmBooking}
                 >
                   {isCreatingBooking ? (

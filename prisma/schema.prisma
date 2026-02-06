@@ -21,6 +21,7 @@ enum UserRole {
   admin
   owner
   professional
+  owner_professional
   client
 }
 

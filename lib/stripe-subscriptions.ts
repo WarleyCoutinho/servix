@@ -119,10 +119,10 @@ export async function syncSubscriptionFromStripe(
     id: string;
     status: Stripe.Subscription.Status;
     items: { data: Array<{ price: { id: string; product: string | { id: string } } }> };
-    current_period_start: number;
-    current_period_end: number;
-    cancel_at_period_end: boolean;
-    canceled_at: number | null;
+    current_period_start?: number;
+    current_period_end?: number;
+    cancel_at_period_end?: boolean;
+    canceled_at?: number | null;
     metadata?: { plan?: string };
   };
 
@@ -138,6 +138,16 @@ export async function syncSubscriptionFromStripe(
     (sub.metadata?.plan as SubscriptionPlan) ||
     SubscriptionPlan.BASIC;
 
+  const currentPeriodStart =
+    sub.current_period_start && sub.current_period_start > 0
+      ? new Date(sub.current_period_start * 1000)
+      : new Date();
+
+  const currentPeriodEnd =
+    sub.current_period_end && sub.current_period_end > 0
+      ? new Date(sub.current_period_end * 1000)
+      : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+
   await prisma.subscription.upsert({
     where: { barbershopId },
     create: {
@@ -147,9 +157,9 @@ export async function syncSubscriptionFromStripe(
       stripeProductId: productId,
       plan,
       status,
-      currentPeriodStart: new Date(sub.current_period_start * 1000),
-      currentPeriodEnd: new Date(sub.current_period_end * 1000),
-      cancelAtPeriodEnd: sub.cancel_at_period_end,
+      currentPeriodStart,
+      currentPeriodEnd,
+      cancelAtPeriodEnd: sub.cancel_at_period_end ?? false,
       canceledAt: sub.canceled_at ? new Date(sub.canceled_at * 1000) : null,
     },
     update: {
@@ -158,9 +168,9 @@ export async function syncSubscriptionFromStripe(
       stripeProductId: productId,
       plan,
       status,
-      currentPeriodStart: new Date(sub.current_period_start * 1000),
-      currentPeriodEnd: new Date(sub.current_period_end * 1000),
-      cancelAtPeriodEnd: sub.cancel_at_period_end,
+      currentPeriodStart,
+      currentPeriodEnd,
+      cancelAtPeriodEnd: sub.cancel_at_period_end ?? false,
       canceledAt: sub.canceled_at ? new Date(sub.canceled_at * 1000) : null,
     },
   });

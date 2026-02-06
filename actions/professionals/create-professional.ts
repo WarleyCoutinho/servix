@@ -6,6 +6,7 @@ import { returnValidationErrors } from "next-safe-action";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { checkProfessionalLimit } from "@/lib/plan-limits";
+import { UserRole } from "@/generated/prisma/enums";
 
 const cpfRegex = /^\d{11}$/;
 
@@ -26,7 +27,13 @@ const inputSchema = z.object({
 
 export const createProfessional = subscribedOwnerActionClient
   .inputSchema(inputSchema)
-  .action(async ({ parsedInput, ctx: { barbershop } }) => {
+  .action(async ({ parsedInput, ctx: { barbershop, user } }) => {
+    if (user.role === UserRole.owner_professional) {
+      throw new Error(
+        "O plano Básico não permite adicionar profissionais. Faça upgrade para o plano Profissional ou superior.",
+      );
+    }
+
     const limitCheck = await checkProfessionalLimit(barbershop.id);
     if (!limitCheck.allowed) {
       throw new Error(limitCheck.message);
@@ -52,12 +59,12 @@ export const createProfessional = subscribedOwnerActionClient
       });
     }
 
-    let user = await prisma.user.findUnique({
+    let targetUser = await prisma.user.findUnique({
       where: { email: parsedInput.email },
     });
 
-    if (!user) {
-      user = await prisma.user.create({
+    if (!targetUser) {
+      targetUser = await prisma.user.create({
         data: {
           id: crypto.randomUUID(),
           email: parsedInput.email,
@@ -66,7 +73,7 @@ export const createProfessional = subscribedOwnerActionClient
         },
       });
     } else {
-      if (user.role !== "client") {
+      if (targetUser.role !== "client") {
         returnValidationErrors(inputSchema, {
           email: {
             _errors: [
@@ -77,7 +84,7 @@ export const createProfessional = subscribedOwnerActionClient
       }
 
       await prisma.user.update({
-        where: { id: user.id },
+        where: { id: targetUser.id },
         data: { role: "professional" },
       });
     }
@@ -90,7 +97,7 @@ export const createProfessional = subscribedOwnerActionClient
         imageUrl: parsedInput.imageUrl,
         acceptsPix: parsedInput.acceptsPix,
         acceptsCard: parsedInput.acceptsCard,
-        userId: user.id,
+        userId: targetUser.id,
         barbershopId: barbershop.id,
       },
       include: {

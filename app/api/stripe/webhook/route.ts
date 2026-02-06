@@ -4,6 +4,7 @@ import z from "zod";
 import { PaymentStatus, SubscriptionPlan } from "@/generated/prisma/enums";
 import { syncSubscriptionFromStripe } from "@/lib/stripe-subscriptions";
 import { verifyStripeWebhook } from "@/lib/stripe-webhook";
+import { handlePlanDowngrade, updateUserRoleBasedOnPlan } from "@/lib/role-sync";
 
 const bookingMetadataSchema = z.object({
   serviceId: z.uuid(),
@@ -17,7 +18,7 @@ const bookingMetadataSchema = z.object({
 
 const subscriptionMetadataSchema = z.object({
   barbershopId: z.uuid(),
-  plan: z.enum(["BASIC", "PROFESSIONAL", "ENTERPRISE"]).optional(),
+  plan: z.enum(["BASIC", "STANDARD", "PROFESSIONAL", "ENTERPRISE"]).optional(),
 });
 
 export const POST = async (request: Request) => {
@@ -74,8 +75,12 @@ export const POST = async (request: Request) => {
               metadata.data.barbershopId,
               plan,
             );
+
+            const activePlan = plan || SubscriptionPlan.BASIC;
+            await updateUserRoleBasedOnPlan(metadata.data.barbershopId, activePlan);
+
             console.log(
-              `Subscription ${subscriptionId} created for barbershop ${metadata.data.barbershopId} with plan ${plan || "BASIC"}`,
+              `Subscription ${subscriptionId} created for barbershop ${metadata.data.barbershopId} with plan ${activePlan}`,
             );
           }
         } else if (session.mode === "payment") {
@@ -133,12 +138,34 @@ export const POST = async (request: Request) => {
       case "customer.subscription.updated": {
         const subscription = event.data.object;
         const barbershopId = subscription.metadata?.barbershopId;
-        const plan = subscription.metadata?.plan as SubscriptionPlan | undefined;
+        const newPlan = subscription.metadata?.plan as SubscriptionPlan | undefined;
 
         if (barbershopId) {
-          await syncSubscriptionFromStripe(subscription, barbershopId, plan);
+          if (event.type === "customer.subscription.updated") {
+            const existingSubscription = await prisma.subscription.findUnique({
+              where: { barbershopId },
+              select: { plan: true },
+            });
+
+            const oldPlan = existingSubscription?.plan;
+            const activePlan = newPlan || SubscriptionPlan.BASIC;
+
+            if (oldPlan && oldPlan !== activePlan) {
+              await handlePlanDowngrade(barbershopId, oldPlan, activePlan);
+            }
+
+            await updateUserRoleBasedOnPlan(barbershopId, activePlan);
+          }
+
+          await syncSubscriptionFromStripe(subscription, barbershopId, newPlan);
+
+          if (event.type === "customer.subscription.created") {
+            const activePlan = newPlan || SubscriptionPlan.BASIC;
+            await updateUserRoleBasedOnPlan(barbershopId, activePlan);
+          }
+
           console.log(
-            `Subscription ${subscription.id} ${event.type === "customer.subscription.created" ? "created" : "updated"} for barbershop ${barbershopId} with plan ${plan || "BASIC"}`,
+            `Subscription ${subscription.id} ${event.type === "customer.subscription.created" ? "created" : "updated"} for barbershop ${barbershopId} with plan ${newPlan || "BASIC"}`,
           );
         }
         break;

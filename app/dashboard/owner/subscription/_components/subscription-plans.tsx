@@ -2,6 +2,8 @@
 
 import { createSubscriptionCheckout } from "@/actions/subscriptions/create-subscription-checkout";
 import { getCustomerPortalUrl } from "@/actions/subscriptions/get-customer-portal-url";
+import { syncSubscription } from "@/actions/subscriptions/sync-subscription";
+import { DowngradeAlertDialog } from "@/components/downgrade-alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,7 +14,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { SubscriptionPlan } from "@/generated/prisma/enums";
-import { Check, CreditCard, ExternalLink, Loader2 } from "lucide-react";
+import { Check, CreditCard, ExternalLink, Loader2, RefreshCw } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -31,16 +33,27 @@ interface PlanData {
 
 interface SubscriptionPlansProps {
   plans: PlanData[];
+  currentPlan?: SubscriptionPlan | null;
 }
 
 const RECOMMENDED_PLAN = SubscriptionPlan.PROFESSIONAL;
 
-export function SubscriptionPlans({ plans }: SubscriptionPlansProps) {
+const PLAN_ORDER: Record<SubscriptionPlan, number> = {
+  [SubscriptionPlan.BASIC]: 1,
+  [SubscriptionPlan.STANDARD]: 2,
+  [SubscriptionPlan.PROFESSIONAL]: 3,
+  [SubscriptionPlan.ENTERPRISE]: 4,
+};
+
+export function SubscriptionPlans({ plans, currentPlan }: SubscriptionPlansProps) {
   const searchParams = useSearchParams();
   const toastShownRef = useRef(false);
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(
     null,
   );
+  const [showDowngradeAlert, setShowDowngradeAlert] = useState(false);
+  const [pendingDowngradePlan, setPendingDowngradePlan] =
+    useState<SubscriptionPlan | null>(null);
 
   const showSuccess = useMemo(
     () => searchParams.get("success") === "true",
@@ -86,9 +99,41 @@ export function SubscriptionPlans({ plans }: SubscriptionPlansProps) {
     },
   );
 
+  const { execute: sync, isPending: isSyncing } = useAction(syncSubscription, {
+    onSuccess: ({ data }) => {
+      if (data?.success) {
+        toast.success(data.message);
+        window.location.reload();
+      }
+    },
+    onError: ({ error }) => {
+      toast.error(error.serverError ?? "Erro ao sincronizar assinatura");
+    },
+  });
+
+  const isDowngrade = (targetPlan: SubscriptionPlan): boolean => {
+    if (!currentPlan) return false;
+    return PLAN_ORDER[targetPlan] < PLAN_ORDER[currentPlan];
+  };
+
   const handleSubscribe = (plan: SubscriptionPlan) => {
+    if (isDowngrade(plan) && plan === SubscriptionPlan.BASIC) {
+      setPendingDowngradePlan(plan);
+      setShowDowngradeAlert(true);
+      return;
+    }
+
     setSelectedPlan(plan);
     subscribe({ plan });
+  };
+
+  const handleConfirmDowngrade = () => {
+    if (pendingDowngradePlan) {
+      setSelectedPlan(pendingDowngradePlan);
+      subscribe({ plan: pendingDowngradePlan });
+      setShowDowngradeAlert(false);
+      setPendingDowngradePlan(null);
+    }
   };
 
   const formatPrice = (priceInCents: number) => {
@@ -105,6 +150,8 @@ export function SubscriptionPlans({ plans }: SubscriptionPlansProps) {
     switch (plan) {
       case SubscriptionPlan.BASIC:
         return "Assinar Básico";
+      case SubscriptionPlan.STANDARD:
+        return "Assinar Padrão";
       case SubscriptionPlan.PROFESSIONAL:
         return "Assinar Profissional";
       case SubscriptionPlan.ENTERPRISE:
@@ -115,8 +162,16 @@ export function SubscriptionPlans({ plans }: SubscriptionPlansProps) {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="text-center">
+    <>
+      <DowngradeAlertDialog
+        open={showDowngradeAlert}
+        onOpenChange={setShowDowngradeAlert}
+        onConfirm={handleConfirmDowngrade}
+        isLoading={isSubscribing}
+      />
+
+      <div className="space-y-6">
+        <div className="text-center">
         <h1 className="text-3xl font-bold">Planos que crescem com você</h1>
         <p className="text-muted-foreground mt-2">
           Escolha o plano ideal para o seu negócio
@@ -218,21 +273,43 @@ export function SubscriptionPlans({ plans }: SubscriptionPlansProps) {
             </li>
           </ul>
 
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={() => openPortal()}
-            disabled={isOpeningPortal}
-          >
-            {isOpeningPortal ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <ExternalLink className="mr-2 h-4 w-4" />
-            )}
-            Abrir Portal do Cliente
-          </Button>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Button
+              variant="outline"
+              className="flex-1"
+              onClick={() => openPortal()}
+              disabled={isOpeningPortal}
+            >
+              {isOpeningPortal ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <ExternalLink className="mr-2 h-4 w-4" />
+              )}
+              Abrir Portal do Cliente
+            </Button>
+
+            <Button
+              variant="secondary"
+              className="flex-1"
+              onClick={() => sync()}
+              disabled={isSyncing}
+            >
+              {isSyncing ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <RefreshCw className="mr-2 h-4 w-4" />
+              )}
+              Sincronizar Assinatura
+            </Button>
+          </div>
+
+          <p className="text-muted-foreground text-xs">
+            Use &quot;Sincronizar Assinatura&quot; caso seu pagamento tenha sido
+            confirmado no Stripe mas não esteja refletindo aqui.
+          </p>
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </>
   );
 }

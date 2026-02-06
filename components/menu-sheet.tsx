@@ -9,7 +9,7 @@ import {
   LogOut,
   MenuIcon,
   Scissors,
-  Sparkles,
+  User,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -68,7 +68,7 @@ const MenuSheet = ({ categories = [], onLoginClick }: MenuSheetProps) => {
         </Button>
       </SheetTrigger>
       <SheetContent
-        side="left"
+        side="right"
         className="flex w-[85vw] max-w-sm flex-col overflow-hidden p-0"
       >
         <SheetHeader className="border-border shrink-0 border-b px-4 py-4 text-left sm:px-6">
@@ -127,25 +127,36 @@ const MenuSheet = ({ categories = [], onLoginClick }: MenuSheetProps) => {
                 Início
               </button>
 
-              {session?.user?.role === "owner" && (
+              {(session?.user?.role === "owner" || session?.user?.role === "owner_professional") && (
                 <button
                   type="button"
                   onClick={() => handleNavigation("/dashboard/owner")}
                   className="hover:bg-accent flex items-center gap-3 px-4 py-3 text-left text-sm font-medium transition-colors sm:px-6"
                 >
                   <LayoutDashboard className="size-4 shrink-0" />
-                  Painel do Proprietário
+                  Painel do Estabelecimento
                 </button>
               )}
 
-              {session?.user?.role === "professional" && (
+              {(session?.user?.role === "professional" || session?.user?.role === "owner_professional") && (
                 <button
                   type="button"
                   onClick={() => handleNavigation("/dashboard/professional")}
                   className="hover:bg-accent flex items-center gap-3 px-4 py-3 text-left text-sm font-medium transition-colors sm:px-6"
                 >
                   <Scissors className="size-4 shrink-0" />
-                  Painel do Profissional
+                  Painel Profissional
+                </button>
+              )}
+
+              {session?.user?.role === "client" && (
+                <button
+                  type="button"
+                  onClick={() => handleNavigation("/dashboard/client")}
+                  className="hover:bg-accent flex items-center gap-3 px-4 py-3 text-left text-sm font-medium transition-colors sm:px-6"
+                >
+                  <User className="size-4 shrink-0" />
+                  Meu Painel
                 </button>
               )}
 
@@ -159,15 +170,6 @@ const MenuSheet = ({ categories = [], onLoginClick }: MenuSheetProps) => {
                   Meus Agendamentos
                 </button>
               )}
-
-              <button
-                type="button"
-                onClick={() => handleNavigation("/chat")}
-                className="hover:bg-accent flex items-center gap-3 px-4 py-3 text-left text-sm font-medium transition-colors sm:px-6"
-              >
-                <Sparkles className="size-4 shrink-0" />
-                Assistente IA
-              </button>
             </nav>
 
             <div className="border-border border-b" />

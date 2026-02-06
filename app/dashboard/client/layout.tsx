@@ -4,23 +4,19 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { UserRole } from "@/generated/prisma/enums";
 import {
-  Users,
-  Scissors,
-  Clock,
-  CreditCard,
   LayoutDashboard,
+  CalendarDays,
+  Store,
 } from "lucide-react";
 import { DashboardSidebar, type NavItem } from "@/components/dashboard-sidebar";
 
 const navItems: NavItem[] = [
-  { href: "/dashboard/owner", label: "Visão Geral", icon: LayoutDashboard },
-  { href: "/dashboard/owner/professionals", label: "Profissionais", icon: Users },
-  { href: "/dashboard/owner/services", label: "Serviços", icon: Scissors },
-  { href: "/dashboard/owner/schedule", label: "Horários", icon: Clock },
-  { href: "/dashboard/owner/subscription", label: "Assinatura", icon: CreditCard },
+  { href: "/dashboard/client", label: "Visão Geral", icon: LayoutDashboard },
+  { href: "/bookings", label: "Meus Agendamentos", icon: CalendarDays },
+  { href: "/barbershops", label: "Estabelecimentos", icon: Store },
 ];
 
-export default async function OwnerDashboardLayout({
+export default async function ClientDashboardLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -35,22 +31,17 @@ export default async function OwnerDashboardLayout({
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    include: { ownedBarbershop: true },
   });
 
-  if (user?.role !== UserRole.owner && user?.role !== UserRole.owner_professional) {
+  if (user?.role !== UserRole.client) {
     redirect("/");
-  }
-
-  if (!user.ownedBarbershop) {
-    redirect("/onboarding/owner");
   }
 
   return (
     <div className="flex min-h-screen">
       <DashboardSidebar
-        title={user.ownedBarbershop.name}
-        subtitle="Painel do Proprietário"
+        title={user.name}
+        subtitle="Meu Painel"
         navItems={navItems}
       />
       <main className="flex-1 p-6">{children}</main>

@@ -1,12 +1,12 @@
-import { headers } from "next/headers";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SubscriptionStatus } from "@/generated/prisma/enums";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { redirect } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Calendar, DollarSign, TrendingUp } from "lucide-react";
-import { startOfMonth, endOfMonth } from "date-fns";
 import { formatCurrency } from "@/lib/utils";
-import { SubscriptionStatus } from "@/generated/prisma/enums";
+import { endOfMonth, startOfMonth } from "date-fns";
+import { Calendar, DollarSign, TrendingUp, Users } from "lucide-react";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 export default async function OwnerDashboardPage() {
   const session = await auth.api.getSession({
@@ -77,9 +77,7 @@ export default async function OwnerDashboardPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Dashboard</h1>
-        <p className="text-muted-foreground">
-          Visão geral da sua barbearia
-        </p>
+        <p className="text-muted-foreground">Visão geral da sua barbearia</p>
       </div>
 
       {!isSubscriptionActive && (
@@ -87,7 +85,7 @@ export default async function OwnerDashboardPage() {
           <CardContent className="pt-6">
             <p className="text-yellow-800 dark:text-yellow-200">
               Sua assinatura não está ativa. Ative para desbloquear todos os
-              recursos.
+              recursos.oi warley resolver
             </p>
           </CardContent>
         </Card>
@@ -146,7 +144,9 @@ export default async function OwnerDashboardPage() {
             <div className="text-2xl font-bold">
               {formatCurrency(monthlyRevenue._sum.applicationFeeInCents ?? 0)}
             </div>
-            <p className="text-xs text-muted-foreground">receita da plataforma</p>
+            <p className="text-xs text-muted-foreground">
+              receita da plataforma
+            </p>
           </CardContent>
         </Card>
       </div>

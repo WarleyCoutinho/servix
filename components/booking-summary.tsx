@@ -7,6 +7,7 @@ interface BookingSummaryProps {
   serviceName: string;
   servicePrice: number;
   barbershopName: string;
+  professionalName?: string;
   date: Date;
   time?: string;
 }
@@ -15,6 +16,7 @@ const BookingSummary = ({
   serviceName,
   servicePrice,
   barbershopName,
+  professionalName,
   date,
   time,
 }: BookingSummaryProps) => {
@@ -44,6 +46,13 @@ const BookingSummary = ({
           <p className="text-muted-foreground text-sm">Barbearia</p>
           <p className="text-sm">{barbershopName}</p>
         </div>
+
+        {professionalName && (
+          <div className="flex items-center justify-between">
+            <p className="text-muted-foreground text-sm">Profissional</p>
+            <p className="text-sm">{professionalName}</p>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

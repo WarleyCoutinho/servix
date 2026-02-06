@@ -130,6 +130,15 @@ export const getAvailableSlots = actionClient
       const now = new Date();
       const currentTime = format(now, "HH:mm");
       barbershopSlots = barbershopSlots.filter((slot) => slot > currentTime);
+
+      const currentHour = now.getHours();
+      const MEIO_DIA = 12;
+      if (currentHour >= MEIO_DIA) {
+        barbershopSlots = barbershopSlots.filter((slot) => {
+          const [hour] = slot.split(":").map(Number);
+          return hour >= MEIO_DIA;
+        });
+      }
     }
 
     if (isPast(date) && !isToday(date)) {

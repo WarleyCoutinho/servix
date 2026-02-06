@@ -1,19 +1,26 @@
-import { getDateAvailableTimeSlots } from "@/actions/get-date-available-time-slots";
+import { getAvailableSlots } from "@/actions/schedules/get-available-slots";
 import { queryKeys } from "@/constants/query-keys";
 import { useQuery } from "@tanstack/react-query";
 
 export const useGetDateAvailableTimeSlots = ({
   barbershopId,
+  professionalId,
   date,
 }: {
   barbershopId: string;
+  professionalId?: string;
   date?: Date;
 }) => {
   return useQuery({
-    queryKey: queryKeys.getDateAvailableTimeSlots(barbershopId, date),
+    queryKey: queryKeys.getDateAvailableTimeSlots(
+      barbershopId,
+      professionalId,
+      date,
+    ),
     queryFn: () =>
-      getDateAvailableTimeSlots({
+      getAvailableSlots({
         barbershopId,
+        professionalId,
         date: date!,
       }),
     enabled: Boolean(date),

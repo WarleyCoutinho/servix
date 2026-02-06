@@ -3,10 +3,15 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getAllProfessionalsByBarbershop } from "@/data/professionals";
-import { StripeAccountStatus } from "@/generated/prisma/enums";
+import { StripeAccountStatus, UserRole } from "@/generated/prisma/enums";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { Plus, UserCheck, UserX } from "lucide-react";
+import { AlertTriangle, Plus, UserCheck, UserX } from "lucide-react";
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@/components/ui/alert";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -50,6 +55,8 @@ export default async function ProfessionalsPage() {
     user.ownedBarbershop.id,
   );
 
+  const isBasicPlan = user.role === UserRole.owner_professional;
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -59,13 +66,29 @@ export default async function ProfessionalsPage() {
             Gerencie os profissionais da sua barbearia
           </p>
         </div>
-        <Button asChild>
-          <Link href="/dashboard/owner/professionals/new">
-            <Plus className="mr-2 h-4 w-4" />
-            Adicionar Profissional
-          </Link>
-        </Button>
+        {!isBasicPlan && (
+          <Button asChild>
+            <Link href="/dashboard/owner/professionals/new">
+              <Plus className="mr-2 h-4 w-4" />
+              Adicionar Profissional
+            </Link>
+          </Button>
+        )}
       </div>
+
+      {isBasicPlan && (
+        <Alert variant="default" className="border-yellow-500 bg-yellow-50 dark:bg-yellow-950">
+          <AlertTriangle className="h-4 w-4 text-yellow-600" />
+          <AlertTitle className="text-yellow-800 dark:text-yellow-200">
+            Plano Básico
+          </AlertTitle>
+          <AlertDescription className="text-yellow-700 dark:text-yellow-300">
+            No plano Básico, você é o único profissional do estabelecimento. Para
+            adicionar outros profissionais, faça upgrade para o plano Profissional
+            ou superior.
+          </AlertDescription>
+        </Alert>
+      )}
 
       {professionals.length === 0 ? (
         <Card>
@@ -73,12 +96,14 @@ export default async function ProfessionalsPage() {
             <p className="mb-4 text-muted-foreground">
               Nenhum profissional cadastrado ainda.
             </p>
-            <Button asChild>
-              <Link href="/dashboard/owner/professionals/new">
-                <Plus className="mr-2 h-4 w-4" />
-                Adicionar Primeiro Profissional
-              </Link>
-            </Button>
+            {!isBasicPlan && (
+              <Button asChild>
+                <Link href="/dashboard/owner/professionals/new">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Adicionar Primeiro Profissional
+                </Link>
+              </Button>
+            )}
           </CardContent>
         </Card>
       ) : (
