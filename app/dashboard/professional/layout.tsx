@@ -43,8 +43,12 @@ export default async function ProfessionalDashboardLayout({
     },
   });
 
-  if (user?.role !== UserRole.professional || !user.professional) {
+  if (user?.role !== UserRole.professional) {
     redirect("/");
+  }
+
+  if (!user.professional) {
+    redirect("/onboarding/professional");
   }
 
   const professional = user.professional;

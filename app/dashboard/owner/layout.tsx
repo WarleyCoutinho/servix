@@ -38,8 +38,12 @@ export default async function OwnerDashboardLayout({
     include: { ownedBarbershop: true },
   });
 
-  if (user?.role !== UserRole.owner || !user.ownedBarbershop) {
+  if (user?.role !== UserRole.owner) {
     redirect("/");
+  }
+
+  if (!user.ownedBarbershop) {
+    redirect("/onboarding/owner");
   }
 
   return (
