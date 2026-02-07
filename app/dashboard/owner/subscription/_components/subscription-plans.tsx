@@ -1,5 +1,6 @@
 "use client";
 
+import { changeSubscriptionPlan } from "@/actions/subscriptions/change-subscription-plan";
 import { createSubscriptionCheckout } from "@/actions/subscriptions/create-subscription-checkout";
 import { getCustomerPortalUrl } from "@/actions/subscriptions/get-customer-portal-url";
 import { syncSubscription } from "@/actions/subscriptions/sync-subscription";
@@ -14,9 +15,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { SubscriptionPlan } from "@/generated/prisma/enums";
-import { Check, CreditCard, ExternalLink, Loader2, RefreshCw } from "lucide-react";
+import { ArrowUp, Check, CreditCard, ExternalLink, Loader2, RefreshCw } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -47,6 +48,7 @@ const PLAN_ORDER: Record<SubscriptionPlan, number> = {
 
 export function SubscriptionPlans({ plans, currentPlan }: SubscriptionPlansProps) {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const toastShownRef = useRef(false);
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(
     null,
@@ -67,9 +69,6 @@ export function SubscriptionPlans({ plans, currentPlan }: SubscriptionPlansProps
     }
   }, [showSuccess]);
 
-  console.log("Plans data:", plans);
-  console.log("Plans length:", plans?.length);
-
   const { execute: subscribe, isPending: isSubscribing } = useAction(
     createSubscriptionCheckout,
     {
@@ -80,6 +79,23 @@ export function SubscriptionPlans({ plans, currentPlan }: SubscriptionPlansProps
       },
       onError: ({ error }) => {
         toast.error(error.serverError ?? "Erro ao criar checkout");
+        setSelectedPlan(null);
+      },
+    },
+  );
+
+  const { execute: changePlan, isPending: isChangingPlan } = useAction(
+    changeSubscriptionPlan,
+    {
+      onSuccess: ({ data }) => {
+        if (data?.success) {
+          toast.success(data.message);
+          router.refresh();
+        }
+        setSelectedPlan(null);
+      },
+      onError: ({ error }) => {
+        toast.error(error.serverError ?? "Erro ao alterar plano");
         setSelectedPlan(null);
       },
     },
@@ -117,20 +133,29 @@ export function SubscriptionPlans({ plans, currentPlan }: SubscriptionPlansProps
   };
 
   const handleSubscribe = (plan: SubscriptionPlan) => {
-    if (isDowngrade(plan) && plan === SubscriptionPlan.BASIC) {
+    if (isDowngrade(plan)) {
       setPendingDowngradePlan(plan);
       setShowDowngradeAlert(true);
       return;
     }
 
     setSelectedPlan(plan);
-    subscribe({ plan });
+
+    if (currentPlan) {
+      changePlan({ plan });
+    } else {
+      subscribe({ plan });
+    }
   };
 
   const handleConfirmDowngrade = () => {
     if (pendingDowngradePlan) {
       setSelectedPlan(pendingDowngradePlan);
-      subscribe({ plan: pendingDowngradePlan });
+      if (currentPlan) {
+        changePlan({ plan: pendingDowngradePlan });
+      } else {
+        subscribe({ plan: pendingDowngradePlan });
+      }
       setShowDowngradeAlert(false);
       setPendingDowngradePlan(null);
     }
@@ -147,6 +172,17 @@ export function SubscriptionPlans({ plans, currentPlan }: SubscriptionPlansProps
   };
 
   const getButtonText = (plan: SubscriptionPlan) => {
+    if (currentPlan) {
+      if (plan === currentPlan) {
+        return "Plano Atual";
+      }
+      const isUpgrade = PLAN_ORDER[plan] > PLAN_ORDER[currentPlan];
+      if (isUpgrade) {
+        return "Fazer Upgrade";
+      }
+      return "Fazer Downgrade";
+    }
+
     switch (plan) {
       case SubscriptionPlan.BASIC:
         return "Assinar Básico";
@@ -161,13 +197,15 @@ export function SubscriptionPlans({ plans, currentPlan }: SubscriptionPlansProps
     }
   };
 
+  const isLoading = isSubscribing || isChangingPlan;
+
   return (
     <>
       <DowngradeAlertDialog
         open={showDowngradeAlert}
         onOpenChange={setShowDowngradeAlert}
         onConfirm={handleConfirmDowngrade}
-        isLoading={isSubscribing}
+        isLoading={isLoading}
       />
 
       <div className="space-y-6">
@@ -189,20 +227,32 @@ export function SubscriptionPlans({ plans, currentPlan }: SubscriptionPlansProps
         </Card>
       )}
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {plans.map((plan) => {
           const isRecommended = plan.plan === RECOMMENDED_PLAN;
+          const isCurrent = plan.plan === currentPlan;
           return (
             <Card
               key={plan.plan}
-              className={isRecommended ? "border-primary shadow-lg" : ""}
+              className={
+                isCurrent
+                  ? "border-green-500 shadow-lg"
+                  : isRecommended
+                    ? "border-primary shadow-lg"
+                    : ""
+              }
             >
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle>{plan.name}</CardTitle>
-                  {isRecommended && (
-                    <Badge className="bg-primary">Recomendado</Badge>
-                  )}
+                  <div className="flex gap-2">
+                    {isCurrent && (
+                      <Badge className="bg-green-500">Atual</Badge>
+                    )}
+                    {isRecommended && !isCurrent && (
+                      <Badge className="bg-primary">Recomendado</Badge>
+                    )}
+                  </div>
                 </div>
                 <CardDescription>{plan.description}</CardDescription>
               </CardHeader>
@@ -225,12 +275,14 @@ export function SubscriptionPlans({ plans, currentPlan }: SubscriptionPlansProps
 
                 <Button
                   className="w-full"
-                  variant={getButtonVariant(plan.plan)}
+                  variant={plan.plan === currentPlan ? "secondary" : getButtonVariant(plan.plan)}
                   onClick={() => handleSubscribe(plan.plan)}
-                  disabled={isSubscribing && selectedPlan === plan.plan}
+                  disabled={plan.plan === currentPlan || (isLoading && selectedPlan === plan.plan)}
                 >
-                  {isSubscribing && selectedPlan === plan.plan ? (
+                  {isLoading && selectedPlan === plan.plan ? (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : currentPlan && PLAN_ORDER[plan.plan] > PLAN_ORDER[currentPlan] ? (
+                    <ArrowUp className="mr-2 h-4 w-4" />
                   ) : (
                     <CreditCard className="mr-2 h-4 w-4" />
                   )}

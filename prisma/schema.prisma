@@ -84,11 +84,11 @@ model User {
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 
-  sessions        Session[]
-  accounts        Account[]
-  bookings        Booking[]
-  ownedBarbershop Barbershop?   @relation("BarbershopOwner")
-  professional    Professional?
+  sessions         Session[]
+  accounts         Account[]
+  bookings         Booking[]
+  ownedBarbershops Barbershop[]  @relation("BarbershopOwner")
+  professional     Professional?
 
   @@unique([email])
   @@map("user")
@@ -157,8 +157,10 @@ model Barbershop {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  ownerId String? @unique
+  ownerId String?
   owner   User?   @relation("BarbershopOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+
+  @@index([ownerId])
 
   services       BarbershopService[]
   bookings       Booking[]

@@ -241,7 +241,7 @@ export type UserWhereInput = {
   sessions?: Prisma.SessionListRelationFilter
   accounts?: Prisma.AccountListRelationFilter
   bookings?: Prisma.BookingListRelationFilter
-  ownedBarbershop?: Prisma.XOR<Prisma.BarbershopNullableScalarRelationFilter, Prisma.BarbershopWhereInput> | null
+  ownedBarbershops?: Prisma.BarbershopListRelationFilter
   professional?: Prisma.XOR<Prisma.ProfessionalNullableScalarRelationFilter, Prisma.ProfessionalWhereInput> | null
 }
 
@@ -261,7 +261,7 @@ export type UserOrderByWithRelationInput = {
   sessions?: Prisma.SessionOrderByRelationAggregateInput
   accounts?: Prisma.AccountOrderByRelationAggregateInput
   bookings?: Prisma.BookingOrderByRelationAggregateInput
-  ownedBarbershop?: Prisma.BarbershopOrderByWithRelationInput
+  ownedBarbershops?: Prisma.BarbershopOrderByRelationAggregateInput
   professional?: Prisma.ProfessionalOrderByWithRelationInput
 }
 
@@ -284,7 +284,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   sessions?: Prisma.SessionListRelationFilter
   accounts?: Prisma.AccountListRelationFilter
   bookings?: Prisma.BookingListRelationFilter
-  ownedBarbershop?: Prisma.XOR<Prisma.BarbershopNullableScalarRelationFilter, Prisma.BarbershopWhereInput> | null
+  ownedBarbershops?: Prisma.BarbershopListRelationFilter
   professional?: Prisma.XOR<Prisma.ProfessionalNullableScalarRelationFilter, Prisma.ProfessionalWhereInput> | null
 }, "id" | "email">
 
@@ -340,7 +340,7 @@ export type UserCreateInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   bookings?: Prisma.BookingCreateNestedManyWithoutUserInput
-  ownedBarbershop?: Prisma.BarbershopCreateNestedOneWithoutOwnerInput
+  ownedBarbershops?: Prisma.BarbershopCreateNestedManyWithoutOwnerInput
   professional?: Prisma.ProfessionalCreateNestedOneWithoutUserInput
 }
 
@@ -360,7 +360,7 @@ export type UserUncheckedCreateInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutUserInput
-  ownedBarbershop?: Prisma.BarbershopUncheckedCreateNestedOneWithoutOwnerInput
+  ownedBarbershops?: Prisma.BarbershopUncheckedCreateNestedManyWithoutOwnerInput
   professional?: Prisma.ProfessionalUncheckedCreateNestedOneWithoutUserInput
 }
 
@@ -380,7 +380,7 @@ export type UserUpdateInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   bookings?: Prisma.BookingUpdateManyWithoutUserNestedInput
-  ownedBarbershop?: Prisma.BarbershopUpdateOneWithoutOwnerNestedInput
+  ownedBarbershops?: Prisma.BarbershopUpdateManyWithoutOwnerNestedInput
   professional?: Prisma.ProfessionalUpdateOneWithoutUserNestedInput
 }
 
@@ -400,7 +400,7 @@ export type UserUncheckedUpdateInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutUserNestedInput
-  ownedBarbershop?: Prisma.BarbershopUncheckedUpdateOneWithoutOwnerNestedInput
+  ownedBarbershops?: Prisma.BarbershopUncheckedUpdateManyWithoutOwnerNestedInput
   professional?: Prisma.ProfessionalUncheckedUpdateOneWithoutUserNestedInput
 }
 
@@ -556,20 +556,20 @@ export type UserUpdateOneRequiredWithoutAccountsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAccountsInput, Prisma.UserUpdateWithoutAccountsInput>, Prisma.UserUncheckedUpdateWithoutAccountsInput>
 }
 
-export type UserCreateNestedOneWithoutOwnedBarbershopInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutOwnedBarbershopInput, Prisma.UserUncheckedCreateWithoutOwnedBarbershopInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutOwnedBarbershopInput
+export type UserCreateNestedOneWithoutOwnedBarbershopsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutOwnedBarbershopsInput, Prisma.UserUncheckedCreateWithoutOwnedBarbershopsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutOwnedBarbershopsInput
   connect?: Prisma.UserWhereUniqueInput
 }
 
-export type UserUpdateOneWithoutOwnedBarbershopNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutOwnedBarbershopInput, Prisma.UserUncheckedCreateWithoutOwnedBarbershopInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutOwnedBarbershopInput
-  upsert?: Prisma.UserUpsertWithoutOwnedBarbershopInput
+export type UserUpdateOneWithoutOwnedBarbershopsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutOwnedBarbershopsInput, Prisma.UserUncheckedCreateWithoutOwnedBarbershopsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutOwnedBarbershopsInput
+  upsert?: Prisma.UserUpsertWithoutOwnedBarbershopsInput
   disconnect?: Prisma.UserWhereInput | boolean
   delete?: Prisma.UserWhereInput | boolean
   connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutOwnedBarbershopInput, Prisma.UserUpdateWithoutOwnedBarbershopInput>, Prisma.UserUncheckedUpdateWithoutOwnedBarbershopInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutOwnedBarbershopsInput, Prisma.UserUpdateWithoutOwnedBarbershopsInput>, Prisma.UserUncheckedUpdateWithoutOwnedBarbershopsInput>
 }
 
 export type UserCreateNestedOneWithoutProfessionalInput = {
@@ -615,7 +615,7 @@ export type UserCreateWithoutSessionsInput = {
   updatedAt?: Date | string
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   bookings?: Prisma.BookingCreateNestedManyWithoutUserInput
-  ownedBarbershop?: Prisma.BarbershopCreateNestedOneWithoutOwnerInput
+  ownedBarbershops?: Prisma.BarbershopCreateNestedManyWithoutOwnerInput
   professional?: Prisma.ProfessionalCreateNestedOneWithoutUserInput
 }
 
@@ -634,7 +634,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   updatedAt?: Date | string
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutUserInput
-  ownedBarbershop?: Prisma.BarbershopUncheckedCreateNestedOneWithoutOwnerInput
+  ownedBarbershops?: Prisma.BarbershopUncheckedCreateNestedManyWithoutOwnerInput
   professional?: Prisma.ProfessionalUncheckedCreateNestedOneWithoutUserInput
 }
 
@@ -669,7 +669,7 @@ export type UserUpdateWithoutSessionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   bookings?: Prisma.BookingUpdateManyWithoutUserNestedInput
-  ownedBarbershop?: Prisma.BarbershopUpdateOneWithoutOwnerNestedInput
+  ownedBarbershops?: Prisma.BarbershopUpdateManyWithoutOwnerNestedInput
   professional?: Prisma.ProfessionalUpdateOneWithoutUserNestedInput
 }
 
@@ -688,7 +688,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutUserNestedInput
-  ownedBarbershop?: Prisma.BarbershopUncheckedUpdateOneWithoutOwnerNestedInput
+  ownedBarbershops?: Prisma.BarbershopUncheckedUpdateManyWithoutOwnerNestedInput
   professional?: Prisma.ProfessionalUncheckedUpdateOneWithoutUserNestedInput
 }
 
@@ -707,7 +707,7 @@ export type UserCreateWithoutAccountsInput = {
   updatedAt?: Date | string
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   bookings?: Prisma.BookingCreateNestedManyWithoutUserInput
-  ownedBarbershop?: Prisma.BarbershopCreateNestedOneWithoutOwnerInput
+  ownedBarbershops?: Prisma.BarbershopCreateNestedManyWithoutOwnerInput
   professional?: Prisma.ProfessionalCreateNestedOneWithoutUserInput
 }
 
@@ -726,7 +726,7 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   updatedAt?: Date | string
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutUserInput
-  ownedBarbershop?: Prisma.BarbershopUncheckedCreateNestedOneWithoutOwnerInput
+  ownedBarbershops?: Prisma.BarbershopUncheckedCreateNestedManyWithoutOwnerInput
   professional?: Prisma.ProfessionalUncheckedCreateNestedOneWithoutUserInput
 }
 
@@ -761,7 +761,7 @@ export type UserUpdateWithoutAccountsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   bookings?: Prisma.BookingUpdateManyWithoutUserNestedInput
-  ownedBarbershop?: Prisma.BarbershopUpdateOneWithoutOwnerNestedInput
+  ownedBarbershops?: Prisma.BarbershopUpdateManyWithoutOwnerNestedInput
   professional?: Prisma.ProfessionalUpdateOneWithoutUserNestedInput
 }
 
@@ -780,11 +780,11 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutUserNestedInput
-  ownedBarbershop?: Prisma.BarbershopUncheckedUpdateOneWithoutOwnerNestedInput
+  ownedBarbershops?: Prisma.BarbershopUncheckedUpdateManyWithoutOwnerNestedInput
   professional?: Prisma.ProfessionalUncheckedUpdateOneWithoutUserNestedInput
 }
 
-export type UserCreateWithoutOwnedBarbershopInput = {
+export type UserCreateWithoutOwnedBarbershopsInput = {
   id: string
   name: string
   email: string
@@ -803,7 +803,7 @@ export type UserCreateWithoutOwnedBarbershopInput = {
   professional?: Prisma.ProfessionalCreateNestedOneWithoutUserInput
 }
 
-export type UserUncheckedCreateWithoutOwnedBarbershopInput = {
+export type UserUncheckedCreateWithoutOwnedBarbershopsInput = {
   id: string
   name: string
   email: string
@@ -822,23 +822,23 @@ export type UserUncheckedCreateWithoutOwnedBarbershopInput = {
   professional?: Prisma.ProfessionalUncheckedCreateNestedOneWithoutUserInput
 }
 
-export type UserCreateOrConnectWithoutOwnedBarbershopInput = {
+export type UserCreateOrConnectWithoutOwnedBarbershopsInput = {
   where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutOwnedBarbershopInput, Prisma.UserUncheckedCreateWithoutOwnedBarbershopInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutOwnedBarbershopsInput, Prisma.UserUncheckedCreateWithoutOwnedBarbershopsInput>
 }
 
-export type UserUpsertWithoutOwnedBarbershopInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutOwnedBarbershopInput, Prisma.UserUncheckedUpdateWithoutOwnedBarbershopInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutOwnedBarbershopInput, Prisma.UserUncheckedCreateWithoutOwnedBarbershopInput>
+export type UserUpsertWithoutOwnedBarbershopsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutOwnedBarbershopsInput, Prisma.UserUncheckedUpdateWithoutOwnedBarbershopsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutOwnedBarbershopsInput, Prisma.UserUncheckedCreateWithoutOwnedBarbershopsInput>
   where?: Prisma.UserWhereInput
 }
 
-export type UserUpdateToOneWithWhereWithoutOwnedBarbershopInput = {
+export type UserUpdateToOneWithWhereWithoutOwnedBarbershopsInput = {
   where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutOwnedBarbershopInput, Prisma.UserUncheckedUpdateWithoutOwnedBarbershopInput>
+  data: Prisma.XOR<Prisma.UserUpdateWithoutOwnedBarbershopsInput, Prisma.UserUncheckedUpdateWithoutOwnedBarbershopsInput>
 }
 
-export type UserUpdateWithoutOwnedBarbershopInput = {
+export type UserUpdateWithoutOwnedBarbershopsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
@@ -857,7 +857,7 @@ export type UserUpdateWithoutOwnedBarbershopInput = {
   professional?: Prisma.ProfessionalUpdateOneWithoutUserNestedInput
 }
 
-export type UserUncheckedUpdateWithoutOwnedBarbershopInput = {
+export type UserUncheckedUpdateWithoutOwnedBarbershopsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
@@ -892,7 +892,7 @@ export type UserCreateWithoutProfessionalInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   bookings?: Prisma.BookingCreateNestedManyWithoutUserInput
-  ownedBarbershop?: Prisma.BarbershopCreateNestedOneWithoutOwnerInput
+  ownedBarbershops?: Prisma.BarbershopCreateNestedManyWithoutOwnerInput
 }
 
 export type UserUncheckedCreateWithoutProfessionalInput = {
@@ -911,7 +911,7 @@ export type UserUncheckedCreateWithoutProfessionalInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutUserInput
-  ownedBarbershop?: Prisma.BarbershopUncheckedCreateNestedOneWithoutOwnerInput
+  ownedBarbershops?: Prisma.BarbershopUncheckedCreateNestedManyWithoutOwnerInput
 }
 
 export type UserCreateOrConnectWithoutProfessionalInput = {
@@ -946,7 +946,7 @@ export type UserUpdateWithoutProfessionalInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   bookings?: Prisma.BookingUpdateManyWithoutUserNestedInput
-  ownedBarbershop?: Prisma.BarbershopUpdateOneWithoutOwnerNestedInput
+  ownedBarbershops?: Prisma.BarbershopUpdateManyWithoutOwnerNestedInput
 }
 
 export type UserUncheckedUpdateWithoutProfessionalInput = {
@@ -965,7 +965,7 @@ export type UserUncheckedUpdateWithoutProfessionalInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutUserNestedInput
-  ownedBarbershop?: Prisma.BarbershopUncheckedUpdateOneWithoutOwnerNestedInput
+  ownedBarbershops?: Prisma.BarbershopUncheckedUpdateManyWithoutOwnerNestedInput
 }
 
 export type UserCreateWithoutBookingsInput = {
@@ -983,7 +983,7 @@ export type UserCreateWithoutBookingsInput = {
   updatedAt?: Date | string
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
-  ownedBarbershop?: Prisma.BarbershopCreateNestedOneWithoutOwnerInput
+  ownedBarbershops?: Prisma.BarbershopCreateNestedManyWithoutOwnerInput
   professional?: Prisma.ProfessionalCreateNestedOneWithoutUserInput
 }
 
@@ -1002,7 +1002,7 @@ export type UserUncheckedCreateWithoutBookingsInput = {
   updatedAt?: Date | string
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
-  ownedBarbershop?: Prisma.BarbershopUncheckedCreateNestedOneWithoutOwnerInput
+  ownedBarbershops?: Prisma.BarbershopUncheckedCreateNestedManyWithoutOwnerInput
   professional?: Prisma.ProfessionalUncheckedCreateNestedOneWithoutUserInput
 }
 
@@ -1037,7 +1037,7 @@ export type UserUpdateWithoutBookingsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
-  ownedBarbershop?: Prisma.BarbershopUpdateOneWithoutOwnerNestedInput
+  ownedBarbershops?: Prisma.BarbershopUpdateManyWithoutOwnerNestedInput
   professional?: Prisma.ProfessionalUpdateOneWithoutUserNestedInput
 }
 
@@ -1056,7 +1056,7 @@ export type UserUncheckedUpdateWithoutBookingsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
-  ownedBarbershop?: Prisma.BarbershopUncheckedUpdateOneWithoutOwnerNestedInput
+  ownedBarbershops?: Prisma.BarbershopUncheckedUpdateManyWithoutOwnerNestedInput
   professional?: Prisma.ProfessionalUncheckedUpdateOneWithoutUserNestedInput
 }
 
@@ -1069,12 +1069,14 @@ export type UserCountOutputType = {
   sessions: number
   accounts: number
   bookings: number
+  ownedBarbershops: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sessions?: boolean | UserCountOutputTypeCountSessionsArgs
   accounts?: boolean | UserCountOutputTypeCountAccountsArgs
   bookings?: boolean | UserCountOutputTypeCountBookingsArgs
+  ownedBarbershops?: boolean | UserCountOutputTypeCountOwnedBarbershopsArgs
 }
 
 /**
@@ -1108,6 +1110,13 @@ export type UserCountOutputTypeCountBookingsArgs<ExtArgs extends runtime.Types.E
   where?: Prisma.BookingWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountOwnedBarbershopsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.BarbershopWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1125,7 +1134,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
   bookings?: boolean | Prisma.User$bookingsArgs<ExtArgs>
-  ownedBarbershop?: boolean | Prisma.User$ownedBarbershopArgs<ExtArgs>
+  ownedBarbershops?: boolean | Prisma.User$ownedBarbershopsArgs<ExtArgs>
   professional?: boolean | Prisma.User$professionalArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
@@ -1180,7 +1189,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
   bookings?: boolean | Prisma.User$bookingsArgs<ExtArgs>
-  ownedBarbershop?: boolean | Prisma.User$ownedBarbershopArgs<ExtArgs>
+  ownedBarbershops?: boolean | Prisma.User$ownedBarbershopsArgs<ExtArgs>
   professional?: boolean | Prisma.User$professionalArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -1193,7 +1202,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     sessions: Prisma.$SessionPayload<ExtArgs>[]
     accounts: Prisma.$AccountPayload<ExtArgs>[]
     bookings: Prisma.$BookingPayload<ExtArgs>[]
-    ownedBarbershop: Prisma.$BarbershopPayload<ExtArgs> | null
+    ownedBarbershops: Prisma.$BarbershopPayload<ExtArgs>[]
     professional: Prisma.$ProfessionalPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1606,7 +1615,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   sessions<T extends Prisma.User$sessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   accounts<T extends Prisma.User$accountsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$accountsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   bookings<T extends Prisma.User$bookingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$bookingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BookingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  ownedBarbershop<T extends Prisma.User$ownedBarbershopArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$ownedBarbershopArgs<ExtArgs>>): Prisma.Prisma__BarbershopClient<runtime.Types.Result.GetResult<Prisma.$BarbershopPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  ownedBarbershops<T extends Prisma.User$ownedBarbershopsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$ownedBarbershopsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BarbershopPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   professional<T extends Prisma.User$professionalArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$professionalArgs<ExtArgs>>): Prisma.Prisma__ProfessionalClient<runtime.Types.Result.GetResult<Prisma.$ProfessionalPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -2109,9 +2118,9 @@ export type User$bookingsArgs<ExtArgs extends runtime.Types.Extensions.InternalA
 }
 
 /**
- * User.ownedBarbershop
+ * User.ownedBarbershops
  */
-export type User$ownedBarbershopArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type User$ownedBarbershopsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Select specific fields to fetch from the Barbershop
    */
@@ -2125,6 +2134,11 @@ export type User$ownedBarbershopArgs<ExtArgs extends runtime.Types.Extensions.In
    */
   include?: Prisma.BarbershopInclude<ExtArgs> | null
   where?: Prisma.BarbershopWhereInput
+  orderBy?: Prisma.BarbershopOrderByWithRelationInput | Prisma.BarbershopOrderByWithRelationInput[]
+  cursor?: Prisma.BarbershopWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.BarbershopScalarFieldEnum | Prisma.BarbershopScalarFieldEnum[]
 }
 
 /**

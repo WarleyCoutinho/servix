@@ -18,14 +18,14 @@ export const setOwnerRole = protectedActionClient
   .action(async ({ parsedInput, ctx: { user } }) => {
     const existingUser = await prisma.user.findUnique({
       where: { id: user.id },
-      include: { ownedBarbershop: true },
+      include: { ownedBarbershops: true },
     });
 
     if (!existingUser) {
       throw new Error("Usuário não encontrado.");
     }
 
-    if (existingUser.role === UserRole.owner && existingUser.ownedBarbershop) {
+    if (existingUser.role === UserRole.owner && existingUser.ownedBarbershops.length > 0) {
       throw new Error("Você já possui uma barbearia cadastrada.");
     }
 

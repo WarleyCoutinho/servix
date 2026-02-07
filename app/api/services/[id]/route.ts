@@ -20,19 +20,21 @@ export async function GET(
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
     include: {
-      ownedBarbershop: true,
+      ownedBarbershops: true,
     },
   });
 
-  if (!user?.ownedBarbershop) {
+  if (!user || user.ownedBarbershops.length === 0) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
+
+  const activeBarbershop = user.ownedBarbershops[0];
 
   const service = await prisma.barbershopService.findUnique({
     where: { id },
   });
 
-  if (!service || service.barbershopId !== user.ownedBarbershop.id) {
+  if (!service || service.barbershopId !== activeBarbershop.id) {
     return NextResponse.json({ error: "Service not found" }, { status: 404 });
   }
 

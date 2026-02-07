@@ -44,15 +44,16 @@ export default async function ProfessionalsPage() {
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    include: { ownedBarbershop: true },
+    include: { ownedBarbershops: true },
   });
 
-  if (!user?.ownedBarbershop) {
+  if (!user || user.ownedBarbershops.length === 0) {
     redirect("/");
   }
 
+  const activeBarbershop = user.ownedBarbershops[0];
   const professionals = await getAllProfessionalsByBarbershop(
-    user.ownedBarbershop.id,
+    activeBarbershop.id,
   );
 
   const isBasicPlan = user.role === UserRole.owner_professional;

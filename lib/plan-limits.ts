@@ -5,8 +5,10 @@ export interface PlanLimits {
   maxBarbershops: number;
   maxProfessionals: number;
   maxServices: number | null;
+  currentBarbershops: number;
   currentProfessionals: number;
   currentServices: number;
+  canAddBarbershop: boolean;
   canAddProfessional: boolean;
   canAddService: boolean;
 }
@@ -48,8 +50,10 @@ export async function getPlanLimits(
     maxBarbershops: planConfig.maxBarbershops,
     maxProfessionals: planConfig.maxProfessionals,
     maxServices: planConfig.maxServices,
+    currentBarbershops: 1,
     currentProfessionals,
     currentServices,
+    canAddBarbershop: planConfig.maxBarbershops > 1,
     canAddProfessional,
     canAddService,
   };
@@ -97,4 +101,64 @@ export async function checkServiceLimit(
   }
 
   return { allowed: true };
+}
+
+export async function checkBarbershopLimit(
+  userId: string,
+): Promise<{ allowed: boolean; message?: string; maxBarbershops?: number }> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    include: {
+      ownedBarbershops: {
+        include: {
+          subscription: true,
+        },
+      },
+    },
+  });
+
+  if (!user) {
+    return {
+      allowed: false,
+      message: "Usuário não encontrado.",
+    };
+  }
+
+  if (user.ownedBarbershops.length === 0) {
+    return { allowed: true, maxBarbershops: 1 };
+  }
+
+  const activeSubscription = user.ownedBarbershops.find(
+    (b) => b.subscription?.status === SubscriptionStatus.ACTIVE,
+  )?.subscription;
+
+  if (!activeSubscription) {
+    return {
+      allowed: false,
+      message: "Você não possui uma assinatura ativa.",
+    };
+  }
+
+  const planConfig = await prisma.planConfig.findUnique({
+    where: { plan: activeSubscription.plan },
+  });
+
+  if (!planConfig) {
+    return {
+      allowed: false,
+      message: "Plano não encontrado.",
+    };
+  }
+
+  const currentBarbershops = user.ownedBarbershops.length;
+
+  if (currentBarbershops >= planConfig.maxBarbershops) {
+    return {
+      allowed: false,
+      message: `Limite de estabelecimentos atingido (${currentBarbershops}/${planConfig.maxBarbershops}). Faça upgrade para o plano Enterprise para adicionar mais.`,
+      maxBarbershops: planConfig.maxBarbershops,
+    };
+  }
+
+  return { allowed: true, maxBarbershops: planConfig.maxBarbershops };
 }

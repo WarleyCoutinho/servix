@@ -59,7 +59,7 @@ interface UserData {
   banned: boolean;
   banReason: string | null;
   createdAt: Date;
-  ownedBarbershop: { id: string; name: string } | null;
+  ownedBarbershops: { id: string; name: string }[];
   professional: { id: string; barbershopId: string; isActive: boolean } | null;
 }
 

@@ -20,7 +20,7 @@ export default async function OwnerDashboardPage() {
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
     include: {
-      ownedBarbershop: {
+      ownedBarbershops: {
         include: {
           subscription: true,
           professionals: true,
@@ -34,11 +34,11 @@ export default async function OwnerDashboardPage() {
     },
   });
 
-  if (!user?.ownedBarbershop) {
+  if (!user || user.ownedBarbershops.length === 0) {
     redirect("/");
   }
 
-  const barbershop = user.ownedBarbershop;
+  const barbershop = user.ownedBarbershops[0];
   const now = new Date();
   const monthStart = startOfMonth(now);
   const monthEnd = endOfMonth(now);

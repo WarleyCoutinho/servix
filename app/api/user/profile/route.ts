@@ -17,7 +17,7 @@ export async function GET() {
       where: { id: session.user.id },
       select: {
         role: true,
-        ownedBarbershop: {
+        ownedBarbershops: {
           select: { id: true },
         },
         professional: {
@@ -32,7 +32,7 @@ export async function GET() {
 
     return NextResponse.json({
       role: user.role,
-      hasOwnedBarbershop: !!user.ownedBarbershop,
+      hasOwnedBarbershop: user.ownedBarbershops.length > 0,
       hasProfessionalProfile: !!user.professional,
     });
   } catch (error) {

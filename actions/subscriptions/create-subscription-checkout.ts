@@ -26,11 +26,8 @@ export const createSubscriptionCheckout = ownerActionClient
       existingSubscription &&
       existingSubscription.status === SubscriptionStatus.ACTIVE
     ) {
-      if (existingSubscription.plan === plan) {
-        throw new Error("Você já possui este plano ativo.");
-      }
       throw new Error(
-        "Você já possui uma assinatura ativa. Use o portal do cliente para alterar seu plano.",
+        "Você já possui uma assinatura ativa. Use a opção de upgrade/downgrade para alterar seu plano.",
       );
     }
 

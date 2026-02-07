@@ -13,19 +13,21 @@ async function main() {
 
   const user = await prisma.user.findUnique({
     where: { email: userEmail },
-    include: { ownedBarbershop: true },
+    include: { ownedBarbershops: true },
   });
 
   if (!user) {
-    console.log("❌ Usuário não encontrado!");
+    console.log("Usuário não encontrado!");
     return;
   }
 
-  console.log("📋 Usuário encontrado:");
+  const ownedBarbershop = user.ownedBarbershops[0];
+
+  console.log("Usuário encontrado:");
   console.log(`   ID: ${user.id}`);
   console.log(`   Nome: ${user.name}`);
   console.log(`   Role atual: ${user.role}`);
-  console.log(`   Tem barbershop: ${user.ownedBarbershop ? "Sim" : "Não"}`);
+  console.log(`   Tem barbershop: ${ownedBarbershop ? "Sim" : "Não"}`);
 
   // Atualizar role para owner
   if (user.role !== "owner") {
@@ -39,7 +41,7 @@ async function main() {
   }
 
   // Criar barbershop se não existir
-  if (!user.ownedBarbershop) {
+  if (!ownedBarbershop) {
     const barbershop = await prisma.barbershop.create({
       data: {
         name: "Barbearia Teste",
@@ -96,7 +98,7 @@ async function main() {
     }
     console.log("✅ Serviços de exemplo criados");
   } else {
-    console.log(`✓ Barbershop já existe: ${user.ownedBarbershop.name}`);
+    console.log(`Barbershop já existe: ${ownedBarbershop.name}`);
   }
 
   console.log("\n🎉 Setup completo! Agora você pode acessar /dashboard/owner\n");

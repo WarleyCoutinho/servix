@@ -15,7 +15,7 @@ async function seedPlanConfigs() {
     {
       plan: SubscriptionPlan.BASIC,
       name: "Básico",
-      description: "Ideal para começar seu negócio",
+      description: "Ideal para profissionais autônomos",
       priceInCents: 2990,
       stripePriceId:
         process.env.STRIPE_PRICE_BASIC || "price_placeholder_basic",
@@ -24,10 +24,10 @@ async function seedPlanConfigs() {
       maxServices: 5,
       features: [
         "1 Estabelecimento",
-        "1 Profissional",
+        "Proprietário é o profissional",
         "Até 5 Serviços",
         "Agendamento online",
-        "Suporte por email",
+        "Pagamentos via Stripe Connect",
       ],
     },
     {
@@ -45,9 +45,8 @@ async function seedPlanConfigs() {
         "Até 3 Profissionais",
         "Até 10 Serviços",
         "Agendamento online",
-        "Gestão de clientes",
-        "Suporte por email",
         "Pagamentos via Stripe Connect",
+        "Gerenciamento de equipe",
       ],
     },
     {
@@ -61,11 +60,12 @@ async function seedPlanConfigs() {
       maxProfessionals: 10,
       maxServices: 100,
       features: [
-        "Tudo do Básico, e:",
+        "1 Estabelecimento",
         "Até 10 Profissionais",
-        "Até 100 tipos de Serviços",
+        "Até 100 Serviços",
+        "Agendamento online",
         "Pagamentos via Stripe Connect",
-        "Relatórios e métricas avançadas",
+        "Gerenciamento de equipe",
         "Suporte prioritário",
       ],
     },
@@ -80,12 +80,13 @@ async function seedPlanConfigs() {
       maxProfessionals: 50,
       maxServices: null,
       features: [
-        "Tudo do Profissional, mais:",
         "Até 5 Estabelecimentos",
         "Até 50 Profissionais por unidade",
-        "Multi-unidade centralizada",
-        "Relatórios consolidados",
-        "White label (marca própria)",
+        "Serviços ilimitados",
+        "Agendamento online",
+        "Pagamentos via Stripe Connect",
+        "Gerenciamento de equipe",
+        "Suporte prioritário",
       ],
     },
   ];

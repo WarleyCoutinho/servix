@@ -4,8 +4,9 @@ import { UsersManager } from "./users-manager";
 export default async function AdminUsersPage() {
   const users = await prisma.user.findMany({
     include: {
-      ownedBarbershop: {
+      ownedBarbershops: {
         select: { id: true, name: true },
+        take: 1,
       },
       professional: {
         select: { id: true, barbershopId: true, isActive: true },

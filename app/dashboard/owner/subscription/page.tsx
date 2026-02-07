@@ -17,7 +17,7 @@ export default async function SubscriptionPage() {
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
     include: {
-      ownedBarbershop: {
+      ownedBarbershops: {
         include: {
           subscription: true,
         },
@@ -25,7 +25,8 @@ export default async function SubscriptionPage() {
     },
   });
 
-  const currentPlan = user?.ownedBarbershop?.subscription?.plan ?? null;
+  const activeBarbershop = user?.ownedBarbershops[0];
+  const currentPlan = activeBarbershop?.subscription?.plan ?? null;
 
   const plans = await getAllPlans();
 

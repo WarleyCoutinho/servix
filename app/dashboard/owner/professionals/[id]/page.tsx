@@ -28,12 +28,14 @@ export default async function ProfessionalPage({
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    include: { ownedBarbershop: true },
+    include: { ownedBarbershops: true },
   });
 
-  if (!user?.ownedBarbershop) {
+  if (!user || user.ownedBarbershops.length === 0) {
     redirect("/");
   }
+
+  const activeBarbershop = user.ownedBarbershops[0];
 
   const professional = await prisma.professional.findUnique({
     where: { id },
@@ -52,7 +54,7 @@ export default async function ProfessionalPage({
     notFound();
   }
 
-  if (professional.barbershopId !== user.ownedBarbershop.id) {
+  if (professional.barbershopId !== activeBarbershop.id) {
     redirect("/dashboard/owner/professionals");
   }
 

@@ -36,23 +36,26 @@ export const ownerActionClient = protectedActionClient.use(
   async ({ next, ctx }) => {
     const user = await prisma.user.findUnique({
       where: { id: ctx.user.id },
-      include: { ownedBarbershop: true },
+      include: { ownedBarbershops: true },
     });
 
     if (
       (user?.role !== UserRole.owner && user?.role !== UserRole.owner_professional) ||
-      !user.ownedBarbershop
+      user.ownedBarbershops.length === 0
     ) {
       throw new Error(
         "Acesso negado. Apenas proprietários podem acessar este recurso.",
       );
     }
 
+    const activeBarbershop = user.ownedBarbershops[0];
+
     return next({
       ctx: {
         ...ctx,
         user,
-        barbershop: user.ownedBarbershop,
+        barbershop: activeBarbershop,
+        ownedBarbershops: user.ownedBarbershops,
       },
     });
   },

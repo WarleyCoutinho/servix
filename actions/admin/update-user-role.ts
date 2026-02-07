@@ -24,7 +24,7 @@ export const updateUserRole = adminActionClient
     const user = await prisma.user.findUnique({
       where: { id: userId },
       include: {
-        ownedBarbershop: true,
+        ownedBarbershops: true,
         professional: true,
       },
     });
@@ -35,7 +35,7 @@ export const updateUserRole = adminActionClient
       });
     }
 
-    if (role === UserRole.owner && !user.ownedBarbershop) {
+    if (role === UserRole.owner && user.ownedBarbershops.length === 0) {
       returnValidationErrors(inputSchema, {
         role: {
           _errors: [
@@ -56,7 +56,7 @@ export const updateUserRole = adminActionClient
     }
 
     if (role === UserRole.owner_professional) {
-      if (!user.ownedBarbershop) {
+      if (user.ownedBarbershops.length === 0) {
         returnValidationErrors(inputSchema, {
           role: {
             _errors: [

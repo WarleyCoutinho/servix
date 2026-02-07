@@ -22,7 +22,7 @@ export default async function OwnerServicesPage() {
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
     include: {
-      ownedBarbershop: {
+      ownedBarbershops: {
         include: {
           services: {
             orderBy: { name: "asc" },
@@ -32,11 +32,12 @@ export default async function OwnerServicesPage() {
     },
   });
 
-  if (!user?.ownedBarbershop) {
+  if (!user || user.ownedBarbershops.length === 0) {
     redirect("/");
   }
 
-  const services = user.ownedBarbershop.services.filter((s) => !s.deletedAt);
+  const activeBarbershop = user.ownedBarbershops[0];
+  const services = activeBarbershop.services.filter((s) => !s.deletedAt);
 
   return (
     <div className="space-y-6">

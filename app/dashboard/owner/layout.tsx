@@ -35,21 +35,23 @@ export default async function OwnerDashboardLayout({
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    include: { ownedBarbershop: true },
+    include: { ownedBarbershops: true },
   });
 
   if (user?.role !== UserRole.owner && user?.role !== UserRole.owner_professional) {
     redirect("/");
   }
 
-  if (!user.ownedBarbershop) {
+  if (user.ownedBarbershops.length === 0) {
     redirect("/onboarding/owner");
   }
+
+  const activeBarbershop = user.ownedBarbershops[0];
 
   return (
     <div className="flex min-h-screen">
       <DashboardSidebar
-        title={user.ownedBarbershop.name}
+        title={activeBarbershop.name}
         subtitle="Painel do Proprietário"
         navItems={navItems}
       />
