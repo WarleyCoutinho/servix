@@ -6,6 +6,7 @@ import { getAllProfessionalsByBarbershop } from "@/data/professionals";
 import { StripeAccountStatus, UserRole } from "@/generated/prisma/enums";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getPlanLimits } from "@/lib/plan-limits";
 import { AlertTriangle, Plus, UserCheck, UserX } from "lucide-react";
 import {
   Alert,
@@ -57,6 +58,10 @@ export default async function ProfessionalsPage() {
   );
 
   const isBasicPlan = user.role === UserRole.owner_professional;
+  const limits = await getPlanLimits(activeBarbershop.id);
+
+  const canAddProfessional = !isBasicPlan && (limits?.canAddProfessional ?? false);
+  const isAtLimit = !isBasicPlan && limits && !limits.canAddProfessional;
 
   return (
     <div className="space-y-6">
@@ -65,11 +70,16 @@ export default async function ProfessionalsPage() {
           <h1 className="text-3xl font-bold">Profissionais</h1>
           <p className="text-muted-foreground">
             Gerencie os profissionais da sua barbearia
+            {limits && !isBasicPlan && (
+              <span className="ml-2">
+                ({limits.currentProfessionals}/{limits.maxProfessionals})
+              </span>
+            )}
           </p>
         </div>
         {!isBasicPlan && (
-          <Button asChild>
-            <Link href="/dashboard/owner/professionals/new">
+          <Button asChild disabled={!canAddProfessional}>
+            <Link href={canAddProfessional ? "/dashboard/owner/professionals/new" : "#"}>
               <Plus className="mr-2 h-4 w-4" />
               Adicionar Profissional
             </Link>
@@ -85,8 +95,21 @@ export default async function ProfessionalsPage() {
           </AlertTitle>
           <AlertDescription className="text-yellow-700 dark:text-yellow-300">
             No plano Básico, você é o único profissional do estabelecimento. Para
-            adicionar outros profissionais, faça upgrade para o plano Profissional
+            adicionar outros profissionais, faça upgrade para o plano Standard
             ou superior.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {isAtLimit && (
+        <Alert variant="default" className="border-yellow-500 bg-yellow-50 dark:bg-yellow-950">
+          <AlertTriangle className="h-4 w-4 text-yellow-600" />
+          <AlertTitle className="text-yellow-800 dark:text-yellow-200">
+            Limite de profissionais atingido
+          </AlertTitle>
+          <AlertDescription className="text-yellow-700 dark:text-yellow-300">
+            Você atingiu o limite de {limits.maxProfessionals} profissionais do seu plano.
+            Faça upgrade para adicionar mais profissionais.
           </AlertDescription>
         </Alert>
       )}
@@ -97,7 +120,7 @@ export default async function ProfessionalsPage() {
             <p className="mb-4 text-muted-foreground">
               Nenhum profissional cadastrado ainda.
             </p>
-            {!isBasicPlan && (
+            {canAddProfessional && (
               <Button asChild>
                 <Link href="/dashboard/owner/professionals/new">
                   <Plus className="mr-2 h-4 w-4" />

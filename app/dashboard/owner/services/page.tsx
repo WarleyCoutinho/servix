@@ -5,10 +5,12 @@ import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { formatCurrency } from "@/lib/utils";
-import { Plus, Scissors, Clock, ImageIcon } from "lucide-react";
+import { Plus, Scissors, Clock, ImageIcon, AlertTriangle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { getPlanLimits } from "@/lib/plan-limits";
 
 export default async function OwnerServicesPage() {
   const session = await auth.api.getSession({
@@ -38,6 +40,10 @@ export default async function OwnerServicesPage() {
 
   const activeBarbershop = user.ownedBarbershops[0];
   const services = activeBarbershop.services.filter((s) => !s.deletedAt);
+  const limits = await getPlanLimits(activeBarbershop.id);
+
+  const canAddService = limits?.canAddService ?? false;
+  const isAtLimit = limits && !limits.canAddService;
 
   return (
     <div className="space-y-6">
@@ -46,15 +52,33 @@ export default async function OwnerServicesPage() {
           <h1 className="text-3xl font-bold">Serviços</h1>
           <p className="text-muted-foreground">
             Gerencie os serviços oferecidos pela sua barbearia
+            {limits && limits.maxServices && (
+              <span className="ml-2">
+                ({limits.currentServices}/{limits.maxServices})
+              </span>
+            )}
           </p>
         </div>
-        <Button asChild>
-          <Link href="/dashboard/owner/services/new">
+        <Button asChild disabled={!canAddService}>
+          <Link href={canAddService ? "/dashboard/owner/services/new" : "#"}>
             <Plus className="mr-2 size-4" />
             Novo Serviço
           </Link>
         </Button>
       </div>
+
+      {isAtLimit && (
+        <Alert variant="default" className="border-yellow-500 bg-yellow-50 dark:bg-yellow-950">
+          <AlertTriangle className="h-4 w-4 text-yellow-600" />
+          <AlertTitle className="text-yellow-800 dark:text-yellow-200">
+            Limite de serviços atingido
+          </AlertTitle>
+          <AlertDescription className="text-yellow-700 dark:text-yellow-300">
+            Você atingiu o limite de {limits.maxServices} serviços do seu plano.
+            Faça upgrade para adicionar mais serviços.
+          </AlertDescription>
+        </Alert>
+      )}
 
       {services.length === 0 ? (
         <Card>
