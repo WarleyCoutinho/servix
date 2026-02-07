@@ -1,6 +1,8 @@
 import { Prisma } from "@/generated/prisma/client";
 
 export type DatabaseErrorType =
+  | "NO_INTERNET"
+  | "DATABASE_UNREACHABLE"
   | "CONNECTION_TIMEOUT"
   | "CONNECTION_REFUSED"
   | "QUERY_TIMEOUT"
@@ -17,6 +19,18 @@ interface DatabaseErrorInfo {
 }
 
 const ERROR_MESSAGES: Record<DatabaseErrorType, Omit<DatabaseErrorInfo, "type">> = {
+  NO_INTERNET: {
+    message: "No internet connection",
+    userMessage:
+      "Sem conexão com a internet. Verifique sua conexão e tente novamente.",
+    isRetryable: true,
+  },
+  DATABASE_UNREACHABLE: {
+    message: "Database unreachable",
+    userMessage:
+      "Sem conexão com o banco de dados. O servidor pode estar em manutenção. Tente novamente em alguns instantes.",
+    isRetryable: true,
+  },
   CONNECTION_TIMEOUT: {
     message: "Database connection timeout",
     userMessage:
@@ -61,7 +75,19 @@ const ERROR_MESSAGES: Record<DatabaseErrorType, Omit<DatabaseErrorInfo, "type">>
 
 export function classifyDatabaseError(error: unknown): DatabaseErrorInfo {
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
-    switch (error.code) {
+    const errorCode = (error as { code?: string }).code;
+    const errorMessage = error.message.toLowerCase();
+
+    if (
+      errorMessage.includes("eai_again") ||
+      errorMessage.includes("eai_nodata") ||
+      errorMessage.includes("enotfound") ||
+      errorMessage.includes("getaddrinfo")
+    ) {
+      return { type: "NO_INTERNET", ...ERROR_MESSAGES.NO_INTERNET };
+    }
+
+    switch (errorCode) {
       case "P2002":
         return { type: "UNIQUE_CONSTRAINT", ...ERROR_MESSAGES.UNIQUE_CONSTRAINT };
       case "P2003":
@@ -77,11 +103,38 @@ export function classifyDatabaseError(error: unknown): DatabaseErrorInfo {
   }
 
   if (error instanceof Prisma.PrismaClientInitializationError) {
-    return { type: "CONNECTION_REFUSED", ...ERROR_MESSAGES.CONNECTION_REFUSED };
+    const errorMessage = error.message.toLowerCase();
+
+    if (
+      errorMessage.includes("eai_again") ||
+      errorMessage.includes("eai_nodata") ||
+      errorMessage.includes("enotfound") ||
+      errorMessage.includes("getaddrinfo")
+    ) {
+      return { type: "NO_INTERNET", ...ERROR_MESSAGES.NO_INTERNET };
+    }
+
+    return { type: "DATABASE_UNREACHABLE", ...ERROR_MESSAGES.DATABASE_UNREACHABLE };
   }
 
   if (error instanceof Error) {
     const message = error.message.toLowerCase();
+
+    if (
+      message.includes("eai_again") ||
+      message.includes("eai_nodata") ||
+      message.includes("dns") ||
+      message.includes("getaddrinfo enotfound")
+    ) {
+      return { type: "NO_INTERNET", ...ERROR_MESSAGES.NO_INTERNET };
+    }
+
+    if (
+      message.includes("enotfound") ||
+      message.includes("getaddrinfo")
+    ) {
+      return { type: "NO_INTERNET", ...ERROR_MESSAGES.NO_INTERNET };
+    }
 
     if (
       message.includes("etimedout") ||
@@ -95,18 +148,19 @@ export function classifyDatabaseError(error: unknown): DatabaseErrorInfo {
       message.includes("econnrefused") ||
       message.includes("connection refused")
     ) {
-      return { type: "CONNECTION_REFUSED", ...ERROR_MESSAGES.CONNECTION_REFUSED };
-    }
-
-    if (
-      message.includes("enotfound") ||
-      message.includes("getaddrinfo")
-    ) {
-      return { type: "CONNECTION_REFUSED", ...ERROR_MESSAGES.CONNECTION_REFUSED };
+      return { type: "DATABASE_UNREACHABLE", ...ERROR_MESSAGES.DATABASE_UNREACHABLE };
     }
 
     if (message.includes("query timeout") || message.includes("statement timeout")) {
       return { type: "QUERY_TIMEOUT", ...ERROR_MESSAGES.QUERY_TIMEOUT };
+    }
+
+    if (
+      message.includes("econnreset") ||
+      message.includes("socket hang up") ||
+      message.includes("connection reset")
+    ) {
+      return { type: "DATABASE_UNREACHABLE", ...ERROR_MESSAGES.DATABASE_UNREACHABLE };
     }
   }
 
@@ -140,6 +194,8 @@ export function isDatabaseError(error: unknown): error is DatabaseError {
 export function isConnectionError(error: unknown): boolean {
   if (isDatabaseError(error)) {
     return (
+      error.type === "NO_INTERNET" ||
+      error.type === "DATABASE_UNREACHABLE" ||
       error.type === "CONNECTION_TIMEOUT" ||
       error.type === "CONNECTION_REFUSED" ||
       error.type === "QUERY_TIMEOUT"
@@ -149,14 +205,47 @@ export function isConnectionError(error: unknown): boolean {
   if (error instanceof Error) {
     const message = error.message.toLowerCase();
     return (
+      message.includes("eai_again") ||
+      message.includes("eai_nodata") ||
       message.includes("etimedout") ||
       message.includes("econnrefused") ||
+      message.includes("enotfound") ||
+      message.includes("getaddrinfo") ||
       message.includes("timeout") ||
       message.includes("connection")
     );
   }
 
   return false;
+}
+
+export function isNoInternetError(error: unknown): boolean {
+  const info = classifyDatabaseError(error);
+  return info.type === "NO_INTERNET";
+}
+
+export function isDatabaseUnreachableError(error: unknown): boolean {
+  const info = classifyDatabaseError(error);
+  return info.type === "DATABASE_UNREACHABLE";
+}
+
+export function getConnectionErrorType(
+  error: unknown,
+): "no_internet" | "database" | "timeout" | "unknown" {
+  const info = classifyDatabaseError(error);
+
+  switch (info.type) {
+    case "NO_INTERNET":
+      return "no_internet";
+    case "DATABASE_UNREACHABLE":
+    case "CONNECTION_REFUSED":
+      return "database";
+    case "CONNECTION_TIMEOUT":
+    case "QUERY_TIMEOUT":
+      return "timeout";
+    default:
+      return "unknown";
+  }
 }
 
 export function getUserFriendlyMessage(error: unknown): string {
