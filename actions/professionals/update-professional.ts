@@ -11,22 +11,13 @@ const inputSchema = z.object({
   displayName: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
   bio: z.string().optional(),
   email: z.email("Email inválido"),
-  acceptsPix: z.boolean(),
-  acceptsCard: z.boolean(),
 });
 
 export const updateProfessional = subscribedOwnerActionClient
   .inputSchema(inputSchema)
   .action(
     async ({
-      parsedInput: {
-        professionalId,
-        displayName,
-        bio,
-        email,
-        acceptsPix,
-        acceptsCard,
-      },
+      parsedInput: { professionalId, displayName, bio, email },
       ctx: { barbershop },
     }) => {
       const professional = await prisma.professional.findUnique({
@@ -64,8 +55,6 @@ export const updateProfessional = subscribedOwnerActionClient
           data: {
             displayName,
             bio,
-            acceptsPix,
-            acceptsCard,
           },
           include: { user: true },
         }),

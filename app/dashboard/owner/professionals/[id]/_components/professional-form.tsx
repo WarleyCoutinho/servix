@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   AlertDialog,
@@ -80,8 +79,6 @@ export default function ProfessionalForm({
     displayName: professional.displayName ?? professional.user.name,
     email: professional.user.email,
     bio: professional.bio ?? "",
-    acceptsPix: professional.acceptsPix,
-    acceptsCard: professional.acceptsCard,
   });
 
   const { execute: executeUpdate, isPending: isUpdating } = useAction(
@@ -231,51 +228,50 @@ export default function ProfessionalForm({
               />
             </div>
 
-            <div className="space-y-4">
-              <Label>Formas de Pagamento Aceitas</Label>
-              <div className="flex items-center justify-between rounded-lg border p-4">
-                <div className="flex items-center gap-3">
-                  <CreditCard className="text-muted-foreground h-5 w-5" />
-                  <div>
-                    <p className="font-medium">Cartão de Crédito</p>
-                    <p className="text-muted-foreground text-sm">
-                      Aceitar pagamentos via cartão
-                    </p>
-                  </div>
-                </div>
-                <Switch
-                  checked={formData.acceptsCard}
-                  onCheckedChange={(checked) =>
-                    setFormData({ ...formData, acceptsCard: checked })
-                  }
-                  disabled={isLoading}
-                />
-              </div>
-              <div className="flex items-center justify-between rounded-lg border p-4">
-                <div className="flex items-center gap-3">
-                  <Banknote className="text-muted-foreground h-5 w-5" />
-                  <div>
-                    <p className="font-medium">PIX</p>
-                    <p className="text-muted-foreground text-sm">
-                      Aceitar pagamentos via PIX
-                    </p>
-                  </div>
-                </div>
-                <Switch
-                  checked={formData.acceptsPix}
-                  onCheckedChange={(checked) =>
-                    setFormData({ ...formData, acceptsPix: checked })
-                  }
-                  disabled={isLoading}
-                />
-              </div>
-            </div>
-
             <Button type="submit" disabled={isLoading}>
               {isUpdating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Salvar Alterações
             </Button>
           </form>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Formas de Pagamento</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-muted-foreground text-sm">
+            As formas de pagamento são configuradas pelo próprio profissional.
+          </p>
+          <div className="flex items-center justify-between rounded-lg border p-4">
+            <div className="flex items-center gap-3">
+              <CreditCard className="text-muted-foreground h-5 w-5" />
+              <div>
+                <p className="font-medium">Cartão de Crédito</p>
+                <p className="text-muted-foreground text-sm">
+                  Pagamentos via cartão
+                </p>
+              </div>
+            </div>
+            <Badge variant={professional.acceptsCard ? "default" : "secondary"}>
+              {professional.acceptsCard ? "Aceita" : "Não aceita"}
+            </Badge>
+          </div>
+          <div className="flex items-center justify-between rounded-lg border p-4">
+            <div className="flex items-center gap-3">
+              <Banknote className="text-muted-foreground h-5 w-5" />
+              <div>
+                <p className="font-medium">PIX</p>
+                <p className="text-muted-foreground text-sm">
+                  Pagamentos via PIX
+                </p>
+              </div>
+            </div>
+            <Badge variant={professional.acceptsPix ? "default" : "secondary"}>
+              {professional.acceptsPix ? "Aceita" : "Não aceita"}
+            </Badge>
+          </div>
         </CardContent>
       </Card>
 
