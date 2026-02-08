@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getAllProfessionalsByBarbershop } from "@/data/professionals";
 import { StripeAccountStatus, UserRole } from "@/generated/prisma/enums";
 import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { getActiveBarbershop } from "@/lib/get-active-barbershop";
 import { getPlanLimits } from "@/lib/plan-limits";
 import { AlertTriangle, Plus, UserCheck, UserX } from "lucide-react";
 import {
@@ -43,16 +43,13 @@ export default async function ProfessionalsPage() {
     redirect("/");
   }
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    include: { ownedBarbershops: true },
-  });
+  const data = await getActiveBarbershop(session.user.id);
 
-  if (!user || user.ownedBarbershops.length === 0) {
+  if (!data) {
     redirect("/");
   }
 
-  const activeBarbershop = user.ownedBarbershops[0];
+  const { user, activeBarbershop } = data;
   const professionals = await getAllProfessionalsByBarbershop(
     activeBarbershop.id,
   );

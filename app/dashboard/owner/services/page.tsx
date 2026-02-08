@@ -1,5 +1,6 @@
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
+import { getActiveBarbershop } from "@/lib/get-active-barbershop";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,25 +22,28 @@ export default async function OwnerServicesPage() {
     redirect("/");
   }
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
+  const data = await getActiveBarbershop(session.user.id);
+
+  if (!data) {
+    redirect("/");
+  }
+
+  const { activeBarbershop } = data;
+
+  const barbershopWithServices = await prisma.barbershop.findUnique({
+    where: { id: activeBarbershop.id },
     include: {
-      ownedBarbershops: {
-        include: {
-          services: {
-            orderBy: { name: "asc" },
-          },
-        },
+      services: {
+        orderBy: { name: "asc" },
       },
     },
   });
 
-  if (!user || user.ownedBarbershops.length === 0) {
+  if (!barbershopWithServices) {
     redirect("/");
   }
 
-  const activeBarbershop = user.ownedBarbershops[0];
-  const services = activeBarbershop.services.filter((s) => !s.deletedAt);
+  const services = barbershopWithServices.services.filter((s) => !s.deletedAt);
   const limits = await getPlanLimits(activeBarbershop.id);
 
   const canAddService = limits?.canAddService ?? false;

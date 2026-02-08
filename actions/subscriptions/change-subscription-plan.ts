@@ -75,7 +75,7 @@ export const changeSubscriptionPlan = ownerActionClient
         barbershopId: barbershop.id,
         plan: plan,
       },
-      proration_behavior: isUpgrade ? "create_prorations" : "none",
+      proration_behavior: "none",
     });
 
     await prisma.subscription.update({

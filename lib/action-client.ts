@@ -1,9 +1,11 @@
 import { createSafeActionClient } from "next-safe-action";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { auth } from "./auth";
 import { prisma } from "./prisma";
 import { SubscriptionStatus, UserRole } from "@/generated/prisma/enums";
 import { getUserFriendlyMessage, isConnectionError } from "./db-error";
+
+const ACTIVE_BARBERSHOP_COOKIE = "active-barbershop-id";
 
 export const actionClient = createSafeActionClient({
   handleServerError: (error) => {
@@ -48,7 +50,16 @@ export const ownerActionClient = protectedActionClient.use(
       );
     }
 
-    const activeBarbershop = user.ownedBarbershops[0];
+    const cookieStore = await cookies();
+    const activeBarbershopId = cookieStore.get(ACTIVE_BARBERSHOP_COOKIE)?.value;
+
+    let activeBarbershop = user.ownedBarbershops.find(
+      (b) => b.id === activeBarbershopId
+    );
+
+    if (!activeBarbershop) {
+      activeBarbershop = user.ownedBarbershops[0];
+    }
 
     return next({
       ctx: {
@@ -100,11 +111,16 @@ export const professionalActionClient = protectedActionClient.use(
 
 export const subscribedOwnerActionClient = ownerActionClient.use(
   async ({ next, ctx }) => {
-    const subscription = await prisma.subscription.findUnique({
-      where: { barbershopId: ctx.barbershop.id },
+    const subscription = await prisma.subscription.findFirst({
+      where: {
+        barbershop: {
+          ownerId: ctx.user.id,
+        },
+        status: SubscriptionStatus.ACTIVE,
+      },
     });
 
-    if (!subscription || subscription.status !== SubscriptionStatus.ACTIVE) {
+    if (!subscription) {
       throw new Error(
         "Assinatura inativa. Por favor, renove sua assinatura para continuar.",
       );

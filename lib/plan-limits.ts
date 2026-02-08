@@ -16,11 +16,25 @@ export interface PlanLimits {
 export async function getPlanLimits(
   barbershopId: string,
 ): Promise<PlanLimits | null> {
-  const subscription = await prisma.subscription.findUnique({
-    where: { barbershopId },
+  const barbershop = await prisma.barbershop.findUnique({
+    where: { id: barbershopId },
+    select: { ownerId: true },
   });
 
-  if (!subscription || subscription.status !== SubscriptionStatus.ACTIVE) {
+  if (!barbershop?.ownerId) {
+    return null;
+  }
+
+  const subscription = await prisma.subscription.findFirst({
+    where: {
+      barbershop: {
+        ownerId: barbershop.ownerId,
+      },
+      status: SubscriptionStatus.ACTIVE,
+    },
+  });
+
+  if (!subscription) {
     return null;
   }
 
@@ -32,12 +46,15 @@ export async function getPlanLimits(
     return null;
   }
 
-  const [currentProfessionals, currentServices] = await Promise.all([
+  const [currentProfessionals, currentServices, currentBarbershops] = await Promise.all([
     prisma.professional.count({
       where: { barbershopId, isActive: true },
     }),
     prisma.barbershopService.count({
       where: { barbershopId, deletedAt: null },
+    }),
+    prisma.barbershop.count({
+      where: { ownerId: barbershop.ownerId },
     }),
   ]);
 
@@ -50,10 +67,10 @@ export async function getPlanLimits(
     maxBarbershops: planConfig.maxBarbershops,
     maxProfessionals: planConfig.maxProfessionals,
     maxServices: planConfig.maxServices,
-    currentBarbershops: 1,
+    currentBarbershops,
     currentProfessionals,
     currentServices,
-    canAddBarbershop: planConfig.maxBarbershops > 1,
+    canAddBarbershop: currentBarbershops < planConfig.maxBarbershops,
     canAddProfessional,
     canAddService,
   };

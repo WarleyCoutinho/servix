@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { SubscriptionStatus } from "@/generated/prisma/enums";
 import { auth } from "@/lib/auth";
+import { getActiveBarbershop } from "@/lib/get-active-barbershop";
+import { hasActiveSubscription } from "@/lib/get-owner-subscription";
 import { prisma } from "@/lib/prisma";
 import { formatCurrency } from "@/lib/utils";
 import { endOfMonth, startOfMonth } from "date-fns";
@@ -17,28 +18,28 @@ export default async function OwnerDashboardPage() {
     redirect("/");
   }
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
+  const data = await getActiveBarbershop(session.user.id);
+
+  if (!data) {
+    redirect("/");
+  }
+
+  const barbershop = await prisma.barbershop.findUnique({
+    where: { id: data.activeBarbershop.id },
     include: {
-      ownedBarbershops: {
-        include: {
-          subscription: true,
-          professionals: true,
-          _count: {
-            select: {
-              services: true,
-            },
-          },
+      subscription: true,
+      professionals: true,
+      _count: {
+        select: {
+          services: true,
         },
       },
     },
   });
 
-  if (!user || user.ownedBarbershops.length === 0) {
+  if (!barbershop) {
     redirect("/");
   }
-
-  const barbershop = user.ownedBarbershops[0];
   const now = new Date();
   const monthStart = startOfMonth(now);
   const monthEnd = endOfMonth(now);
@@ -70,8 +71,7 @@ export default async function OwnerDashboardPage() {
     },
   });
 
-  const isSubscriptionActive =
-    barbershop.subscription?.status === SubscriptionStatus.ACTIVE;
+  const isSubscriptionActive = await hasActiveSubscription(session.user.id);
 
   return (
     <div className="space-y-6">
@@ -85,7 +85,7 @@ export default async function OwnerDashboardPage() {
           <CardContent className="pt-6">
             <p className="text-yellow-800 dark:text-yellow-200">
               Sua assinatura não está ativa. Ative para desbloquear todos os
-              recursos.oi warley resolver
+              recursos.
             </p>
           </CardContent>
         </Card>

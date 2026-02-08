@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { UserRole } from "@/generated/prisma/enums";
@@ -9,11 +9,16 @@ import {
   Clock,
   CreditCard,
   LayoutDashboard,
+  Store,
 } from "lucide-react";
 import { DashboardSidebar, type NavItem } from "@/components/dashboard-sidebar";
+import { BarbershopSelector } from "@/components/barbershop-selector";
+
+const ACTIVE_BARBERSHOP_COOKIE = "active-barbershop-id";
 
 const navItems: NavItem[] = [
   { href: "/dashboard/owner", label: "Visão Geral", icon: LayoutDashboard },
+  { href: "/dashboard/owner/establishments", label: "Estabelecimentos", icon: Store },
   { href: "/dashboard/owner/professionals", label: "Profissionais", icon: Users },
   { href: "/dashboard/owner/services", label: "Serviços", icon: Scissors },
   { href: "/dashboard/owner/schedule", label: "Horários", icon: Clock },
@@ -46,7 +51,18 @@ export default async function OwnerDashboardLayout({
     redirect("/onboarding/owner");
   }
 
-  const activeBarbershop = user.ownedBarbershops[0];
+  const cookieStore = await cookies();
+  const activeBarbershopId = cookieStore.get(ACTIVE_BARBERSHOP_COOKIE)?.value;
+
+  let activeBarbershop = user.ownedBarbershops.find(
+    (b) => b.id === activeBarbershopId
+  );
+
+  if (!activeBarbershop) {
+    activeBarbershop = user.ownedBarbershops[0];
+  }
+
+  const showSelector = user.ownedBarbershops.length > 1;
 
   return (
     <div className="flex min-h-screen">
@@ -54,7 +70,14 @@ export default async function OwnerDashboardLayout({
         title={activeBarbershop.name}
         subtitle="Painel do Proprietário"
         navItems={navItems}
-      />
+      >
+        {showSelector && (
+          <BarbershopSelector
+            barbershops={user.ownedBarbershops}
+            activeBarbershopId={activeBarbershop.id}
+          />
+        )}
+      </DashboardSidebar>
       <main className="flex-1 p-6">{children}</main>
     </div>
   );

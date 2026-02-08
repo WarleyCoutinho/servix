@@ -73,22 +73,21 @@ async function seedPlans() {
     {
       plan: SubscriptionPlan.ENTERPRISE,
       name: "Empresarial",
-      description: "Para grandes operações",
+      description: "Para redes e múltiplos estabelecimentos",
       priceInCents: 19990, // R$ 199,90
       stripePriceId: "price_enterprise_xxx",
-      maxBarbershops: 999,
-      maxProfessionals: 999,
+      maxBarbershops: 5,
+      maxProfessionals: 50,
       maxServices: null, // ilimitado
       isActive: true,
       features: [
-        "Barbearias ilimitadas",
-        "Profissionais ilimitados",
+        "Até 5 Estabelecimentos",
+        "Até 50 Profissionais por unidade",
         "Serviços ilimitados",
         "Agendamento online",
-        "Relatórios personalizados",
-        "API de integração",
-        "Suporte 24/7",
-        "Gerente de conta dedicado",
+        "Pagamentos via Stripe Connect",
+        "Gerenciamento de equipe",
+        "Suporte prioritário",
       ],
     },
   ];
