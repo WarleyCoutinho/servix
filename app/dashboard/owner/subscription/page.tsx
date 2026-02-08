@@ -1,6 +1,7 @@
 import { getAllPlans, type PlanConfig } from "@/data/plans";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import { getOwnerSubscription } from "@/lib/get-owner-subscription";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { SubscriptionPlans } from "./_components/subscription-plans";
@@ -14,19 +15,8 @@ export default async function SubscriptionPage() {
     redirect("/");
   }
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    include: {
-      ownedBarbershops: {
-        include: {
-          subscription: true,
-        },
-      },
-    },
-  });
-
-  const activeBarbershop = user?.ownedBarbershops[0];
-  const currentPlan = activeBarbershop?.subscription?.plan ?? null;
+  const ownerSubscription = await getOwnerSubscription(session.user.id);
+  const currentPlan = ownerSubscription?.plan ?? null;
 
   const plans = await getAllPlans();
 

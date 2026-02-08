@@ -21,12 +21,20 @@ const PLAN_ORDER: Record<SubscriptionPlan, number> = {
 
 export const changeSubscriptionPlan = ownerActionClient
   .inputSchema(inputSchema)
-  .action(async ({ parsedInput: { plan }, ctx: { barbershop } }) => {
-    const subscription = await prisma.subscription.findUnique({
-      where: { barbershopId: barbershop.id },
+  .action(async ({ parsedInput: { plan }, ctx: { barbershop, user } }) => {
+    const subscription = await prisma.subscription.findFirst({
+      where: {
+        barbershop: {
+          ownerId: user.id,
+        },
+        status: SubscriptionStatus.ACTIVE,
+      },
+      include: {
+        barbershop: true,
+      },
     });
 
-    if (!subscription || subscription.status !== SubscriptionStatus.ACTIVE) {
+    if (!subscription) {
       throw new Error("Você não possui uma assinatura ativa.");
     }
 
@@ -44,9 +52,11 @@ export const changeSubscriptionPlan = ownerActionClient
 
     const isUpgrade = PLAN_ORDER[plan] > PLAN_ORDER[subscription.plan];
 
+    const subscriptionBarbershopId = subscription.barbershopId;
+
     if (!isUpgrade) {
       const downgradeResult = await handlePlanDowngrade(
-        barbershop.id,
+        subscriptionBarbershopId,
         subscription.plan,
         plan,
       );
@@ -72,7 +82,7 @@ export const changeSubscriptionPlan = ownerActionClient
         },
       ],
       metadata: {
-        barbershopId: barbershop.id,
+        barbershopId: subscriptionBarbershopId,
         plan: plan,
       },
       proration_behavior: "none",
@@ -86,7 +96,7 @@ export const changeSubscriptionPlan = ownerActionClient
       },
     });
 
-    await updateUserRoleBasedOnPlan(barbershop.id, plan);
+    await updateUserRoleBasedOnPlan(subscriptionBarbershopId, plan);
 
     revalidatePath("/dashboard/owner/subscription");
     revalidatePath("/dashboard/owner");

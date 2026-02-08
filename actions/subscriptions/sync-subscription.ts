@@ -5,15 +5,25 @@ import { prisma } from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
 import { syncSubscriptionFromStripe } from "@/lib/stripe-subscriptions";
 import { updateUserRoleBasedOnPlan } from "@/lib/role-sync";
-import { SubscriptionPlan } from "@/generated/prisma/enums";
+import { SubscriptionPlan, SubscriptionStatus } from "@/generated/prisma/enums";
 
 export const syncSubscription = ownerActionClient.action(
-  async ({ ctx: { user, barbershop } }) => {
+  async ({ ctx: { user, ownedBarbershops } }) => {
     if (!user.stripeCustomerId) {
       throw new Error(
         "Nenhum cliente Stripe encontrado. Faça uma assinatura primeiro.",
       );
     }
+
+    const existingSubscription = await prisma.subscription.findFirst({
+      where: {
+        barbershop: {
+          ownerId: user.id,
+        },
+      },
+    });
+
+    const targetBarbershopId = existingSubscription?.barbershopId || ownedBarbershops[0].id;
 
     const subscriptions = await stripe.subscriptions.list({
       customer: user.stripeCustomerId,
@@ -47,7 +57,7 @@ export const syncSubscription = ownerActionClient.action(
       {
         metadata: {
           ...stripeSubscription.metadata,
-          barbershopId: barbershop.id,
+          barbershopId: targetBarbershopId,
           plan,
         },
       },
@@ -55,13 +65,18 @@ export const syncSubscription = ownerActionClient.action(
 
     await syncSubscriptionFromStripe(
       updatedStripeSubscription,
-      barbershop.id,
+      targetBarbershopId,
       plan,
     );
-    await updateUserRoleBasedOnPlan(barbershop.id, plan);
+    await updateUserRoleBasedOnPlan(targetBarbershopId, plan);
 
-    const updatedSubscription = await prisma.subscription.findUnique({
-      where: { barbershopId: barbershop.id },
+    const updatedSubscription = await prisma.subscription.findFirst({
+      where: {
+        barbershop: {
+          ownerId: user.id,
+        },
+        status: SubscriptionStatus.ACTIVE,
+      },
     });
 
     return {

@@ -18,14 +18,16 @@ const inputSchema = z.object({
 export const createSubscriptionCheckout = ownerActionClient
   .inputSchema(inputSchema)
   .action(async ({ parsedInput: { plan }, ctx: { user, barbershop } }) => {
-    const existingSubscription = await prisma.subscription.findUnique({
-      where: { barbershopId: barbershop.id },
+    const existingSubscription = await prisma.subscription.findFirst({
+      where: {
+        barbershop: {
+          ownerId: user.id,
+        },
+        status: SubscriptionStatus.ACTIVE,
+      },
     });
 
-    if (
-      existingSubscription &&
-      existingSubscription.status === SubscriptionStatus.ACTIVE
-    ) {
+    if (existingSubscription) {
       throw new Error(
         "Você já possui uma assinatura ativa. Use a opção de upgrade/downgrade para alterar seu plano.",
       );
