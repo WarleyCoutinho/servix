@@ -2,6 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { auth } from "@/lib/auth";
+import { getActiveBarbershop } from "@/lib/get-active-barbershop";
 import { prisma } from "@/lib/prisma";
 import { ArrowLeft, UserCheck, UserX } from "lucide-react";
 import { headers } from "next/headers";
@@ -26,16 +27,13 @@ export default async function ProfessionalPage({
     redirect("/");
   }
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    include: { ownedBarbershops: true },
-  });
+  const data = await getActiveBarbershop(session.user.id);
 
-  if (!user || user.ownedBarbershops.length === 0) {
+  if (!data) {
     redirect("/");
   }
 
-  const activeBarbershop = user.ownedBarbershops[0];
+  const { activeBarbershop } = data;
 
   const professional = await prisma.professional.findUnique({
     where: { id },
