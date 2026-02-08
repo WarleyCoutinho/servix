@@ -172,6 +172,10 @@ export const createBookingCheckoutSession = protectedActionClient
       }
 
       const checkoutSession = await stripe.checkout.sessions.create(sessionParams);
-      return checkoutSession;
+
+      return {
+        id: checkoutSession.id,
+        url: checkoutSession.url,
+      };
     },
   );
