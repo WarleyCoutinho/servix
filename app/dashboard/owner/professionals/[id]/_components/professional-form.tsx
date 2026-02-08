@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import { Switch } from "@/components/ui/switch";
 import {
   Loader2,
   UserCheck,
@@ -79,6 +80,8 @@ export default function ProfessionalForm({
     displayName: professional.displayName ?? professional.user.name,
     email: professional.user.email,
     bio: professional.bio ?? "",
+    acceptsPix: professional.acceptsPix,
+    acceptsCard: professional.acceptsCard,
   });
 
   const { execute: executeUpdate, isPending: isUpdating } = useAction(
@@ -242,7 +245,7 @@ export default function ProfessionalForm({
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-muted-foreground text-sm">
-            As formas de pagamento são configuradas pelo próprio profissional.
+            Configure quais formas de pagamento este profissional aceita.
           </p>
           <div className="flex items-center justify-between rounded-lg border p-4">
             <div className="flex items-center gap-3">
@@ -254,9 +257,13 @@ export default function ProfessionalForm({
                 </p>
               </div>
             </div>
-            <Badge variant={professional.acceptsCard ? "default" : "secondary"}>
-              {professional.acceptsCard ? "Aceita" : "Não aceita"}
-            </Badge>
+            <Switch
+              checked={formData.acceptsCard}
+              onCheckedChange={(checked) =>
+                setFormData({ ...formData, acceptsCard: checked })
+              }
+              disabled={isLoading || (!formData.acceptsPix && formData.acceptsCard)}
+            />
           </div>
           <div className="flex items-center justify-between rounded-lg border p-4">
             <div className="flex items-center gap-3">
@@ -268,10 +275,19 @@ export default function ProfessionalForm({
                 </p>
               </div>
             </div>
-            <Badge variant={professional.acceptsPix ? "default" : "secondary"}>
-              {professional.acceptsPix ? "Aceita" : "Não aceita"}
-            </Badge>
+            <Switch
+              checked={formData.acceptsPix}
+              onCheckedChange={(checked) =>
+                setFormData({ ...formData, acceptsPix: checked })
+              }
+              disabled={isLoading || (!formData.acceptsCard && formData.acceptsPix)}
+            />
           </div>
+          {!formData.acceptsCard && !formData.acceptsPix && (
+            <p className="text-destructive text-sm">
+              O profissional deve aceitar pelo menos uma forma de pagamento.
+            </p>
+          )}
         </CardContent>
       </Card>
 

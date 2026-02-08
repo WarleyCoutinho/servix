@@ -11,13 +11,15 @@ const inputSchema = z.object({
   displayName: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
   bio: z.string().optional(),
   email: z.email("Email inválido"),
+  acceptsPix: z.boolean().optional(),
+  acceptsCard: z.boolean().optional(),
 });
 
 export const updateProfessional = subscribedOwnerActionClient
   .inputSchema(inputSchema)
   .action(
     async ({
-      parsedInput: { professionalId, displayName, bio, email },
+      parsedInput: { professionalId, displayName, bio, email, acceptsPix, acceptsCard },
       ctx: { barbershop },
     }) => {
       const professional = await prisma.professional.findUnique({
@@ -49,12 +51,18 @@ export const updateProfessional = subscribedOwnerActionClient
         }
       }
 
+      if (acceptsPix === false && acceptsCard === false) {
+        throw new Error("O profissional deve aceitar pelo menos uma forma de pagamento.");
+      }
+
       const [updatedProfessional] = await prisma.$transaction([
         prisma.professional.update({
           where: { id: professionalId },
           data: {
             displayName,
             bio,
+            ...(acceptsPix !== undefined && { acceptsPix }),
+            ...(acceptsCard !== undefined && { acceptsCard }),
           },
           include: { user: true },
         }),

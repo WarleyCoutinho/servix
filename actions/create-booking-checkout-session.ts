@@ -103,8 +103,25 @@ export const createBookingCheckoutSession = protectedActionClient
 
       const applicationFeeAmount = calculatePlatformFee(service.priceInCents);
 
+      const paymentMethods: Stripe.Checkout.SessionCreateParams.PaymentMethodType[] = [];
+
+      if (professional) {
+        if (professional.acceptsCard) {
+          paymentMethods.push("card");
+        }
+        if (professional.acceptsPix) {
+          paymentMethods.push("pix");
+        }
+      } else {
+        paymentMethods.push("card", "pix");
+      }
+
+      if (paymentMethods.length === 0) {
+        throw new Error("Nenhuma forma de pagamento disponível para este profissional.");
+      }
+
       const sessionParams: Stripe.Checkout.SessionCreateParams = {
-        payment_method_types: ["card", "boleto"],
+        payment_method_types: paymentMethods,
         mode: "payment",
         success_url: `${process.env.NEXT_PUBLIC_APP_URL}/bookings?success=true`,
         cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}`,
@@ -133,6 +150,14 @@ export const createBookingCheckoutSession = protectedActionClient
         ],
         payment_intent_data: {},
       };
+
+      if (paymentMethods.includes("pix")) {
+        sessionParams.payment_method_options = {
+          pix: {
+            expires_after_seconds: 1800,
+          },
+        };
+      }
 
       if (
         professional?.stripeAccountId &&
