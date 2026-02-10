@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { auth } from "@/lib/auth";
 import { getActiveBarbershop } from "@/lib/get-active-barbershop";
 import { prisma } from "@/lib/prisma";
+import { getUserPlanInfo, getPlanLimits } from "@/lib/plan-limits";
 import { ArrowLeft, UserCheck, UserX } from "lucide-react";
 import { headers } from "next/headers";
 import Link from "next/link";
@@ -29,11 +30,14 @@ export default async function ProfessionalPage({
 
   const data = await getActiveBarbershop(session.user.id);
 
-  if (!data) {
-    redirect("/");
+  if (!data || !data.activeBarbershop) {
+    redirect("/dashboard/owner/subscription");
   }
 
-  const { activeBarbershop } = data;
+  const { activeBarbershop, user } = data;
+
+  const planInfo = await getUserPlanInfo(user.id, activeBarbershop.id);
+  const limits = await getPlanLimits(activeBarbershop.id);
 
   const professional = await prisma.professional.findUnique({
     where: { id },
@@ -97,7 +101,12 @@ export default async function ProfessionalPage({
         </div>
       </div>
 
-      <ProfessionalForm professional={professional} />
+      <ProfessionalForm
+        professional={professional}
+        isBasicPlan={planInfo?.isBasicPlan ?? false}
+        isOwnerProfessional={professional.userId === user.id}
+        canActivateProfessional={limits?.canAddProfessional ?? false}
+      />
     </div>
   );
 }

@@ -53,6 +53,9 @@ interface ProfessionalFormProps {
       image: string | null;
     };
   };
+  isBasicPlan: boolean;
+  isOwnerProfessional: boolean;
+  canActivateProfessional: boolean;
 }
 
 function getStripeStatusInfo(status: StripeAccountStatus) {
@@ -74,6 +77,9 @@ function getStripeStatusInfo(status: StripeAccountStatus) {
 
 export default function ProfessionalForm({
   professional,
+  isBasicPlan,
+  isOwnerProfessional,
+  canActivateProfessional,
 }: ProfessionalFormProps) {
   const router = useRouter();
   const [formData, setFormData] = useState({
@@ -161,6 +167,27 @@ export default function ProfessionalForm({
 
   const stripeStatus = getStripeStatusInfo(professional.stripeAccountStatus);
   const isLoading = isUpdating || isTogglingStatus || isRemoving;
+
+  const canToggleStatus = (() => {
+    if (professional.isActive) {
+      return true;
+    }
+    if (isOwnerProfessional) {
+      return true;
+    }
+    if (isBasicPlan) {
+      return false;
+    }
+    return canActivateProfessional;
+  })();
+
+  const toggleStatusDisabledReason = (() => {
+    if (canToggleStatus) return null;
+    if (isBasicPlan && !isOwnerProfessional) {
+      return "No plano Básico, apenas o proprietário pode ser profissional. Faça upgrade para reativar.";
+    }
+    return "Limite de profissionais ativos atingido. Faça upgrade para reativar.";
+  })();
 
   return (
     <div className="space-y-6">
@@ -329,36 +356,46 @@ export default function ProfessionalForm({
           <CardTitle>Status e Ações</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center justify-between rounded-lg border p-4">
-            <div className="flex items-center gap-3">
-              {professional.isActive ? (
-                <UserCheck className="h-5 w-5 text-green-600" />
-              ) : (
-                <UserX className="h-5 w-5 text-red-600" />
-              )}
-              <div>
-                <p className="font-medium">
-                  {professional.isActive
-                    ? "Profissional Ativo"
-                    : "Profissional Bloqueado"}
-                </p>
-                <p className="text-muted-foreground text-sm">
-                  {professional.isActive
-                    ? "O profissional pode receber agendamentos"
-                    : "O profissional não pode receber agendamentos"}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between rounded-lg border p-4">
+              <div className="flex items-center gap-3">
+                {professional.isActive ? (
+                  <UserCheck className="h-5 w-5 text-green-600" />
+                ) : (
+                  <UserX className="h-5 w-5 text-red-600" />
+                )}
+                <div>
+                  <p className="font-medium">
+                    {professional.isActive
+                      ? "Profissional Ativo"
+                      : "Profissional Bloqueado"}
+                  </p>
+                  <p className="text-muted-foreground text-sm">
+                    {professional.isActive
+                      ? "O profissional pode receber agendamentos"
+                      : "O profissional não pode receber agendamentos"}
+                  </p>
+                </div>
+              </div>
+              <Button
+                variant={professional.isActive ? "destructive" : "default"}
+                onClick={handleToggleStatus}
+                disabled={isLoading || !canToggleStatus}
+              >
+                {isTogglingStatus && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                {professional.isActive ? "Bloquear" : "Ativar"}
+              </Button>
+            </div>
+            {toggleStatusDisabledReason && (
+              <div className="flex items-start gap-2 rounded-lg border border-yellow-500 bg-yellow-50 p-3 dark:bg-yellow-950">
+                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-yellow-600" />
+                <p className="text-sm text-yellow-700 dark:text-yellow-300">
+                  {toggleStatusDisabledReason}
                 </p>
               </div>
-            </div>
-            <Button
-              variant={professional.isActive ? "destructive" : "default"}
-              onClick={handleToggleStatus}
-              disabled={isLoading}
-            >
-              {isTogglingStatus && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              )}
-              {professional.isActive ? "Bloquear" : "Ativar"}
-            </Button>
+            )}
           </div>
 
           <div className="flex items-center justify-between rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-900 dark:bg-red-950">

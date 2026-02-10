@@ -13,17 +13,10 @@ import {
 } from "lucide-react";
 import { DashboardSidebar, type NavItem } from "@/components/dashboard-sidebar";
 import { BarbershopSelector } from "@/components/barbershop-selector";
+import { getUserPlanInfo } from "@/lib/plan-limits";
+import { PlanBadge } from "@/components/plan-badge";
 
 const ACTIVE_BARBERSHOP_COOKIE = "active-barbershop-id";
-
-const navItems: NavItem[] = [
-  { href: "/dashboard/owner", label: "Visão Geral", icon: LayoutDashboard },
-  { href: "/dashboard/owner/establishments", label: "Estabelecimentos", icon: Store },
-  { href: "/dashboard/owner/professionals", label: "Profissionais", icon: Users },
-  { href: "/dashboard/owner/services", label: "Serviços", icon: Scissors },
-  { href: "/dashboard/owner/schedule", label: "Horários", icon: Clock },
-  { href: "/dashboard/owner/subscription", label: "Assinatura", icon: CreditCard },
-];
 
 export default async function OwnerDashboardLayout({
   children,
@@ -40,10 +33,14 @@ export default async function OwnerDashboardLayout({
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    include: { ownedBarbershops: true },
+    include: {
+      ownedBarbershops: {
+        orderBy: { createdAt: "asc" },
+      },
+    },
   });
 
-  if (user?.role !== UserRole.owner && user?.role !== UserRole.owner_professional) {
+  if (user?.role !== UserRole.owner) {
     redirect("/");
   }
 
@@ -51,18 +48,50 @@ export default async function OwnerDashboardLayout({
     redirect("/onboarding/owner");
   }
 
+  const activeBarbershops = user.ownedBarbershops.filter((b) => b.isActive);
+
+  if (activeBarbershops.length === 0) {
+    redirect("/dashboard/owner/subscription");
+  }
+
   const cookieStore = await cookies();
   const activeBarbershopId = cookieStore.get(ACTIVE_BARBERSHOP_COOKIE)?.value;
 
-  let activeBarbershop = user.ownedBarbershops.find(
-    (b) => b.id === activeBarbershopId
+  let activeBarbershop = activeBarbershops.find(
+    (b) => b.id === activeBarbershopId,
   );
 
   if (!activeBarbershop) {
-    activeBarbershop = user.ownedBarbershops[0];
+    activeBarbershop = activeBarbershops[0];
   }
 
-  const showSelector = user.ownedBarbershops.length > 1;
+  const planInfo = await getUserPlanInfo(user.id, activeBarbershop.id);
+
+  const navItems: NavItem[] = [
+    { href: "/dashboard/owner", label: "Visão Geral", icon: LayoutDashboard },
+  ];
+
+  if (planInfo?.canHaveMultipleBarbershops) {
+    navItems.push({
+      href: "/dashboard/owner/establishments",
+      label: "Estabelecimentos",
+      icon: Store,
+    });
+  }
+
+  navItems.push({
+    href: "/dashboard/owner/professionals",
+    label: "Profissionais",
+    icon: Users,
+  });
+
+  navItems.push(
+    { href: "/dashboard/owner/services", label: "Serviços", icon: Scissors },
+    { href: "/dashboard/owner/schedule", label: "Horários", icon: Clock },
+    { href: "/dashboard/owner/subscription", label: "Assinatura", icon: CreditCard },
+  );
+
+  const showSelector = activeBarbershops.length > 1;
 
   return (
     <div className="flex min-h-screen">
@@ -71,12 +100,20 @@ export default async function OwnerDashboardLayout({
         subtitle="Painel do Proprietário"
         navItems={navItems}
       >
-        {showSelector && (
-          <BarbershopSelector
-            barbershops={user.ownedBarbershops}
-            activeBarbershopId={activeBarbershop.id}
-          />
-        )}
+        <div className="space-y-3">
+          {planInfo && (
+            <PlanBadge
+              planName={planInfo.planName}
+              isBasicPlan={planInfo.isBasicPlan}
+            />
+          )}
+          {showSelector && (
+            <BarbershopSelector
+              barbershops={activeBarbershops}
+              activeBarbershopId={activeBarbershop.id}
+            />
+          )}
+        </div>
       </DashboardSidebar>
       <main className="flex-1 p-6">{children}</main>
     </div>
