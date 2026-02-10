@@ -68,6 +68,19 @@ export const createBookingCheckoutSession = protectedActionClient
           });
         }
 
+        if (
+          !professional.stripeAccountId ||
+          !isAccountReadyForPayments(professional.stripeAccountStatus)
+        ) {
+          returnValidationErrors(inputSchema, {
+            professionalId: {
+              _errors: [
+                "Este profissional ainda não configurou o recebimento de pagamentos. Por favor, escolha outro profissional.",
+              ],
+            },
+          });
+        }
+
         const existingBooking = await prisma.booking.findFirst({
           where: {
             professionalId,
@@ -86,6 +99,27 @@ export const createBookingCheckoutSession = protectedActionClient
           });
         }
       } else {
+        // Se não há profissional selecionado, buscar um profissional ativo com Stripe Connect
+        const availableProfessional = await prisma.professional.findFirst({
+          where: {
+            barbershopId: service.barbershopId,
+            isActive: true,
+            stripeAccountStatus: "ACTIVE",
+            stripeAccountId: { not: null },
+          },
+        });
+
+        if (!availableProfessional) {
+          returnValidationErrors(inputSchema, {
+            _errors: [
+              "Nenhum profissional disponível para receber pagamentos neste estabelecimento.",
+            ],
+          });
+        }
+
+        // Usar o profissional encontrado
+        professional = availableProfessional;
+
         const existingBooking = await prisma.booking.findFirst({
           where: {
             barbershopId: service.barbershopId,
@@ -162,10 +196,8 @@ export const createBookingCheckoutSession = protectedActionClient
           };
         }
 
-        if (
-          professional?.stripeAccountId &&
-          isAccountReadyForPayments(professional.stripeAccountStatus)
-        ) {
+        // Stripe Connect é obrigatório - profissional sempre terá conta ativa
+        if (professional?.stripeAccountId) {
           params.payment_intent_data = {
             application_fee_amount: applicationFeeAmount,
             transfer_data: {

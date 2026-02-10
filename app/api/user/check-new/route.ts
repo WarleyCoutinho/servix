@@ -20,11 +20,6 @@ export async function GET() {
         id: true,
         role: true,
         createdAt: true,
-        _count: {
-          select: {
-            bookings: true,
-          },
-        },
       },
     });
 
@@ -32,9 +27,12 @@ export async function GET() {
       return NextResponse.json({ error: "Usuário não encontrado" }, { status: 404 });
     }
 
-    const isNewUser =
-      user.role === "client" &&
-      user._count.bookings === 0;
+    // Usuário é considerado "novo" apenas se:
+    // 1. O role ainda é "client" (padrão) E
+    // 2. A conta foi criada há menos de 1 minuto (acabou de se registrar)
+    const ONE_MINUTE = 60 * 1000;
+    const timeSinceCreation = Date.now() - user.createdAt.getTime();
+    const isNewUser = user.role === "client" && timeSinceCreation < ONE_MINUTE;
 
     return NextResponse.json({
       isNewUser,

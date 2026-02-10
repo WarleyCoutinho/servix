@@ -105,16 +105,15 @@ export const POST = async (request: Request) => {
           const expandedSession = await stripe.checkout.sessions.retrieve(
             session.id,
             {
-              expand: ["payment_intent"],
+              expand: ["payment_intent", "payment_intent.latest_charge"],
             },
           );
 
           const paymentIntent =
             expandedSession.payment_intent as import("stripe").Stripe.PaymentIntent;
-          const chargeId =
-            typeof paymentIntent.latest_charge === "string"
-              ? paymentIntent.latest_charge
-              : paymentIntent.latest_charge?.id;
+          const charge = paymentIntent.latest_charge as import("stripe").Stripe.Charge | null;
+          const chargeId = charge?.id;
+          const transferId = charge?.transfer as string | null;
 
           const professionalId = metadata.data.professionalId || undefined;
 
@@ -139,11 +138,12 @@ export const POST = async (request: Request) => {
                 paymentMethod: paymentIntent.payment_method_types?.[0] ?? "card",
                 stripePaymentIntentId: paymentIntent.id,
                 stripeChargeId: chargeId,
+                stripeTransferId: transferId,
               },
             });
 
             console.log(
-              `Booking ${booking.id} created with payment for user ${metadata.data.userId}`
+              `Booking ${booking.id} created with payment for user ${metadata.data.userId}${transferId ? ` (transfer: ${transferId})` : ""}`
             );
           });
         }

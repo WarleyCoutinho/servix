@@ -4,15 +4,17 @@ import { createBookingCheckoutSession } from "@/actions/create-booking-checkout-
 import { Barbershop, BarbershopService } from "@/generated/prisma/client";
 import { useGetBarbershopProfessionals } from "@/hooks/data/use-get-barbershop-professionals";
 import { useGetDateAvailableTimeSlots } from "@/hooks/data/use-get-date-availabe-time-slots";
+import { authClient } from "@/lib/auth-client";
 import { formatCurrency } from "@/lib/utils";
 import { loadStripe } from "@stripe/stripe-js";
 import { ptBR } from "date-fns/locale";
-import { Loader2, User } from "lucide-react";
+import { Loader2, LogIn, User } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
 import Image from "next/image";
 import { useState } from "react";
 import { toast } from "sonner";
 import BookingSummary from "./booking-summary";
+import LoginModal from "./login-modal";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import { Calendar } from "./ui/calendar";
@@ -39,6 +41,8 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
     undefined,
   );
   const [sheetIsOpen, setSheetIsOpen] = useState(false);
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const { data: session } = authClient.useSession();
   const { executeAsync: executeCreateBooking, isPending: isCreatingBooking } =
     useAction(createBookingCheckoutSession);
 
@@ -157,6 +161,34 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
                 <SheetTitle>Fazer Reserva</SheetTitle>
               </SheetHeader>
 
+              {!session?.user ? (
+                <div className="flex flex-col items-center justify-center gap-4 px-5 py-12">
+                  <div className="rounded-full bg-muted p-4">
+                    <LogIn className="size-8 text-muted-foreground" />
+                  </div>
+                  <div className="text-center">
+                    <h3 className="text-lg font-semibold">
+                      Faça login para continuar
+                    </h3>
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      Para fazer um agendamento, você precisa estar cadastrado na
+                      plataforma. Faça login ou crie sua conta para acessar
+                      nossos serviços.
+                    </p>
+                  </div>
+                  <Button
+                    onClick={() => {
+                      setSheetIsOpen(false);
+                      setLoginModalOpen(true);
+                    }}
+                    className="mt-2 w-full"
+                  >
+                    <LogIn className="mr-2 size-4" />
+                    Fazer Login
+                  </Button>
+                </div>
+              ) : (
+                <>
               <div className="border-border border-b px-5 py-6">
                 <Calendar
                   mode="single"
@@ -306,8 +338,12 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
                   )}
                 </Button>
               </SheetFooter>
+                </>
+              )}
             </SheetContent>
           </Sheet>
+
+          <LoginModal open={loginModalOpen} onOpenChange={setLoginModalOpen} />
         </div>
       </div>
     </div>

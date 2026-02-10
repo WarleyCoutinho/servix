@@ -28,26 +28,26 @@ const plans: PlanConfig[] = [
   {
     plan: SubscriptionPlan.BASIC,
     name: "Básico",
-    description: "Ideal para começar seu negócio",
-    priceInCents: 2990,
+    description: "Organize sua agenda e comece a atender online",
+    priceInCents: 3990,
   },
   {
     plan: SubscriptionPlan.STANDARD,
     name: "Padrão",
-    description: "Para pequenos negócios em crescimento",
-    priceInCents: 4990,
+    description: "Mais equipe, mais organização e menos bagunça",
+    priceInCents: 5990,
   },
   {
     plan: SubscriptionPlan.PROFESSIONAL,
     name: "Profissional",
-    description: "Para negócios em crescimento",
+    description: "Controle total para crescer com dados",
     priceInCents: 9990,
   },
   {
     plan: SubscriptionPlan.ENTERPRISE,
     name: "Empresarial",
-    description: "Para redes e múltiplos estabelecimentos",
-    priceInCents: 19990,
+    description: "Escala, padronização e gestão profissional",
+    priceInCents: 24990,
   },
 ];
 
