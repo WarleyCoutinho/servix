@@ -83,6 +83,11 @@ export type Booking = Prisma.BookingModel
  */
 export type Payment = Prisma.PaymentModel
 /**
+ * Model PlanHistory
+ * 
+ */
+export type PlanHistory = Prisma.PlanHistoryModel
+/**
  * Model StripeEvent
  * 
  */

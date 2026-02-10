@@ -224,6 +224,7 @@ export type BarbershopWhereInput = {
   professionals?: Prisma.ProfessionalListRelationFilter
   operatingHours?: Prisma.OperatingHoursListRelationFilter
   subscription?: Prisma.XOR<Prisma.SubscriptionNullableScalarRelationFilter, Prisma.SubscriptionWhereInput> | null
+  planHistory?: Prisma.PlanHistoryListRelationFilter
 }
 
 export type BarbershopOrderByWithRelationInput = {
@@ -243,6 +244,7 @@ export type BarbershopOrderByWithRelationInput = {
   professionals?: Prisma.ProfessionalOrderByRelationAggregateInput
   operatingHours?: Prisma.OperatingHoursOrderByRelationAggregateInput
   subscription?: Prisma.SubscriptionOrderByWithRelationInput
+  planHistory?: Prisma.PlanHistoryOrderByRelationAggregateInput
 }
 
 export type BarbershopWhereUniqueInput = Prisma.AtLeast<{
@@ -265,6 +267,7 @@ export type BarbershopWhereUniqueInput = Prisma.AtLeast<{
   professionals?: Prisma.ProfessionalListRelationFilter
   operatingHours?: Prisma.OperatingHoursListRelationFilter
   subscription?: Prisma.XOR<Prisma.SubscriptionNullableScalarRelationFilter, Prisma.SubscriptionWhereInput> | null
+  planHistory?: Prisma.PlanHistoryListRelationFilter
 }, "id">
 
 export type BarbershopOrderByWithAggregationInput = {
@@ -315,6 +318,7 @@ export type BarbershopCreateInput = {
   professionals?: Prisma.ProfessionalCreateNestedManyWithoutBarbershopInput
   operatingHours?: Prisma.OperatingHoursCreateNestedManyWithoutBarbershopInput
   subscription?: Prisma.SubscriptionCreateNestedOneWithoutBarbershopInput
+  planHistory?: Prisma.PlanHistoryCreateNestedManyWithoutBarbershopInput
 }
 
 export type BarbershopUncheckedCreateInput = {
@@ -333,6 +337,7 @@ export type BarbershopUncheckedCreateInput = {
   professionals?: Prisma.ProfessionalUncheckedCreateNestedManyWithoutBarbershopInput
   operatingHours?: Prisma.OperatingHoursUncheckedCreateNestedManyWithoutBarbershopInput
   subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutBarbershopInput
+  planHistory?: Prisma.PlanHistoryUncheckedCreateNestedManyWithoutBarbershopInput
 }
 
 export type BarbershopUpdateInput = {
@@ -351,6 +356,7 @@ export type BarbershopUpdateInput = {
   professionals?: Prisma.ProfessionalUpdateManyWithoutBarbershopNestedInput
   operatingHours?: Prisma.OperatingHoursUpdateManyWithoutBarbershopNestedInput
   subscription?: Prisma.SubscriptionUpdateOneWithoutBarbershopNestedInput
+  planHistory?: Prisma.PlanHistoryUpdateManyWithoutBarbershopNestedInput
 }
 
 export type BarbershopUncheckedUpdateInput = {
@@ -369,6 +375,7 @@ export type BarbershopUncheckedUpdateInput = {
   professionals?: Prisma.ProfessionalUncheckedUpdateManyWithoutBarbershopNestedInput
   operatingHours?: Prisma.OperatingHoursUncheckedUpdateManyWithoutBarbershopNestedInput
   subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutBarbershopNestedInput
+  planHistory?: Prisma.PlanHistoryUncheckedUpdateManyWithoutBarbershopNestedInput
 }
 
 export type BarbershopCreateManyInput = {
@@ -590,6 +597,20 @@ export type BarbershopUpdateOneRequiredWithoutBookingsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.BarbershopUpdateToOneWithWhereWithoutBookingsInput, Prisma.BarbershopUpdateWithoutBookingsInput>, Prisma.BarbershopUncheckedUpdateWithoutBookingsInput>
 }
 
+export type BarbershopCreateNestedOneWithoutPlanHistoryInput = {
+  create?: Prisma.XOR<Prisma.BarbershopCreateWithoutPlanHistoryInput, Prisma.BarbershopUncheckedCreateWithoutPlanHistoryInput>
+  connectOrCreate?: Prisma.BarbershopCreateOrConnectWithoutPlanHistoryInput
+  connect?: Prisma.BarbershopWhereUniqueInput
+}
+
+export type BarbershopUpdateOneRequiredWithoutPlanHistoryNestedInput = {
+  create?: Prisma.XOR<Prisma.BarbershopCreateWithoutPlanHistoryInput, Prisma.BarbershopUncheckedCreateWithoutPlanHistoryInput>
+  connectOrCreate?: Prisma.BarbershopCreateOrConnectWithoutPlanHistoryInput
+  upsert?: Prisma.BarbershopUpsertWithoutPlanHistoryInput
+  connect?: Prisma.BarbershopWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.BarbershopUpdateToOneWithWhereWithoutPlanHistoryInput, Prisma.BarbershopUpdateWithoutPlanHistoryInput>, Prisma.BarbershopUncheckedUpdateWithoutPlanHistoryInput>
+}
+
 export type BarbershopCreateWithoutOwnerInput = {
   id?: string
   name: string
@@ -605,6 +626,7 @@ export type BarbershopCreateWithoutOwnerInput = {
   professionals?: Prisma.ProfessionalCreateNestedManyWithoutBarbershopInput
   operatingHours?: Prisma.OperatingHoursCreateNestedManyWithoutBarbershopInput
   subscription?: Prisma.SubscriptionCreateNestedOneWithoutBarbershopInput
+  planHistory?: Prisma.PlanHistoryCreateNestedManyWithoutBarbershopInput
 }
 
 export type BarbershopUncheckedCreateWithoutOwnerInput = {
@@ -622,6 +644,7 @@ export type BarbershopUncheckedCreateWithoutOwnerInput = {
   professionals?: Prisma.ProfessionalUncheckedCreateNestedManyWithoutBarbershopInput
   operatingHours?: Prisma.OperatingHoursUncheckedCreateNestedManyWithoutBarbershopInput
   subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutBarbershopInput
+  planHistory?: Prisma.PlanHistoryUncheckedCreateNestedManyWithoutBarbershopInput
 }
 
 export type BarbershopCreateOrConnectWithoutOwnerInput = {
@@ -681,6 +704,7 @@ export type BarbershopCreateWithoutProfessionalsInput = {
   bookings?: Prisma.BookingCreateNestedManyWithoutBarbershopInput
   operatingHours?: Prisma.OperatingHoursCreateNestedManyWithoutBarbershopInput
   subscription?: Prisma.SubscriptionCreateNestedOneWithoutBarbershopInput
+  planHistory?: Prisma.PlanHistoryCreateNestedManyWithoutBarbershopInput
 }
 
 export type BarbershopUncheckedCreateWithoutProfessionalsInput = {
@@ -698,6 +722,7 @@ export type BarbershopUncheckedCreateWithoutProfessionalsInput = {
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutBarbershopInput
   operatingHours?: Prisma.OperatingHoursUncheckedCreateNestedManyWithoutBarbershopInput
   subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutBarbershopInput
+  planHistory?: Prisma.PlanHistoryUncheckedCreateNestedManyWithoutBarbershopInput
 }
 
 export type BarbershopCreateOrConnectWithoutProfessionalsInput = {
@@ -731,6 +756,7 @@ export type BarbershopUpdateWithoutProfessionalsInput = {
   bookings?: Prisma.BookingUpdateManyWithoutBarbershopNestedInput
   operatingHours?: Prisma.OperatingHoursUpdateManyWithoutBarbershopNestedInput
   subscription?: Prisma.SubscriptionUpdateOneWithoutBarbershopNestedInput
+  planHistory?: Prisma.PlanHistoryUpdateManyWithoutBarbershopNestedInput
 }
 
 export type BarbershopUncheckedUpdateWithoutProfessionalsInput = {
@@ -748,6 +774,7 @@ export type BarbershopUncheckedUpdateWithoutProfessionalsInput = {
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutBarbershopNestedInput
   operatingHours?: Prisma.OperatingHoursUncheckedUpdateManyWithoutBarbershopNestedInput
   subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutBarbershopNestedInput
+  planHistory?: Prisma.PlanHistoryUncheckedUpdateManyWithoutBarbershopNestedInput
 }
 
 export type BarbershopCreateWithoutSubscriptionInput = {
@@ -765,6 +792,7 @@ export type BarbershopCreateWithoutSubscriptionInput = {
   bookings?: Prisma.BookingCreateNestedManyWithoutBarbershopInput
   professionals?: Prisma.ProfessionalCreateNestedManyWithoutBarbershopInput
   operatingHours?: Prisma.OperatingHoursCreateNestedManyWithoutBarbershopInput
+  planHistory?: Prisma.PlanHistoryCreateNestedManyWithoutBarbershopInput
 }
 
 export type BarbershopUncheckedCreateWithoutSubscriptionInput = {
@@ -782,6 +810,7 @@ export type BarbershopUncheckedCreateWithoutSubscriptionInput = {
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutBarbershopInput
   professionals?: Prisma.ProfessionalUncheckedCreateNestedManyWithoutBarbershopInput
   operatingHours?: Prisma.OperatingHoursUncheckedCreateNestedManyWithoutBarbershopInput
+  planHistory?: Prisma.PlanHistoryUncheckedCreateNestedManyWithoutBarbershopInput
 }
 
 export type BarbershopCreateOrConnectWithoutSubscriptionInput = {
@@ -815,6 +844,7 @@ export type BarbershopUpdateWithoutSubscriptionInput = {
   bookings?: Prisma.BookingUpdateManyWithoutBarbershopNestedInput
   professionals?: Prisma.ProfessionalUpdateManyWithoutBarbershopNestedInput
   operatingHours?: Prisma.OperatingHoursUpdateManyWithoutBarbershopNestedInput
+  planHistory?: Prisma.PlanHistoryUpdateManyWithoutBarbershopNestedInput
 }
 
 export type BarbershopUncheckedUpdateWithoutSubscriptionInput = {
@@ -832,6 +862,7 @@ export type BarbershopUncheckedUpdateWithoutSubscriptionInput = {
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutBarbershopNestedInput
   professionals?: Prisma.ProfessionalUncheckedUpdateManyWithoutBarbershopNestedInput
   operatingHours?: Prisma.OperatingHoursUncheckedUpdateManyWithoutBarbershopNestedInput
+  planHistory?: Prisma.PlanHistoryUncheckedUpdateManyWithoutBarbershopNestedInput
 }
 
 export type BarbershopCreateWithoutOperatingHoursInput = {
@@ -849,6 +880,7 @@ export type BarbershopCreateWithoutOperatingHoursInput = {
   bookings?: Prisma.BookingCreateNestedManyWithoutBarbershopInput
   professionals?: Prisma.ProfessionalCreateNestedManyWithoutBarbershopInput
   subscription?: Prisma.SubscriptionCreateNestedOneWithoutBarbershopInput
+  planHistory?: Prisma.PlanHistoryCreateNestedManyWithoutBarbershopInput
 }
 
 export type BarbershopUncheckedCreateWithoutOperatingHoursInput = {
@@ -866,6 +898,7 @@ export type BarbershopUncheckedCreateWithoutOperatingHoursInput = {
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutBarbershopInput
   professionals?: Prisma.ProfessionalUncheckedCreateNestedManyWithoutBarbershopInput
   subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutBarbershopInput
+  planHistory?: Prisma.PlanHistoryUncheckedCreateNestedManyWithoutBarbershopInput
 }
 
 export type BarbershopCreateOrConnectWithoutOperatingHoursInput = {
@@ -899,6 +932,7 @@ export type BarbershopUpdateWithoutOperatingHoursInput = {
   bookings?: Prisma.BookingUpdateManyWithoutBarbershopNestedInput
   professionals?: Prisma.ProfessionalUpdateManyWithoutBarbershopNestedInput
   subscription?: Prisma.SubscriptionUpdateOneWithoutBarbershopNestedInput
+  planHistory?: Prisma.PlanHistoryUpdateManyWithoutBarbershopNestedInput
 }
 
 export type BarbershopUncheckedUpdateWithoutOperatingHoursInput = {
@@ -916,6 +950,7 @@ export type BarbershopUncheckedUpdateWithoutOperatingHoursInput = {
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutBarbershopNestedInput
   professionals?: Prisma.ProfessionalUncheckedUpdateManyWithoutBarbershopNestedInput
   subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutBarbershopNestedInput
+  planHistory?: Prisma.PlanHistoryUncheckedUpdateManyWithoutBarbershopNestedInput
 }
 
 export type BarbershopCreateWithoutServicesInput = {
@@ -933,6 +968,7 @@ export type BarbershopCreateWithoutServicesInput = {
   professionals?: Prisma.ProfessionalCreateNestedManyWithoutBarbershopInput
   operatingHours?: Prisma.OperatingHoursCreateNestedManyWithoutBarbershopInput
   subscription?: Prisma.SubscriptionCreateNestedOneWithoutBarbershopInput
+  planHistory?: Prisma.PlanHistoryCreateNestedManyWithoutBarbershopInput
 }
 
 export type BarbershopUncheckedCreateWithoutServicesInput = {
@@ -950,6 +986,7 @@ export type BarbershopUncheckedCreateWithoutServicesInput = {
   professionals?: Prisma.ProfessionalUncheckedCreateNestedManyWithoutBarbershopInput
   operatingHours?: Prisma.OperatingHoursUncheckedCreateNestedManyWithoutBarbershopInput
   subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutBarbershopInput
+  planHistory?: Prisma.PlanHistoryUncheckedCreateNestedManyWithoutBarbershopInput
 }
 
 export type BarbershopCreateOrConnectWithoutServicesInput = {
@@ -983,6 +1020,7 @@ export type BarbershopUpdateWithoutServicesInput = {
   professionals?: Prisma.ProfessionalUpdateManyWithoutBarbershopNestedInput
   operatingHours?: Prisma.OperatingHoursUpdateManyWithoutBarbershopNestedInput
   subscription?: Prisma.SubscriptionUpdateOneWithoutBarbershopNestedInput
+  planHistory?: Prisma.PlanHistoryUpdateManyWithoutBarbershopNestedInput
 }
 
 export type BarbershopUncheckedUpdateWithoutServicesInput = {
@@ -1000,6 +1038,7 @@ export type BarbershopUncheckedUpdateWithoutServicesInput = {
   professionals?: Prisma.ProfessionalUncheckedUpdateManyWithoutBarbershopNestedInput
   operatingHours?: Prisma.OperatingHoursUncheckedUpdateManyWithoutBarbershopNestedInput
   subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutBarbershopNestedInput
+  planHistory?: Prisma.PlanHistoryUncheckedUpdateManyWithoutBarbershopNestedInput
 }
 
 export type BarbershopCreateWithoutBookingsInput = {
@@ -1017,6 +1056,7 @@ export type BarbershopCreateWithoutBookingsInput = {
   professionals?: Prisma.ProfessionalCreateNestedManyWithoutBarbershopInput
   operatingHours?: Prisma.OperatingHoursCreateNestedManyWithoutBarbershopInput
   subscription?: Prisma.SubscriptionCreateNestedOneWithoutBarbershopInput
+  planHistory?: Prisma.PlanHistoryCreateNestedManyWithoutBarbershopInput
 }
 
 export type BarbershopUncheckedCreateWithoutBookingsInput = {
@@ -1034,6 +1074,7 @@ export type BarbershopUncheckedCreateWithoutBookingsInput = {
   professionals?: Prisma.ProfessionalUncheckedCreateNestedManyWithoutBarbershopInput
   operatingHours?: Prisma.OperatingHoursUncheckedCreateNestedManyWithoutBarbershopInput
   subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutBarbershopInput
+  planHistory?: Prisma.PlanHistoryUncheckedCreateNestedManyWithoutBarbershopInput
 }
 
 export type BarbershopCreateOrConnectWithoutBookingsInput = {
@@ -1067,6 +1108,7 @@ export type BarbershopUpdateWithoutBookingsInput = {
   professionals?: Prisma.ProfessionalUpdateManyWithoutBarbershopNestedInput
   operatingHours?: Prisma.OperatingHoursUpdateManyWithoutBarbershopNestedInput
   subscription?: Prisma.SubscriptionUpdateOneWithoutBarbershopNestedInput
+  planHistory?: Prisma.PlanHistoryUpdateManyWithoutBarbershopNestedInput
 }
 
 export type BarbershopUncheckedUpdateWithoutBookingsInput = {
@@ -1081,6 +1123,95 @@ export type BarbershopUncheckedUpdateWithoutBookingsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   services?: Prisma.BarbershopServiceUncheckedUpdateManyWithoutBarbershopNestedInput
+  professionals?: Prisma.ProfessionalUncheckedUpdateManyWithoutBarbershopNestedInput
+  operatingHours?: Prisma.OperatingHoursUncheckedUpdateManyWithoutBarbershopNestedInput
+  subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutBarbershopNestedInput
+  planHistory?: Prisma.PlanHistoryUncheckedUpdateManyWithoutBarbershopNestedInput
+}
+
+export type BarbershopCreateWithoutPlanHistoryInput = {
+  id?: string
+  name: string
+  address: string
+  description: string
+  imageUrl: string
+  phones?: Prisma.BarbershopCreatephonesInput | string[]
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  owner?: Prisma.UserCreateNestedOneWithoutOwnedBarbershopsInput
+  services?: Prisma.BarbershopServiceCreateNestedManyWithoutBarbershopInput
+  bookings?: Prisma.BookingCreateNestedManyWithoutBarbershopInput
+  professionals?: Prisma.ProfessionalCreateNestedManyWithoutBarbershopInput
+  operatingHours?: Prisma.OperatingHoursCreateNestedManyWithoutBarbershopInput
+  subscription?: Prisma.SubscriptionCreateNestedOneWithoutBarbershopInput
+}
+
+export type BarbershopUncheckedCreateWithoutPlanHistoryInput = {
+  id?: string
+  name: string
+  address: string
+  description: string
+  imageUrl: string
+  phones?: Prisma.BarbershopCreatephonesInput | string[]
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ownerId?: string | null
+  services?: Prisma.BarbershopServiceUncheckedCreateNestedManyWithoutBarbershopInput
+  bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutBarbershopInput
+  professionals?: Prisma.ProfessionalUncheckedCreateNestedManyWithoutBarbershopInput
+  operatingHours?: Prisma.OperatingHoursUncheckedCreateNestedManyWithoutBarbershopInput
+  subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutBarbershopInput
+}
+
+export type BarbershopCreateOrConnectWithoutPlanHistoryInput = {
+  where: Prisma.BarbershopWhereUniqueInput
+  create: Prisma.XOR<Prisma.BarbershopCreateWithoutPlanHistoryInput, Prisma.BarbershopUncheckedCreateWithoutPlanHistoryInput>
+}
+
+export type BarbershopUpsertWithoutPlanHistoryInput = {
+  update: Prisma.XOR<Prisma.BarbershopUpdateWithoutPlanHistoryInput, Prisma.BarbershopUncheckedUpdateWithoutPlanHistoryInput>
+  create: Prisma.XOR<Prisma.BarbershopCreateWithoutPlanHistoryInput, Prisma.BarbershopUncheckedCreateWithoutPlanHistoryInput>
+  where?: Prisma.BarbershopWhereInput
+}
+
+export type BarbershopUpdateToOneWithWhereWithoutPlanHistoryInput = {
+  where?: Prisma.BarbershopWhereInput
+  data: Prisma.XOR<Prisma.BarbershopUpdateWithoutPlanHistoryInput, Prisma.BarbershopUncheckedUpdateWithoutPlanHistoryInput>
+}
+
+export type BarbershopUpdateWithoutPlanHistoryInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  phones?: Prisma.BarbershopUpdatephonesInput | string[]
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  owner?: Prisma.UserUpdateOneWithoutOwnedBarbershopsNestedInput
+  services?: Prisma.BarbershopServiceUpdateManyWithoutBarbershopNestedInput
+  bookings?: Prisma.BookingUpdateManyWithoutBarbershopNestedInput
+  professionals?: Prisma.ProfessionalUpdateManyWithoutBarbershopNestedInput
+  operatingHours?: Prisma.OperatingHoursUpdateManyWithoutBarbershopNestedInput
+  subscription?: Prisma.SubscriptionUpdateOneWithoutBarbershopNestedInput
+}
+
+export type BarbershopUncheckedUpdateWithoutPlanHistoryInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  phones?: Prisma.BarbershopUpdatephonesInput | string[]
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  services?: Prisma.BarbershopServiceUncheckedUpdateManyWithoutBarbershopNestedInput
+  bookings?: Prisma.BookingUncheckedUpdateManyWithoutBarbershopNestedInput
   professionals?: Prisma.ProfessionalUncheckedUpdateManyWithoutBarbershopNestedInput
   operatingHours?: Prisma.OperatingHoursUncheckedUpdateManyWithoutBarbershopNestedInput
   subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutBarbershopNestedInput
@@ -1113,6 +1244,7 @@ export type BarbershopUpdateWithoutOwnerInput = {
   professionals?: Prisma.ProfessionalUpdateManyWithoutBarbershopNestedInput
   operatingHours?: Prisma.OperatingHoursUpdateManyWithoutBarbershopNestedInput
   subscription?: Prisma.SubscriptionUpdateOneWithoutBarbershopNestedInput
+  planHistory?: Prisma.PlanHistoryUpdateManyWithoutBarbershopNestedInput
 }
 
 export type BarbershopUncheckedUpdateWithoutOwnerInput = {
@@ -1130,6 +1262,7 @@ export type BarbershopUncheckedUpdateWithoutOwnerInput = {
   professionals?: Prisma.ProfessionalUncheckedUpdateManyWithoutBarbershopNestedInput
   operatingHours?: Prisma.OperatingHoursUncheckedUpdateManyWithoutBarbershopNestedInput
   subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutBarbershopNestedInput
+  planHistory?: Prisma.PlanHistoryUncheckedUpdateManyWithoutBarbershopNestedInput
 }
 
 export type BarbershopUncheckedUpdateManyWithoutOwnerInput = {
@@ -1154,6 +1287,7 @@ export type BarbershopCountOutputType = {
   bookings: number
   professionals: number
   operatingHours: number
+  planHistory: number
 }
 
 export type BarbershopCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1161,6 +1295,7 @@ export type BarbershopCountOutputTypeSelect<ExtArgs extends runtime.Types.Extens
   bookings?: boolean | BarbershopCountOutputTypeCountBookingsArgs
   professionals?: boolean | BarbershopCountOutputTypeCountProfessionalsArgs
   operatingHours?: boolean | BarbershopCountOutputTypeCountOperatingHoursArgs
+  planHistory?: boolean | BarbershopCountOutputTypeCountPlanHistoryArgs
 }
 
 /**
@@ -1201,6 +1336,13 @@ export type BarbershopCountOutputTypeCountOperatingHoursArgs<ExtArgs extends run
   where?: Prisma.OperatingHoursWhereInput
 }
 
+/**
+ * BarbershopCountOutputType without action
+ */
+export type BarbershopCountOutputTypeCountPlanHistoryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PlanHistoryWhereInput
+}
+
 
 export type BarbershopSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1219,6 +1361,7 @@ export type BarbershopSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   professionals?: boolean | Prisma.Barbershop$professionalsArgs<ExtArgs>
   operatingHours?: boolean | Prisma.Barbershop$operatingHoursArgs<ExtArgs>
   subscription?: boolean | Prisma.Barbershop$subscriptionArgs<ExtArgs>
+  planHistory?: boolean | Prisma.Barbershop$planHistoryArgs<ExtArgs>
   _count?: boolean | Prisma.BarbershopCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["barbershop"]>
 
@@ -1271,6 +1414,7 @@ export type BarbershopInclude<ExtArgs extends runtime.Types.Extensions.InternalA
   professionals?: boolean | Prisma.Barbershop$professionalsArgs<ExtArgs>
   operatingHours?: boolean | Prisma.Barbershop$operatingHoursArgs<ExtArgs>
   subscription?: boolean | Prisma.Barbershop$subscriptionArgs<ExtArgs>
+  planHistory?: boolean | Prisma.Barbershop$planHistoryArgs<ExtArgs>
   _count?: boolean | Prisma.BarbershopCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type BarbershopIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1289,6 +1433,7 @@ export type $BarbershopPayload<ExtArgs extends runtime.Types.Extensions.Internal
     professionals: Prisma.$ProfessionalPayload<ExtArgs>[]
     operatingHours: Prisma.$OperatingHoursPayload<ExtArgs>[]
     subscription: Prisma.$SubscriptionPayload<ExtArgs> | null
+    planHistory: Prisma.$PlanHistoryPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1701,6 +1846,7 @@ export interface Prisma__BarbershopClient<T, Null = never, ExtArgs extends runti
   professionals<T extends Prisma.Barbershop$professionalsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Barbershop$professionalsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProfessionalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   operatingHours<T extends Prisma.Barbershop$operatingHoursArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Barbershop$operatingHoursArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OperatingHoursPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   subscription<T extends Prisma.Barbershop$subscriptionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Barbershop$subscriptionArgs<ExtArgs>>): Prisma.Prisma__SubscriptionClient<runtime.Types.Result.GetResult<Prisma.$SubscriptionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  planHistory<T extends Prisma.Barbershop$planHistoryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Barbershop$planHistoryArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PlanHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2267,6 +2413,30 @@ export type Barbershop$subscriptionArgs<ExtArgs extends runtime.Types.Extensions
    */
   include?: Prisma.SubscriptionInclude<ExtArgs> | null
   where?: Prisma.SubscriptionWhereInput
+}
+
+/**
+ * Barbershop.planHistory
+ */
+export type Barbershop$planHistoryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PlanHistory
+   */
+  select?: Prisma.PlanHistorySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PlanHistory
+   */
+  omit?: Prisma.PlanHistoryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PlanHistoryInclude<ExtArgs> | null
+  where?: Prisma.PlanHistoryWhereInput
+  orderBy?: Prisma.PlanHistoryOrderByWithRelationInput | Prisma.PlanHistoryOrderByWithRelationInput[]
+  cursor?: Prisma.PlanHistoryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PlanHistoryScalarFieldEnum | Prisma.PlanHistoryScalarFieldEnum[]
 }
 
 /**

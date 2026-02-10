@@ -1,7 +1,7 @@
 import { convertToModelMessages, stepCountIs, streamText, tool } from "ai";
 import { openai } from "@ai-sdk/openai";
 import z from "zod";
-import { prisma } from "@/lib/prisma";
+import { prisma, safeQuery } from "@/lib/prisma";
 import { getDateAvailableTimeSlots } from "@/actions/get-date-available-time-slots";
 import { createBooking } from "@/actions/create-booking";
 
@@ -84,25 +84,28 @@ chat/r
         }),
         execute: async ({ name }) => {
           console.log("searchBarbershops", name);
-          if (!name?.trim()) {
-            const barbershops = await prisma.barbershop.findMany({
-              include: {
-                services: true,
-              },
-            });
-            return barbershops;
+          const { data: barbershops, error } = await safeQuery(
+            () =>
+              prisma.barbershop.findMany({
+                where: name?.trim()
+                  ? {
+                      name: {
+                        contains: name,
+                        mode: "insensitive",
+                      },
+                    }
+                  : undefined,
+                include: {
+                  services: true,
+                },
+              }),
+            []
+          );
+
+          if (error) {
+            return { error: "Não foi possível buscar as barbearias. Por favor, tente novamente." };
           }
-          const barbershops = await prisma.barbershop.findMany({
-            where: {
-              name: {
-                contains: name,
-                mode: "insensitive",
-              },
-            },
-            include: {
-              services: true,
-            },
-          });
+
           return barbershops;
         },
       }),

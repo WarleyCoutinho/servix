@@ -1,9 +1,9 @@
+import { SubscriptionStatus, UserRole } from "@/generated/prisma/enums";
 import { createSafeActionClient } from "next-safe-action";
 import { cookies, headers } from "next/headers";
 import { auth } from "./auth";
-import { prisma } from "./prisma";
-import { SubscriptionStatus, UserRole } from "@/generated/prisma/enums";
 import { getUserFriendlyMessage, isConnectionError } from "./db-error";
+import { prisma } from "./prisma";
 
 const ACTIVE_BARBERSHOP_COOKIE = "active-barbershop-id";
 
@@ -38,27 +38,36 @@ export const ownerActionClient = protectedActionClient.use(
   async ({ next, ctx }) => {
     const user = await prisma.user.findUnique({
       where: { id: ctx.user.id },
-      include: { ownedBarbershops: true },
+      include: {
+        ownedBarbershops: {
+          orderBy: { createdAt: "asc" },
+        },
+      },
     });
 
-    if (
-      (user?.role !== UserRole.owner && user?.role !== UserRole.owner_professional) ||
-      user.ownedBarbershops.length === 0
-    ) {
+    if (user?.role !== UserRole.owner || user.ownedBarbershops.length === 0) {
       throw new Error(
         "Acesso negado. Apenas proprietários podem acessar este recurso.",
+      );
+    }
+
+    const activeBarbershops = user.ownedBarbershops.filter((b) => b.isActive);
+
+    if (activeBarbershops.length === 0) {
+      throw new Error(
+        "Nenhum estabelecimento ativo. Faça upgrade do seu plano para reativar.",
       );
     }
 
     const cookieStore = await cookies();
     const activeBarbershopId = cookieStore.get(ACTIVE_BARBERSHOP_COOKIE)?.value;
 
-    let activeBarbershop = user.ownedBarbershops.find(
-      (b) => b.id === activeBarbershopId
+    let activeBarbershop = activeBarbershops.find(
+      (b) => b.id === activeBarbershopId,
     );
 
     if (!activeBarbershop) {
-      activeBarbershop = user.ownedBarbershops[0];
+      activeBarbershop = activeBarbershops[0];
     }
 
     return next({
@@ -66,7 +75,8 @@ export const ownerActionClient = protectedActionClient.use(
         ...ctx,
         user,
         barbershop: activeBarbershop,
-        ownedBarbershops: user.ownedBarbershops,
+        ownedBarbershops: activeBarbershops,
+        allBarbershops: user.ownedBarbershops,
       },
     });
   },
@@ -84,7 +94,7 @@ export const professionalActionClient = protectedActionClient.use(
     });
 
     if (
-      (user?.role !== UserRole.professional && user?.role !== UserRole.owner_professional) ||
+      (user?.role !== UserRole.professional && user?.role !== UserRole.owner) ||
       !user.professional
     ) {
       throw new Error(

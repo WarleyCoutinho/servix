@@ -397,6 +397,7 @@ export const ModelName = {
   BarbershopService: 'BarbershopService',
   Booking: 'Booking',
   Payment: 'Payment',
+  PlanHistory: 'PlanHistory',
   StripeEvent: 'StripeEvent'
 } as const
 
@@ -413,7 +414,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "account" | "verification" | "barbershop" | "professional" | "planConfig" | "subscription" | "operatingHours" | "professionalSchedule" | "barbershopService" | "booking" | "payment" | "stripeEvent"
+    modelProps: "user" | "session" | "account" | "verification" | "barbershop" | "professional" | "planConfig" | "subscription" | "operatingHours" | "professionalSchedule" | "barbershopService" | "booking" | "payment" | "planHistory" | "stripeEvent"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1379,6 +1380,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    PlanHistory: {
+      payload: Prisma.$PlanHistoryPayload<ExtArgs>
+      fields: Prisma.PlanHistoryFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PlanHistoryFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlanHistoryPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PlanHistoryFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlanHistoryPayload>
+        }
+        findFirst: {
+          args: Prisma.PlanHistoryFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlanHistoryPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PlanHistoryFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlanHistoryPayload>
+        }
+        findMany: {
+          args: Prisma.PlanHistoryFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlanHistoryPayload>[]
+        }
+        create: {
+          args: Prisma.PlanHistoryCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlanHistoryPayload>
+        }
+        createMany: {
+          args: Prisma.PlanHistoryCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PlanHistoryCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlanHistoryPayload>[]
+        }
+        delete: {
+          args: Prisma.PlanHistoryDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlanHistoryPayload>
+        }
+        update: {
+          args: Prisma.PlanHistoryUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlanHistoryPayload>
+        }
+        deleteMany: {
+          args: Prisma.PlanHistoryDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PlanHistoryUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PlanHistoryUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlanHistoryPayload>[]
+        }
+        upsert: {
+          args: Prisma.PlanHistoryUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlanHistoryPayload>
+        }
+        aggregate: {
+          args: Prisma.PlanHistoryAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePlanHistory>
+        }
+        groupBy: {
+          args: Prisma.PlanHistoryGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PlanHistoryGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PlanHistoryCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PlanHistoryCountAggregateOutputType> | number
+        }
+      }
+    }
     StripeEvent: {
       payload: Prisma.$StripeEventPayload<ExtArgs>
       fields: Prisma.StripeEventFieldRefs
@@ -1702,6 +1777,24 @@ export const PaymentScalarFieldEnum = {
 export type PaymentScalarFieldEnum = (typeof PaymentScalarFieldEnum)[keyof typeof PaymentScalarFieldEnum]
 
 
+export const PlanHistoryScalarFieldEnum = {
+  id: 'id',
+  fromPlan: 'fromPlan',
+  toPlan: 'toPlan',
+  isUpgrade: 'isUpgrade',
+  professionalsDisabled: 'professionalsDisabled',
+  servicesDisabled: 'servicesDisabled',
+  barbershopsDisabled: 'barbershopsDisabled',
+  professionalsReactivated: 'professionalsReactivated',
+  servicesReactivated: 'servicesReactivated',
+  barbershopsReactivated: 'barbershopsReactivated',
+  changedAt: 'changedAt',
+  barbershopId: 'barbershopId'
+} as const
+
+export type PlanHistoryScalarFieldEnum = (typeof PlanHistoryScalarFieldEnum)[keyof typeof PlanHistoryScalarFieldEnum]
+
+
 export const StripeEventScalarFieldEnum = {
   id: 'id',
   stripeEventId: 'stripeEventId',
@@ -1996,6 +2089,7 @@ export type GlobalOmitConfig = {
   barbershopService?: Prisma.BarbershopServiceOmit
   booking?: Prisma.BookingOmit
   payment?: Prisma.PaymentOmit
+  planHistory?: Prisma.PlanHistoryOmit
   stripeEvent?: Prisma.StripeEventOmit
 }
 

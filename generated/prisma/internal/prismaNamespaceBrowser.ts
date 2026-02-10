@@ -64,6 +64,7 @@ export const ModelName = {
   BarbershopService: 'BarbershopService',
   Booking: 'Booking',
   Payment: 'Payment',
+  PlanHistory: 'PlanHistory',
   StripeEvent: 'StripeEvent'
 } as const
 
@@ -291,6 +292,24 @@ export const PaymentScalarFieldEnum = {
 } as const
 
 export type PaymentScalarFieldEnum = (typeof PaymentScalarFieldEnum)[keyof typeof PaymentScalarFieldEnum]
+
+
+export const PlanHistoryScalarFieldEnum = {
+  id: 'id',
+  fromPlan: 'fromPlan',
+  toPlan: 'toPlan',
+  isUpgrade: 'isUpgrade',
+  professionalsDisabled: 'professionalsDisabled',
+  servicesDisabled: 'servicesDisabled',
+  barbershopsDisabled: 'barbershopsDisabled',
+  professionalsReactivated: 'professionalsReactivated',
+  servicesReactivated: 'servicesReactivated',
+  barbershopsReactivated: 'barbershopsReactivated',
+  changedAt: 'changedAt',
+  barbershopId: 'barbershopId'
+} as const
+
+export type PlanHistoryScalarFieldEnum = (typeof PlanHistoryScalarFieldEnum)[keyof typeof PlanHistoryScalarFieldEnum]
 
 
 export const StripeEventScalarFieldEnum = {

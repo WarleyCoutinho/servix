@@ -9,6 +9,7 @@ import {
   LogOut,
   MenuIcon,
   Scissors,
+  Shield,
   User,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -127,18 +128,39 @@ const MenuSheet = ({ categories = [], onLoginClick }: MenuSheetProps) => {
                 Início
               </button>
 
-              {(session?.user?.role === "owner" || session?.user?.role === "owner_professional") && (
+              {session?.user?.role === "admin" && (
                 <button
                   type="button"
-                  onClick={() => handleNavigation("/dashboard/owner")}
+                  onClick={() => handleNavigation("/dashboard/admin")}
                   className="hover:bg-accent flex items-center gap-3 px-4 py-3 text-left text-sm font-medium transition-colors sm:px-6"
                 >
-                  <LayoutDashboard className="size-4 shrink-0" />
-                  Painel do Estabelecimento
+                  <Shield className="size-4 shrink-0" />
+                  Painel Administrativo
                 </button>
               )}
 
-              {(session?.user?.role === "professional" || session?.user?.role === "owner_professional") && (
+              {session?.user?.role === "owner" && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => handleNavigation("/dashboard/owner")}
+                    className="hover:bg-accent flex items-center gap-3 px-4 py-3 text-left text-sm font-medium transition-colors sm:px-6"
+                  >
+                    <LayoutDashboard className="size-4 shrink-0" />
+                    Painel do Estabelecimento
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleNavigation("/dashboard/professional")}
+                    className="hover:bg-accent flex items-center gap-3 px-4 py-3 text-left text-sm font-medium transition-colors sm:px-6"
+                  >
+                    <Scissors className="size-4 shrink-0" />
+                    Painel Profissional
+                  </button>
+                </>
+              )}
+
+              {session?.user?.role === "professional" && (
                 <button
                   type="button"
                   onClick={() => handleNavigation("/dashboard/professional")}

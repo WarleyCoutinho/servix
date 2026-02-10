@@ -1,8 +1,10 @@
+import { Suspense } from "react";
 import BookingItem from "@/components/booking-item";
 import Header from "@/components/header";
 import banner from "@/public/logo-marca-sem-fundo.png";
 import Image from "next/image";
 
+import { AuthErrorAlert } from "@/components/auth-error-alert";
 import BarbershopItem from "@/components/barbershop-item";
 import Footer from "@/components/footer";
 import QuickSearch from "@/components/quick-search";
@@ -29,6 +31,9 @@ export default async function Home() {
     <div>
       <Header categories={categories} />
       <PageContainer>
+        <Suspense fallback={null}>
+          <AuthErrorAlert />
+        </Suspense>
         <QuickSearch categories={categories} />
         <Image
           src={banner}

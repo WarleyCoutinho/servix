@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { SubscriptionStatus } from "@/generated/prisma/enums";
+import { SubscriptionPlan, SubscriptionStatus } from "@/generated/prisma/enums";
 
 export interface PlanLimits {
   maxBarbershops: number;
@@ -118,6 +118,81 @@ export async function checkServiceLimit(
   }
 
   return { allowed: true };
+}
+
+export interface UserPlanInfo {
+  plan: SubscriptionPlan;
+  planName: string;
+  maxBarbershops: number;
+  maxProfessionals: number;
+  maxServices: number | null;
+  currentBarbershops: number;
+  currentProfessionals: number;
+  currentServices: number;
+  isBasicPlan: boolean;
+  canHaveMultipleBarbershops: boolean;
+  canHaveMultipleProfessionals: boolean;
+  hasActiveSubscription: boolean;
+}
+
+export async function getUserPlanInfo(
+  userId: string,
+  barbershopId?: string,
+): Promise<UserPlanInfo | null> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    include: {
+      ownedBarbershops: {
+        include: {
+          subscription: true,
+          professionals: { where: { isActive: true } },
+          services: { where: { deletedAt: null } },
+        },
+      },
+    },
+  });
+
+  if (!user || user.ownedBarbershops.length === 0) {
+    return null;
+  }
+
+  const activeSubscription = user.ownedBarbershops.find(
+    (b) => b.subscription?.status === SubscriptionStatus.ACTIVE,
+  )?.subscription;
+
+  if (!activeSubscription) {
+    return null;
+  }
+
+  const planConfig = await prisma.planConfig.findUnique({
+    where: { plan: activeSubscription.plan },
+  });
+
+  if (!planConfig) {
+    return null;
+  }
+
+  const targetBarbershop = barbershopId
+    ? user.ownedBarbershops.find((b) => b.id === barbershopId)
+    : user.ownedBarbershops[0];
+
+  const currentProfessionals = targetBarbershop?.professionals.length ?? 0;
+  const currentServices = targetBarbershop?.services.length ?? 0;
+
+  return {
+    plan: activeSubscription.plan,
+    planName: planConfig.name,
+    maxBarbershops: planConfig.maxBarbershops,
+    maxProfessionals: planConfig.maxProfessionals,
+    maxServices: planConfig.maxServices,
+    currentBarbershops: user.ownedBarbershops.length,
+    currentProfessionals,
+    currentServices,
+    isBasicPlan: activeSubscription.plan === SubscriptionPlan.BASIC,
+    canHaveMultipleBarbershops: planConfig.maxBarbershops > 1,
+    canHaveMultipleProfessionals: planConfig.maxProfessionals > 1,
+    hasActiveSubscription: true,
+  };
 }
 
 export async function checkBarbershopLimit(

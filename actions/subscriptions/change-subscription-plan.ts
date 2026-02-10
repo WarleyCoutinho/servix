@@ -5,7 +5,11 @@ import { ownerActionClient } from "@/lib/action-client";
 import { prisma } from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
 import { SubscriptionPlan, SubscriptionStatus } from "@/generated/prisma/enums";
-import { handlePlanDowngrade, updateUserRoleBasedOnPlan } from "@/lib/role-sync";
+import {
+  handlePlanDowngrade,
+  handlePlanUpgrade,
+  updateUserRoleBasedOnPlan,
+} from "@/lib/role-sync";
 import { revalidatePath } from "next/cache";
 
 const inputSchema = z.object({
@@ -53,19 +57,33 @@ export const changeSubscriptionPlan = ownerActionClient
     const isUpgrade = PLAN_ORDER[plan] > PLAN_ORDER[subscription.plan];
 
     const subscriptionBarbershopId = subscription.barbershopId;
+    const fromPlan = subscription.plan;
 
-    if (!isUpgrade) {
-      const downgradeResult = await handlePlanDowngrade(
-        subscriptionBarbershopId,
-        subscription.plan,
+    let professionalsDisabled = 0;
+    let servicesDisabled = 0;
+    let barbershopsDisabled = 0;
+    let professionalsReactivated = 0;
+    let servicesReactivated = 0;
+    let barbershopsReactivated = 0;
+
+    if (isUpgrade) {
+      const upgradeResult = await handlePlanUpgrade(
+        user.id,
+        fromPlan,
         plan,
       );
-
-      if (downgradeResult.disabledProfessionals > 0 || downgradeResult.disabledServices > 0) {
-        console.log(
-          `Downgrade: ${downgradeResult.disabledProfessionals} profissionais e ${downgradeResult.disabledServices} serviços desativados`,
-        );
-      }
+      professionalsReactivated = upgradeResult.reactivatedProfessionals;
+      servicesReactivated = upgradeResult.reactivatedServices;
+      barbershopsReactivated = upgradeResult.reactivatedBarbershops;
+    } else {
+      const downgradeResult = await handlePlanDowngrade(
+        user.id,
+        fromPlan,
+        plan,
+      );
+      professionalsDisabled = downgradeResult.disabledProfessionals;
+      servicesDisabled = downgradeResult.disabledServices;
+      barbershopsDisabled = downgradeResult.disabledBarbershops;
     }
 
     const stripeSubscription = await stripe.subscriptions.retrieve(
@@ -96,9 +114,25 @@ export const changeSubscriptionPlan = ownerActionClient
       },
     });
 
+    await prisma.planHistory.create({
+      data: {
+        barbershopId: subscriptionBarbershopId,
+        fromPlan,
+        toPlan: plan,
+        isUpgrade,
+        professionalsDisabled,
+        servicesDisabled,
+        barbershopsDisabled,
+        professionalsReactivated,
+        servicesReactivated,
+        barbershopsReactivated,
+      },
+    });
+
     await updateUserRoleBasedOnPlan(subscriptionBarbershopId, plan);
 
     revalidatePath("/dashboard/owner/subscription");
+    revalidatePath("/dashboard/owner/establishments");
     revalidatePath("/dashboard/owner");
 
     return {

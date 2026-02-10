@@ -1,12 +1,23 @@
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { auth } from "@/lib/auth";
 import { getActiveBarbershop } from "@/lib/get-active-barbershop";
 import { hasActiveSubscription } from "@/lib/get-owner-subscription";
+import { getUserPlanInfo } from "@/lib/plan-limits";
 import { prisma } from "@/lib/prisma";
 import { formatCurrency } from "@/lib/utils";
 import { endOfMonth, startOfMonth } from "date-fns";
-import { Calendar, DollarSign, TrendingUp, Users } from "lucide-react";
+import {
+  ArrowUpRight,
+  Calendar,
+  Crown,
+  DollarSign,
+  TrendingUp,
+  Users,
+} from "lucide-react";
 import { headers } from "next/headers";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 export default async function OwnerDashboardPage() {
@@ -20,8 +31,8 @@ export default async function OwnerDashboardPage() {
 
   const data = await getActiveBarbershop(session.user.id);
 
-  if (!data) {
-    redirect("/");
+  if (!data || !data.activeBarbershop) {
+    redirect("/dashboard/owner/subscription");
   }
 
   const barbershop = await prisma.barbershop.findUnique({
@@ -72,6 +83,10 @@ export default async function OwnerDashboardPage() {
   });
 
   const isSubscriptionActive = await hasActiveSubscription(session.user.id);
+  const planInfo = await getUserPlanInfo(
+    session.user.id,
+    data.activeBarbershop.id,
+  );
 
   return (
     <div className="space-y-6">
@@ -82,11 +97,70 @@ export default async function OwnerDashboardPage() {
 
       {!isSubscriptionActive && (
         <Card className="border-yellow-500 bg-yellow-50 dark:bg-yellow-950">
-          <CardContent className="pt-6">
+          <CardContent className="flex items-center justify-between pt-6">
             <p className="text-yellow-800 dark:text-yellow-200">
               Sua assinatura não está ativa. Ative para desbloquear todos os
               recursos.
             </p>
+            <Button size="sm" asChild>
+              <Link href="/dashboard/owner/subscription">Assinar Agora</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {planInfo && (
+        <Card className="border-primary/20 bg-primary/5">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Crown className="h-5 w-5 text-primary" />
+                <CardTitle className="text-lg">Seu Plano</CardTitle>
+              </div>
+              <Badge
+                variant={planInfo.isBasicPlan ? "secondary" : "default"}
+                className="text-sm"
+              >
+                {planInfo.planName}
+              </Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-3 text-sm sm:grid-cols-3">
+              <div className="flex flex-col">
+                <span className="text-muted-foreground">Estabelecimentos</span>
+                <span className="font-medium">
+                  {planInfo.currentBarbershops}/{planInfo.maxBarbershops}
+                </span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-muted-foreground">Profissionais</span>
+                <span className="font-medium">
+                  {planInfo.currentProfessionals}/{planInfo.maxProfessionals}
+                </span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-muted-foreground">Serviços</span>
+                <span className="font-medium">
+                  {planInfo.currentServices}/
+                  {planInfo.maxServices ?? "Ilimitado"}
+                </span>
+              </div>
+            </div>
+
+            {planInfo.isBasicPlan && (
+              <div className="flex items-center justify-between rounded-lg border bg-background p-3">
+                <p className="text-sm text-muted-foreground">
+                  Desbloqueie mais recursos com um plano superior
+                </p>
+                <Button size="sm" variant="default" asChild>
+                  <Link href="/dashboard/owner/subscription">
+                    <ArrowUpRight className="mr-1 h-4 w-4" />
+                    Fazer Upgrade
+                  </Link>
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
       )}

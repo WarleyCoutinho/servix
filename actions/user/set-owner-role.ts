@@ -6,11 +6,19 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { UserRole } from "@/generated/prisma/enums";
 
+const cpfRegex = /^\d{11}$/;
+
 const inputSchema = z.object({
   barbershopName: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
   address: z.string().min(5, "Endereço deve ter pelo menos 5 caracteres"),
   description: z.string().min(10, "Descrição deve ter pelo menos 10 caracteres"),
   phone: z.string().min(10, "Telefone inválido"),
+  ownerCpf: z
+    .string()
+    .transform((val) => val.replace(/\D/g, ""))
+    .refine((val) => cpfRegex.test(val), {
+      message: "CPF inválido. Deve conter 11 dígitos.",
+    }),
 });
 
 export const setOwnerRole = protectedActionClient
@@ -35,6 +43,14 @@ export const setOwnerRole = protectedActionClient
       );
     }
 
+    const existingCpf = await prisma.professional.findUnique({
+      where: { cpf: parsedInput.ownerCpf },
+    });
+
+    if (existingCpf) {
+      throw new Error("Este CPF já está cadastrado no sistema.");
+    }
+
     const result = await prisma.$transaction(async (tx) => {
       await tx.user.update({
         where: { id: user.id },
@@ -49,6 +65,18 @@ export const setOwnerRole = protectedActionClient
           phones: [parsedInput.phone],
           imageUrl: "/banner.png",
           ownerId: user.id,
+        },
+      });
+
+      await tx.professional.create({
+        data: {
+          userId: user.id,
+          barbershopId: barbershop.id,
+          cpf: parsedInput.ownerCpf,
+          displayName: existingUser.name,
+          isActive: true,
+          acceptsCard: true,
+          acceptsPix: false,
         },
       });
 

@@ -42,15 +42,22 @@ export function PlansManager({ initialPlans }: PlansManagerProps) {
 
   const { execute: save, isPending: isSaving } = useAction(updatePlan, {
     onSuccess: ({ data }) => {
-      if (data) {
-        setPlans((prev) =>
-          prev.map((p) => (p.plan === data.plan ? { ...p, ...data } : p)),
-        );
-        toast.success("Plano atualizado com sucesso!");
+      try {
+        if (data) {
+          setPlans((prev) =>
+            prev.map((p) => (p.plan === data.plan ? { ...p, ...data } : p)),
+          );
+          toast.success("Plano atualizado com sucesso!");
+          setEditingPlan(null);
+        }
+      } catch (e) {
+        console.error("Error updating local state:", e);
+        toast.success("Plano salvo! Recarregue a página para ver as alterações.");
         setEditingPlan(null);
       }
     },
     onError: ({ error }) => {
+      console.error("Server action error:", error);
       toast.error(error.serverError ?? "Erro ao atualizar plano");
     },
   });

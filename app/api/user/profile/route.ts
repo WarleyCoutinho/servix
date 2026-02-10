@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { isConnectionError, getUserFriendlyMessage } from "@/lib/db-error";
 
 export async function GET() {
   try {
@@ -37,6 +38,14 @@ export async function GET() {
     });
   } catch (error) {
     console.error("Error fetching user profile:", error);
+
+    if (isConnectionError(error)) {
+      return NextResponse.json(
+        { error: getUserFriendlyMessage(error) },
+        { status: 503 }
+      );
+    }
+
     return NextResponse.json(
       { error: "Erro interno do servidor" },
       { status: 500 }

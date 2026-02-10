@@ -120,58 +120,89 @@ export const createBookingCheckoutSession = protectedActionClient
         throw new Error("Nenhuma forma de pagamento disponível para este profissional.");
       }
 
-      const sessionParams: Stripe.Checkout.SessionCreateParams = {
-        payment_method_types: paymentMethods,
-        mode: "payment",
-        success_url: `${process.env.NEXT_PUBLIC_APP_URL}/bookings?success=true`,
-        cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}`,
-        metadata: {
-          serviceId: service.id,
-          barbershopId: service.barbershopId,
-          userId: user.id,
-          date: date.toISOString(),
-          professionalId: professionalId ?? "",
-          priceInCents: service.priceInCents.toString(),
-          applicationFeeInCents: applicationFeeAmount.toString(),
-        },
-        line_items: [
-          {
-            price_data: {
-              currency: "brl",
-              unit_amount: service.priceInCents,
-              product_data: {
-                name: `${service.barbershop.name} - ${service.name}`,
-                description: service.description,
-                images: [service.imageUrl],
-              },
-            },
-            quantity: 1,
+      const buildSessionParams = (
+        methods: Stripe.Checkout.SessionCreateParams.PaymentMethodType[]
+      ): Stripe.Checkout.SessionCreateParams => {
+        const params: Stripe.Checkout.SessionCreateParams = {
+          payment_method_types: methods,
+          mode: "payment",
+          success_url: `${process.env.NEXT_PUBLIC_APP_URL}/bookings?success=true`,
+          cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}`,
+          metadata: {
+            serviceId: service.id,
+            barbershopId: service.barbershopId,
+            userId: user.id,
+            date: date.toISOString(),
+            professionalId: professionalId ?? "",
+            priceInCents: service.priceInCents.toString(),
+            applicationFeeInCents: applicationFeeAmount.toString(),
           },
-        ],
-        payment_intent_data: {},
+          line_items: [
+            {
+              price_data: {
+                currency: "brl",
+                unit_amount: service.priceInCents,
+                product_data: {
+                  name: `${service.barbershop.name} - ${service.name}`,
+                  description: service.description,
+                  images: [service.imageUrl],
+                },
+              },
+              quantity: 1,
+            },
+          ],
+          payment_intent_data: {},
+        };
+
+        if (methods.includes("pix")) {
+          params.payment_method_options = {
+            pix: {
+              expires_after_seconds: 1800,
+            },
+          };
+        }
+
+        if (
+          professional?.stripeAccountId &&
+          isAccountReadyForPayments(professional.stripeAccountStatus)
+        ) {
+          params.payment_intent_data = {
+            application_fee_amount: applicationFeeAmount,
+            transfer_data: {
+              destination: professional.stripeAccountId,
+            },
+          };
+        }
+
+        return params;
       };
 
-      if (paymentMethods.includes("pix")) {
-        sessionParams.payment_method_options = {
-          pix: {
-            expires_after_seconds: 1800,
-          },
-        };
+      let checkoutSession;
+      try {
+        checkoutSession = await stripe.checkout.sessions.create(
+          buildSessionParams(paymentMethods)
+        );
+      } catch (error) {
+        console.error("Error creating checkout session:", error);
+
+        const errorMessage = error instanceof Error ? error.message.toLowerCase() : "";
+        const isPaymentMethodError =
+          errorMessage.includes("pix") ||
+          errorMessage.includes("payment_method") ||
+          errorMessage.includes("payment method");
+
+        if (isPaymentMethodError && paymentMethods.includes("card")) {
+          console.log("Falling back to card-only checkout");
+          checkoutSession = await stripe.checkout.sessions.create(
+            buildSessionParams(["card"])
+          );
+        } else {
+          throw error;
+        }
       }
 
-      if (
-        professional?.stripeAccountId &&
-        isAccountReadyForPayments(professional.stripeAccountStatus)
-      ) {
-        sessionParams.payment_intent_data = {
-          application_fee_amount: applicationFeeAmount,
-          transfer_data: {
-            destination: professional.stripeAccountId,
-          },
-        };
-      }
+      console.log(`Checkout session created: ${checkoutSession.id}`);
 
-      const checkoutSession = await stripe.checkout.sessions.create(sessionParams);
 
       return {
         id: checkoutSession.id,

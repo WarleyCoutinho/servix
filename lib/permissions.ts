@@ -14,9 +14,9 @@ export const ac = createAccessControl(statement);
 export const ownerRole = ac.newRole({
   barbershop: ["read", "update"],
   professional: ["create", "read", "update", "delete", "block"],
-  booking: ["read"],
+  booking: ["read", "update"],
   service: ["create", "read", "update", "delete"],
-  schedule: ["read"],
+  schedule: ["read", "update"],
   subscription: ["read", "manage"],
 });
 

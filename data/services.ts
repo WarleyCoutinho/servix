@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { prisma, safeQuery } from "@/lib/prisma";
 
 export interface ServiceCategory {
   label: string;
@@ -6,21 +6,25 @@ export interface ServiceCategory {
 }
 
 export async function getServiceCategories(): Promise<ServiceCategory[]> {
-  const services = await prisma.barbershopService.findMany({
-    where: {
-      deletedAt: null,
-      barbershop: {
-        isActive: true,
-      },
-    },
-    select: {
-      name: true,
-    },
-    distinct: ["name"],
-    orderBy: {
-      name: "asc",
-    },
-  });
+  const { data: services } = await safeQuery(
+    () =>
+      prisma.barbershopService.findMany({
+        where: {
+          deletedAt: null,
+          barbershop: {
+            isActive: true,
+          },
+        },
+        select: {
+          name: true,
+        },
+        distinct: ["name"],
+        orderBy: {
+          name: "asc",
+        },
+      }),
+    []
+  );
 
   return services.map((service) => ({
     label: service.name,

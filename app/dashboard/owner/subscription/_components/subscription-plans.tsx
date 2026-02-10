@@ -3,6 +3,7 @@
 import { changeSubscriptionPlan } from "@/actions/subscriptions/change-subscription-plan";
 import { createSubscriptionCheckout } from "@/actions/subscriptions/create-subscription-checkout";
 import { getCustomerPortalUrl } from "@/actions/subscriptions/get-customer-portal-url";
+import { getDowngradeImpactAction } from "@/actions/subscriptions/get-downgrade-impact";
 import { syncSubscription } from "@/actions/subscriptions/sync-subscription";
 import { DowngradeAlertDialog } from "@/components/downgrade-alert-dialog";
 import { Badge } from "@/components/ui/badge";
@@ -56,6 +57,12 @@ export function SubscriptionPlans({ plans, currentPlan }: SubscriptionPlansProps
   const [showDowngradeAlert, setShowDowngradeAlert] = useState(false);
   const [pendingDowngradePlan, setPendingDowngradePlan] =
     useState<SubscriptionPlan | null>(null);
+  const [downgradeImpact, setDowngradeImpact] = useState<{
+    professionalsToDisable: number;
+    servicesToDisable: number;
+    barbershopsToDisable: number;
+  } | null>(null);
+  const [isLoadingImpact, setIsLoadingImpact] = useState(false);
 
   const showSuccess = useMemo(
     () => searchParams.get("success") === "true",
@@ -127,15 +134,31 @@ export function SubscriptionPlans({ plans, currentPlan }: SubscriptionPlansProps
     },
   });
 
+  const { execute: getImpact } = useAction(getDowngradeImpactAction, {
+    onSuccess: ({ data }) => {
+      if (data) {
+        setDowngradeImpact(data);
+      }
+      setIsLoadingImpact(false);
+    },
+    onError: () => {
+      setDowngradeImpact(null);
+      setIsLoadingImpact(false);
+    },
+  });
+
   const isDowngrade = (targetPlan: SubscriptionPlan): boolean => {
     if (!currentPlan) return false;
     return PLAN_ORDER[targetPlan] < PLAN_ORDER[currentPlan];
   };
 
-  const handleSubscribe = (plan: SubscriptionPlan) => {
+  const handleSubscribe = async (plan: SubscriptionPlan) => {
     if (isDowngrade(plan)) {
       setPendingDowngradePlan(plan);
+      setDowngradeImpact(null);
+      setIsLoadingImpact(true);
       setShowDowngradeAlert(true);
+      getImpact({ toPlan: plan });
       return;
     }
 
@@ -158,8 +181,16 @@ export function SubscriptionPlans({ plans, currentPlan }: SubscriptionPlansProps
       }
       setShowDowngradeAlert(false);
       setPendingDowngradePlan(null);
+      setDowngradeImpact(null);
     }
   };
+
+  const getPendingPlanData = () => {
+    if (!pendingDowngradePlan) return null;
+    return plans.find((p) => p.plan === pendingDowngradePlan);
+  };
+
+  const pendingPlanData = getPendingPlanData();
 
   const formatPrice = (priceInCents: number) => {
     return (priceInCents / 100).toFixed(2).replace(".", ",");
@@ -203,9 +234,21 @@ export function SubscriptionPlans({ plans, currentPlan }: SubscriptionPlansProps
     <>
       <DowngradeAlertDialog
         open={showDowngradeAlert}
-        onOpenChange={setShowDowngradeAlert}
+        onOpenChange={(open) => {
+          setShowDowngradeAlert(open);
+          if (!open) {
+            setDowngradeImpact(null);
+            setPendingDowngradePlan(null);
+          }
+        }}
         onConfirm={handleConfirmDowngrade}
         isLoading={isLoading}
+        isLoadingImpact={isLoadingImpact}
+        targetPlanName={pendingPlanData?.name}
+        newMaxServices={pendingPlanData?.maxServices}
+        newMaxProfessionals={pendingPlanData?.maxProfessionals}
+        newMaxBarbershops={pendingPlanData?.maxBarbershops}
+        impact={downgradeImpact}
       />
 
       <div className="space-y-6">

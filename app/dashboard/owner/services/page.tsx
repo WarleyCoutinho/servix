@@ -24,8 +24,8 @@ export default async function OwnerServicesPage() {
 
   const data = await getActiveBarbershop(session.user.id);
 
-  if (!data) {
-    redirect("/");
+  if (!data || !data.activeBarbershop) {
+    redirect("/dashboard/owner/subscription");
   }
 
   const { activeBarbershop } = data;
@@ -77,9 +77,14 @@ export default async function OwnerServicesPage() {
           <AlertTitle className="text-yellow-800 dark:text-yellow-200">
             Limite de serviços atingido
           </AlertTitle>
-          <AlertDescription className="text-yellow-700 dark:text-yellow-300">
-            Você atingiu o limite de {limits.maxServices} serviços do seu plano.
-            Faça upgrade para adicionar mais serviços.
+          <AlertDescription className="flex flex-col gap-3 text-yellow-700 dark:text-yellow-300">
+            <span>
+              Você atingiu o limite de {limits.maxServices} serviços do seu
+              plano.
+            </span>
+            <Button size="sm" variant="outline" className="w-fit" asChild>
+              <Link href="/dashboard/owner/subscription">Fazer Upgrade</Link>
+            </Button>
           </AlertDescription>
         </Alert>
       )}

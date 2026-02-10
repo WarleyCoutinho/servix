@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { prisma, safeQuery } from "@/lib/prisma";
 
 export interface BarbershopVisit {
   barbershopId: string;
@@ -27,25 +27,29 @@ export interface ClientStats {
 }
 
 export async function getClientStats(userId: string): Promise<ClientStats> {
-  const bookings = await prisma.booking.findMany({
-    where: {
-      userId,
-      cancelledAt: null,
-    },
-    include: {
-      barbershop: true,
-      service: true,
-      professional: {
-        include: {
-          user: true,
+  const { data: bookings } = await safeQuery(
+    () =>
+      prisma.booking.findMany({
+        where: {
+          userId,
+          cancelledAt: null,
         },
-      },
-      payment: true,
-    },
-    orderBy: {
-      date: "desc",
-    },
-  });
+        include: {
+          barbershop: true,
+          service: true,
+          professional: {
+            include: {
+              user: true,
+            },
+          },
+          payment: true,
+        },
+        orderBy: {
+          date: "desc",
+        },
+      }),
+    []
+  );
 
   const barbershopMap = new Map<string, BarbershopVisit>();
 

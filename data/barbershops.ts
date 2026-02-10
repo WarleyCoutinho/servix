@@ -1,18 +1,25 @@
 // Data Access Layer
-import { prisma } from "@/lib/prisma";
+import { prisma, safeQuery } from "@/lib/prisma";
 
 export const getBarbershops = async () => {
-  const barbershops = await prisma.barbershop.findMany();
-  return barbershops;
+  const { data } = await safeQuery(
+    () => prisma.barbershop.findMany(),
+    []
+  );
+  return data;
 };
 
 export const getPopularBarbershops = async () => {
-  const popularBarbershops = await prisma.barbershop.findMany({
-    orderBy: {
-      name: "desc",
-    },
-  });
-  return popularBarbershops;
+  const { data } = await safeQuery(
+    () =>
+      prisma.barbershop.findMany({
+        orderBy: {
+          name: "desc",
+        },
+      }),
+    []
+  );
+  return data;
 };
 
 export const getBarbershopById = async (id: string) => {

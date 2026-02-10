@@ -55,18 +55,6 @@ export const updateUserRole = adminActionClient
       });
     }
 
-    if (role === UserRole.owner_professional) {
-      if (user.ownedBarbershops.length === 0) {
-        returnValidationErrors(inputSchema, {
-          role: {
-            _errors: [
-              "Este usuário não possui um estabelecimento. Não pode ser owner_professional.",
-            ],
-          },
-        });
-      }
-    }
-
     const updatedUser = await prisma.user.update({
       where: { id: userId },
       data: { role },

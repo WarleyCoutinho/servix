@@ -4,7 +4,18 @@ import z from "zod";
 import { PaymentStatus, SubscriptionPlan } from "@/generated/prisma/enums";
 import { syncSubscriptionFromStripe } from "@/lib/stripe-subscriptions";
 import { verifyStripeWebhook } from "@/lib/stripe-webhook";
-import { handlePlanDowngrade, updateUserRoleBasedOnPlan } from "@/lib/role-sync";
+import {
+  handlePlanDowngrade,
+  handlePlanUpgrade,
+  updateUserRoleBasedOnPlan,
+} from "@/lib/role-sync";
+
+const PLAN_ORDER: Record<SubscriptionPlan, number> = {
+  [SubscriptionPlan.BASIC]: 1,
+  [SubscriptionPlan.STANDARD]: 2,
+  [SubscriptionPlan.PROFESSIONAL]: 3,
+  [SubscriptionPlan.ENTERPRISE]: 4,
+};
 
 const bookingMetadataSchema = z.object({
   serviceId: z.uuid(),
@@ -12,8 +23,8 @@ const bookingMetadataSchema = z.object({
   userId: z.string(),
   date: z.iso.datetime(),
   professionalId: z.string().optional(),
-  priceInCents: z.coerce.number().optional(),
-  applicationFeeInCents: z.coerce.number().optional(),
+  priceInCents: z.coerce.number(),
+  applicationFeeInCents: z.coerce.number().default(0),
 });
 
 const subscriptionMetadataSchema = z.object({
@@ -57,6 +68,7 @@ export const POST = async (request: Request) => {
     switch (event.type) {
       case "checkout.session.completed": {
         const session = event.data.object;
+        console.log(`Processing checkout.session.completed: mode=${session.mode}, sessionId=${session.id}`);
 
         if (session.mode === "subscription") {
           const metadata = subscriptionMetadataSchema.safeParse(session.metadata);
@@ -87,7 +99,7 @@ export const POST = async (request: Request) => {
           const metadata = bookingMetadataSchema.safeParse(session.metadata);
           if (!metadata.success) {
             console.error("Invalid booking metadata", metadata.error);
-            break;
+            throw new Error(`Invalid booking metadata: ${metadata.error.message}`);
           }
 
           const expandedSession = await stripe.checkout.sessions.retrieve(
@@ -106,30 +118,34 @@ export const POST = async (request: Request) => {
 
           const professionalId = metadata.data.professionalId || undefined;
 
-          const booking = await prisma.booking.create({
-            data: {
-              serviceId: metadata.data.serviceId,
-              barbershopId: metadata.data.barbershopId,
-              userId: metadata.data.userId,
-              date: metadata.data.date,
-              professionalId: professionalId || null,
-            },
-          });
+          await prisma.$transaction(async (tx) => {
+            const booking = await tx.booking.create({
+              data: {
+                serviceId: metadata.data.serviceId,
+                barbershopId: metadata.data.barbershopId,
+                userId: metadata.data.userId,
+                date: metadata.data.date,
+                professionalId: professionalId || null,
+              },
+            });
 
-          if (metadata.data.priceInCents) {
-            await prisma.payment.create({
+            await tx.payment.create({
               data: {
                 bookingId: booking.id,
                 professionalId: professionalId || null,
                 amountInCents: metadata.data.priceInCents,
-                applicationFeeInCents: metadata.data.applicationFeeInCents ?? 0,
+                applicationFeeInCents: metadata.data.applicationFeeInCents,
                 status: PaymentStatus.SUCCEEDED,
                 paymentMethod: paymentIntent.payment_method_types?.[0] ?? "card",
                 stripePaymentIntentId: paymentIntent.id,
                 stripeChargeId: chargeId,
               },
             });
-          }
+
+            console.log(
+              `Booking ${booking.id} created with payment for user ${metadata.data.userId}`
+            );
+          });
         }
         break;
       }
@@ -141,6 +157,8 @@ export const POST = async (request: Request) => {
         const newPlan = subscription.metadata?.plan as SubscriptionPlan | undefined;
 
         if (barbershopId) {
+          const activePlan = newPlan || SubscriptionPlan.BASIC;
+
           if (event.type === "customer.subscription.updated") {
             const existingSubscription = await prisma.subscription.findUnique({
               where: { barbershopId },
@@ -148,10 +166,45 @@ export const POST = async (request: Request) => {
             });
 
             const oldPlan = existingSubscription?.plan;
-            const activePlan = newPlan || SubscriptionPlan.BASIC;
 
             if (oldPlan && oldPlan !== activePlan) {
-              await handlePlanDowngrade(barbershopId, oldPlan, activePlan);
+              const isUpgrade = PLAN_ORDER[activePlan] > PLAN_ORDER[oldPlan];
+
+              let professionalsDisabled = 0;
+              let servicesDisabled = 0;
+              let professionalsReactivated = 0;
+              let servicesReactivated = 0;
+
+              if (isUpgrade) {
+                const upgradeResult = await handlePlanUpgrade(
+                  barbershopId,
+                  oldPlan,
+                  activePlan,
+                );
+                professionalsReactivated = upgradeResult.reactivatedProfessionals;
+                servicesReactivated = upgradeResult.reactivatedServices;
+              } else {
+                const downgradeResult = await handlePlanDowngrade(
+                  barbershopId,
+                  oldPlan,
+                  activePlan,
+                );
+                professionalsDisabled = downgradeResult.disabledProfessionals;
+                servicesDisabled = downgradeResult.disabledServices;
+              }
+
+              await prisma.planHistory.create({
+                data: {
+                  barbershopId,
+                  fromPlan: oldPlan,
+                  toPlan: activePlan,
+                  isUpgrade,
+                  professionalsDisabled,
+                  servicesDisabled,
+                  professionalsReactivated,
+                  servicesReactivated,
+                },
+              });
             }
 
             await updateUserRoleBasedOnPlan(barbershopId, activePlan);
@@ -160,8 +213,16 @@ export const POST = async (request: Request) => {
           await syncSubscriptionFromStripe(subscription, barbershopId, newPlan);
 
           if (event.type === "customer.subscription.created") {
-            const activePlan = newPlan || SubscriptionPlan.BASIC;
             await updateUserRoleBasedOnPlan(barbershopId, activePlan);
+
+            await prisma.planHistory.create({
+              data: {
+                barbershopId,
+                fromPlan: null,
+                toPlan: activePlan,
+                isUpgrade: true,
+              },
+            });
           }
 
           console.log(

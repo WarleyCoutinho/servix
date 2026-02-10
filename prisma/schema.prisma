@@ -21,7 +21,6 @@ enum UserRole {
   admin
   owner
   professional
-  owner_professional
   client
 }
 
@@ -167,6 +166,7 @@ model Barbershop {
   professionals  Professional[]
   operatingHours OperatingHours[]
   subscription   Subscription?
+  planHistory    PlanHistory[]
 }
 
 // =====================
@@ -346,6 +346,30 @@ model Payment {
 
   @@index([professionalId])
   @@index([status])
+}
+
+// =====================
+// PLAN HISTORY (Histórico de Planos)
+// =====================
+
+model PlanHistory {
+  id                       String           @id @default(uuid())
+  fromPlan                 SubscriptionPlan?
+  toPlan                   SubscriptionPlan
+  isUpgrade                Boolean
+  professionalsDisabled    Int              @default(0)
+  servicesDisabled         Int              @default(0)
+  barbershopsDisabled      Int              @default(0)
+  professionalsReactivated Int              @default(0)
+  servicesReactivated      Int              @default(0)
+  barbershopsReactivated   Int              @default(0)
+  changedAt                DateTime         @default(now()) @db.Timestamptz()
+
+  barbershopId String
+  barbershop   Barbershop @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
+
+  @@index([barbershopId])
+  @@map("plan_history")
 }
 
 // =====================

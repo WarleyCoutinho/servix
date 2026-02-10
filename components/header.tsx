@@ -3,7 +3,6 @@
 import { authClient } from "@/lib/auth-client";
 import logo from "@/public/logo-sem-fundo.png";
 import {
-  BotMessageSquare,
   CalendarDays,
   ChevronDown,
   Home,
@@ -11,6 +10,7 @@ import {
   LogIn,
   LogOut,
   Scissors,
+  Shield,
   User,
 } from "lucide-react";
 import Image from "next/image";
@@ -108,16 +108,33 @@ const Header = ({ categories = [] }: HeaderProps) => {
               </Button>
             )}
 
-            {(session?.user?.role === "owner" || session?.user?.role === "owner_professional") && (
+            {session?.user?.role === "admin" && (
               <Button variant="ghost" size="sm" asChild>
-                <Link href="/dashboard/owner">
-                  <LayoutDashboard className="mr-2 size-4" />
-                  Estabelecimento
+                <Link href="/dashboard/admin">
+                  <Shield className="mr-2 size-4" />
+                  Administração
                 </Link>
               </Button>
             )}
 
-            {(session?.user?.role === "professional" || session?.user?.role === "owner_professional") && (
+            {session?.user?.role === "owner" && (
+              <>
+                <Button variant="ghost" size="sm" asChild>
+                  <Link href="/dashboard/owner">
+                    <LayoutDashboard className="mr-2 size-4" />
+                    Estabelecimento
+                  </Link>
+                </Button>
+                <Button variant="ghost" size="sm" asChild>
+                  <Link href="/dashboard/professional">
+                    <Scissors className="mr-2 size-4" />
+                    Profissional
+                  </Link>
+                </Button>
+              </>
+            )}
+
+            {session?.user?.role === "professional" && (
               <Button variant="ghost" size="sm" asChild>
                 <Link href="/dashboard/professional">
                   <Scissors className="mr-2 size-4" />
@@ -166,15 +183,31 @@ const Header = ({ categories = [] }: HeaderProps) => {
                       Meus Agendamentos
                     </Link>
                   </DropdownMenuItem>
-                  {(session.user.role === "owner" || session.user.role === "owner_professional") && (
+                  {session.user.role === "admin" && (
                     <DropdownMenuItem asChild>
-                      <Link href="/dashboard/owner">
-                        <LayoutDashboard className="mr-2 size-4" />
-                        Painel do Estabelecimento
+                      <Link href="/dashboard/admin">
+                        <Shield className="mr-2 size-4" />
+                        Painel Administrativo
                       </Link>
                     </DropdownMenuItem>
                   )}
-                  {(session.user.role === "professional" || session.user.role === "owner_professional") && (
+                  {session.user.role === "owner" && (
+                    <>
+                      <DropdownMenuItem asChild>
+                        <Link href="/dashboard/owner">
+                          <LayoutDashboard className="mr-2 size-4" />
+                          Painel do Estabelecimento
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href="/dashboard/professional">
+                          <Scissors className="mr-2 size-4" />
+                          Painel Profissional
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                  {session.user.role === "professional" && (
                     <DropdownMenuItem asChild>
                       <Link href="/dashboard/professional">
                         <Scissors className="mr-2 size-4" />

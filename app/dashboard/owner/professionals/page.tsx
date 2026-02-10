@@ -3,10 +3,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getAllProfessionalsByBarbershop } from "@/data/professionals";
-import { StripeAccountStatus, UserRole } from "@/generated/prisma/enums";
+import { StripeAccountStatus } from "@/generated/prisma/enums";
 import { auth } from "@/lib/auth";
 import { getActiveBarbershop } from "@/lib/get-active-barbershop";
-import { getPlanLimits } from "@/lib/plan-limits";
+import { getPlanLimits, getUserPlanInfo } from "@/lib/plan-limits";
 import { AlertTriangle, Plus, UserCheck, UserX } from "lucide-react";
 import {
   Alert,
@@ -45,8 +45,8 @@ export default async function ProfessionalsPage() {
 
   const data = await getActiveBarbershop(session.user.id);
 
-  if (!data) {
-    redirect("/");
+  if (!data || !data.activeBarbershop) {
+    redirect("/dashboard/owner/subscription");
   }
 
   const { user, activeBarbershop } = data;
@@ -54,7 +54,8 @@ export default async function ProfessionalsPage() {
     activeBarbershop.id,
   );
 
-  const isBasicPlan = user.role === UserRole.owner_professional;
+  const planInfo = await getUserPlanInfo(user.id, activeBarbershop.id);
+  const isBasicPlan = planInfo?.isBasicPlan ?? false;
   const limits = await getPlanLimits(activeBarbershop.id);
 
   const canAddProfessional = !isBasicPlan && (limits?.canAddProfessional ?? false);
@@ -90,10 +91,15 @@ export default async function ProfessionalsPage() {
           <AlertTitle className="text-yellow-800 dark:text-yellow-200">
             Plano Básico
           </AlertTitle>
-          <AlertDescription className="text-yellow-700 dark:text-yellow-300">
-            No plano Básico, você é o único profissional do estabelecimento. Para
-            adicionar outros profissionais, faça upgrade para o plano Standard
-            ou superior.
+          <AlertDescription className="flex flex-col gap-3 text-yellow-700 dark:text-yellow-300">
+            <span>
+              No plano Básico, você é o único profissional do estabelecimento.
+              Para adicionar outros profissionais, faça upgrade para o plano
+              Standard ou superior.
+            </span>
+            <Button size="sm" variant="outline" className="w-fit" asChild>
+              <Link href="/dashboard/owner/subscription">Fazer Upgrade</Link>
+            </Button>
           </AlertDescription>
         </Alert>
       )}
@@ -104,9 +110,14 @@ export default async function ProfessionalsPage() {
           <AlertTitle className="text-yellow-800 dark:text-yellow-200">
             Limite de profissionais atingido
           </AlertTitle>
-          <AlertDescription className="text-yellow-700 dark:text-yellow-300">
-            Você atingiu o limite de {limits.maxProfessionals} profissionais do seu plano.
-            Faça upgrade para adicionar mais profissionais.
+          <AlertDescription className="flex flex-col gap-3 text-yellow-700 dark:text-yellow-300">
+            <span>
+              Você atingiu o limite de {limits.maxProfessionals} profissionais
+              do seu plano.
+            </span>
+            <Button size="sm" variant="outline" className="w-fit" asChild>
+              <Link href="/dashboard/owner/subscription">Fazer Upgrade</Link>
+            </Button>
           </AlertDescription>
         </Alert>
       )}

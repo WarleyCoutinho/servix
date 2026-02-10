@@ -13,7 +13,6 @@ export const UserRole = {
   admin: 'admin',
   owner: 'owner',
   professional: 'professional',
-  owner_professional: 'owner_professional',
   client: 'client'
 } as const
 

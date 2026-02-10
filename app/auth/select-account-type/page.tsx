@@ -47,6 +47,11 @@ export default function SelectAccountTypePage() {
       return;
     }
 
+    if (session.user.role === "admin") {
+      router.replace("/dashboard/admin");
+      return;
+    }
+
     if (session.user.role === "owner") {
       router.replace("/dashboard/owner");
       return;
@@ -57,25 +62,14 @@ export default function SelectAccountTypePage() {
       return;
     }
 
-    const hasSelectedType = localStorage.getItem("accountTypeSelected");
-    if (hasSelectedType === "true") {
-      router.replace("/");
-      return;
-    }
-
     setIsChecking(false);
   }, [session, isSessionLoading, router]);
 
   const handleContinue = () => {
     if (!selectedType) return;
 
-    localStorage.setItem("accountTypeSelected", "true");
-
     const selected = ACCOUNT_TYPES.find((t) => t.id === selectedType);
     if (selected) {
-      if (selected.id === "owner") {
-        localStorage.setItem("pendingAccountType", "owner");
-      }
       router.push(selected.href);
     }
   };

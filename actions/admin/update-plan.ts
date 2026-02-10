@@ -3,7 +3,6 @@
 import { z } from "zod";
 import { adminActionClient } from "@/lib/action-client";
 import { prisma } from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
 import { SubscriptionPlan } from "@/generated/prisma/enums";
 
 const inputSchema = z.object({
@@ -37,8 +36,17 @@ export const updatePlan = adminActionClient
       },
     });
 
-    revalidatePath("/dashboard/admin/plans");
-    revalidatePath("/dashboard/owner/subscription");
-
-    return updatedPlan;
+    return {
+      id: updatedPlan.id,
+      plan: updatedPlan.plan,
+      name: updatedPlan.name,
+      description: updatedPlan.description,
+      priceInCents: updatedPlan.priceInCents,
+      stripePriceId: updatedPlan.stripePriceId,
+      maxBarbershops: updatedPlan.maxBarbershops,
+      maxProfessionals: updatedPlan.maxProfessionals,
+      maxServices: updatedPlan.maxServices,
+      features: updatedPlan.features,
+      isActive: updatedPlan.isActive,
+    };
   });

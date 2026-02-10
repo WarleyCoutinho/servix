@@ -118,6 +118,13 @@ export function classifyDatabaseError(error: unknown): DatabaseErrorInfo {
   }
 
   if (error instanceof Error) {
+    const errorWithMeta = error as {
+      code?: string;
+      cause?: { code?: string };
+    };
+
+    const code = errorWithMeta.code?.toLowerCase();
+    const causeCode = errorWithMeta.cause?.code?.toLowerCase();
     const message = error.message.toLowerCase();
 
     if (
@@ -137,14 +144,17 @@ export function classifyDatabaseError(error: unknown): DatabaseErrorInfo {
     }
 
     if (
+      code === "etimedout" ||
+      causeCode === "etimedout" ||
       message.includes("etimedout") ||
-      message.includes("timeout") ||
       message.includes("timed out")
     ) {
       return { type: "CONNECTION_TIMEOUT", ...ERROR_MESSAGES.CONNECTION_TIMEOUT };
     }
 
     if (
+      code === "econnrefused" ||
+      causeCode === "econnrefused" ||
       message.includes("econnrefused") ||
       message.includes("connection refused")
     ) {
@@ -156,9 +166,12 @@ export function classifyDatabaseError(error: unknown): DatabaseErrorInfo {
     }
 
     if (
+      code === "econnreset" ||
+      causeCode === "econnreset" ||
       message.includes("econnreset") ||
       message.includes("socket hang up") ||
-      message.includes("connection reset")
+      message.includes("connection reset") ||
+      message.includes("fetch failed")
     ) {
       return { type: "DATABASE_UNREACHABLE", ...ERROR_MESSAGES.DATABASE_UNREACHABLE };
     }
@@ -203,16 +216,37 @@ export function isConnectionError(error: unknown): boolean {
   }
 
   if (error instanceof Error) {
+    const errorWithMeta = error as {
+      code?: string;
+      cause?: { code?: string };
+    };
+
+    const code = errorWithMeta.code?.toLowerCase();
+    const causeCode = errorWithMeta.cause?.code?.toLowerCase();
+
+    if (
+      code === "etimedout" ||
+      code === "econnrefused" ||
+      code === "econnreset" ||
+      causeCode === "etimedout" ||
+      causeCode === "econnrefused" ||
+      causeCode === "econnreset"
+    ) {
+      return true;
+    }
+
     const message = error.message.toLowerCase();
     return (
       message.includes("eai_again") ||
       message.includes("eai_nodata") ||
       message.includes("etimedout") ||
       message.includes("econnrefused") ||
+      message.includes("econnreset") ||
       message.includes("enotfound") ||
       message.includes("getaddrinfo") ||
-      message.includes("timeout") ||
-      message.includes("connection")
+      message.includes("timed out") ||
+      message.includes("connection reset") ||
+      message.includes("fetch failed")
     );
   }
 

@@ -6,9 +6,13 @@ import { createProfessional } from "@/actions/professionals/create-professional"
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { toast } from "sonner";
 import { Loader2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
@@ -20,9 +24,6 @@ export default function NewProfessionalPage() {
     cpf: "",
     displayName: "",
     email: "",
-    bio: "",
-    acceptsPix: false,
-    acceptsCard: true,
   });
 
   const { execute, isPending } = useAction(createProfessional, {
@@ -80,13 +81,17 @@ export default function NewProfessionalPage() {
 
       <Card className="max-w-2xl">
         <CardHeader>
-          <CardTitle>Dados do Profissional</CardTitle>
+          <CardTitle>Dados Básicos do Profissional</CardTitle>
+          <CardDescription>
+            Preencha apenas os dados básicos. O profissional completará seu
+            cadastro (biografia, foto e dados bancários) após fazer login.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="displayName">Nome de Exibição</Label>
+                <Label htmlFor="displayName">Nome</Label>
                 <Input
                   id="displayName"
                   placeholder="Nome do profissional"
@@ -125,54 +130,9 @@ export default function NewProfessionalPage() {
                 required
               />
               <p className="text-xs text-muted-foreground">
-                O profissional receberá um convite neste email para criar sua
-                conta.
+                O profissional usará este email para fazer login e completar
+                seu cadastro.
               </p>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="bio">Biografia (opcional)</Label>
-              <Textarea
-                id="bio"
-                placeholder="Uma breve descrição do profissional..."
-                value={formData.bio}
-                onChange={(e) =>
-                  setFormData({ ...formData, bio: e.target.value })
-                }
-                rows={3}
-              />
-            </div>
-
-            <div className="space-y-4">
-              <Label>Formas de Pagamento Aceitas</Label>
-              <div className="flex items-center justify-between rounded-lg border p-4">
-                <div>
-                  <p className="font-medium">Cartão de Crédito</p>
-                  <p className="text-sm text-muted-foreground">
-                    Aceitar pagamentos via cartão
-                  </p>
-                </div>
-                <Switch
-                  checked={formData.acceptsCard}
-                  onCheckedChange={(checked) =>
-                    setFormData({ ...formData, acceptsCard: checked })
-                  }
-                />
-              </div>
-              <div className="flex items-center justify-between rounded-lg border p-4">
-                <div>
-                  <p className="font-medium">PIX</p>
-                  <p className="text-sm text-muted-foreground">
-                    Aceitar pagamentos via PIX
-                  </p>
-                </div>
-                <Switch
-                  checked={formData.acceptsPix}
-                  onCheckedChange={(checked) =>
-                    setFormData({ ...formData, acceptsPix: checked })
-                  }
-                />
-              </div>
             </div>
 
             <div className="flex gap-4">

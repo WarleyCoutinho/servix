@@ -13,9 +13,23 @@ const inputSchema = z.object({
 
 export const setActiveBarbershop = ownerActionClient
   .inputSchema(inputSchema)
-  .action(async ({ parsedInput, ctx: { ownedBarbershops } }) => {
+  .action(async ({ parsedInput, ctx: { ownedBarbershops, allBarbershops } }) => {
+    const allBarbershop = allBarbershops?.find(
+      (b) => b.id === parsedInput.barbershopId,
+    );
+
+    if (!allBarbershop) {
+      throw new Error("Estabelecimento não encontrado ou não pertence a você.");
+    }
+
+    if (!allBarbershop.isActive) {
+      throw new Error(
+        "Este estabelecimento está desativado. Faça upgrade do seu plano para reativá-lo.",
+      );
+    }
+
     const barbershop = ownedBarbershops.find(
-      (b) => b.id === parsedInput.barbershopId
+      (b) => b.id === parsedInput.barbershopId,
     );
 
     if (!barbershop) {

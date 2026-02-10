@@ -18,8 +18,8 @@ export default async function AdminUsersPage() {
   const stats = {
     total: users.length,
     admins: users.filter((u) => u.role === "admin").length,
-    owners: users.filter((u) => u.role === "owner" || u.role === "owner_professional").length,
-    professionals: users.filter((u) => u.role === "professional" || u.role === "owner_professional").length,
+    owners: users.filter((u) => u.role === "owner").length,
+    professionals: users.filter((u) => u.role === "professional").length,
     clients: users.filter((u) => u.role === "client").length,
     banned: users.filter((u) => u.banned).length,
   };

@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { prisma, safeQuery } from "@/lib/prisma";
 import { DayOfWeek } from "@/generated/prisma/enums";
 export {
   DAY_OF_WEEK_ORDER,
@@ -7,47 +7,67 @@ export {
 } from "@/lib/day-of-week";
 
 export async function getBarbershopOperatingHours(barbershopId: string) {
-  return prisma.operatingHours.findMany({
-    where: { barbershopId },
-    orderBy: {
-      dayOfWeek: "asc",
-    },
-  });
+  const { data } = await safeQuery(
+    () =>
+      prisma.operatingHours.findMany({
+        where: { barbershopId },
+        orderBy: {
+          dayOfWeek: "asc",
+        },
+      }),
+    []
+  );
+  return data;
 }
 
 export async function getProfessionalSchedule(professionalId: string) {
-  return prisma.professionalSchedule.findMany({
-    where: { professionalId },
-    orderBy: {
-      dayOfWeek: "asc",
-    },
-  });
+  const { data } = await safeQuery(
+    () =>
+      prisma.professionalSchedule.findMany({
+        where: { professionalId },
+        orderBy: {
+          dayOfWeek: "asc",
+        },
+      }),
+    []
+  );
+  return data;
 }
 
 export async function getBarbershopOperatingHoursForDay(
   barbershopId: string,
   dayOfWeek: DayOfWeek,
 ) {
-  return prisma.operatingHours.findUnique({
-    where: {
-      barbershopId_dayOfWeek: {
-        barbershopId,
-        dayOfWeek,
-      },
-    },
-  });
+  const { data } = await safeQuery(
+    () =>
+      prisma.operatingHours.findUnique({
+        where: {
+          barbershopId_dayOfWeek: {
+            barbershopId,
+            dayOfWeek,
+          },
+        },
+      }),
+    null
+  );
+  return data;
 }
 
 export async function getProfessionalScheduleForDay(
   professionalId: string,
   dayOfWeek: DayOfWeek,
 ) {
-  return prisma.professionalSchedule.findUnique({
-    where: {
-      professionalId_dayOfWeek: {
-        professionalId,
-        dayOfWeek,
-      },
-    },
-  });
+  const { data } = await safeQuery(
+    () =>
+      prisma.professionalSchedule.findUnique({
+        where: {
+          professionalId_dayOfWeek: {
+            professionalId,
+            dayOfWeek,
+          },
+        },
+      }),
+    null
+  );
+  return data;
 }

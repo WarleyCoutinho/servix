@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { prisma, safeQuery } from "@/lib/prisma";
 import { UserRole } from "@/generated/prisma/enums";
 import { LayoutDashboard, CreditCard, Users, Settings } from "lucide-react";
 import {
@@ -21,17 +21,23 @@ export default async function AdminDashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  let session;
+  try {
+    session = await auth.api.getSession({
+      headers: await headers(),
+    });
+  } catch {
+    redirect("/");
+  }
 
   if (!session?.user) {
     redirect("/");
   }
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-  });
+  const { data: user } = await safeQuery(
+    () => prisma.user.findUnique({ where: { id: session.user.id } }),
+    null
+  );
 
   if (user?.role !== UserRole.admin) {
     redirect("/");

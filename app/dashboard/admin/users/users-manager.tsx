@@ -78,7 +78,6 @@ interface UsersManagerProps {
 const roleLabels: Record<UserRole, string> = {
   [UserRole.admin]: "Administrador",
   [UserRole.owner]: "Proprietário",
-  [UserRole.owner_professional]: "Proprietário/Profissional",
   [UserRole.professional]: "Profissional",
   [UserRole.client]: "Cliente",
 };
@@ -86,7 +85,6 @@ const roleLabels: Record<UserRole, string> = {
 const roleColors: Record<UserRole, string> = {
   [UserRole.admin]: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
   [UserRole.owner]: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
-  [UserRole.owner_professional]: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
   [UserRole.professional]: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
   [UserRole.client]: "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200",
 };
@@ -238,9 +236,6 @@ export function UsersManager({ initialUsers, stats }: UsersManagerProps) {
                   <SelectItem value="all">Todos</SelectItem>
                   <SelectItem value={UserRole.admin}>Admin</SelectItem>
                   <SelectItem value={UserRole.owner}>Owner</SelectItem>
-                  <SelectItem value={UserRole.owner_professional}>
-                    Owner/Prof.
-                  </SelectItem>
                   <SelectItem value={UserRole.professional}>
                     Profissional
                   </SelectItem>
@@ -303,9 +298,6 @@ export function UsersManager({ initialUsers, stats }: UsersManagerProps) {
                           </SelectItem>
                           <SelectItem value={UserRole.owner}>
                             Proprietário
-                          </SelectItem>
-                          <SelectItem value={UserRole.owner_professional}>
-                            Prop./Profissional
                           </SelectItem>
                           <SelectItem value={UserRole.professional}>
                             Profissional

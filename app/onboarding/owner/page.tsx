@@ -38,6 +38,7 @@ const formSchema = z.object({
     .string()
     .min(10, "Telefone inválido")
     .transform((val) => val.replace(/\D/g, "")),
+  ownerCpf: z.string().min(11, "CPF deve conter 11 dígitos"),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -54,12 +55,12 @@ export default function OwnerOnboardingPage() {
       address: "",
       description: "",
       phone: "",
+      ownerCpf: "",
     },
   });
 
   const { execute, isPending } = useAction(setOwnerRole, {
     onSuccess: () => {
-      localStorage.removeItem("pendingAccountType");
       toast.success("Barbearia criada com sucesso!");
       router.push("/dashboard/owner");
     },
@@ -86,20 +87,12 @@ export default function OwnerOnboardingPage() {
         const profile = await response.json();
 
         if (profile.role === "owner" && profile.hasOwnedBarbershop) {
-          localStorage.removeItem("pendingAccountType");
           router.replace("/dashboard/owner");
           return;
         }
 
         if (profile.role === "professional") {
-          localStorage.removeItem("pendingAccountType");
           toast.error("Profissionais não podem se tornar proprietários.");
-          router.replace("/");
-          return;
-        }
-
-        const pendingAccountType = localStorage.getItem("pendingAccountType");
-        if (profile.role === "client" && pendingAccountType !== "owner") {
           router.replace("/");
           return;
         }
@@ -185,6 +178,26 @@ export default function OwnerOnboardingPage() {
                     </FormControl>
                     <FormDescription>
                       Telefone para contato dos clientes
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="ownerCpf"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Seu CPF</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="000.000.000-00"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Necessário para seu cadastro como profissional
                     </FormDescription>
                     <FormMessage />
                   </FormItem>

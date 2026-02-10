@@ -5,8 +5,7 @@ import { subscribedOwnerActionClient } from "@/lib/action-client";
 import { returnValidationErrors } from "next-safe-action";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { checkProfessionalLimit } from "@/lib/plan-limits";
-import { UserRole } from "@/generated/prisma/enums";
+import { checkProfessionalLimit, getUserPlanInfo } from "@/lib/plan-limits";
 
 const cpfRegex = /^\d{11}$/;
 
@@ -18,19 +17,16 @@ const inputSchema = z.object({
       message: "CPF inválido. Deve conter 11 dígitos.",
     }),
   displayName: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
-  email: z.email("Email inválido"),
-  bio: z.string().optional(),
-  imageUrl: z.url().optional(),
-  acceptsPix: z.boolean().default(false),
-  acceptsCard: z.boolean().default(true),
+  email: z.string().email("Email inválido"),
 });
 
 export const createProfessional = subscribedOwnerActionClient
   .inputSchema(inputSchema)
   .action(async ({ parsedInput, ctx: { barbershop, user } }) => {
-    if (user.role === UserRole.owner_professional) {
+    const planInfo = await getUserPlanInfo(user.id, barbershop.id);
+    if (planInfo?.isBasicPlan) {
       throw new Error(
-        "O plano Básico não permite adicionar profissionais. Faça upgrade para o plano Profissional ou superior.",
+        "O plano Básico não permite adicionar profissionais. Faça upgrade para o plano Standard ou superior.",
       );
     }
 
@@ -93,12 +89,10 @@ export const createProfessional = subscribedOwnerActionClient
       data: {
         cpf: parsedInput.cpf,
         displayName: parsedInput.displayName,
-        bio: parsedInput.bio,
-        imageUrl: parsedInput.imageUrl,
-        acceptsPix: parsedInput.acceptsPix,
-        acceptsCard: parsedInput.acceptsCard,
         userId: targetUser.id,
         barbershopId: barbershop.id,
+        acceptsPix: false,
+        acceptsCard: false,
       },
       include: {
         user: true,

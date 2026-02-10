@@ -23,10 +23,10 @@ export default async function EstablishmentPage({ params }: Props) {
   const data = await getActiveBarbershop(session.user.id);
 
   if (!data) {
-    redirect("/");
+    redirect("/dashboard/owner/subscription");
   }
 
-  const barbershop = data.ownedBarbershops.find((b) => b.id === id);
+  const barbershop = data.allBarbershops?.find((b) => b.id === id);
 
   if (!barbershop) {
     notFound();
@@ -54,7 +54,7 @@ export default async function EstablishmentPage({ params }: Props) {
     <div className="space-y-6">
       <EstablishmentDetails
         barbershop={barbershopWithDetails}
-        isActive={data.activeBarbershop.id === id}
+        isActive={data.activeBarbershop?.id === id}
       />
     </div>
   );

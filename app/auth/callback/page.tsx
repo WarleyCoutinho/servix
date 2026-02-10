@@ -32,6 +32,11 @@ export default function AuthCallbackPage() {
         const profileResponse = await fetch("/api/user/profile");
         const profile: UserProfile = await profileResponse.json();
 
+        if (profile.role === "admin") {
+          router.replace("/dashboard/admin");
+          return;
+        }
+
         if (profile.role === "owner" && profile.hasOwnedBarbershop) {
           router.replace("/dashboard/owner");
           return;
@@ -52,19 +57,12 @@ export default function AuthCallbackPage() {
           return;
         }
 
-        const hasSelectedType = localStorage.getItem("accountTypeSelected");
-        if (hasSelectedType === "true") {
-          router.replace("/");
-          return;
-        }
-
         const response = await fetch("/api/user/check-new");
         const data = await response.json();
 
         if (data.isNewUser) {
           router.replace("/auth/select-account-type");
         } else {
-          localStorage.setItem("accountTypeSelected", "true");
           router.replace("/");
         }
       } catch {

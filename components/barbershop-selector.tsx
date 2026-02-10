@@ -16,6 +16,7 @@ import { toast } from "sonner";
 interface Barbershop {
   id: string;
   name: string;
+  isActive: boolean;
 }
 
 interface BarbershopSelectorProps {
@@ -63,8 +64,14 @@ export function BarbershopSelector({
         </SelectTrigger>
         <SelectContent>
           {barbershops.map((barbershop) => (
-            <SelectItem key={barbershop.id} value={barbershop.id}>
+            <SelectItem
+              key={barbershop.id}
+              value={barbershop.id}
+              disabled={!barbershop.isActive}
+              className={!barbershop.isActive ? "opacity-50" : ""}
+            >
               {barbershop.name}
+              {!barbershop.isActive && " (Desativado)"}
             </SelectItem>
           ))}
         </SelectContent>

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { isConnectionError, getUserFriendlyMessage } from "@/lib/db-error";
 
 export async function GET() {
   try {
@@ -31,14 +32,9 @@ export async function GET() {
       return NextResponse.json({ error: "Usuário não encontrado" }, { status: 404 });
     }
 
-    const now = new Date();
-    const createdAt = new Date(user.createdAt);
-    const diffInSeconds = (now.getTime() - createdAt.getTime()) / 1000;
-
     const isNewUser =
       user.role === "client" &&
-      user._count.bookings === 0 &&
-      diffInSeconds < 60;
+      user._count.bookings === 0;
 
     return NextResponse.json({
       isNewUser,
@@ -46,6 +42,14 @@ export async function GET() {
     });
   } catch (error) {
     console.error("Error checking new user:", error);
+
+    if (isConnectionError(error)) {
+      return NextResponse.json(
+        { error: getUserFriendlyMessage(error) },
+        { status: 503 }
+      );
+    }
+
     return NextResponse.json(
       { error: "Erro interno do servidor" },
       { status: 500 }
