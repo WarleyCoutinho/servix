@@ -1,9 +1,21 @@
 "use client";
 
-import Image from "next/image";
-import { Button } from "./ui/button";
+import { createBookingCheckoutSession } from "@/actions/create-booking-checkout-session";
+import { Barbershop, BarbershopService } from "@/generated/prisma/client";
+import { useGetBarbershopProfessionals } from "@/hooks/data/use-get-barbershop-professionals";
+import { useGetDateAvailableTimeSlots } from "@/hooks/data/use-get-date-availabe-time-slots";
 import { formatCurrency } from "@/lib/utils";
-import { BarbershopService, Barbershop } from "@/generated/prisma/client";
+import { loadStripe } from "@stripe/stripe-js";
+import { ptBR } from "date-fns/locale";
+import { Loader2, User } from "lucide-react";
+import { useAction } from "next-safe-action/hooks";
+import Image from "next/image";
+import { useState } from "react";
+import { toast } from "sonner";
+import BookingSummary from "./booking-summary";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Button } from "./ui/button";
+import { Calendar } from "./ui/calendar";
 import {
   Sheet,
   SheetContent,
@@ -12,18 +24,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "./ui/sheet";
-import { Calendar } from "./ui/calendar";
-import { ptBR } from "date-fns/locale";
-import { useState } from "react";
-import { useAction } from "next-safe-action/hooks";
-import { toast } from "sonner";
-import { Loader2, User } from "lucide-react";
-import { useGetDateAvailableTimeSlots } from "@/hooks/data/use-get-date-availabe-time-slots";
-import { useGetBarbershopProfessionals } from "@/hooks/data/use-get-barbershop-professionals";
-import BookingSummary from "./booking-summary";
-import { createBookingCheckoutSession } from "@/actions/create-booking-checkout-session";
-import { loadStripe } from "@stripe/stripe-js";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 interface ServiceItemProps {
   service: BarbershopService;
@@ -124,7 +124,7 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
   return (
     <div className="border-border bg-card flex gap-3 rounded-2xl border p-3">
       {/* Service Image */}
-      <div className="relative h-[110px] w-[110px] shrink-0">
+      <div className="relative h-27.5 w-27.5 shrink-0">
         <Image
           src={service.imageUrl}
           alt={service.name}
@@ -202,7 +202,7 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
                           onClick={() =>
                             handleProfessionalSelect(professional.id)
                           }
-                          className={`flex min-w-[5rem] flex-col items-center gap-2 rounded-lg border p-3 transition-colors ${
+                          className={`flex min-w-20 flex-col items-center gap-2 rounded-lg border p-3 transition-colors ${
                             selectedProfessional === professional.id
                               ? "border-primary bg-primary/10"
                               : "border-border hover:bg-muted"
@@ -251,7 +251,9 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
                       {availableTimeSlots.data.slots.map((time) => (
                         <Button
                           key={time}
-                          variant={selectedTime === time ? "default" : "outline"}
+                          variant={
+                            selectedTime === time ? "default" : "outline"
+                          }
                           className="rounded-full"
                           onClick={() => handleTimeSelect(time)}
                         >
