@@ -1,31 +1,42 @@
-# GUIA COMPLETO - CONFIGURAÇÃO STRIPE PASSO A PASSO
+# GUIA COMPLETO - CONFIGURACAO STRIPE 2025-2026
+
+## VISAO GERAL DO SISTEMA
+
+O Servix utiliza o Stripe para dois tipos de pagamentos:
+
+| Tipo | Metodos Aceitos | Descricao |
+|------|-----------------|-----------|
+| **Assinaturas** | Cartao | Planos mensais para proprietarios |
+| **Agendamentos** | Cartao + PIX | Servicos pagos pelos clientes |
+
+> **IMPORTANTE**: PIX nao suporta cobrancas recorrentes, por isso assinaturas usam apenas cartao.
+
+---
 
 ## PASSO 1: ACESSAR O STRIPE DASHBOARD
 
 ### 1.1 - Login no Stripe
 
 1. Acesse: https://dashboard.stripe.com/
-2. Faça login com sua conta
+2. Faca login com sua conta
 3. **IMPORTANTE**: Certifique-se de estar em **modo de teste** (canto superior direito deve mostrar "Test mode")
 
 ---
 
 ## PASSO 2: OBTER AS CHAVES API
 
-### 2.1 - Chaves Publicáveis e Secretas
+### 2.1 - Chaves Publicaveis e Secretas
 
 1. No Stripe Dashboard, clique em **Developers** (menu superior)
 2. Clique em **API keys** (menu lateral esquerdo)
-3. Você verá duas chaves:
+3. Voce vera duas chaves:
 
-**Chave Publicável (Publishable key):**
-
+**Chave Publicavel (Publishable key):**
 ```
 pk_test_xxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
 **Chave Secreta (Secret key):**
-
 ```
 sk_test_xxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
@@ -39,55 +50,32 @@ STRIPE_SECRET_KEY="sk_test_xxxxxxxxxxxxxxxxxxxxxxxxxx"
 
 ---
 
-## PASSO 3: CRIAR PRODUTOS E PREÇOS (ASSINATURAS)
+## PASSO 3: CONFIGURAR PLANOS DE ASSINATURA
 
-### 3.1 - Criar Produto de Assinatura
+### 3.1 - Executar Seed dos Planos
 
-1. No Stripe Dashboard, vá em **Products** (menu superior)
-2. Clique em **+ Add product**
-3. Preencha:
-   - **Name**: `Plano Básico - Barbershop SaaS`
-   - **Description**: `Plano básico para proprietários de barbearias`
-4. Em **Pricing**:
-   - **Pricing model**: Selecione `Standard pricing`
-   - **Price**: `49.90`
-   - **Billing period**: Selecione `Monthly`
-   - **Currency**: `BRL - Brazilian Real`
-5. Marque a opção: ✅ **Recurring**
-6. Clique em **Add product**
+Primeiro, execute o seed para criar os planos no banco:
 
-### 3.2 - Obter o Price ID
-
-1. Após criar o produto, você será redirecionado para a página do produto
-2. Na seção **Pricing**, você verá algo como:
-
-```
-R$49.90 / month
-price_xxxxxxxxxxxxxxxxxxxxxxxxxx
+```bash
+npx prisma db seed
 ```
 
-3. **Copie esse Price ID** (começa com `price_`)
-4. Adicione no `.env`:
+### 3.2 - Criar Produtos no Stripe
 
-```env
-STRIPE_SUBSCRIPTION_PRICE_ID="price_xxxxxxxxxxxxxxxxxxxxxxxxxx"
+Execute o script para criar os produtos e precos no Stripe:
+
+```bash
+npx tsx scripts/create-stripe-prices.ts
 ```
 
-### 3.3 - (Opcional) Criar Mais Planos
+Isso criara os seguintes planos:
 
-Repita o processo acima para criar outros planos:
-
-**Plano Profissional:**
-
-- Name: `Plano Profissional - Barbershop SaaS`
-- Price: `99.90`
-- Billing period: `Monthly`
-
-**Plano Empresarial:**
-
-- Name: `Plano Empresarial - Barbershop SaaS`
-- Price: `199.90`
-- Billing period: `Monthly`
+| Plano | Preco | Max Estabelecimentos | Max Profissionais | Max Servicos |
+|-------|-------|----------------------|-------------------|--------------|
+| Basico | R$ 39,90/mes | 1 | 1 | 3 |
+| Padrao | R$ 59,90/mes | 1 | 3 | 10 |
+| Profissional | R$ 99,90/mes | 1 | 10 | 30 |
+| Empresarial | R$ 249,90/mes | 5 | 50 | Ilimitado |
 
 ---
 
@@ -95,77 +83,88 @@ Repita o processo acima para criar outros planos:
 
 ### 4.1 - Habilitar Connect
 
-1. No Stripe Dashboard, vá em **Connect** (menu superior)
+1. No Stripe Dashboard, va em **Connect** (menu superior)
 2. Se for a primeira vez, clique em **Get started**
-3. Preencha as informações da sua plataforma:
-   - **Platform name**: `Barbershop SaaS`
+3. Preencha as informacoes da sua plataforma:
+   - **Platform name**: `Servix`
    - **Support email**: seu email
-   - **Platform website**: `http://localhost:3000` (ou seu domínio)
+   - **Platform website**: `http://localhost:3000` (ou seu dominio)
 
 ### 4.2 - Configurar Connect Settings
 
-1. Vá em **Connect** → **Settings**
+1. Va em **Connect** > **Settings**
 2. Em **Branding**:
-   - **Brand name**: `Barbershop SaaS`
-   - **Brand icon**: (opcional) faça upload de um logo
+   - **Brand name**: `Servix`
+   - **Brand icon**: (opcional) faca upload de um logo
    - **Brand color**: escolha uma cor (ex: `#4F46E5`)
 3. Clique em **Save**
 
 ### 4.3 - Configurar Account Types
 
-1. Em **Connect** → **Settings** → **Account types**
-2. Certifique-se de que **Express** está habilitado
+1. Em **Connect** > **Settings** > **Account types**
+2. Certifique-se de que **Express** esta habilitado
 3. Configure:
-   - ✅ **Individual accounts**
-   - ✅ **Company accounts**
+   - [x] **Individual accounts**
+   - [x] **Company accounts**
+
+### 4.4 - Habilitar PIX para Connect
+
+1. Va em **Settings** > **Payment methods**
+2. Ative **Pix** para sua conta
+3. Em **Connect** > **Settings** > **Payment methods**
+4. Certifique-se de que **Pix** esta habilitado para contas conectadas
 
 ---
 
 ## PASSO 5: CONFIGURAR WEBHOOKS
 
-### 5.1 - Criar Webhook Endpoint Principal
+### 5.1 - Criar Webhook Principal (Assinaturas + Agendamentos)
 
-1. Vá em **Developers** → **Webhooks**
+1. Va em **Developers** > **Webhooks**
 2. Clique em **+ Add endpoint**
 3. Preencha:
-   - **Endpoint URL**: `http://localhost:3000/api/webhooks/stripe`
-   - **Description**: `Main webhook handler`
+   - **Endpoint URL**: `https://seudominio.com/api/stripe/webhook`
+   - **Description**: `Main webhook - subscriptions and bookings`
 4. Em **Select events to listen to**, escolha:
-   - ✅ `checkout.session.completed`
-   - ✅ `customer.subscription.created`
-   - ✅ `customer.subscription.updated`
-   - ✅ `customer.subscription.deleted`
-   - ✅ `invoice.payment_succeeded`
-   - ✅ `invoice.payment_failed`
-   - ✅ `payment_intent.succeeded`
-   - ✅ `payment_intent.payment_failed`
-   - ✅ `payment_intent.canceled`
 
-**OU** selecione **Select all events** (mais fácil para desenvolvimento)
+**Eventos de Assinatura:**
+- [x] `checkout.session.completed`
+- [x] `customer.subscription.created`
+- [x] `customer.subscription.updated`
+- [x] `customer.subscription.deleted`
+- [x] `invoice.paid`
+- [x] `invoice.payment_failed`
+
+**Eventos de Pagamento (Agendamentos):**
+- [x] `payment_intent.payment_failed`
+- [x] `charge.refunded`
 
 5. Clique em **Add endpoint**
 
 ### 5.2 - Obter Webhook Secret (Principal)
 
-1. Após criar o webhook, clique nele
-2. Na seção **Signing secret**, clique em **Reveal**
-3. **Copie o secret** (começa com `whsec_`)
+1. Apos criar o webhook, clique nele
+2. Na secao **Signing secret**, clique em **Reveal**
+3. **Copie o secret** (comeca com `whsec_`)
 4. Adicione no `.env`:
 
 ```env
 STRIPE_WEBHOOK_SECRET_KEY="whsec_xxxxxxxxxxxxxxxxxxxxxxxxxx"
 ```
 
-### 5.3 - Criar Webhook para Connect (Opcional)
+### 5.3 - Criar Webhook para Connect (Profissionais)
 
 1. Repita os passos acima, mas agora:
-   - **Endpoint URL**: `http://localhost:3000/api/webhooks/stripe/connect`
-   - **Description**: `Connect webhook handler`
-2. Eventos:
-   - ✅ `account.updated`
-   - ✅ `account.external_account.created`
-   - ✅ `account.external_account.updated`
-3. Copie o signing secret e adicione:
+   - **Endpoint URL**: `https://seudominio.com/api/stripe/connect/webhook`
+   - **Description**: `Connect webhook - professional accounts`
+2. Marque a opcao **Listen to events on Connected accounts**
+3. Eventos:
+   - [x] `account.updated`
+   - [x] `account.application.deauthorized`
+   - [x] `payout.paid`
+   - [x] `payout.failed`
+
+4. Copie o signing secret e adicione:
 
 ```env
 STRIPE_CONNECT_WEBHOOK_SECRET="whsec_xxxxxxxxxxxxxxxxxxxxxxxxxx"
@@ -173,273 +172,147 @@ STRIPE_CONNECT_WEBHOOK_SECRET="whsec_xxxxxxxxxxxxxxxxxxxxxxxxxx"
 
 ---
 
-## PASSO 6: INSTALAR STRIPE CLI (TESTE LOCAL)
+## PASSO 6: CONFIGURAR TAXA DA PLATAFORMA
 
-### 6.1 - Instalar Stripe CLI
+### 6.1 - Definir Porcentagem
+
+No arquivo `.env`, configure a taxa que voce recebe de cada agendamento:
+
+```env
+PLATFORM_FEE_PERCENTAGE=10
+```
+
+Isso significa que a cada agendamento:
+- **Profissional recebe**: 90%
+- **Plataforma recebe**: 10%
+
+---
+
+## PASSO 7: INSTALAR STRIPE CLI (TESTE LOCAL)
+
+### 7.1 - Instalar Stripe CLI
+
+**Linux (Fedora/RHEL):**
+```bash
+sudo dnf install stripe
+```
+
+**Linux (Ubuntu/Debian):**
+```bash
+curl -s https://packages.stripe.dev/api/security/keypair/stripe-cli-gpg/public | gpg --dearmor | sudo tee /usr/share/keyrings/stripe.gpg
+echo "deb [signed-by=/usr/share/keyrings/stripe.gpg] https://packages.stripe.dev/stripe-cli-debian-local stable main" | sudo tee -a /etc/apt/sources.list.d/stripe.list
+sudo apt update
+sudo apt install stripe
+```
 
 **macOS:**
-
 ```bash
 brew install stripe/stripe-cli/stripe
 ```
 
 **Windows:**
-
 ```bash
 scoop bucket add stripe https://github.com/stripe/scoop-stripe-cli.git
 scoop install stripe
 ```
 
-**Linux:**
-
-```bash
-wget https://github.com/stripe/stripe-cli/releases/latest/download/stripe_linux_amd64.tar.gz
-tar -xvf stripe_linux_amd64.tar.gz
-sudo mv stripe /usr/local/bin
-```
-
-### 6.2 - Login no Stripe CLI
+### 7.2 - Login no Stripe CLI
 
 ```bash
 stripe login
 ```
 
-Isso abrirá o navegador para autenticar. Confirme o acesso.
+Isso abrira o navegador para autenticar. Confirme o acesso.
 
-### 6.3 - Testar Webhooks Localmente
+### 7.3 - Encaminhar Webhooks Localmente
 
 Em um terminal separado, execute:
 
 ```bash
-stripe listen --forward-to localhost:3000/api/webhooks/stripe
+stripe listen --forward-to localhost:3000/api/stripe/webhook
 ```
 
-Você verá algo como:
-
+Voce vera algo como:
 ```
-> Ready! Your webhook signing secret is whsec_xxxxxxxxxxxxx (^C to quit)
+> Ready! Your webhook signing secret is whsec_xxxxxxxxxxxxx
 ```
 
-**COPIE esse signing secret** e **substitua** temporariamente no `.env` durante desenvolvimento local:
+**COPIE esse signing secret** e use temporariamente no `.env` durante desenvolvimento:
 
 ```env
 STRIPE_WEBHOOK_SECRET_KEY="whsec_xxxxxxxxxxxxx"
 ```
 
+Para Connect webhooks:
+```bash
+stripe listen --forward-to localhost:3000/api/stripe/connect/webhook --events account.updated,account.application.deauthorized,payout.paid,payout.failed
+```
+
 ---
 
-## PASSO 7: CONFIGURAR .ENV COMPLETO
+## PASSO 8: CONFIGURAR .ENV COMPLETO
 
 Seu arquivo `.env` deve ficar assim:
 
 ```env
 # Database
-DATABASE_URL="postgresql://user:password@localhost:5432/barbershop_saas"
+DATABASE_URL="postgresql://user:password@localhost:5432/servix"
 
 # Better Auth
-BETTER_AUTH_SECRET="USZFLpuozxsYxmU7Mgv4sFRwQDARtRlx"
+BETTER_AUTH_SECRET="sua_chave_secreta_aqui"
 BETTER_AUTH_URL="http://localhost:3000"
 NEXT_PUBLIC_APP_URL="http://localhost:3000"
 
-# Google OAuth (opcional)
-GOOGLE_CLIENT_ID=""
-GOOGLE_CLIENT_SECRET=""
+# Google OAuth
+GOOGLE_CLIENT_ID="seu_client_id"
+GOOGLE_CLIENT_SECRET="seu_client_secret"
 
-# Stripe
+# Stripe - Chaves API
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="pk_test_xxxxxxxxxxxxxxxxxxxxxxxxxx"
 STRIPE_SECRET_KEY="sk_test_xxxxxxxxxxxxxxxxxxxxxxxxxx"
-STRIPE_WEBHOOK_SECRET_KEY="whsec_xxxxxxxxxxxxxxxxxxxxxxxxxx"
 
-# Stripe Connect (opcional, se criou webhook separado)
+# Stripe - Webhooks
+STRIPE_WEBHOOK_SECRET_KEY="whsec_xxxxxxxxxxxxxxxxxxxxxxxxxx"
 STRIPE_CONNECT_WEBHOOK_SECRET="whsec_xxxxxxxxxxxxxxxxxxxxxxxxxx"
 
-# Stripe Product IDs (após criar os produtos)
-STRIPE_SUBSCRIPTION_PRICE_ID="price_xxxxxxxxxxxxxxxxxxxxxxxxxx"
-
-# AI (opcional)
-GOOGLE_GENERATIVE_AI_API_KEY=""
-OPENAI_API_KEY=""
+# Stripe - Taxa da Plataforma (10%)
+PLATFORM_FEE_PERCENTAGE=10
 ```
 
 ---
 
-## PASSO 8: EXECUTAR SCRIPT DE SETUP
+## PASSO 9: TESTAR FLUXOS DE PAGAMENTO
 
-### 8.1 - Criar Script de Setup de Produtos
+### 9.1 - Testar Assinatura (Proprietario)
 
-Crie o arquivo `scripts/setup-stripe-products.ts`:
+1. Crie uma conta de proprietario
+2. Va para `/dashboard/owner/subscription`
+3. Selecione um plano e clique em **Assinar**
+4. Use os dados de teste:
 
-```typescript
-// scripts/setup-stripe-products.ts
-import { stripe } from "../src/lib/stripe";
-import { prisma } from "../src/lib/prisma";
+**Cartao de Sucesso:**
+- Numero: `4242 4242 4242 4242`
+- Data: Qualquer data futura (ex: `12/28`)
+- CVC: Qualquer 3 digitos (ex: `123`)
+- CEP: Qualquer (ex: `12345-678`)
 
-const PLANS = [
-  {Serviços ilimitados
-    key: "BASIC",
-    name: "Básico",
-    price: 49.9,
-    maxBarbershops: 1,
-    maxProfessionals: 3,
-    features: ["1 Barbearia", "Até 3 Profissionais", "Suporte por Email"],
-  },
-  {
-    key: "PROFESSIONAL",
-    name: "Profissional",
-    price: 99.9,
-    maxBarbershops: 1,
-    maxProfessionals: 10,
-    features: [
-      "1 Barbearia",
-      "Até 10 Profissionais",
-      "Analytics",
-      "Suporte Prioritário",
-    ],
-  },
-  {
-    key: "ENTERPRISE",
-    name: "Empresarial",
-    price: 199.9,
-    maxBarbershops: 5,
-    maxProfessionals: 50,
-    features: ["5 Barbearias", "50 Profissionais", "White Label", "API"],
-  },
-];
+**Cartao que Falha:**
+- Numero: `4000 0000 0000 0002`
 
-async function main() {
-  console.log("🚀 Criando produtos no Stripe...\n");
+### 9.2 - Testar Agendamento com Cartao
 
-  for (const plan of PLANS) {
-    try {
-      // Verificar se já existe
-      const existing = await prisma.subscriptionPlan.findFirst({
-        where: { name: plan.name },
-      });
+1. Faca login como cliente
+2. Selecione um servico e profissional
+3. Escolha data e horario
+4. No checkout, use cartao de teste
 
-      if (existing) {
-        console.log(`⚠️  Plano "${plan.name}" já existe, pulando...\n`);
-        continue;
-      }
+### 9.3 - Testar Agendamento com PIX
 
-      // 1. Criar produto
-      const product = await stripe.products.create({
-        name: `Plano ${plan.name}`,
-        description: plan.features.join(" • "),
-      });
-
-      console.log(`✅ Produto criado: ${product.name}`);
-
-      // 2. Criar preço
-      const price = await stripe.prices.create({
-        product: product.id,
-        unit_amount: Math.round(plan.price * 100),
-        currency: "brl",
-        recurring: {
-          interval: "month",
-          trial_period_days: 14,
-        },
-      });
-
-      console.log(`✅ Preço criado: R$ ${plan.price}`);
-
-      // 3. Salvar no banco
-      await prisma.subscriptionPlan.create({
-        data: {
-          name: plan.name,
-          stripePriceId: price.id,
-          stripeProductId: product.id,
-          price: plan.price,
-          currency: "BRL",
-          interval: "MONTHLY",
-          maxBarbershops: plan.maxBarbershops,
-          maxProfessionals: plan.maxProfessionals,
-          features: plan.features,
-          isActive: true,
-          isPopular: plan.key === "PROFESSIONAL",
-        },
-      });
-
-      console.log(`✅ Salvo no banco\n`);
-    } catch (error: any) {
-      console.error(`❌ Erro ao criar ${plan.name}:`, error.message);
-    }
-  }
-
-  console.log("✅ Setup concluído!");
-}
-
-main()
-  .catch(console.error)
-  .finally(() => process.exit());
-```
-
-### 8.2 - Executar Script
-
-```bash
-npx tsx scripts/setup-stripe-products.ts
-```
-
-Você deve ver:
-
-```
-🚀 Criando produtos no Stripe...
-
-✅ Produto criado: Plano Básico
-✅ Preço criado: R$ 49.9
-✅ Salvo no banco
-
-✅ Produto criado: Plano Profissional
-✅ Preço criado: R$ 99.9
-✅ Salvo no banco
-
-✅ Produto criado: Plano Empresarial
-✅ Preço criado: R$ 199.9
-✅ Salvo no banco
-
-✅ Setup concluído!
-```
-
----
-
-## PASSO 9: TESTAR WEBHOOKS LOCALMENTE
-
-### 9.1 - Iniciar Servidor Next.js
-
-Terminal 1:
-
-```bash
-pnpm dev
-```
-
-### 9.2 - Iniciar Stripe CLI
-
-Terminal 2:
-
-```bash
-stripe listen --forward-to localhost:3000/api/webhooks/stripe
-```
-
-### 9.3 - Testar Evento
-
-Terminal 3:
-
-```bash
-stripe trigger checkout.session.completed
-```
-
-Você deve ver no Terminal 2:
-
-```
-2024-02-03 10:30:15   --> checkout.session.completed [evt_xxxxx]
-2024-02-03 10:30:15  <--  [200] POST http://localhost:3000/api/webhooks/stripe [evt_xxxxx]
-```
-
-E no console do Next.js (Terminal 1):
-
-```
-📨 Webhook: checkout.session.completed
-✅ Assinatura ativada: owner_xxxxx
-```
+1. Faca login como cliente
+2. Selecione um servico e profissional
+3. Escolha data e horario
+4. No checkout, selecione **Pix**
+5. O Stripe gerara um QR Code de teste
 
 ---
 
@@ -447,156 +320,171 @@ E no console do Next.js (Terminal 1):
 
 ### 10.1 - Ativar Customer Portal
 
-1. No Stripe Dashboard, vá em **Settings** → **Billing** → **Customer portal**
+1. No Stripe Dashboard, va em **Settings** > **Billing** > **Customer portal**
 2. Clique em **Activate test link**
 3. Configure:
-   - ✅ **Allow customers to update subscription**: Ativado
-   - ✅ **Allow customers to cancel subscription**: Ativado
-   - ✅ **Allow customers to update payment methods**: Ativado
+   - [x] **Allow customers to update subscription**: Ativado
+   - [x] **Allow customers to cancel subscription**: Ativado
+   - [x] **Allow customers to update payment methods**: Ativado
 4. Em **Business information**:
-   - **Business name**: `Barbershop SaaS`
+   - **Business name**: `Servix`
    - **Support email**: seu email
-   - **Support phone**: (opcional)
 5. Clique em **Save**
 
 ---
 
-## PASSO 11: TESTAR FLUXO COMPLETO
+## FLUXO DE PAGAMENTOS
 
-### 11.1 - Criar Conta de Proprietário
+### Fluxo 1: Assinatura de Plano (Proprietario)
 
-1. Acesse: `http://localhost:3000/register`
-2. Selecione **Proprietário**
-3. Preencha os dados e crie a conta
+```
+Proprietario seleciona plano
+        |
+        v
+Checkout Session (mode: subscription)
+        |
+        v
+Pagamento via CARTAO
+        |
+        v
+Webhook: checkout.session.completed
+        |
+        v
+Cria/Atualiza Subscription no banco
+        |
+        v
+Proprietario tem acesso ao plano
+        |
+        v
+Cobranca automatica mensal via cartao
+```
 
-### 11.2 - Assinar um Plano
+### Fluxo 2: Agendamento de Servico (Cliente)
 
-1. Vá para: `http://localhost:3000/dashboard/owner/subscription`
-2. Clique em **Assinar** em um dos planos
-3. Você será redirecionado para o Stripe Checkout
+```
+Cliente seleciona servico + profissional + data/hora
+        |
+        v
+Verifica se profissional tem Stripe Connect ATIVO
+        |
+        v
+Checkout Session (mode: payment)
+        |
+        v
+Cliente escolhe: CARTAO ou PIX
+        |
+        v
+Pagamento processado
+        |
+        v
+Stripe divide automaticamente:
+  - 90% -> Profissional (via Stripe Connect)
+  - 10% -> Plataforma (application_fee)
+        |
+        v
+Webhook: checkout.session.completed
+        |
+        v
+Cria Booking + Payment no banco
+```
 
-### 11.3 - Pagar com Cartão de Teste
+---
 
-Use os seguintes dados de teste:
+## WEBHOOKS - EVENTOS PROCESSADOS
 
-**Cartão de Sucesso:**
+### Webhook Principal (`/api/stripe/webhook`)
 
-- Número: `4242 4242 4242 4242`
-- Data: Qualquer data futura (ex: `12/25`)
-- CVC: Qualquer 3 dígitos (ex: `123`)
-- CEP: Qualquer (ex: `12345-678`)
+| Evento | Acao |
+|--------|------|
+| `checkout.session.completed` (subscription) | Sincroniza assinatura |
+| `checkout.session.completed` (payment) | Cria Booking e Payment |
+| `customer.subscription.created` | Atualiza plano do proprietario |
+| `customer.subscription.updated` | Upgrade/Downgrade de plano |
+| `customer.subscription.deleted` | Cancela assinatura |
+| `invoice.paid` | Confirma pagamento da assinatura |
+| `invoice.payment_failed` | Marca falha no pagamento |
+| `payment_intent.payment_failed` | Marca pagamento de agendamento como falho |
+| `charge.refunded` | Processa reembolso |
 
-**Cartão que Falha:**
+### Webhook Connect (`/api/stripe/connect/webhook`)
 
-- Número: `4000 0000 0000 0002`
+| Evento | Acao |
+|--------|------|
+| `account.updated` | Atualiza status do profissional |
+| `account.application.deauthorized` | Desativa conta do profissional |
+| `payout.paid` | Registra pagamento ao profissional |
+| `payout.failed` | Registra falha no pagamento |
 
-### 11.4 - Verificar Webhooks
+---
 
-Após o pagamento, verifique:
+## TROUBLESHOOTING
 
-1. Terminal do Stripe CLI mostra eventos recebidos
-2. Console do Next.js mostra processamento
-3. Banco de dados atualizado:
+### Erro: Webhook nao recebe eventos (desenvolvimento local)
 
+**Solucao:**
 ```bash
-npx prisma studio
+# Verifique se Stripe CLI esta rodando
+stripe listen --forward-to localhost:3000/api/stripe/webhook
+
+# Teste manualmente
+stripe trigger checkout.session.completed
 ```
 
-Abra a tabela `Owner` e verifique:
+### Erro: "No such price"
 
-- `subscriptionStatus`: `ACTIVE`
-- `stripeSubscriptionId`: preenchido
-- `currentPeriodEnd`: data futura
+**Solucao:**
+1. Verifique se executou o script de criacao de precos
+2. Liste os precos: `stripe prices list`
+3. Verifique o banco: `npx prisma studio` > tabela `PlanConfig`
+
+### Erro: "Invalid API Key"
+
+**Solucao:**
+1. Certifique-se de estar usando a chave de **teste** (`sk_test_`)
+2. Verifique se nao ha espacos no `.env`
+3. Reinicie o servidor: `pnpm dev`
+
+### Erro: PIX nao aparece no checkout
+
+**Solucao:**
+1. Verifique se PIX esta ativado em **Settings** > **Payment methods**
+2. Verifique se o profissional tem `acceptsPix: true`
+3. PIX so funciona para contas no Brasil
+
+### Erro: Profissional nao pode receber pagamentos
+
+**Solucao:**
+1. Verifique se o profissional completou o onboarding do Stripe Connect
+2. Status deve ser `ACTIVE` no banco
+3. Execute: `npx prisma studio` > tabela `Professional` > `stripeAccountStatus`
+
+### Erro: Taxa da plataforma nao sendo cobrada
+
+**Solucao:**
+1. Verifique `PLATFORM_FEE_PERCENTAGE` no `.env`
+2. Verifique se o profissional tem Stripe Connect ativo
+3. Verifique os logs do webhook
 
 ---
 
-## PASSO 12: CONFIGURAR STRIPE CONNECT PARA PROFISSIONAIS
-
-### 12.1 - Criar Conta de Profissional (Teste)
-
-1. Vá em **Connect** → **Accounts**
-2. Clique em **+ New**
-3. Selecione **Express**
-4. Preencha dados de teste:
-   - **Email**: `professional@test.com`
-   - **Country**: `Brazil`
-5. Complete o onboarding de teste
-
-### 12.2 - Testar Criação de Conta via API
-
-```bash
-curl -X POST http://localhost:3000/api/professionals/connect/create-account \
-  -H "Content-Type: application/json" \
-  -H "Cookie: YOUR_SESSION_COOKIE"
-```
-
-Você receberá:
-
-```json
-{
-  "accountId": "acct_xxxxxxxxxxxxx",
-  "onboardingUrl": "https://connect.stripe.com/setup/c/xxxxx"
-}
-```
-
----
-
-## PASSO 13: CHECKLIST FINAL
-
-Antes de iniciar o desenvolvimento, verifique:
-
-### ✅ Stripe Dashboard
-
-- [ ] Modo de teste ativado
-- [ ] Produtos criados
-- [ ] Preços configurados
-- [ ] Stripe Connect ativado
-- [ ] Webhooks configurados
-- [ ] Customer Portal ativado
-
-### ✅ Variáveis de Ambiente
-
-- [ ] `STRIPE_SECRET_KEY` configurada
-- [ ] `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` configurada
-- [ ] `STRIPE_WEBHOOK_SECRET_KEY` configurada
-- [ ] `STRIPE_SUBSCRIPTION_PRICE_ID` configurada (opcional)
-
-### ✅ Banco de Dados
-
-- [ ] Migrations executadas (`npx prisma migrate dev`)
-- [ ] Tabela `SubscriptionPlan` populada
-- [ ] Prisma Studio funcionando (`npx prisma studio`)
-
-### ✅ Desenvolvimento Local
-
-- [ ] Next.js rodando (`pnpm dev`)
-- [ ] Stripe CLI instalado e autenticado
-- [ ] Webhooks sendo recebidos localmente
-
----
-
-## PASSO 14: COMANDOS ÚTEIS
+## COMANDOS UTEIS
 
 ### Visualizar Banco de Dados
-
 ```bash
 npx prisma studio
 ```
 
 ### Resetar Banco (cuidado!)
-
 ```bash
 npx prisma migrate reset
 ```
 
 ### Ver Logs do Stripe
-
 ```bash
 stripe logs tail
 ```
 
-### Testar Eventos Específicos
-
+### Testar Eventos Especificos
 ```bash
 # Assinatura criada
 stripe trigger customer.subscription.created
@@ -609,74 +497,48 @@ stripe trigger payment_intent.payment_failed
 ```
 
 ### Listar Produtos
-
 ```bash
 stripe products list
 ```
 
-### Listar Preços
-
+### Listar Precos
 ```bash
 stripe prices list
 ```
 
 ---
 
-## TROUBLESHOOTING COMUM
+## CHECKLIST DE PRODUCAO
 
-### ❌ Webhook não recebe eventos
+Antes de ir para producao:
 
-**Solução:**
+### Stripe Dashboard
+- [ ] Mudar para modo **Live** (producao)
+- [ ] Atualizar chaves API no `.env` para `pk_live_` e `sk_live_`
+- [ ] Criar webhooks de producao com URLs reais
+- [ ] Atualizar webhook secrets no `.env`
+- [ ] Verificar conta Stripe (KYC completo)
+- [ ] Ativar PIX em producao
 
-```bash
-# Verifique se Stripe CLI está rodando
-stripe listen --forward-to localhost:3000/api/webhooks/stripe
+### Codigo
+- [ ] Remover logs de debug
+- [ ] Testar todos os fluxos em ambiente de staging
+- [ ] Configurar monitoramento de erros (Sentry, etc.)
 
-# Teste manualmente
-stripe trigger payment_intent.succeeded
-```
-
-### ❌ Erro: "No such price"
-
-**Solução:**
-
-- Verifique se o `STRIPE_SUBSCRIPTION_PRICE_ID` no `.env` está correto
-- Liste os preços: `stripe prices list`
-
-### ❌ Erro: "Invalid API Key"
-
-**Solução:**
-
-- Certifique-se de estar usando a chave de **teste** (`sk_test_`)
-- Verifique se não há espaços no `.env`
-
-### ❌ Connect Account não cria
-
-**Solução:**
-
-- Verifique se Stripe Connect está ativado no Dashboard
-- Certifique-se de que sua conta Stripe foi verificada
+### Banco de Dados
+- [ ] Executar migrations em producao
+- [ ] Executar seed dos planos
+- [ ] Executar script de criacao de precos no Stripe
 
 ---
 
-## PRÓXIMOS PASSOS
+## RESUMO DE METODOS DE PAGAMENTO
 
-Agora você está pronto para:
-
-1. ✅ Desenvolver as páginas de assinatura
-2. ✅ Implementar o onboarding de profissionais
-3. ✅ Criar o sistema de pagamentos de serviços
-4. ✅ Desenvolver os dashboards
-
-**Começar a desenvolver:**
-
-```bash
-pnpm dev
-```
-
-Acesse: `http://localhost:3000`
+| Fluxo | Cartao | PIX | Motivo |
+|-------|--------|-----|--------|
+| **Assinaturas** | Sim | Nao | PIX nao suporta cobranca recorrente |
+| **Agendamentos** | Sim | Sim | Pagamento unico |
 
 ---
 
-**Está tudo configurado! Precisa de ajuda com algum passo específico?** 🚀
-exit
+**Ultima atualizacao:** Fevereiro 2026

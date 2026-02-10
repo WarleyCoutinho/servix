@@ -167,7 +167,7 @@ export const createBookingCheckoutSession = protectedActionClient
             barbershopId: service.barbershopId,
             userId: user.id,
             date: date.toISOString(),
-            professionalId: professionalId ?? "",
+            professionalId: professional?.id ?? "",
             priceInCents: service.priceInCents.toString(),
             applicationFeeInCents: applicationFeeAmount.toString(),
           },
