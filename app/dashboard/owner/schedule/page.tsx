@@ -1,13 +1,13 @@
 "use client";
 
-import { useAction } from "next-safe-action/hooks";
 import { updateOperatingHours } from "@/actions/schedules/update-operating-hours";
-import { toast } from "sonner";
 import {
   ScheduleForm,
   ownerScheduleConfig,
   type DaySchedule,
 } from "@/components/schedule-form";
+import { useAction } from "next-safe-action/hooks";
+import { toast } from "sonner";
 
 export default function OwnerSchedulePage() {
   const { execute, isPending } = useAction(updateOperatingHours, {
