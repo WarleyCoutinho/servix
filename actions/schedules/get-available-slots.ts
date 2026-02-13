@@ -4,11 +4,9 @@ import { actionClient } from "@/lib/action-client";
 import { prisma } from "@/lib/prisma";
 import {
   DEFAULT_INTERVAL_MINUTES,
-  DEFAULT_OPERATING_HOURS,
   filterAvailableSlots,
   generateTimeSlots,
   getDayOfWeekFromDate,
-  getIntersectingSlots,
 } from "@/lib/schedule-utils";
 import { endOfDay, format, isPast, isToday, startOfDay } from "date-fns";
 import { returnValidationErrors } from "next-safe-action";
@@ -16,138 +14,82 @@ import { z } from "zod";
 
 const inputSchema = z.object({
   barbershopId: z.uuid(),
-  professionalId: z.uuid().optional(),
+  professionalId: z.uuid(),
   date: z.date(),
 });
 
 export const getAvailableSlots = actionClient
   .inputSchema(inputSchema)
   .action(async ({ parsedInput: { barbershopId, professionalId, date } }) => {
+    if (isPast(date) && !isToday(date)) {
+      return { slots: [], message: "Data passada." };
+    }
+
     const dayOfWeek = getDayOfWeekFromDate(date);
 
-    const barbershop = await prisma.barbershop.findUnique({
-      where: { id: barbershopId },
+    const professional = await prisma.professional.findUnique({
+      where: { id: professionalId },
       include: {
-        operatingHours: {
+        schedules: {
           where: { dayOfWeek },
         },
       },
     });
 
-    if (!barbershop) {
+    if (!professional) {
       returnValidationErrors(inputSchema, {
-        barbershopId: { _errors: ["Barbearia não encontrada."] },
+        professionalId: { _errors: ["Profissional não encontrado."] },
       });
     }
 
-    const operatingHours = barbershop.operatingHours[0];
-
-    if (operatingHours?.isClosed) {
-      return { slots: [], message: "Barbearia fechada neste dia." };
+    if (!professional.isActive) {
+      return { slots: [], message: "Profissional não disponível." };
     }
 
-    const openTime =
-      operatingHours?.openTime ?? DEFAULT_OPERATING_HOURS.openTime;
-    const closeTime =
-      operatingHours?.closeTime ?? DEFAULT_OPERATING_HOURS.closeTime;
+    if (professional.barbershopId !== barbershopId) {
+      returnValidationErrors(inputSchema, {
+        professionalId: {
+          _errors: ["Profissional não pertence a esta barbearia."],
+        },
+      });
+    }
 
-    let barbershopSlots = generateTimeSlots(
+    const professionalSchedule = professional.schedules[0];
+
+    if (!professionalSchedule || !professionalSchedule.isAvailable) {
+      return {
+        slots: [],
+        message: "Profissional não trabalha neste dia.",
+      };
+    }
+
+    let slots = generateTimeSlots(
       date,
-      openTime,
-      closeTime,
+      professionalSchedule.startTime,
+      professionalSchedule.endTime,
       DEFAULT_INTERVAL_MINUTES,
     );
 
-    if (professionalId) {
-      const professional = await prisma.professional.findUnique({
-        where: { id: professionalId },
-        include: {
-          schedules: {
-            where: { dayOfWeek },
-          },
+    const bookedBookings = await prisma.booking.findMany({
+      where: {
+        professionalId,
+        date: {
+          gte: startOfDay(date),
+          lte: endOfDay(date),
         },
-      });
+        cancelledAt: null,
+      },
+      select: { date: true },
+    });
 
-      if (!professional) {
-        returnValidationErrors(inputSchema, {
-          professionalId: { _errors: ["Profissional não encontrado."] },
-        });
-      }
-
-      if (!professional.isActive) {
-        return { slots: [], message: "Profissional não disponível." };
-      }
-
-      const professionalSchedule = professional.schedules[0];
-
-      if (professionalSchedule && !professionalSchedule.isAvailable) {
-        return {
-          slots: [],
-          message: "Profissional não trabalha neste dia.",
-        };
-      }
-
-      if (professionalSchedule) {
-        const professionalSlots = generateTimeSlots(
-          date,
-          professionalSchedule.startTime,
-          professionalSchedule.endTime,
-          DEFAULT_INTERVAL_MINUTES,
-        );
-        barbershopSlots = getIntersectingSlots(
-          barbershopSlots,
-          professionalSlots,
-        );
-      }
-
-      const bookedBookings = await prisma.booking.findMany({
-        where: {
-          professionalId,
-          date: {
-            gte: startOfDay(date),
-            lte: endOfDay(date),
-          },
-          cancelledAt: null,
-        },
-        select: { date: true },
-      });
-
-      const bookedSlots = bookedBookings.map((b) => b.date);
-      barbershopSlots = filterAvailableSlots(
-        barbershopSlots,
-        bookedSlots,
-        date,
-      );
-    } else {
-      const bookedBookings = await prisma.booking.findMany({
-        where: {
-          barbershopId,
-          date: {
-            gte: startOfDay(date),
-            lte: endOfDay(date),
-          },
-          cancelledAt: null,
-        },
-        select: { date: true },
-      });
-
-      const bookedSlots = bookedBookings.map((b) => b.date);
-      barbershopSlots = filterAvailableSlots(
-        barbershopSlots,
-        bookedSlots,
-        date,
-      );
-    }
+    const bookedSlots = bookedBookings.map((b) => b.date);
+    slots = filterAvailableSlots(slots, bookedSlots, date);
 
     if (isToday(date)) {
       const now = new Date();
       const currentTime = format(now, "HH:mm");
-      barbershopSlots = barbershopSlots.filter((slot) => slot > currentTime);
+      slots = slots.filter((slot) => slot > currentTime);
     }
 
-    if (isPast(date) && !isToday(date)) {
-      return { slots: [], message: "Data passada." };
-    }
-
-    return { slots: barbershopSlots };
+    return { slots };
   });

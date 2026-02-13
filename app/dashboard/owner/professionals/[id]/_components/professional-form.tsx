@@ -32,8 +32,12 @@ import {
   CreditCard,
   Banknote,
   AlertTriangle,
+  MessageCircle,
+  Wifi,
+  WifiOff,
+  QrCode,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { StripeAccountStatus } from "@/generated/prisma/enums";
 
 interface ProfessionalFormProps {
@@ -45,6 +49,7 @@ interface ProfessionalFormProps {
     isActive: boolean;
     acceptsPix: boolean;
     acceptsCard: boolean;
+    whatsappGroupName: string | null;
     stripeAccountStatus: StripeAccountStatus;
     stripeOnboardingComplete: boolean;
     user: {
@@ -88,7 +93,55 @@ export default function ProfessionalForm({
     bio: professional.bio ?? "",
     acceptsPix: professional.acceptsPix,
     acceptsCard: professional.acceptsCard,
+    whatsappGroupName: professional.whatsappGroupName ?? "",
   });
+
+  const [waStatus, setWaStatus] = useState<string>("disconnected");
+  const [waQrCode, setWaQrCode] = useState<string | null>(null);
+  const [waConnecting, setWaConnecting] = useState(false);
+  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const pollWhatsAppStatus = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/whatsapp/${professional.id}/status`);
+      const data = await res.json();
+      setWaStatus(data.status);
+      setWaQrCode(data.qrCode);
+      if (data.status === "connected" || data.status === "disconnected") {
+        setWaConnecting(false);
+        if (pollingRef.current) {
+          clearInterval(pollingRef.current);
+          pollingRef.current = null;
+        }
+      }
+    } catch {
+      /* ignore */
+    }
+  }, [professional.id]);
+
+  const handleConnectWhatsApp = async () => {
+    setWaConnecting(true);
+    await fetch(`/api/whatsapp/${professional.id}/connect`, { method: "POST" });
+    pollingRef.current = setInterval(pollWhatsAppStatus, 3000);
+    pollWhatsAppStatus();
+  };
+
+  const handleDisconnectWhatsApp = async () => {
+    await fetch(`/api/whatsapp/${professional.id}/disconnect`, { method: "POST" });
+    setWaStatus("disconnected");
+    setWaQrCode(null);
+    if (pollingRef.current) {
+      clearInterval(pollingRef.current);
+      pollingRef.current = null;
+    }
+  };
+
+  useEffect(() => {
+    pollWhatsAppStatus();
+    return () => {
+      if (pollingRef.current) clearInterval(pollingRef.current);
+    };
+  }, [pollWhatsAppStatus]);
 
   const { execute: executeUpdate, isPending: isUpdating } = useAction(
     updateProfessional,
@@ -258,6 +311,22 @@ export default function ProfessionalForm({
               />
             </div>
 
+            <div className="space-y-2">
+              <Label htmlFor="whatsappGroupName">Nome do Grupo WhatsApp</Label>
+              <Input
+                id="whatsappGroupName"
+                placeholder="Ex: Agenda - João Silva"
+                value={formData.whatsappGroupName}
+                onChange={(e) =>
+                  setFormData({ ...formData, whatsappGroupName: e.target.value })
+                }
+                disabled={isLoading}
+              />
+              <p className="text-muted-foreground text-xs">
+                Nome exato do grupo no WhatsApp onde a agenda será enviada automaticamente.
+              </p>
+            </div>
+
             <Button type="submit" disabled={isLoading}>
               {isUpdating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Salvar Alterações
@@ -346,6 +415,82 @@ export default function ProfessionalForm({
                   Stripe para receber pagamentos diretamente.
                 </p>
               </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <MessageCircle className="h-5 w-5" />
+            WhatsApp
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex flex-col gap-3 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-3">
+              {waStatus === "connected" ? (
+                <Wifi className="h-5 w-5 shrink-0 text-green-600" />
+              ) : (
+                <WifiOff className="h-5 w-5 shrink-0 text-muted-foreground" />
+              )}
+              <div>
+                <p className="font-medium">
+                  {waStatus === "connected"
+                    ? "Conectado"
+                    : waStatus === "qr_code"
+                      ? "Aguardando QR Code"
+                      : waStatus === "connecting"
+                        ? "Conectando..."
+                        : "Desconectado"}
+                </p>
+                <p className="text-muted-foreground text-sm">
+                  {waStatus === "connected"
+                    ? "WhatsApp conectado. A agenda será enviada automaticamente."
+                    : "Conecte o WhatsApp para enviar a agenda no grupo."}
+                </p>
+              </div>
+            </div>
+            {waStatus === "connected" ? (
+              <Button
+                variant="destructive"
+                onClick={handleDisconnectWhatsApp}
+                className="w-full sm:w-auto"
+              >
+                Desconectar
+              </Button>
+            ) : (
+              <Button
+                onClick={handleConnectWhatsApp}
+                disabled={waConnecting}
+                className="w-full sm:w-auto"
+              >
+                {waConnecting && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                Conectar WhatsApp
+              </Button>
+            )}
+          </div>
+
+          {waStatus === "qr_code" && waQrCode && (
+            <div className="flex flex-col items-center gap-3 rounded-lg border p-6">
+              <QrCode className="h-8 w-8 text-muted-foreground" />
+              <p className="text-center text-sm font-medium">
+                Escaneie o QR Code com o WhatsApp
+              </p>
+              <div className="rounded-lg border bg-white p-4">
+                <img
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodeURIComponent(waQrCode)}`}
+                  alt="QR Code WhatsApp"
+                  width={256}
+                  height={256}
+                />
+              </div>
+              <p className="text-center text-xs text-muted-foreground">
+                Abra o WhatsApp {">"} Dispositivos conectados {">"} Conectar dispositivo
+              </p>
             </div>
           )}
         </CardContent>

@@ -55,30 +55,38 @@ async function main() {
     });
     console.log(`✅ Barbershop criada: ${barbershop.name} (ID: ${barbershop.id})`);
 
-    // Criar horários de funcionamento padrão
-    const days = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"] as const;
-    for (const day of days) {
-      await prisma.operatingHours.create({
+    // Criar profissional do owner com agenda
+    const existingProfessional = await prisma.professional.findUnique({
+      where: { userId: user.id },
+    });
+
+    if (!existingProfessional) {
+      const professional = await prisma.professional.create({
         data: {
+          userId: user.id,
           barbershopId: barbershop.id,
-          dayOfWeek: day,
-          openTime: "09:00",
-          closeTime: "19:00",
-          isClosed: false,
+          cpf: `owner_${user.id.slice(0, 8)}`,
+          displayName: user.name,
+          isActive: true,
+          acceptsCard: true,
+          acceptsPix: false,
         },
       });
+
+      const days = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"] as const;
+      for (const day of days) {
+        await prisma.professionalSchedule.create({
+          data: {
+            professionalId: professional.id,
+            dayOfWeek: day,
+            startTime: "09:00",
+            endTime: day === "SATURDAY" ? "14:00" : "18:00",
+            isAvailable: day !== "SUNDAY",
+          },
+        });
+      }
+      console.log("✅ Profissional do owner criado com agenda");
     }
-    // Domingo fechado
-    await prisma.operatingHours.create({
-      data: {
-        barbershopId: barbershop.id,
-        dayOfWeek: "SUNDAY",
-        openTime: "09:00",
-        closeTime: "19:00",
-        isClosed: true,
-      },
-    });
-    console.log("✅ Horários de funcionamento criados");
 
     // Criar alguns serviços de exemplo
     const services = [

@@ -77,32 +77,4 @@ export function filterAvailableSlots(
   return allSlots.filter((slot) => isTimeSlotAvailable(slot, bookedSlots, date));
 }
 
-export function isWithinOperatingHours(
-  time: string,
-  openTime: string,
-  closeTime: string,
-): boolean {
-  const { hours: timeHours, minutes: timeMinutes } = parseTimeString(time);
-  const { hours: openHours, minutes: openMinutes } = parseTimeString(openTime);
-  const { hours: closeHours, minutes: closeMinutes } = parseTimeString(closeTime);
-
-  const timeInMinutes = timeHours * 60 + timeMinutes;
-  const openInMinutes = openHours * 60 + openMinutes;
-  const closeInMinutes = closeHours * 60 + closeMinutes;
-
-  return timeInMinutes >= openInMinutes && timeInMinutes < closeInMinutes;
-}
-
-export function getIntersectingSlots(
-  barbershopSlots: string[],
-  professionalSlots: string[],
-): string[] {
-  return barbershopSlots.filter((slot) => professionalSlots.includes(slot));
-}
-
-export const DEFAULT_OPERATING_HOURS = {
-  openTime: "09:00",
-  closeTime: "18:00",
-};
-
 export const DEFAULT_INTERVAL_MINUTES = 30;

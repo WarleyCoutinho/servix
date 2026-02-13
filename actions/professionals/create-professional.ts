@@ -20,6 +20,7 @@ const inputSchema = z.object({
     }),
   displayName: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
   email: z.string().email("Email inválido"),
+  whatsappGroupName: z.string().optional(),
 });
 
 export const createProfessional = subscribedOwnerActionClient
@@ -98,6 +99,7 @@ export const createProfessional = subscribedOwnerActionClient
           barbershopId: barbershop.id,
           acceptsPix: false,
           acceptsCard: false,
+          whatsappGroupName: parsedInput.whatsappGroupName || null,
         },
         include: {
           user: true,

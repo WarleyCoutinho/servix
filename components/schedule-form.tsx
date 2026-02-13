@@ -290,13 +290,13 @@ export function ScheduleForm({
 }
 
 export const ownerScheduleConfig: ScheduleFormConfig = {
-  title: "Horário de Funcionamento",
-  subtitle: "Configure os horários de funcionamento da barbearia",
-  cardTitle: "Horários por Dia",
+  title: "Minha Agenda",
+  subtitle: "Configure seus horários de trabalho",
+  cardTitle: "Horários de Trabalho",
   cardDescription:
-    "Defina o horário de abertura e fechamento para cada dia da semana",
-  availableLabel: "Aberto",
-  unavailableLabel: "Fechado",
+    "Defina os dias e horários em que você está disponível para atender",
+  availableLabel: "Disponível",
+  unavailableLabel: "Indisponível",
   lunchBreakLabel: "Intervalo de almoço",
 };
 

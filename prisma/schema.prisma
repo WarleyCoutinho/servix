@@ -164,7 +164,6 @@ model Barbershop {
   services       BarbershopService[]
   bookings       Booking[]
   professionals  Professional[]
-  operatingHours OperatingHours[]
   subscription   Subscription?
   planHistory    PlanHistory[]
 }
@@ -185,6 +184,7 @@ model Professional {
   stripeAccountId          String?             @unique
   stripeAccountStatus      StripeAccountStatus @default(PENDING)
   stripeOnboardingComplete Boolean             @default(false)
+  whatsappGroupName        String?
   createdAt                DateTime            @default(now())
   updatedAt                DateTime            @updatedAt
 
@@ -246,23 +246,6 @@ model Subscription {
 }
 
 // =====================
-// OPERATING HOURS (Barbershop)
-// =====================
-
-model OperatingHours {
-  id        String    @id @default(uuid())
-  dayOfWeek DayOfWeek
-  openTime  String
-  closeTime String
-  isClosed  Boolean   @default(false)
-
-  barbershopId String
-  barbershop   Barbershop @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
-
-  @@unique([barbershopId, dayOfWeek])
-}
-
-// =====================
 // PROFESSIONAL SCHEDULE
 // =====================
 
@@ -313,8 +296,8 @@ model Booking {
   service        BarbershopService @relation(fields: [serviceId], references: [id], onDelete: Cascade)
   userId         String
   user           User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  professionalId String?
-  professional   Professional?     @relation(fields: [professionalId], references: [id], onDelete: SetNull)
+  professionalId String
+  professional   Professional      @relation(fields: [professionalId], references: [id], onDelete: Restrict)
 
   payment Payment?
 

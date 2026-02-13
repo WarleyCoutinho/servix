@@ -8,6 +8,7 @@ import { isFuture } from "date-fns";
 import { revalidatePath } from "next/cache";
 import Stripe from "stripe";
 import { PaymentStatus } from "@/generated/prisma/enums";
+import { sendDailyScheduleToGroup } from "@/lib/whatsapp-schedule";
 
 const inputSchema = z.object({
   bookingId: z.uuid(),
@@ -88,6 +89,13 @@ export const cancelBooking = protectedActionClient
         cancelledAt: new Date(),
       },
     });
+
+    if (booking.professionalId) {
+      sendDailyScheduleToGroup(booking.professionalId, booking.date).catch(
+        (err) => console.error("[WhatsApp] Erro ao enviar agenda:", err),
+      );
+    }
+
     revalidatePath("/");
     revalidatePath("/bookings");
     return cancelledBooking;

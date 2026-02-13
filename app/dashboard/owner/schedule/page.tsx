@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import { getActiveBarbershop } from "@/lib/get-active-barbershop";
-import { getBarbershopOperatingHours } from "@/data/schedules";
+import { prisma } from "@/lib/prisma";
 import { DayOfWeek } from "@/generated/prisma/enums";
 import { DAY_OF_WEEK_ORDER } from "@/lib/day-of-week";
 import type { DaySchedule } from "@/components/schedule-form";
@@ -23,17 +23,24 @@ export default async function OwnerSchedulePage() {
     redirect("/dashboard/owner");
   }
 
-  const operatingHours = await getBarbershopOperatingHours(
-    data.activeBarbershop.id,
-  );
+  const ownerProfessional = await prisma.professional.findUnique({
+    where: { userId: session.user.id },
+    include: { schedules: true },
+  });
+
+  if (!ownerProfessional) {
+    redirect("/dashboard/owner");
+  }
 
   const initialSchedules: DaySchedule[] = DAY_OF_WEEK_ORDER.map((day) => {
-    const existing = operatingHours.find((h) => h.dayOfWeek === day);
+    const existing = ownerProfessional.schedules.find(
+      (s) => s.dayOfWeek === day,
+    );
     return {
       dayOfWeek: day,
-      startTime: existing?.openTime ?? "09:00",
-      endTime: existing?.closeTime ?? "18:00",
-      isAvailable: existing ? !existing.isClosed : day !== DayOfWeek.SUNDAY,
+      startTime: existing?.startTime ?? "09:00",
+      endTime: existing?.endTime ?? "18:00",
+      isAvailable: existing?.isAvailable ?? day !== DayOfWeek.SUNDAY,
       hasLunchBreak: false,
       lunchStartTime: "12:00",
       lunchEndTime: "13:00",

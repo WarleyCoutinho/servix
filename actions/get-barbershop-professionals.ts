@@ -15,6 +15,8 @@ export const getBarbershopProfessionals = actionClient
       where: {
         barbershopId,
         isActive: true,
+        stripeAccountStatus: "ACTIVE",
+        stripeAccountId: { not: null },
       },
       include: {
         user: {

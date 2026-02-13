@@ -36,6 +36,7 @@ export type ProfessionalMinAggregateOutputType = {
   stripeAccountId: string | null
   stripeAccountStatus: $Enums.StripeAccountStatus | null
   stripeOnboardingComplete: boolean | null
+  whatsappGroupName: string | null
   createdAt: Date | null
   updatedAt: Date | null
   userId: string | null
@@ -54,6 +55,7 @@ export type ProfessionalMaxAggregateOutputType = {
   stripeAccountId: string | null
   stripeAccountStatus: $Enums.StripeAccountStatus | null
   stripeOnboardingComplete: boolean | null
+  whatsappGroupName: string | null
   createdAt: Date | null
   updatedAt: Date | null
   userId: string | null
@@ -72,6 +74,7 @@ export type ProfessionalCountAggregateOutputType = {
   stripeAccountId: number
   stripeAccountStatus: number
   stripeOnboardingComplete: number
+  whatsappGroupName: number
   createdAt: number
   updatedAt: number
   userId: number
@@ -92,6 +95,7 @@ export type ProfessionalMinAggregateInputType = {
   stripeAccountId?: true
   stripeAccountStatus?: true
   stripeOnboardingComplete?: true
+  whatsappGroupName?: true
   createdAt?: true
   updatedAt?: true
   userId?: true
@@ -110,6 +114,7 @@ export type ProfessionalMaxAggregateInputType = {
   stripeAccountId?: true
   stripeAccountStatus?: true
   stripeOnboardingComplete?: true
+  whatsappGroupName?: true
   createdAt?: true
   updatedAt?: true
   userId?: true
@@ -128,6 +133,7 @@ export type ProfessionalCountAggregateInputType = {
   stripeAccountId?: true
   stripeAccountStatus?: true
   stripeOnboardingComplete?: true
+  whatsappGroupName?: true
   createdAt?: true
   updatedAt?: true
   userId?: true
@@ -219,6 +225,7 @@ export type ProfessionalGroupByOutputType = {
   stripeAccountId: string | null
   stripeAccountStatus: $Enums.StripeAccountStatus
   stripeOnboardingComplete: boolean
+  whatsappGroupName: string | null
   createdAt: Date
   updatedAt: Date
   userId: string
@@ -258,6 +265,7 @@ export type ProfessionalWhereInput = {
   stripeAccountId?: Prisma.StringNullableFilter<"Professional"> | string | null
   stripeAccountStatus?: Prisma.EnumStripeAccountStatusFilter<"Professional"> | $Enums.StripeAccountStatus
   stripeOnboardingComplete?: Prisma.BoolFilter<"Professional"> | boolean
+  whatsappGroupName?: Prisma.StringNullableFilter<"Professional"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Professional"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Professional"> | Date | string
   userId?: Prisma.StringFilter<"Professional"> | string
@@ -281,6 +289,7 @@ export type ProfessionalOrderByWithRelationInput = {
   stripeAccountId?: Prisma.SortOrderInput | Prisma.SortOrder
   stripeAccountStatus?: Prisma.SortOrder
   stripeOnboardingComplete?: Prisma.SortOrder
+  whatsappGroupName?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
@@ -308,6 +317,7 @@ export type ProfessionalWhereUniqueInput = Prisma.AtLeast<{
   acceptsCard?: Prisma.BoolFilter<"Professional"> | boolean
   stripeAccountStatus?: Prisma.EnumStripeAccountStatusFilter<"Professional"> | $Enums.StripeAccountStatus
   stripeOnboardingComplete?: Prisma.BoolFilter<"Professional"> | boolean
+  whatsappGroupName?: Prisma.StringNullableFilter<"Professional"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Professional"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Professional"> | Date | string
   barbershopId?: Prisma.StringFilter<"Professional"> | string
@@ -330,6 +340,7 @@ export type ProfessionalOrderByWithAggregationInput = {
   stripeAccountId?: Prisma.SortOrderInput | Prisma.SortOrder
   stripeAccountStatus?: Prisma.SortOrder
   stripeOnboardingComplete?: Prisma.SortOrder
+  whatsappGroupName?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
@@ -354,6 +365,7 @@ export type ProfessionalScalarWhereWithAggregatesInput = {
   stripeAccountId?: Prisma.StringNullableWithAggregatesFilter<"Professional"> | string | null
   stripeAccountStatus?: Prisma.EnumStripeAccountStatusWithAggregatesFilter<"Professional"> | $Enums.StripeAccountStatus
   stripeOnboardingComplete?: Prisma.BoolWithAggregatesFilter<"Professional"> | boolean
+  whatsappGroupName?: Prisma.StringNullableWithAggregatesFilter<"Professional"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Professional"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Professional"> | Date | string
   userId?: Prisma.StringWithAggregatesFilter<"Professional"> | string
@@ -372,6 +384,7 @@ export type ProfessionalCreateInput = {
   stripeAccountId?: string | null
   stripeAccountStatus?: $Enums.StripeAccountStatus
   stripeOnboardingComplete?: boolean
+  whatsappGroupName?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProfessionalInput
@@ -393,6 +406,7 @@ export type ProfessionalUncheckedCreateInput = {
   stripeAccountId?: string | null
   stripeAccountStatus?: $Enums.StripeAccountStatus
   stripeOnboardingComplete?: boolean
+  whatsappGroupName?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   userId: string
@@ -414,6 +428,7 @@ export type ProfessionalUpdateInput = {
   stripeAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeAccountStatus?: Prisma.EnumStripeAccountStatusFieldUpdateOperationsInput | $Enums.StripeAccountStatus
   stripeOnboardingComplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  whatsappGroupName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProfessionalNestedInput
@@ -435,6 +450,7 @@ export type ProfessionalUncheckedUpdateInput = {
   stripeAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeAccountStatus?: Prisma.EnumStripeAccountStatusFieldUpdateOperationsInput | $Enums.StripeAccountStatus
   stripeOnboardingComplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  whatsappGroupName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -456,6 +472,7 @@ export type ProfessionalCreateManyInput = {
   stripeAccountId?: string | null
   stripeAccountStatus?: $Enums.StripeAccountStatus
   stripeOnboardingComplete?: boolean
+  whatsappGroupName?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   userId: string
@@ -474,6 +491,7 @@ export type ProfessionalUpdateManyMutationInput = {
   stripeAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeAccountStatus?: Prisma.EnumStripeAccountStatusFieldUpdateOperationsInput | $Enums.StripeAccountStatus
   stripeOnboardingComplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  whatsappGroupName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -490,6 +508,7 @@ export type ProfessionalUncheckedUpdateManyInput = {
   stripeAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeAccountStatus?: Prisma.EnumStripeAccountStatusFieldUpdateOperationsInput | $Enums.StripeAccountStatus
   stripeOnboardingComplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  whatsappGroupName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -523,6 +542,7 @@ export type ProfessionalCountOrderByAggregateInput = {
   stripeAccountId?: Prisma.SortOrder
   stripeAccountStatus?: Prisma.SortOrder
   stripeOnboardingComplete?: Prisma.SortOrder
+  whatsappGroupName?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
@@ -541,6 +561,7 @@ export type ProfessionalMaxOrderByAggregateInput = {
   stripeAccountId?: Prisma.SortOrder
   stripeAccountStatus?: Prisma.SortOrder
   stripeOnboardingComplete?: Prisma.SortOrder
+  whatsappGroupName?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
@@ -559,6 +580,7 @@ export type ProfessionalMinOrderByAggregateInput = {
   stripeAccountId?: Prisma.SortOrder
   stripeAccountStatus?: Prisma.SortOrder
   stripeOnboardingComplete?: Prisma.SortOrder
+  whatsappGroupName?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
@@ -668,12 +690,10 @@ export type ProfessionalCreateNestedOneWithoutBookingsInput = {
   connect?: Prisma.ProfessionalWhereUniqueInput
 }
 
-export type ProfessionalUpdateOneWithoutBookingsNestedInput = {
+export type ProfessionalUpdateOneRequiredWithoutBookingsNestedInput = {
   create?: Prisma.XOR<Prisma.ProfessionalCreateWithoutBookingsInput, Prisma.ProfessionalUncheckedCreateWithoutBookingsInput>
   connectOrCreate?: Prisma.ProfessionalCreateOrConnectWithoutBookingsInput
   upsert?: Prisma.ProfessionalUpsertWithoutBookingsInput
-  disconnect?: Prisma.ProfessionalWhereInput | boolean
-  delete?: Prisma.ProfessionalWhereInput | boolean
   connect?: Prisma.ProfessionalWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.ProfessionalUpdateToOneWithWhereWithoutBookingsInput, Prisma.ProfessionalUpdateWithoutBookingsInput>, Prisma.ProfessionalUncheckedUpdateWithoutBookingsInput>
 }
@@ -706,6 +726,7 @@ export type ProfessionalCreateWithoutUserInput = {
   stripeAccountId?: string | null
   stripeAccountStatus?: $Enums.StripeAccountStatus
   stripeOnboardingComplete?: boolean
+  whatsappGroupName?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   barbershop: Prisma.BarbershopCreateNestedOneWithoutProfessionalsInput
@@ -726,6 +747,7 @@ export type ProfessionalUncheckedCreateWithoutUserInput = {
   stripeAccountId?: string | null
   stripeAccountStatus?: $Enums.StripeAccountStatus
   stripeOnboardingComplete?: boolean
+  whatsappGroupName?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   barbershopId: string
@@ -762,6 +784,7 @@ export type ProfessionalUpdateWithoutUserInput = {
   stripeAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeAccountStatus?: Prisma.EnumStripeAccountStatusFieldUpdateOperationsInput | $Enums.StripeAccountStatus
   stripeOnboardingComplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  whatsappGroupName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   barbershop?: Prisma.BarbershopUpdateOneRequiredWithoutProfessionalsNestedInput
@@ -782,6 +805,7 @@ export type ProfessionalUncheckedUpdateWithoutUserInput = {
   stripeAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeAccountStatus?: Prisma.EnumStripeAccountStatusFieldUpdateOperationsInput | $Enums.StripeAccountStatus
   stripeOnboardingComplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  whatsappGroupName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   barbershopId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -802,6 +826,7 @@ export type ProfessionalCreateWithoutBarbershopInput = {
   stripeAccountId?: string | null
   stripeAccountStatus?: $Enums.StripeAccountStatus
   stripeOnboardingComplete?: boolean
+  whatsappGroupName?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProfessionalInput
@@ -822,6 +847,7 @@ export type ProfessionalUncheckedCreateWithoutBarbershopInput = {
   stripeAccountId?: string | null
   stripeAccountStatus?: $Enums.StripeAccountStatus
   stripeOnboardingComplete?: boolean
+  whatsappGroupName?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   userId: string
@@ -871,6 +897,7 @@ export type ProfessionalScalarWhereInput = {
   stripeAccountId?: Prisma.StringNullableFilter<"Professional"> | string | null
   stripeAccountStatus?: Prisma.EnumStripeAccountStatusFilter<"Professional"> | $Enums.StripeAccountStatus
   stripeOnboardingComplete?: Prisma.BoolFilter<"Professional"> | boolean
+  whatsappGroupName?: Prisma.StringNullableFilter<"Professional"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Professional"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Professional"> | Date | string
   userId?: Prisma.StringFilter<"Professional"> | string
@@ -889,6 +916,7 @@ export type ProfessionalCreateWithoutSchedulesInput = {
   stripeAccountId?: string | null
   stripeAccountStatus?: $Enums.StripeAccountStatus
   stripeOnboardingComplete?: boolean
+  whatsappGroupName?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProfessionalInput
@@ -909,6 +937,7 @@ export type ProfessionalUncheckedCreateWithoutSchedulesInput = {
   stripeAccountId?: string | null
   stripeAccountStatus?: $Enums.StripeAccountStatus
   stripeOnboardingComplete?: boolean
+  whatsappGroupName?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   userId: string
@@ -945,6 +974,7 @@ export type ProfessionalUpdateWithoutSchedulesInput = {
   stripeAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeAccountStatus?: Prisma.EnumStripeAccountStatusFieldUpdateOperationsInput | $Enums.StripeAccountStatus
   stripeOnboardingComplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  whatsappGroupName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProfessionalNestedInput
@@ -965,6 +995,7 @@ export type ProfessionalUncheckedUpdateWithoutSchedulesInput = {
   stripeAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeAccountStatus?: Prisma.EnumStripeAccountStatusFieldUpdateOperationsInput | $Enums.StripeAccountStatus
   stripeOnboardingComplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  whatsappGroupName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -985,6 +1016,7 @@ export type ProfessionalCreateWithoutBookingsInput = {
   stripeAccountId?: string | null
   stripeAccountStatus?: $Enums.StripeAccountStatus
   stripeOnboardingComplete?: boolean
+  whatsappGroupName?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProfessionalInput
@@ -1005,6 +1037,7 @@ export type ProfessionalUncheckedCreateWithoutBookingsInput = {
   stripeAccountId?: string | null
   stripeAccountStatus?: $Enums.StripeAccountStatus
   stripeOnboardingComplete?: boolean
+  whatsappGroupName?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   userId: string
@@ -1041,6 +1074,7 @@ export type ProfessionalUpdateWithoutBookingsInput = {
   stripeAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeAccountStatus?: Prisma.EnumStripeAccountStatusFieldUpdateOperationsInput | $Enums.StripeAccountStatus
   stripeOnboardingComplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  whatsappGroupName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProfessionalNestedInput
@@ -1061,6 +1095,7 @@ export type ProfessionalUncheckedUpdateWithoutBookingsInput = {
   stripeAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeAccountStatus?: Prisma.EnumStripeAccountStatusFieldUpdateOperationsInput | $Enums.StripeAccountStatus
   stripeOnboardingComplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  whatsappGroupName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1081,6 +1116,7 @@ export type ProfessionalCreateWithoutPaymentsInput = {
   stripeAccountId?: string | null
   stripeAccountStatus?: $Enums.StripeAccountStatus
   stripeOnboardingComplete?: boolean
+  whatsappGroupName?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProfessionalInput
@@ -1101,6 +1137,7 @@ export type ProfessionalUncheckedCreateWithoutPaymentsInput = {
   stripeAccountId?: string | null
   stripeAccountStatus?: $Enums.StripeAccountStatus
   stripeOnboardingComplete?: boolean
+  whatsappGroupName?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   userId: string
@@ -1137,6 +1174,7 @@ export type ProfessionalUpdateWithoutPaymentsInput = {
   stripeAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeAccountStatus?: Prisma.EnumStripeAccountStatusFieldUpdateOperationsInput | $Enums.StripeAccountStatus
   stripeOnboardingComplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  whatsappGroupName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProfessionalNestedInput
@@ -1157,6 +1195,7 @@ export type ProfessionalUncheckedUpdateWithoutPaymentsInput = {
   stripeAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeAccountStatus?: Prisma.EnumStripeAccountStatusFieldUpdateOperationsInput | $Enums.StripeAccountStatus
   stripeOnboardingComplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  whatsappGroupName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1177,6 +1216,7 @@ export type ProfessionalCreateManyBarbershopInput = {
   stripeAccountId?: string | null
   stripeAccountStatus?: $Enums.StripeAccountStatus
   stripeOnboardingComplete?: boolean
+  whatsappGroupName?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   userId: string
@@ -1194,6 +1234,7 @@ export type ProfessionalUpdateWithoutBarbershopInput = {
   stripeAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeAccountStatus?: Prisma.EnumStripeAccountStatusFieldUpdateOperationsInput | $Enums.StripeAccountStatus
   stripeOnboardingComplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  whatsappGroupName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProfessionalNestedInput
@@ -1214,6 +1255,7 @@ export type ProfessionalUncheckedUpdateWithoutBarbershopInput = {
   stripeAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeAccountStatus?: Prisma.EnumStripeAccountStatusFieldUpdateOperationsInput | $Enums.StripeAccountStatus
   stripeOnboardingComplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  whatsappGroupName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1234,6 +1276,7 @@ export type ProfessionalUncheckedUpdateManyWithoutBarbershopInput = {
   stripeAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeAccountStatus?: Prisma.EnumStripeAccountStatusFieldUpdateOperationsInput | $Enums.StripeAccountStatus
   stripeOnboardingComplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  whatsappGroupName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1300,6 +1343,7 @@ export type ProfessionalSelect<ExtArgs extends runtime.Types.Extensions.Internal
   stripeAccountId?: boolean
   stripeAccountStatus?: boolean
   stripeOnboardingComplete?: boolean
+  whatsappGroupName?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   userId?: boolean
@@ -1324,6 +1368,7 @@ export type ProfessionalSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   stripeAccountId?: boolean
   stripeAccountStatus?: boolean
   stripeOnboardingComplete?: boolean
+  whatsappGroupName?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   userId?: boolean
@@ -1344,6 +1389,7 @@ export type ProfessionalSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   stripeAccountId?: boolean
   stripeAccountStatus?: boolean
   stripeOnboardingComplete?: boolean
+  whatsappGroupName?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   userId?: boolean
@@ -1364,13 +1410,14 @@ export type ProfessionalSelectScalar = {
   stripeAccountId?: boolean
   stripeAccountStatus?: boolean
   stripeOnboardingComplete?: boolean
+  whatsappGroupName?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   userId?: boolean
   barbershopId?: boolean
 }
 
-export type ProfessionalOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "cpf" | "displayName" | "bio" | "imageUrl" | "isActive" | "acceptsPix" | "acceptsCard" | "stripeAccountId" | "stripeAccountStatus" | "stripeOnboardingComplete" | "createdAt" | "updatedAt" | "userId" | "barbershopId", ExtArgs["result"]["professional"]>
+export type ProfessionalOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "cpf" | "displayName" | "bio" | "imageUrl" | "isActive" | "acceptsPix" | "acceptsCard" | "stripeAccountId" | "stripeAccountStatus" | "stripeOnboardingComplete" | "whatsappGroupName" | "createdAt" | "updatedAt" | "userId" | "barbershopId", ExtArgs["result"]["professional"]>
 export type ProfessionalInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   barbershop?: boolean | Prisma.BarbershopDefaultArgs<ExtArgs>
@@ -1409,6 +1456,7 @@ export type $ProfessionalPayload<ExtArgs extends runtime.Types.Extensions.Intern
     stripeAccountId: string | null
     stripeAccountStatus: $Enums.StripeAccountStatus
     stripeOnboardingComplete: boolean
+    whatsappGroupName: string | null
     createdAt: Date
     updatedAt: Date
     userId: string
@@ -1852,6 +1900,7 @@ export interface ProfessionalFieldRefs {
   readonly stripeAccountId: Prisma.FieldRef<"Professional", 'String'>
   readonly stripeAccountStatus: Prisma.FieldRef<"Professional", 'StripeAccountStatus'>
   readonly stripeOnboardingComplete: Prisma.FieldRef<"Professional", 'Boolean'>
+  readonly whatsappGroupName: Prisma.FieldRef<"Professional", 'String'>
   readonly createdAt: Prisma.FieldRef<"Professional", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Professional", 'DateTime'>
   readonly userId: Prisma.FieldRef<"Professional", 'String'>

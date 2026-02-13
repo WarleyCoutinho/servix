@@ -26,6 +26,7 @@
     "@stripe/stripe-js": "7.8.0",
     "@tailwindcss/typography": "^0.5.19",
     "@tanstack/react-query": "5.90.12",
+    "@whiskeysockets/baileys": "7.0.0-rc.9",
     "ai": "5.0.112",
     "better-auth": "1.4.6",
     "class-variance-authority": "^0.7.1",

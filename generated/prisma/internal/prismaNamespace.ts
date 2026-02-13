@@ -392,7 +392,6 @@ export const ModelName = {
   Professional: 'Professional',
   PlanConfig: 'PlanConfig',
   Subscription: 'Subscription',
-  OperatingHours: 'OperatingHours',
   ProfessionalSchedule: 'ProfessionalSchedule',
   BarbershopService: 'BarbershopService',
   Booking: 'Booking',
@@ -414,7 +413,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "account" | "verification" | "barbershop" | "professional" | "planConfig" | "subscription" | "operatingHours" | "professionalSchedule" | "barbershopService" | "booking" | "payment" | "planHistory" | "stripeEvent"
+    modelProps: "user" | "session" | "account" | "verification" | "barbershop" | "professional" | "planConfig" | "subscription" | "professionalSchedule" | "barbershopService" | "booking" | "payment" | "planHistory" | "stripeEvent"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1010,80 +1009,6 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    OperatingHours: {
-      payload: Prisma.$OperatingHoursPayload<ExtArgs>
-      fields: Prisma.OperatingHoursFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.OperatingHoursFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OperatingHoursPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.OperatingHoursFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OperatingHoursPayload>
-        }
-        findFirst: {
-          args: Prisma.OperatingHoursFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OperatingHoursPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.OperatingHoursFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OperatingHoursPayload>
-        }
-        findMany: {
-          args: Prisma.OperatingHoursFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OperatingHoursPayload>[]
-        }
-        create: {
-          args: Prisma.OperatingHoursCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OperatingHoursPayload>
-        }
-        createMany: {
-          args: Prisma.OperatingHoursCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.OperatingHoursCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OperatingHoursPayload>[]
-        }
-        delete: {
-          args: Prisma.OperatingHoursDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OperatingHoursPayload>
-        }
-        update: {
-          args: Prisma.OperatingHoursUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OperatingHoursPayload>
-        }
-        deleteMany: {
-          args: Prisma.OperatingHoursDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.OperatingHoursUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.OperatingHoursUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OperatingHoursPayload>[]
-        }
-        upsert: {
-          args: Prisma.OperatingHoursUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OperatingHoursPayload>
-        }
-        aggregate: {
-          args: Prisma.OperatingHoursAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateOperatingHours>
-        }
-        groupBy: {
-          args: Prisma.OperatingHoursGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.OperatingHoursGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.OperatingHoursCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.OperatingHoursCountAggregateOutputType> | number
-        }
-      }
-    }
     ProfessionalSchedule: {
       payload: Prisma.$ProfessionalSchedulePayload<ExtArgs>
       fields: Prisma.ProfessionalScheduleFieldRefs
@@ -1658,6 +1583,7 @@ export const ProfessionalScalarFieldEnum = {
   stripeAccountId: 'stripeAccountId',
   stripeAccountStatus: 'stripeAccountStatus',
   stripeOnboardingComplete: 'stripeOnboardingComplete',
+  whatsappGroupName: 'whatsappGroupName',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   userId: 'userId',
@@ -1703,18 +1629,6 @@ export const SubscriptionScalarFieldEnum = {
 } as const
 
 export type SubscriptionScalarFieldEnum = (typeof SubscriptionScalarFieldEnum)[keyof typeof SubscriptionScalarFieldEnum]
-
-
-export const OperatingHoursScalarFieldEnum = {
-  id: 'id',
-  dayOfWeek: 'dayOfWeek',
-  openTime: 'openTime',
-  closeTime: 'closeTime',
-  isClosed: 'isClosed',
-  barbershopId: 'barbershopId'
-} as const
-
-export type OperatingHoursScalarFieldEnum = (typeof OperatingHoursScalarFieldEnum)[keyof typeof OperatingHoursScalarFieldEnum]
 
 
 export const ProfessionalScheduleScalarFieldEnum = {
@@ -2084,7 +1998,6 @@ export type GlobalOmitConfig = {
   professional?: Prisma.ProfessionalOmit
   planConfig?: Prisma.PlanConfigOmit
   subscription?: Prisma.SubscriptionOmit
-  operatingHours?: Prisma.OperatingHoursOmit
   professionalSchedule?: Prisma.ProfessionalScheduleOmit
   barbershopService?: Prisma.BarbershopServiceOmit
   booking?: Prisma.BookingOmit

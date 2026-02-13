@@ -20,10 +20,9 @@ export const useGetDateAvailableTimeSlots = ({
     queryFn: () =>
       getAvailableSlots({
         barbershopId,
-        professionalId,
+        professionalId: professionalId!,
         date: date!,
       }),
-    // enabled: Boolean(date),
     enabled: Boolean(date) && Boolean(professionalId),
   });
 };

@@ -6,20 +6,6 @@ export {
   DAY_OF_WEEK_SHORT_LABELS,
 } from "@/lib/day-of-week";
 
-export async function getBarbershopOperatingHours(barbershopId: string) {
-  const { data } = await safeQuery(
-    () =>
-      prisma.operatingHours.findMany({
-        where: { barbershopId },
-        orderBy: {
-          dayOfWeek: "asc",
-        },
-      }),
-    []
-  );
-  return data;
-}
-
 export async function getProfessionalSchedule(professionalId: string) {
   const { data } = await safeQuery(
     () =>
@@ -30,25 +16,6 @@ export async function getProfessionalSchedule(professionalId: string) {
         },
       }),
     []
-  );
-  return data;
-}
-
-export async function getBarbershopOperatingHoursForDay(
-  barbershopId: string,
-  dayOfWeek: DayOfWeek,
-) {
-  const { data } = await safeQuery(
-    () =>
-      prisma.operatingHours.findUnique({
-        where: {
-          barbershopId_dayOfWeek: {
-            barbershopId,
-            dayOfWeek,
-          },
-        },
-      }),
-    null
   );
   return data;
 }

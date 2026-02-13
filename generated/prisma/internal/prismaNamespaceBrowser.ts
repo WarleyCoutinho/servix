@@ -59,7 +59,6 @@ export const ModelName = {
   Professional: 'Professional',
   PlanConfig: 'PlanConfig',
   Subscription: 'Subscription',
-  OperatingHours: 'OperatingHours',
   ProfessionalSchedule: 'ProfessionalSchedule',
   BarbershopService: 'BarbershopService',
   Booking: 'Booking',
@@ -175,6 +174,7 @@ export const ProfessionalScalarFieldEnum = {
   stripeAccountId: 'stripeAccountId',
   stripeAccountStatus: 'stripeAccountStatus',
   stripeOnboardingComplete: 'stripeOnboardingComplete',
+  whatsappGroupName: 'whatsappGroupName',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   userId: 'userId',
@@ -220,18 +220,6 @@ export const SubscriptionScalarFieldEnum = {
 } as const
 
 export type SubscriptionScalarFieldEnum = (typeof SubscriptionScalarFieldEnum)[keyof typeof SubscriptionScalarFieldEnum]
-
-
-export const OperatingHoursScalarFieldEnum = {
-  id: 'id',
-  dayOfWeek: 'dayOfWeek',
-  openTime: 'openTime',
-  closeTime: 'closeTime',
-  isClosed: 'isClosed',
-  barbershopId: 'barbershopId'
-} as const
-
-export type OperatingHoursScalarFieldEnum = (typeof OperatingHoursScalarFieldEnum)[keyof typeof OperatingHoursScalarFieldEnum]
 
 
 export const ProfessionalScheduleScalarFieldEnum = {

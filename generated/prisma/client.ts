@@ -80,11 +80,6 @@ export type PlanConfig = Prisma.PlanConfigModel
  */
 export type Subscription = Prisma.SubscriptionModel
 /**
- * Model OperatingHours
- * 
- */
-export type OperatingHours = Prisma.OperatingHoursModel
-/**
  * Model ProfessionalSchedule
  * 
  */

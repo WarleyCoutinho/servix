@@ -13,13 +13,14 @@ const inputSchema = z.object({
   email: z.email("Email inválido"),
   acceptsPix: z.boolean().optional(),
   acceptsCard: z.boolean().optional(),
+  whatsappGroupName: z.string().optional(),
 });
 
 export const updateProfessional = subscribedOwnerActionClient
   .inputSchema(inputSchema)
   .action(
     async ({
-      parsedInput: { professionalId, displayName, bio, email, acceptsPix, acceptsCard },
+      parsedInput: { professionalId, displayName, bio, email, acceptsPix, acceptsCard, whatsappGroupName },
       ctx: { barbershop },
     }) => {
       const professional = await prisma.professional.findUnique({
@@ -63,6 +64,7 @@ export const updateProfessional = subscribedOwnerActionClient
             bio,
             ...(acceptsPix !== undefined && { acceptsPix }),
             ...(acceptsCard !== undefined && { acceptsCard }),
+            ...(whatsappGroupName !== undefined && { whatsappGroupName: whatsappGroupName || null }),
           },
           include: { user: true },
         }),

@@ -1,5 +1,6 @@
 import { prisma } from "./prisma";
-import { SubscriptionPlan } from "@/generated/prisma/enums";
+import { DayOfWeek, SubscriptionPlan } from "@/generated/prisma/enums";
+import { DAY_OF_WEEK_ORDER } from "@/lib/day-of-week";
 
 export async function updateUserRoleBasedOnPlan(
   barbershopId: string,
@@ -12,24 +13,76 @@ export async function updateUserRoleBasedOnPlan(
 
   if (!barbershop?.ownerId) return;
 
-  if (plan === SubscriptionPlan.BASIC) {
-    await ensureOwnerHasProfessionalRecord(barbershop.ownerId);
-  }
+  await ensureOwnerHasProfessionalRecord(barbershop.ownerId, barbershopId);
 }
 
 export async function ensureOwnerHasProfessionalRecord(
   userId: string,
+  barbershopId: string,
 ): Promise<void> {
   const existingProfessional = await prisma.professional.findUnique({
     where: { userId },
+    include: {
+      _count: { select: { schedules: true } },
+    },
   });
 
-  if (existingProfessional && !existingProfessional.isActive) {
-    await prisma.professional.update({
-      where: { id: existingProfessional.id },
-      data: { isActive: true },
-    });
+  if (existingProfessional) {
+    if (!existingProfessional.isActive) {
+      await prisma.professional.update({
+        where: { id: existingProfessional.id },
+        data: { isActive: true },
+      });
+    }
+
+    if (existingProfessional._count.schedules < 7) {
+      const existingSchedules = await prisma.professionalSchedule.findMany({
+        where: { professionalId: existingProfessional.id },
+        select: { dayOfWeek: true },
+      });
+      const existingDays = new Set(existingSchedules.map((s) => s.dayOfWeek));
+      const missingDays = DAY_OF_WEEK_ORDER.filter((day) => !existingDays.has(day));
+
+      if (missingDays.length > 0) {
+        await prisma.professionalSchedule.createMany({
+          data: missingDays.map((day) => ({
+            professionalId: existingProfessional.id,
+            dayOfWeek: day,
+            startTime: "09:00",
+            endTime: "18:00",
+            isAvailable: day !== DayOfWeek.SATURDAY && day !== DayOfWeek.SUNDAY,
+          })),
+        });
+      }
+    }
+
+    return;
   }
+
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) return;
+
+  const professional = await prisma.professional.create({
+    data: {
+      userId,
+      barbershopId,
+      cpf: `owner_${userId.slice(0, 8)}`,
+      displayName: user.name,
+      isActive: true,
+      acceptsCard: true,
+      acceptsPix: false,
+    },
+  });
+
+  await prisma.professionalSchedule.createMany({
+    data: DAY_OF_WEEK_ORDER.map((day) => ({
+      professionalId: professional.id,
+      dayOfWeek: day,
+      startTime: "09:00",
+      endTime: "18:00",
+      isAvailable: day !== DayOfWeek.SATURDAY && day !== DayOfWeek.SUNDAY,
+    })),
+  });
 }
 
 interface DowngradeResult {

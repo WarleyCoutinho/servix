@@ -12,7 +12,7 @@ import type Stripe from "stripe";
 const inputSchema = z.object({
   serviceId: z.uuid(),
   date: z.date(),
-  professionalId: z.uuid().optional(),
+  professionalId: z.uuid(),
 });
 
 export const createBookingCheckoutSession = protectedActionClient
@@ -40,114 +40,72 @@ export const createBookingCheckoutSession = protectedActionClient
         });
       }
 
-      let professional = null;
-      if (professionalId) {
-        professional = await prisma.professional.findUnique({
-          where: { id: professionalId },
+      const professional = await prisma.professional.findUnique({
+        where: { id: professionalId },
+      });
+
+      if (!professional) {
+        returnValidationErrors(inputSchema, {
+          professionalId: { _errors: ["Profissional não encontrado."] },
         });
+      }
 
-        if (!professional) {
-          returnValidationErrors(inputSchema, {
-            professionalId: { _errors: ["Profissional não encontrado."] },
-          });
-        }
-
-        if (professional.barbershopId !== service.barbershopId) {
-          returnValidationErrors(inputSchema, {
-            professionalId: {
-              _errors: ["Profissional não pertence a esta barbearia."],
-            },
-          });
-        }
-
-        if (!professional.isActive) {
-          returnValidationErrors(inputSchema, {
-            professionalId: {
-              _errors: ["Este profissional não está disponível no momento."],
-            },
-          });
-        }
-
-        if (
-          !professional.stripeAccountId ||
-          !isAccountReadyForPayments(professional.stripeAccountStatus)
-        ) {
-          returnValidationErrors(inputSchema, {
-            professionalId: {
-              _errors: [
-                "Este profissional ainda não configurou o recebimento de pagamentos. Por favor, escolha outro profissional.",
-              ],
-            },
-          });
-        }
-
-        const existingBooking = await prisma.booking.findFirst({
-          where: {
-            professionalId,
-            date,
-            cancelledAt: null,
+      if (professional.barbershopId !== service.barbershopId) {
+        returnValidationErrors(inputSchema, {
+          professionalId: {
+            _errors: ["Profissional não pertence a esta barbearia."],
           },
         });
+      }
 
-        if (existingBooking) {
-          returnValidationErrors(inputSchema, {
-            date: {
-              _errors: [
-                "Este profissional já possui agendamento neste horário.",
-              ],
-            },
-          });
-        }
-      } else {
-        // Se não há profissional selecionado, buscar um profissional ativo com Stripe Connect
-        const availableProfessional = await prisma.professional.findFirst({
-          where: {
-            barbershopId: service.barbershopId,
-            isActive: true,
-            stripeAccountStatus: "ACTIVE",
-            stripeAccountId: { not: null },
+      if (!professional.isActive) {
+        returnValidationErrors(inputSchema, {
+          professionalId: {
+            _errors: ["Este profissional não está disponível no momento."],
           },
         });
+      }
 
-        if (!availableProfessional) {
-          returnValidationErrors(inputSchema, {
+      if (
+        !professional.stripeAccountId ||
+        !isAccountReadyForPayments(professional.stripeAccountStatus)
+      ) {
+        returnValidationErrors(inputSchema, {
+          professionalId: {
             _errors: [
-              "Nenhum profissional disponível para receber pagamentos neste estabelecimento.",
+              "Este profissional ainda não configurou o recebimento de pagamentos. Por favor, escolha outro profissional.",
             ],
-          });
-        }
-
-        // Usar o profissional encontrado
-        professional = availableProfessional;
-
-        const existingBooking = await prisma.booking.findFirst({
-          where: {
-            barbershopId: service.barbershopId,
-            date,
-            cancelledAt: null,
           },
         });
+      }
 
-        if (existingBooking) {
-          returnValidationErrors(inputSchema, {
-            date: { _errors: ["Data e hora selecionadas já estão agendadas."] },
-          });
-        }
+      const existingBooking = await prisma.booking.findFirst({
+        where: {
+          professionalId,
+          date,
+          cancelledAt: null,
+        },
+      });
+
+      if (existingBooking) {
+        returnValidationErrors(inputSchema, {
+          date: {
+            _errors: [
+              "Este profissional já possui agendamento neste horário.",
+            ],
+          },
+        });
       }
 
       const applicationFeeAmount = calculatePlatformFee(service.priceInCents);
 
       const paymentMethods: Stripe.Checkout.SessionCreateParams.PaymentMethodType[] = [];
 
-      if (professional) {
-        if (professional.acceptsCard) {
-          paymentMethods.push("card");
-        }
-        if (professional.acceptsPix) {
-          paymentMethods.push("pix");
-        }
-      } else {
-        paymentMethods.push("card", "pix");
+      if (professional.acceptsCard) {
+        paymentMethods.push("card");
+      }
+      if (professional.acceptsPix) {
+        paymentMethods.push("pix");
       }
 
       if (paymentMethods.length === 0) {
@@ -167,7 +125,7 @@ export const createBookingCheckoutSession = protectedActionClient
             barbershopId: service.barbershopId,
             userId: user.id,
             date: date.toISOString(),
-            professionalId: professional?.id ?? "",
+            professionalId: professional.id,
             priceInCents: service.priceInCents.toString(),
             applicationFeeInCents: applicationFeeAmount.toString(),
           },
@@ -196,8 +154,7 @@ export const createBookingCheckoutSession = protectedActionClient
           };
         }
 
-        // Stripe Connect é obrigatório - profissional sempre terá conta ativa
-        if (professional?.stripeAccountId) {
+        if (professional.stripeAccountId) {
           params.payment_intent_data = {
             application_fee_amount: applicationFeeAmount,
             transfer_data: {
@@ -234,7 +191,6 @@ export const createBookingCheckoutSession = protectedActionClient
       }
 
       console.log(`Checkout session created: ${checkoutSession.id}`);
-
 
       return {
         id: checkoutSession.id,

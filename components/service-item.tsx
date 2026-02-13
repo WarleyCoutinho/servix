@@ -72,7 +72,7 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
   };
 
   const handleConfirmBooking = async () => {
-    if (!selectedDate || !selectedTime) {
+    if (!selectedDate || !selectedTime || !selectedProfessional) {
       return;
     }
     const splittedTime = selectedTime.split(":");
@@ -85,8 +85,22 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
       serviceId: service.id,
       professionalId: selectedProfessional,
     });
+    if (!result) {
+      return toast.error(
+        "Erro ao criar agendamento. Por favor, tente novamente.",
+      );
+    }
     if (result.validationErrors) {
-      return toast.error(result.validationErrors._errors?.[0]);
+      const errors = result.validationErrors;
+      const firstError =
+        errors._errors?.[0] ||
+        Object.values(errors).find(
+          (v): v is { _errors: string[] } =>
+            v != null && typeof v === "object" && "_errors" in v && Array.isArray((v as { _errors?: unknown })._errors),
+        )?._errors?.[0];
+      return toast.error(
+        firstError || "Erro ao criar agendamento. Por favor, tente novamente.",
+      );
     }
     if (result.serverError) {
       return toast.error(

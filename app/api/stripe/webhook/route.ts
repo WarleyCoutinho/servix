@@ -9,6 +9,7 @@ import {
   handlePlanUpgrade,
   updateUserRoleBasedOnPlan,
 } from "@/lib/role-sync";
+import { sendDailyScheduleToGroup } from "@/lib/whatsapp-schedule";
 
 const PLAN_ORDER: Record<SubscriptionPlan, number> = {
   [SubscriptionPlan.BASIC]: 1,
@@ -22,7 +23,7 @@ const bookingMetadataSchema = z.object({
   barbershopId: z.uuid(),
   userId: z.string(),
   date: z.iso.datetime(),
-  professionalId: z.string().optional(),
+  professionalId: z.uuid(),
   priceInCents: z.coerce.number(),
   applicationFeeInCents: z.coerce.number().default(0),
 });
@@ -115,7 +116,7 @@ export const POST = async (request: Request) => {
           const chargeId = charge?.id;
           const transferId = charge?.transfer as string | null;
 
-          const professionalId = metadata.data.professionalId || undefined;
+          const professionalId = metadata.data.professionalId;
 
           await prisma.$transaction(async (tx) => {
             const booking = await tx.booking.create({
@@ -124,14 +125,14 @@ export const POST = async (request: Request) => {
                 barbershopId: metadata.data.barbershopId,
                 userId: metadata.data.userId,
                 date: metadata.data.date,
-                professionalId: professionalId || null,
+                professionalId,
               },
             });
 
             await tx.payment.create({
               data: {
                 bookingId: booking.id,
-                professionalId: professionalId || null,
+                professionalId,
                 amountInCents: metadata.data.priceInCents,
                 applicationFeeInCents: metadata.data.applicationFeeInCents,
                 status: PaymentStatus.SUCCEEDED,
@@ -146,6 +147,12 @@ export const POST = async (request: Request) => {
               `Booking ${booking.id} created with payment for user ${metadata.data.userId}${transferId ? ` (transfer: ${transferId})` : ""}`
             );
           });
+
+          if (professionalId) {
+            sendDailyScheduleToGroup(professionalId, metadata.data.date).catch(
+              (err) => console.error("[WhatsApp] Erro ao enviar agenda:", err),
+            );
+          }
         }
         break;
       }

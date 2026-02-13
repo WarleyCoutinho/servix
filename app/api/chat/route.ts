@@ -2,7 +2,7 @@ import { convertToModelMessages, stepCountIs, streamText, tool } from "ai";
 import { openai } from "@ai-sdk/openai";
 import z from "zod";
 import { prisma, safeQuery } from "@/lib/prisma";
-import { getDateAvailableTimeSlots } from "@/actions/get-date-available-time-slots";
+import { getAvailableSlots } from "@/actions/schedules/get-available-slots";
 import { createBooking } from "@/actions/create-booking";
 
 export const POST = async (request: Request) => {
@@ -19,23 +19,26 @@ export const POST = async (request: Request) => {
       month: "long",
       day: "numeric",
     })} (${new Date().toISOString().split("T")[0]})
-chat/r
+
     Seu objetivo é ajudar os usuários a:
     - Encontrar barbearias (por nome ou todas disponíveis)
-    - Verificar disponibilidade de horários para barbearias específicas
+    - Listar profissionais disponíveis de uma barbearia
+    - Verificar disponibilidade de horários para um profissional específico
     - Fornecer informações sobre serviços e preços
 
     Fluxo de atendimento:
 
     CENÁRIO 1 - Usuário menciona data/horário na primeira mensagem (ex: "quero um corte pra hoje", "preciso cortar o cabelo amanhã", "quero marcar para sexta"):
     1. Use a ferramenta searchBarbershops para buscar barbearias
-    2. IMEDIATAMENTE após receber as barbearias, use a ferramenta getAvailableTimeSlotsForBarbershop para CADA barbearia retornada, passando a data mencionada pelo usuário
-    3. Apresente APENAS as barbearias que têm horários disponíveis, mostrando:
+    2. Para cada barbearia, use getProfessionalsForBarbershop para listar os profissionais
+    3. Para cada profissional, use getAvailableTimeSlotsForProfessional para verificar disponibilidade
+    4. Apresente APENAS as barbearias/profissionais que têm horários disponíveis, mostrando:
        - Nome da barbearia
        - Endereço
+       - Nome do profissional
        - Serviços oferecidos com preços
        - Alguns horários disponíveis (4-5 opções espaçadas)
-    4. Quando o usuário escolher, forneça o resumo final
+    5. Quando o usuário escolher, forneça o resumo final
 
     CENÁRIO 2 - Usuário não menciona data/horário inicialmente:
     1. Use a ferramenta searchBarbershops para buscar barbearias
@@ -43,13 +46,15 @@ chat/r
        - Nome da barbearia
        - Endereço
        - Serviços oferecidos com preços
-    3. Quando o usuário demonstrar interesse em uma barbearia específica ou mencionar uma data, pergunte a data desejada (se ainda não foi informada)
-    4. Use a ferramenta getAvailableTimeSlotsForBarbershop passando o barbershopId e a data
-    5. Apresente os horários disponíveis (liste alguns horários, não todos - sugira 4-5 opções espaçadas)
+    3. Quando o usuário demonstrar interesse em uma barbearia, use getProfessionalsForBarbershop para listar profissionais
+    4. Pergunte qual profissional e data desejada
+    5. Use getAvailableTimeSlotsForProfessional passando barbershopId, professionalId e data
+    6. Apresente os horários disponíveis (4-5 opções espaçadas)
 
     Resumo final (quando o usuário escolher):
     - Nome da barbearia
     - Endereço
+    - Profissional escolhido
     - Serviço escolhido
     - Data e horário escolhido
     - Preço
@@ -58,6 +63,7 @@ chat/r
     - Após o usuário confirmar explicitamente a escolha (ex: "confirmo", "pode agendar", "quero esse horário"), use a tool createBooking
     - Parâmetros necessários:
       * serviceId: ID do serviço escolhido
+      * professionalId: ID do profissional escolhido
       * date: Data e horário no formato ISO (YYYY-MM-DDTHH:mm:ss) - exemplo: "2025-11-05T10:00:00"
     - Se a criação for bem-sucedida (success: true), informe ao usuário que a reserva foi confirmada com sucesso
     - Se houver erro (success: false), explique o erro ao usuário:
@@ -65,11 +71,12 @@ chat/r
       * Para outros erros, informe que houve um problema e peça para tentar novamente
 
     Importante:
-    - NUNCA mostre informações técnicas ao usuário (barbershopId, serviceId, formatos ISO de data, etc.)
+    - NUNCA mostre informações técnicas ao usuário (barbershopId, serviceId, professionalId, formatos ISO de data, etc.)
     - Seja sempre educado, prestativo e use uma linguagem informal e amigável
     - Não liste TODOS os horários disponíveis, sugira apenas 4-5 opções espaçadas ao longo do dia
     - Se não houver horários disponíveis, sugira uma data alternativa
-    - Quando o usuário mencionar "hoje", "amanhã", "depois de amanhã" ou dias da semana, calcule a data correta automaticamente`,
+    - Quando o usuário mencionar "hoje", "amanhã", "depois de amanhã" ou dias da semana, calcule a data correta automaticamente
+    - SEMPRE passe pela etapa de seleção de profissional antes de verificar horários`,
     tools: {
       searchBarbershops: tool({
         description:
@@ -109,46 +116,87 @@ chat/r
           return barbershops;
         },
       }),
-      getAvailableTimeSlotsForBarbershop: tool({
+      getProfessionalsForBarbershop: tool({
         description:
-          "Obtém os horários disponíveis para uma barbearia específica.",
+          "Lista os profissionais ativos de uma barbearia específica.",
         inputSchema: z.object({
           barbershopId: z.string().uuid(),
+        }),
+        execute: async ({ barbershopId }) => {
+          console.log("getProfessionalsForBarbershop", barbershopId);
+          const { data: professionals, error } = await safeQuery(
+            () =>
+              prisma.professional.findMany({
+                where: {
+                  barbershopId,
+                  isActive: true,
+                },
+                include: {
+                  user: {
+                    select: { name: true, image: true },
+                  },
+                },
+                orderBy: { displayName: "asc" },
+              }),
+            []
+          );
+
+          if (error) {
+            return { error: "Não foi possível buscar os profissionais." };
+          }
+
+          return professionals.map((p) => ({
+            id: p.id,
+            name: p.displayName ?? p.user.name,
+          }));
+        },
+      }),
+      getAvailableTimeSlotsForProfessional: tool({
+        description:
+          "Obtém os horários disponíveis para um profissional específico em uma data.",
+        inputSchema: z.object({
+          barbershopId: z.string().uuid(),
+          professionalId: z.string().uuid(),
           date: z
             .string()
             .describe(
               "A data no formato ISO (YYYY-MM-DD) para a qual você deseja verificar os horários disponíveis.",
             ),
         }),
-        execute: async ({ barbershopId, date }) => {
-          console.log("getAvailableTimeSlotsForBarbershop", barbershopId, date);
-          const availableTimeSlots = await getDateAvailableTimeSlots({
+        execute: async ({ barbershopId, professionalId, date }) => {
+          console.log("getAvailableTimeSlotsForProfessional", barbershopId, professionalId, date);
+          const result = await getAvailableSlots({
             barbershopId,
+            professionalId,
             date: new Date(date),
           });
           return {
             barbershopId,
+            professionalId,
             date,
-            availableTimeSlots,
+            availableTimeSlots: result?.data?.slots ?? [],
+            message: result?.data?.message,
           };
         },
       }),
       createBooking: tool({
         description:
-          "Cria um novo agendamento para um serviço específico em uma data específica.",
+          "Cria um novo agendamento para um serviço e profissional específico em uma data.",
         inputSchema: z.object({
           serviceId: z.uuid(),
+          professionalId: z.uuid(),
           date: z
             .string()
             .describe(
-              "A data no formato ISO (YYYY-MM-DD) para a qual você deseja criar o agendamento.",
+              "A data e hora no formato ISO (YYYY-MM-DDTHH:mm:ss) para o agendamento.",
             ),
         }),
-        execute: async ({ serviceId, date }) => {
-          console.log("createBooking", serviceId, date);
+        execute: async ({ serviceId, professionalId, date }) => {
+          console.log("createBooking", serviceId, professionalId, date);
           try {
             await createBooking({
               serviceId,
+              professionalId,
               date: new Date(date),
             });
             return {

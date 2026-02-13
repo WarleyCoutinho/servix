@@ -4,7 +4,8 @@ import { z } from "zod";
 import { protectedActionClient } from "@/lib/action-client";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { UserRole } from "@/generated/prisma/enums";
+import { DayOfWeek, UserRole } from "@/generated/prisma/enums";
+import { DAY_OF_WEEK_ORDER } from "@/lib/day-of-week";
 
 const cpfRegex = /^\d{11}$/;
 
@@ -68,7 +69,7 @@ export const setOwnerRole = protectedActionClient
         },
       });
 
-      await tx.professional.create({
+      const professional = await tx.professional.create({
         data: {
           userId: user.id,
           barbershopId: barbershop.id,
@@ -78,6 +79,17 @@ export const setOwnerRole = protectedActionClient
           acceptsCard: true,
           acceptsPix: false,
         },
+      });
+
+      await tx.professionalSchedule.createMany({
+        data: DAY_OF_WEEK_ORDER.map((day) => ({
+          professionalId: professional.id,
+          dayOfWeek: day,
+          startTime: "09:00",
+          endTime: "18:00",
+          isAvailable:
+            day !== DayOfWeek.SATURDAY && day !== DayOfWeek.SUNDAY,
+        })),
       });
 
       return barbershop;

@@ -24,6 +24,7 @@ export default function NewProfessionalPage() {
     cpf: "",
     displayName: "",
     email: "",
+    whatsappGroupName: "",
   });
 
   const { execute, isPending } = useAction(createProfessional, {
@@ -60,6 +61,7 @@ export default function NewProfessionalPage() {
     execute({
       ...formData,
       cpf: formData.cpf.replace(/\D/g, ""),
+      whatsappGroupName: formData.whatsappGroupName || undefined,
     });
   }
 
@@ -132,6 +134,22 @@ export default function NewProfessionalPage() {
               <p className="text-xs text-muted-foreground">
                 O profissional usará este email para fazer login e completar
                 seu cadastro.
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="whatsappGroupName">Nome do Grupo WhatsApp</Label>
+              <Input
+                id="whatsappGroupName"
+                placeholder="Ex: Agenda - João Silva"
+                value={formData.whatsappGroupName}
+                onChange={(e) =>
+                  setFormData({ ...formData, whatsappGroupName: e.target.value })
+                }
+              />
+              <p className="text-xs text-muted-foreground">
+                Nome exato do grupo no WhatsApp onde a agenda será enviada
+                automaticamente.
               </p>
             </div>
 

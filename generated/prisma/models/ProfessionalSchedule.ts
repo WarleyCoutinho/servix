@@ -387,6 +387,10 @@ export type ProfessionalScheduleUncheckedUpdateManyWithoutProfessionalNestedInpu
   deleteMany?: Prisma.ProfessionalScheduleScalarWhereInput | Prisma.ProfessionalScheduleScalarWhereInput[]
 }
 
+export type EnumDayOfWeekFieldUpdateOperationsInput = {
+  set?: $Enums.DayOfWeek
+}
+
 export type ProfessionalScheduleCreateWithoutProfessionalInput = {
   id?: string
   dayOfWeek: $Enums.DayOfWeek
