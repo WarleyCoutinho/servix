@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth";
 import { checkBarbershopLimit } from "@/lib/plan-limits";
+import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { NewEstablishmentForm } from "./_components/new-establishment-form";
@@ -19,6 +20,10 @@ export default async function NewEstablishmentPage() {
     redirect("/dashboard/owner/establishments");
   }
 
+  const existingProfessional = await prisma.professional.findUnique({
+    where: { userId: session.user.id },
+  });
+
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <div>
@@ -28,7 +33,7 @@ export default async function NewEstablishmentPage() {
         </p>
       </div>
 
-      <NewEstablishmentForm />
+      <NewEstablishmentForm showCpfField={!existingProfessional} />
     </div>
   );
 }

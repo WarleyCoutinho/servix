@@ -23,6 +23,7 @@ export const useGetDateAvailableTimeSlots = ({
         professionalId,
         date: date!,
       }),
-    enabled: Boolean(date),
+    // enabled: Boolean(date),
+    enabled: Boolean(date) && Boolean(professionalId),
   });
 };

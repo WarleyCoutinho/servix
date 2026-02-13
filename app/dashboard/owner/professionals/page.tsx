@@ -63,10 +63,10 @@ export default async function ProfessionalsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Profissionais</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl font-bold sm:text-3xl">Profissionais</h1>
+          <p className="text-muted-foreground text-sm sm:text-base">
             Gerencie os profissionais da sua barbearia
             {limits && !isBasicPlan && (
               <span className="ml-2">
@@ -76,7 +76,7 @@ export default async function ProfessionalsPage() {
           </p>
         </div>
         {!isBasicPlan && (
-          <Button asChild disabled={!canAddProfessional}>
+          <Button asChild disabled={!canAddProfessional} className="w-full sm:w-auto">
             <Link href={canAddProfessional ? "/dashboard/owner/professionals/new" : "#"}>
               <Plus className="mr-2 h-4 w-4" />
               Adicionar Profissional

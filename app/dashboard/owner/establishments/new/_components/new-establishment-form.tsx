@@ -18,13 +18,27 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
-export function NewEstablishmentForm() {
+function formatCPF(value: string) {
+  const digits = value.replace(/\D/g, "").slice(0, 11);
+  if (digits.length <= 3) return digits;
+  if (digits.length <= 6) return `${digits.slice(0, 3)}.${digits.slice(3)}`;
+  if (digits.length <= 9)
+    return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6)}`;
+  return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9)}`;
+}
+
+interface NewEstablishmentFormProps {
+  showCpfField: boolean;
+}
+
+export function NewEstablishmentForm({ showCpfField }: NewEstablishmentFormProps) {
   const router = useRouter();
   const [formData, setFormData] = useState({
     name: "",
     address: "",
     description: "",
     phone: "",
+    cpf: "",
   });
 
   const { execute, isPending } = useAction(createBarbershop, {
@@ -42,7 +56,11 @@ export function NewEstablishmentForm() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    execute(formData);
+    const { cpf, ...rest } = formData;
+    execute({
+      ...rest,
+      ...(showCpfField ? { cpf } : {}),
+    });
   };
 
   const handleChange = (
@@ -121,6 +139,30 @@ export function NewEstablishmentForm() {
               rows={3}
             />
           </div>
+
+          {showCpfField && (
+            <div className="space-y-2">
+              <Label htmlFor="cpf">Seu CPF *</Label>
+              <Input
+                id="cpf"
+                name="cpf"
+                placeholder="000.000.000-00"
+                value={formData.cpf}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    cpf: formatCPF(e.target.value),
+                  }))
+                }
+                required
+                maxLength={14}
+              />
+              <p className="text-muted-foreground text-xs">
+                Você será registrado como profissional do estabelecimento
+                automaticamente.
+              </p>
+            </div>
+          )}
 
           <div className="flex gap-3 pt-4">
             <Button

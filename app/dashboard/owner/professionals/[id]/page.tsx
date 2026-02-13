@@ -62,26 +62,26 @@ export default async function ProfessionalPage({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" asChild>
+      <div className="flex items-start gap-3 sm:items-center sm:gap-4">
+        <Button variant="ghost" size="icon" asChild className="shrink-0">
           <Link href="/dashboard/owner/professionals">
             <ArrowLeft className="h-4 w-4" />
           </Link>
         </Button>
-        <div className="flex flex-1 items-center gap-4">
-          <Avatar className="h-16 w-16">
+        <div className="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+          <Avatar className="h-12 w-12 shrink-0 sm:h-16 sm:w-16">
             <AvatarImage
               src={professional.imageUrl ?? professional.user.image ?? ""}
             />
-            <AvatarFallback className="text-lg">
+            <AvatarFallback className="text-base sm:text-lg">
               {(professional.displayName ?? professional.user.name)
                 .slice(0, 2)
                 .toUpperCase()}
             </AvatarFallback>
           </Avatar>
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-bold">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="text-xl font-bold sm:text-2xl">
                 {professional.displayName ?? professional.user.name}
               </h1>
               {professional.isActive ? (
@@ -96,7 +96,9 @@ export default async function ProfessionalPage({
                 </Badge>
               )}
             </div>
-            <p className="text-muted-foreground">{professional.user.email}</p>
+            <p className="text-muted-foreground truncate text-sm sm:text-base">
+              {professional.user.email}
+            </p>
           </div>
         </div>
       </div>

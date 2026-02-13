@@ -1,40 +1,44 @@
-"use client";
+import { auth } from "@/lib/auth";
+import { getActiveBarbershop } from "@/lib/get-active-barbershop";
+import { getBarbershopOperatingHours } from "@/data/schedules";
+import { DayOfWeek } from "@/generated/prisma/enums";
+import { DAY_OF_WEEK_ORDER } from "@/lib/day-of-week";
+import type { DaySchedule } from "@/components/schedule-form";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+import OwnerScheduleClient from "./_components/schedule-client";
 
-import { updateOperatingHours } from "@/actions/schedules/update-operating-hours";
-import {
-  ScheduleForm,
-  ownerScheduleConfig,
-  type DaySchedule,
-} from "@/components/schedule-form";
-import { useAction } from "next-safe-action/hooks";
-import { toast } from "sonner";
-
-export default function OwnerSchedulePage() {
-  const { execute, isPending } = useAction(updateOperatingHours, {
-    onSuccess: () => {
-      toast.success("Horários atualizados com sucesso!");
-    },
-    onError: ({ error }) => {
-      toast.error(error.serverError ?? "Erro ao atualizar horários");
-    },
+export default async function OwnerSchedulePage() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
   });
 
-  function handleSubmit(schedules: DaySchedule[]) {
-    const convertedSchedules = schedules.map((s) => ({
-      dayOfWeek: s.dayOfWeek,
-      openTime: s.startTime,
-      closeTime: s.endTime,
-      isClosed: !s.isAvailable,
-    }));
-
-    execute({ schedules: convertedSchedules });
+  if (!session?.user) {
+    redirect("/");
   }
 
-  return (
-    <ScheduleForm
-      config={ownerScheduleConfig}
-      isPending={isPending}
-      onSubmit={handleSubmit}
-    />
+  const data = await getActiveBarbershop(session.user.id);
+
+  if (!data || !data.activeBarbershop) {
+    redirect("/dashboard/owner");
+  }
+
+  const operatingHours = await getBarbershopOperatingHours(
+    data.activeBarbershop.id,
   );
+
+  const initialSchedules: DaySchedule[] = DAY_OF_WEEK_ORDER.map((day) => {
+    const existing = operatingHours.find((h) => h.dayOfWeek === day);
+    return {
+      dayOfWeek: day,
+      startTime: existing?.openTime ?? "09:00",
+      endTime: existing?.closeTime ?? "18:00",
+      isAvailable: existing ? !existing.isClosed : day !== DayOfWeek.SUNDAY,
+      hasLunchBreak: false,
+      lunchStartTime: "12:00",
+      lunchEndTime: "13:00",
+    };
+  });
+
+  return <OwnerScheduleClient initialSchedules={initialSchedules} />;
 }

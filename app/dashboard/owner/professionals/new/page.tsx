@@ -65,15 +65,15 @@ export default function NewProfessionalPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" asChild>
+      <div className="flex items-start gap-3 sm:items-center sm:gap-4">
+        <Button variant="ghost" size="icon" asChild className="shrink-0">
           <Link href="/dashboard/owner/professionals">
             <ArrowLeft className="h-4 w-4" />
           </Link>
         </Button>
         <div>
-          <h1 className="text-3xl font-bold">Adicionar Profissional</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl font-bold sm:text-3xl">Adicionar Profissional</h1>
+          <p className="text-muted-foreground text-sm sm:text-base">
             Cadastre um novo profissional na sua barbearia
           </p>
         </div>
@@ -135,12 +135,12 @@ export default function NewProfessionalPage() {
               </p>
             </div>
 
-            <div className="flex gap-4">
-              <Button type="submit" disabled={isPending}>
+            <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
+              <Button type="submit" disabled={isPending} className="w-full sm:w-auto">
                 {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Adicionar Profissional
               </Button>
-              <Button type="button" variant="outline" asChild>
+              <Button type="button" variant="outline" asChild className="w-full sm:w-auto">
                 <Link href="/dashboard/owner/professionals">Cancelar</Link>
               </Button>
             </div>

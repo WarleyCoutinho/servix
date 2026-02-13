@@ -1,18 +1,18 @@
 "use server";
 
-import { z } from "zod";
 import { actionClient } from "@/lib/action-client";
 import { prisma } from "@/lib/prisma";
-import { returnValidationErrors } from "next-safe-action";
 import {
-  getDayOfWeekFromDate,
-  generateTimeSlots,
-  filterAvailableSlots,
-  getIntersectingSlots,
-  DEFAULT_OPERATING_HOURS,
   DEFAULT_INTERVAL_MINUTES,
+  DEFAULT_OPERATING_HOURS,
+  filterAvailableSlots,
+  generateTimeSlots,
+  getDayOfWeekFromDate,
+  getIntersectingSlots,
 } from "@/lib/schedule-utils";
-import { startOfDay, endOfDay, isPast, isToday, format } from "date-fns";
+import { endOfDay, format, isPast, isToday, startOfDay } from "date-fns";
+import { returnValidationErrors } from "next-safe-action";
+import { z } from "zod";
 
 const inputSchema = z.object({
   barbershopId: z.uuid(),
@@ -46,8 +46,10 @@ export const getAvailableSlots = actionClient
       return { slots: [], message: "Barbearia fechada neste dia." };
     }
 
-    const openTime = operatingHours?.openTime ?? DEFAULT_OPERATING_HOURS.openTime;
-    const closeTime = operatingHours?.closeTime ?? DEFAULT_OPERATING_HOURS.closeTime;
+    const openTime =
+      operatingHours?.openTime ?? DEFAULT_OPERATING_HOURS.openTime;
+    const closeTime =
+      operatingHours?.closeTime ?? DEFAULT_OPERATING_HOURS.closeTime;
 
     let barbershopSlots = generateTimeSlots(
       date,
@@ -92,7 +94,10 @@ export const getAvailableSlots = actionClient
           professionalSchedule.endTime,
           DEFAULT_INTERVAL_MINUTES,
         );
-        barbershopSlots = getIntersectingSlots(barbershopSlots, professionalSlots);
+        barbershopSlots = getIntersectingSlots(
+          barbershopSlots,
+          professionalSlots,
+        );
       }
 
       const bookedBookings = await prisma.booking.findMany({
@@ -108,7 +113,11 @@ export const getAvailableSlots = actionClient
       });
 
       const bookedSlots = bookedBookings.map((b) => b.date);
-      barbershopSlots = filterAvailableSlots(barbershopSlots, bookedSlots, date);
+      barbershopSlots = filterAvailableSlots(
+        barbershopSlots,
+        bookedSlots,
+        date,
+      );
     } else {
       const bookedBookings = await prisma.booking.findMany({
         where: {
@@ -123,7 +132,11 @@ export const getAvailableSlots = actionClient
       });
 
       const bookedSlots = bookedBookings.map((b) => b.date);
-      barbershopSlots = filterAvailableSlots(barbershopSlots, bookedSlots, date);
+      barbershopSlots = filterAvailableSlots(
+        barbershopSlots,
+        bookedSlots,
+        date,
+      );
     }
 
     if (isToday(date)) {

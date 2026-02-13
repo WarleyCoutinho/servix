@@ -38,6 +38,14 @@ export const removeProfessional = subscribedOwnerActionClient
       });
     }
 
+    if (professional.userId === barbershop.ownerId) {
+      returnValidationErrors(inputSchema, {
+        _errors: [
+          "O profissional proprietário não pode ser removido do estabelecimento.",
+        ],
+      });
+    }
+
     const futureBookings = professional.bookings.filter((booking) =>
       isFuture(booking.date),
     );
@@ -50,13 +58,9 @@ export const removeProfessional = subscribedOwnerActionClient
       });
     }
 
-    await prisma.professional.delete({
+    await prisma.professional.update({
       where: { id: professionalId },
-    });
-
-    await prisma.user.update({
-      where: { id: professional.userId },
-      data: { role: "client" },
+      data: { isActive: false },
     });
 
     revalidatePath("/dashboard/owner/professionals");

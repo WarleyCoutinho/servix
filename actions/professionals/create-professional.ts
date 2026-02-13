@@ -6,6 +6,8 @@ import { returnValidationErrors } from "next-safe-action";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { checkProfessionalLimit, getUserPlanInfo } from "@/lib/plan-limits";
+import { DayOfWeek } from "@/generated/prisma/enums";
+import { DAY_OF_WEEK_ORDER } from "@/lib/day-of-week";
 
 const cpfRegex = /^\d{11}$/;
 
@@ -55,48 +57,65 @@ export const createProfessional = subscribedOwnerActionClient
       });
     }
 
-    let targetUser = await prisma.user.findUnique({
+    const existingUser = await prisma.user.findUnique({
       where: { email: parsedInput.email },
     });
 
-    if (!targetUser) {
-      targetUser = await prisma.user.create({
-        data: {
-          id: crypto.randomUUID(),
-          email: parsedInput.email,
-          name: parsedInput.displayName,
-          role: "professional",
+    if (existingUser && existingUser.role !== "client") {
+      returnValidationErrors(inputSchema, {
+        email: {
+          _errors: [
+            "Este email já está associado a um usuário que não é cliente.",
+          ],
         },
-      });
-    } else {
-      if (targetUser.role !== "client") {
-        returnValidationErrors(inputSchema, {
-          email: {
-            _errors: [
-              "Este email já está associado a um usuário que não é cliente.",
-            ],
-          },
-        });
-      }
-
-      await prisma.user.update({
-        where: { id: targetUser.id },
-        data: { role: "professional" },
       });
     }
 
-    const professional = await prisma.professional.create({
-      data: {
-        cpf: parsedInput.cpf,
-        displayName: parsedInput.displayName,
-        userId: targetUser.id,
-        barbershopId: barbershop.id,
-        acceptsPix: false,
-        acceptsCard: false,
-      },
-      include: {
-        user: true,
-      },
+    const professional = await prisma.$transaction(async (tx) => {
+      let targetUser = existingUser;
+
+      if (!targetUser) {
+        targetUser = await tx.user.create({
+          data: {
+            id: crypto.randomUUID(),
+            email: parsedInput.email,
+            name: parsedInput.displayName,
+            role: "professional",
+          },
+        });
+      } else {
+        targetUser = await tx.user.update({
+          where: { id: targetUser.id },
+          data: { role: "professional" },
+        });
+      }
+
+      const newProfessional = await tx.professional.create({
+        data: {
+          cpf: parsedInput.cpf,
+          displayName: parsedInput.displayName,
+          userId: targetUser.id,
+          barbershopId: barbershop.id,
+          acceptsPix: false,
+          acceptsCard: false,
+        },
+        include: {
+          user: true,
+        },
+      });
+
+      await tx.professionalSchedule.createMany({
+        data: DAY_OF_WEEK_ORDER.map((day) => ({
+          professionalId: newProfessional.id,
+          dayOfWeek: day,
+          startTime: "09:00",
+          endTime: "18:00",
+          isAvailable:
+            day !== DayOfWeek.SATURDAY && day !== DayOfWeek.SUNDAY,
+        })),
+      });
+
+      return newProfessional;
     });
 
     revalidatePath("/dashboard/owner/professionals");

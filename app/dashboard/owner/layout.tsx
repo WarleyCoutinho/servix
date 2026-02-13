@@ -115,7 +115,7 @@ export default async function OwnerDashboardLayout({
           )}
         </div>
       </DashboardSidebar>
-      <main className="flex-1 p-6">{children}</main>
+      <main className="flex-1 p-4 pt-18 sm:p-6 md:pt-6">{children}</main>
     </div>
   );
 }

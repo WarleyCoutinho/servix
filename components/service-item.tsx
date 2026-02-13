@@ -171,8 +171,8 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
                       Faça login para continuar
                     </h3>
                     <p className="mt-2 text-sm text-muted-foreground">
-                      Para fazer um agendamento, você precisa estar cadastrado na
-                      plataforma. Faça login ou crie sua conta para acessar
+                      Para fazer um agendamento, você precisa estar cadastrado
+                      na plataforma. Faça login ou crie sua conta para acessar
                       nossos serviços.
                     </p>
                   </div>
@@ -189,155 +189,157 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
                 </div>
               ) : (
                 <>
-              <div className="border-border border-b px-5 py-6">
-                <Calendar
-                  mode="single"
-                  selected={selectedDate}
-                  onSelect={handleDateSelect}
-                  locale={ptBR}
-                  className="w-full p-0"
-                  disabled={{ before: new Date() }}
-                  classNames={{
-                    cell: "w-full",
-                    day: "w-[36px] h-[36px] mx-auto text-sm bg-transparent hover:bg-muted rounded-full data-[selected=true]:bg-primary data-[selected=true]:text-primary-foreground",
-                    head_cell:
-                      "w-full text-xs font-normal text-muted-foreground capitalize",
-                    caption: "capitalize",
-                    caption_label: "text-base font-bold",
-                    nav: "flex gap-1 absolute right-0 top-0 z-10",
-                    nav_button_previous:
-                      "w-7 h-7 bg-transparent border border-border rounded-lg hover:opacity-100 hover:bg-transparent",
-                    nav_button_next:
-                      "w-7 h-7 bg-muted text-muted-foreground rounded-lg hover:opacity-100 hover:bg-muted",
-                    month_caption:
-                      "flex justify-start pt-1 relative items-center w-full px-0",
-                  }}
-                />
-              </div>
+                  <div className="border-border border-b px-5 py-6">
+                    <Calendar
+                      mode="single"
+                      selected={selectedDate}
+                      onSelect={handleDateSelect}
+                      locale={ptBR}
+                      className="w-full p-0"
+                      disabled={{ before: new Date() }}
+                      classNames={{
+                        cell: "w-full",
+                        day: "w-[36px] h-[36px] mx-auto text-sm bg-transparent hover:bg-muted rounded-full data-[selected=true]:bg-primary data-[selected=true]:text-primary-foreground",
+                        head_cell:
+                          "w-full text-xs font-normal text-muted-foreground capitalize",
+                        caption: "capitalize",
+                        caption_label: "text-base font-bold",
+                        nav: "flex gap-1 absolute right-0 top-0 z-10",
+                        nav_button_previous:
+                          "w-7 h-7 bg-transparent border border-border rounded-lg hover:opacity-100 hover:bg-transparent",
+                        nav_button_next:
+                          "w-7 h-7 bg-muted text-muted-foreground rounded-lg hover:opacity-100 hover:bg-muted",
+                        month_caption:
+                          "flex justify-start pt-1 relative items-center w-full px-0",
+                      }}
+                    />
+                  </div>
 
-              {/* Professional Selection */}
-              {selectedDate && (
-                <div className="border-border border-b px-5 py-6">
-                  <p className="text-muted-foreground mb-3 text-sm font-medium">
-                    Selecione o profissional
-                  </p>
-                  {isLoadingProfessionals ? (
-                    <div className="flex justify-center py-4">
-                      <Loader2 className="size-5 animate-spin" />
-                    </div>
-                  ) : professionals?.data && professionals.data.length > 0 ? (
-                    <div className="flex gap-3 overflow-x-auto [&::-webkit-scrollbar]:hidden">
-                      {professionals.data.map((professional) => (
-                        <button
-                          key={professional.id}
-                          type="button"
-                          onClick={() =>
-                            handleProfessionalSelect(professional.id)
-                          }
-                          className={`flex min-w-20 flex-col items-center gap-2 rounded-lg border p-3 transition-colors ${
-                            selectedProfessional === professional.id
-                              ? "border-primary bg-primary/10"
-                              : "border-border hover:bg-muted"
-                          }`}
-                        >
-                          <Avatar className="size-12">
-                            <AvatarImage
-                              src={professional.user.image ?? undefined}
-                              alt={
-                                professional.displayName ??
-                                professional.user.name ??
-                                "Profissional"
+                  {/* Professional Selection */}
+                  {selectedDate && (
+                    <div className="border-border border-b px-5 py-6">
+                      <p className="text-muted-foreground mb-3 text-sm font-medium">
+                        Selecione o profissional
+                      </p>
+                      {isLoadingProfessionals ? (
+                        <div className="flex justify-center py-4">
+                          <Loader2 className="size-5 animate-spin" />
+                        </div>
+                      ) : professionals?.data &&
+                        professionals.data.length > 0 ? (
+                        <div className="flex gap-3 overflow-x-auto [&::-webkit-scrollbar]:hidden">
+                          {professionals.data.map((professional) => (
+                            <button
+                              key={professional.id}
+                              type="button"
+                              onClick={() =>
+                                handleProfessionalSelect(professional.id)
                               }
-                            />
-                            <AvatarFallback>
-                              <User className="size-5" />
-                            </AvatarFallback>
-                          </Avatar>
-                          <span className="text-xs font-medium">
-                            {professional.displayName ?? professional.user.name}
-                          </span>
-                        </button>
-                      ))}
+                              className={`flex min-w-20 flex-col items-center gap-2 rounded-lg border p-3 transition-colors ${
+                                selectedProfessional === professional.id
+                                  ? "border-primary bg-primary/10"
+                                  : "border-border hover:bg-muted"
+                              }`}
+                            >
+                              <Avatar className="size-12">
+                                <AvatarImage
+                                  src={professional.user.image ?? undefined}
+                                  alt={
+                                    professional.displayName ??
+                                    professional.user.name ??
+                                    "Profissional"
+                                  }
+                                />
+                                <AvatarFallback>
+                                  <User className="size-5" />
+                                </AvatarFallback>
+                              </Avatar>
+                              <span className="text-xs font-medium">
+                                {professional.displayName ??
+                                  professional.user.name}
+                              </span>
+                            </button>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-muted-foreground py-4 text-center text-sm">
+                          Nenhum profissional disponível
+                        </p>
+                      )}
                     </div>
-                  ) : (
-                    <p className="text-muted-foreground py-4 text-center text-sm">
-                      Nenhum profissional disponível
-                    </p>
                   )}
-                </div>
-              )}
 
-              {/* Time Selection */}
-              {selectedDate && selectedProfessional && (
-                <div className="border-border border-b px-5 py-6">
-                  <p className="text-muted-foreground mb-3 text-sm font-medium">
-                    Selecione o horário
-                  </p>
-                  {isLoadingSlots ? (
-                    <div className="flex justify-center py-4">
-                      <Loader2 className="size-5 animate-spin" />
+                  {/* Time Selection */}
+                  {selectedDate && selectedProfessional && (
+                    <div className="border-border border-b px-5 py-6">
+                      <p className="text-muted-foreground mb-3 text-sm font-medium">
+                        Selecione o horário
+                      </p>
+                      {isLoadingSlots ? (
+                        <div className="flex justify-center py-4">
+                          <Loader2 className="size-5 animate-spin" />
+                        </div>
+                      ) : availableTimeSlots?.data?.slots &&
+                        availableTimeSlots.data.slots.length > 0 ? (
+                        <div className="flex gap-3 overflow-x-auto [&::-webkit-scrollbar]:hidden">
+                          {availableTimeSlots.data.slots.map((time) => (
+                            <Button
+                              key={time}
+                              variant={
+                                selectedTime === time ? "default" : "outline"
+                              }
+                              className="rounded-full"
+                              onClick={() => handleTimeSelect(time)}
+                            >
+                              {time}
+                            </Button>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-muted-foreground py-4 text-center text-sm">
+                          {availableTimeSlots?.data?.message ??
+                            "Nenhum horário disponível"}
+                        </p>
+                      )}
                     </div>
-                  ) : availableTimeSlots?.data?.slots &&
-                    availableTimeSlots.data.slots.length > 0 ? (
-                    <div className="flex gap-3 overflow-x-auto [&::-webkit-scrollbar]:hidden">
-                      {availableTimeSlots.data.slots.map((time) => (
-                        <Button
-                          key={time}
-                          variant={
-                            selectedTime === time ? "default" : "outline"
-                          }
-                          className="rounded-full"
-                          onClick={() => handleTimeSelect(time)}
-                        >
-                          {time}
-                        </Button>
-                      ))}
+                  )}
+
+                  {/* Booking Summary */}
+                  {selectedDate && selectedProfessional && selectedTime && (
+                    <div className="px-5 py-6">
+                      <BookingSummary
+                        serviceName={service.name}
+                        servicePrice={service.priceInCents}
+                        barbershopName={barbershop.name}
+                        professionalName={
+                          selectedProfessionalData?.displayName ??
+                          selectedProfessionalData?.user.name ??
+                          undefined
+                        }
+                        date={selectedDate}
+                        time={selectedTime}
+                      />
                     </div>
-                  ) : (
-                    <p className="text-muted-foreground py-4 text-center text-sm">
-                      {availableTimeSlots?.data?.message ??
-                        "Nenhum horário disponível"}
-                    </p>
                   )}
-                </div>
-              )}
 
-              {/* Booking Summary */}
-              {selectedDate && selectedProfessional && selectedTime && (
-                <div className="px-5 py-6">
-                  <BookingSummary
-                    serviceName={service.name}
-                    servicePrice={service.priceInCents}
-                    barbershopName={barbershop.name}
-                    professionalName={
-                      selectedProfessionalData?.displayName ??
-                      selectedProfessionalData?.user.name ??
-                      undefined
-                    }
-                    date={selectedDate}
-                    time={selectedTime}
-                  />
-                </div>
-              )}
-
-              <SheetFooter className="px-5 pb-6">
-                <Button
-                  className="w-full"
-                  disabled={
-                    !selectedDate ||
-                    !selectedProfessional ||
-                    !selectedTime ||
-                    isCreatingBooking
-                  }
-                  onClick={handleConfirmBooking}
-                >
-                  {isCreatingBooking ? (
-                    <Loader2 className="size-4 animate-spin" />
-                  ) : (
-                    "Confirmar"
-                  )}
-                </Button>
-              </SheetFooter>
+                  <SheetFooter className="px-5 pb-6">
+                    <Button
+                      className="w-full"
+                      disabled={
+                        !selectedDate ||
+                        !selectedProfessional ||
+                        !selectedTime ||
+                        isCreatingBooking
+                      }
+                      onClick={handleConfirmBooking}
+                    >
+                      {isCreatingBooking ? (
+                        <Loader2 className="size-4 animate-spin" />
+                      ) : (
+                        "Confirmar"
+                      )}
+                    </Button>
+                  </SheetFooter>
                 </>
               )}
             </SheetContent>

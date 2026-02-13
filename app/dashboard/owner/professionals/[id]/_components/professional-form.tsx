@@ -323,7 +323,7 @@ export default function ProfessionalForm({
           <CardTitle>Conta Stripe</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center justify-between rounded-lg border p-4">
+          <div className="flex flex-col gap-3 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="font-medium">Status da Conta Stripe</p>
               <p className="text-muted-foreground text-sm">
@@ -331,7 +331,7 @@ export default function ProfessionalForm({
                 profissional
               </p>
             </div>
-            <Badge variant={stripeStatus.variant}>{stripeStatus.label}</Badge>
+            <Badge variant={stripeStatus.variant} className="w-fit">{stripeStatus.label}</Badge>
           </div>
 
           {professional.stripeAccountStatus === StripeAccountStatus.PENDING && (
@@ -357,12 +357,12 @@ export default function ProfessionalForm({
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-3">
-            <div className="flex items-center justify-between rounded-lg border p-4">
+            <div className="flex flex-col gap-3 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-3">
                 {professional.isActive ? (
-                  <UserCheck className="h-5 w-5 text-green-600" />
+                  <UserCheck className="h-5 w-5 shrink-0 text-green-600" />
                 ) : (
-                  <UserX className="h-5 w-5 text-red-600" />
+                  <UserX className="h-5 w-5 shrink-0 text-red-600" />
                 )}
                 <div>
                   <p className="font-medium">
@@ -381,6 +381,7 @@ export default function ProfessionalForm({
                 variant={professional.isActive ? "destructive" : "default"}
                 onClick={handleToggleStatus}
                 disabled={isLoading || !canToggleStatus}
+                className="w-full sm:w-auto"
               >
                 {isTogglingStatus && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -398,49 +399,51 @@ export default function ProfessionalForm({
             )}
           </div>
 
-          <div className="flex items-center justify-between rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-900 dark:bg-red-950">
-            <div className="flex items-center gap-3">
-              <Trash2 className="h-5 w-5 text-red-600" />
-              <div>
-                <p className="font-medium text-red-900 dark:text-red-100">
-                  Remover Profissional
-                </p>
-                <p className="text-sm text-red-700 dark:text-red-300">
-                  Esta ação é irreversível. O profissional perderá acesso à
-                  barbearia.
-                </p>
+          {!isOwnerProfessional && (
+            <div className="flex flex-col gap-3 rounded-lg border border-red-200 bg-red-50 p-4 sm:flex-row sm:items-center sm:justify-between dark:border-red-900 dark:bg-red-950">
+              <div className="flex items-center gap-3">
+                <Trash2 className="h-5 w-5 shrink-0 text-red-600" />
+                <div>
+                  <p className="font-medium text-red-900 dark:text-red-100">
+                    Desativar Profissional
+                  </p>
+                  <p className="text-sm text-red-700 dark:text-red-300">
+                    O profissional será desativado e não poderá receber
+                    agendamentos. Você pode reativá-lo depois.
+                  </p>
+                </div>
               </div>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" disabled={isLoading} className="w-full sm:w-auto">
+                    Desativar
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Desativar profissional?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      O profissional será desativado e não poderá receber novos
+                      agendamentos. Agendamentos futuros precisam ser cancelados
+                      primeiro. Você pode reativá-lo posteriormente.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleRemove}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      {isRemoving && (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      )}
+                      Sim, desativar
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="destructive" disabled={isLoading}>
-                  Remover
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Remover profissional?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Esta ação não pode ser desfeita. O profissional será
-                    removido da barbearia e seu acesso será revogado. Se houver
-                    agendamentos futuros, eles precisam ser cancelados primeiro.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={handleRemove}
-                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                  >
-                    {isRemoving && (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    )}
-                    Sim, remover
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </div>
+          )}
         </CardContent>
       </Card>
     </div>

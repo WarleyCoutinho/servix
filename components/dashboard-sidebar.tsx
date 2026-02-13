@@ -1,6 +1,13 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, type LucideIcon } from "lucide-react";
+import { ChevronLeft, Menu, type LucideIcon } from "lucide-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 export interface NavItem {
   href: string;
@@ -15,14 +22,14 @@ interface DashboardSidebarProps {
   children?: React.ReactNode;
 }
 
-export function DashboardSidebar({
+function SidebarContent({
   title,
   subtitle,
   navItems,
   children,
 }: DashboardSidebarProps) {
   return (
-    <aside className="w-64 border-r bg-card">
+    <>
       <div className="flex h-16 items-center border-b px-4">
         <Link
           href="/"
@@ -52,6 +59,41 @@ export function DashboardSidebar({
         ))}
       </nav>
       {children}
-    </aside>
+    </>
+  );
+}
+
+export function DashboardSidebar(props: DashboardSidebarProps) {
+  return (
+    <>
+      {/* Mobile: header com hamburger */}
+      <div className="bg-card fixed top-0 right-0 left-0 z-40 flex h-14 items-center justify-between border-b px-4 md:hidden">
+        <div className="min-w-0 flex-1">
+          <h2 className="truncate text-sm font-semibold">{props.title}</h2>
+          <p className="text-muted-foreground truncate text-xs">
+            {props.subtitle}
+          </p>
+        </div>
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button variant="ghost" size="icon" className="shrink-0">
+              <Menu className="h-5 w-5" />
+              <span className="sr-only">Abrir menu</span>
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="w-64 p-0">
+            <SheetHeader className="sr-only">
+              <SheetTitle>Menu de navegação</SheetTitle>
+            </SheetHeader>
+            <SidebarContent {...props} />
+          </SheetContent>
+        </Sheet>
+      </div>
+
+      {/* Desktop: sidebar fixa */}
+      <aside className="bg-card hidden w-64 shrink-0 border-r md:block">
+        <SidebarContent {...props} />
+      </aside>
+    </>
   );
 }
