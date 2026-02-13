@@ -1,5 +1,6 @@
 import { getConnectionStatus, getQRCode } from "@/lib/whatsapp";
 import { NextResponse } from "next/server";
+import QRCode from "qrcode";
 
 export const GET = async (
   _request: Request,
@@ -9,5 +10,17 @@ export const GET = async (
   const status = getConnectionStatus(professionalId);
   const qrCode = getQRCode(professionalId);
 
-  return NextResponse.json({ status, qrCode });
+  let qrDataUrl: string | null = null;
+  if (qrCode) {
+    try {
+      qrDataUrl = await QRCode.toDataURL(qrCode, {
+        width: 256,
+        margin: 2,
+      });
+    } catch {
+      qrDataUrl = null;
+    }
+  }
+
+  return NextResponse.json({ status, qrCode: qrDataUrl });
 };

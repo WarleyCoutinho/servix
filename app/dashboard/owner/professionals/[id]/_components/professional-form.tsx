@@ -100,6 +100,18 @@ export default function ProfessionalForm({
   const [waQrCode, setWaQrCode] = useState<string | null>(null);
   const [waConnecting, setWaConnecting] = useState(false);
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const pollingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const stopPolling = useCallback(() => {
+    if (pollingRef.current) {
+      clearInterval(pollingRef.current);
+      pollingRef.current = null;
+    }
+    if (pollingTimeoutRef.current) {
+      clearTimeout(pollingTimeoutRef.current);
+      pollingTimeoutRef.current = null;
+    }
+  }, []);
 
   const pollWhatsAppStatus = useCallback(async () => {
     try {
@@ -109,39 +121,58 @@ export default function ProfessionalForm({
       setWaQrCode(data.qrCode);
       if (data.status === "connected" || data.status === "disconnected") {
         setWaConnecting(false);
-        if (pollingRef.current) {
-          clearInterval(pollingRef.current);
-          pollingRef.current = null;
+        stopPolling();
+        if (data.status === "connected") {
+          toast.success("WhatsApp conectado com sucesso!");
         }
       }
     } catch {
-      /* ignore */
+      /* ignore network errors during polling */
     }
-  }, [professional.id]);
+  }, [professional.id, stopPolling]);
+
+  const startPolling = useCallback(() => {
+    stopPolling();
+    pollingRef.current = setInterval(pollWhatsAppStatus, 1500);
+    pollingTimeoutRef.current = setTimeout(() => {
+      stopPolling();
+      setWaConnecting(false);
+      setWaStatus("disconnected");
+      setWaQrCode(null);
+      toast.error("Tempo esgotado. Tente conectar novamente.");
+    }, 120000);
+  }, [pollWhatsAppStatus, stopPolling]);
 
   const handleConnectWhatsApp = async () => {
+    if (waConnecting) return;
     setWaConnecting(true);
-    await fetch(`/api/whatsapp/${professional.id}/connect`, { method: "POST" });
-    pollingRef.current = setInterval(pollWhatsAppStatus, 3000);
-    pollWhatsAppStatus();
+    setWaQrCode(null);
+    try {
+      await fetch(`/api/whatsapp/${professional.id}/connect`, { method: "POST" });
+      startPolling();
+      pollWhatsAppStatus();
+    } catch {
+      setWaConnecting(false);
+      toast.error("Erro ao conectar WhatsApp. Tente novamente.");
+    }
   };
 
   const handleDisconnectWhatsApp = async () => {
-    await fetch(`/api/whatsapp/${professional.id}/disconnect`, { method: "POST" });
+    stopPolling();
+    try {
+      await fetch(`/api/whatsapp/${professional.id}/disconnect`, { method: "POST" });
+    } catch {
+      /* ignore */
+    }
     setWaStatus("disconnected");
     setWaQrCode(null);
-    if (pollingRef.current) {
-      clearInterval(pollingRef.current);
-      pollingRef.current = null;
-    }
+    setWaConnecting(false);
   };
 
   useEffect(() => {
     pollWhatsAppStatus();
-    return () => {
-      if (pollingRef.current) clearInterval(pollingRef.current);
-    };
-  }, [pollWhatsAppStatus]);
+    return () => stopPolling();
+  }, [pollWhatsAppStatus, stopPolling]);
 
   const { execute: executeUpdate, isPending: isUpdating } = useAction(
     updateProfessional,
@@ -482,7 +513,7 @@ export default function ProfessionalForm({
               </p>
               <div className="rounded-lg border bg-white p-4">
                 <img
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodeURIComponent(waQrCode)}`}
+                  src={waQrCode}
                   alt="QR Code WhatsApp"
                   width={256}
                   height={256}
@@ -490,6 +521,18 @@ export default function ProfessionalForm({
               </div>
               <p className="text-center text-xs text-muted-foreground">
                 Abra o WhatsApp {">"} Dispositivos conectados {">"} Conectar dispositivo
+              </p>
+            </div>
+          )}
+
+          {waConnecting && waStatus === "connecting" && !waQrCode && (
+            <div className="flex flex-col items-center gap-3 rounded-lg border p-6">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+              <p className="text-center text-sm font-medium">
+                Gerando QR Code...
+              </p>
+              <p className="text-center text-xs text-muted-foreground">
+                Aguarde enquanto o QR Code é gerado
               </p>
             </div>
           )}
