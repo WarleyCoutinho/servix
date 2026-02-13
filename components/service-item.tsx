@@ -113,6 +113,9 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
         "Erro ao criar agendamento. Por favor, tente novamente.",
       );
     }
+    if (checkoutSession.pixFallback) {
+      toast.info("PIX indisponível para este profissional. Pagamento será por cartão.");
+    }
     if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
       return toast.error(
         "Erro ao criar agendamento. Por favor, tente novamente.",

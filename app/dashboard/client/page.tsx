@@ -12,8 +12,8 @@ import {
 } from "lucide-react";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { formatBrt } from "@/lib/timezone";
 
 function formatCurrency(cents: number): string {
   return (cents / 100).toLocaleString("pt-BR", {
@@ -135,7 +135,7 @@ export default async function ClientDashboardPage() {
                       </p>
                       <p className="text-xs text-muted-foreground">
                         última:{" "}
-                        {format(visit.lastVisit, "dd/MM/yy", { locale: ptBR })}
+                        {formatBrt(visit.lastVisit, "dd/MM/yy", { locale: ptBR })}
                       </p>
                     </div>
                   </div>
@@ -178,7 +178,7 @@ export default async function ClientDashboardPage() {
                         {formatCurrency(service.priceInCents)}
                       </Badge>
                       <p className="text-xs text-muted-foreground mt-1">
-                        {format(service.date, "dd/MM/yy 'às' HH:mm", {
+                        {formatBrt(service.date, "dd/MM/yy 'às' HH:mm", {
                           locale: ptBR,
                         })}
                       </p>

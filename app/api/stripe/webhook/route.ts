@@ -115,6 +115,8 @@ export const POST = async (request: Request) => {
           const charge = paymentIntent.latest_charge as import("stripe").Stripe.Charge | null;
           const chargeId = charge?.id;
           const transferId = charge?.transfer as string | null;
+          const actualPaymentMethod =
+            charge?.payment_method_details?.type ?? paymentIntent.payment_method_types?.[0] ?? "card";
 
           const professionalId = metadata.data.professionalId;
 
@@ -136,7 +138,7 @@ export const POST = async (request: Request) => {
                 amountInCents: metadata.data.priceInCents,
                 applicationFeeInCents: metadata.data.applicationFeeInCents,
                 status: PaymentStatus.SUCCEEDED,
-                paymentMethod: paymentIntent.payment_method_types?.[0] ?? "card",
+                paymentMethod: actualPaymentMethod,
                 stripePaymentIntentId: paymentIntent.id,
                 stripeChargeId: chargeId,
                 stripeTransferId: transferId,
@@ -148,11 +150,9 @@ export const POST = async (request: Request) => {
             );
           });
 
-          if (professionalId) {
-            sendDailyScheduleToGroup(professionalId, metadata.data.date).catch(
-              (err) => console.error("[WhatsApp] Erro ao enviar agenda:", err),
-            );
-          }
+          sendDailyScheduleToGroup(professionalId, metadata.data.date).catch(
+            (err) => console.error("[WhatsApp] Erro ao enviar agenda:", err),
+          );
         }
         break;
       }

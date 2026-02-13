@@ -4,6 +4,7 @@ import z from "zod";
 import { prisma, safeQuery } from "@/lib/prisma";
 import { getAvailableSlots } from "@/actions/schedules/get-available-slots";
 import { createBooking } from "@/actions/create-booking";
+import { formatBrt } from "@/lib/timezone";
 
 export const POST = async (request: Request) => {
   const { messages } = await request.json();
@@ -13,12 +14,7 @@ export const POST = async (request: Request) => {
     stopWhen: stepCountIs(10),
     system: `Você é o Agenda.ai, um assistente virtual de agendamento de barbearias.
 
-    DATA ATUAL: Hoje é ${new Date().toLocaleDateString("pt-BR", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    })} (${new Date().toISOString().split("T")[0]})
+    DATA ATUAL: Hoje é ${formatBrt(new Date(), "EEEE, d 'de' MMMM 'de' yyyy")} (${formatBrt(new Date(), "yyyy-MM-dd")})
 
     Seu objetivo é ajudar os usuários a:
     - Encontrar barbearias (por nome ou todas disponíveis)

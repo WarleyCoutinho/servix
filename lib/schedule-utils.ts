@@ -5,13 +5,13 @@ import {
   setMinutes,
   addMinutes,
   isBefore,
-  isAfter,
   startOfDay,
-  getDay,
 } from "date-fns";
+import { toZonedTime, fromZonedTime } from "date-fns-tz";
+import { TIMEZONE, getDayBrt, formatBrt } from "@/lib/timezone";
 
 export function getDayOfWeekFromDate(date: Date): DayOfWeek {
-  const day = getDay(date);
+  const day = getDayBrt(date);
   const mapping: Record<number, DayOfWeek> = {
     0: DayOfWeek.SUNDAY,
     1: DayOfWeek.MONDAY,
@@ -31,10 +31,10 @@ export function parseTimeString(timeString: string): { hours: number; minutes: n
 
 export function createTimeSlot(date: Date, timeString: string): Date {
   const { hours, minutes } = parseTimeString(timeString);
-  let slot = startOfDay(date);
-  slot = setHours(slot, hours);
-  slot = setMinutes(slot, minutes);
-  return slot;
+  const zoned = toZonedTime(date, TIMEZONE);
+  const dayStart = startOfDay(zoned);
+  const zonedSlot = setMinutes(setHours(dayStart, hours), minutes);
+  return fromZonedTime(zonedSlot, TIMEZONE);
 }
 
 export function generateTimeSlots(
@@ -47,8 +47,9 @@ export function generateTimeSlots(
   const { hours: startHours, minutes: startMinutes } = parseTimeString(startTime);
   const { hours: endHours, minutes: endMinutes } = parseTimeString(endTime);
 
-  let current = setMinutes(setHours(startOfDay(date), startHours), startMinutes);
-  const end = setMinutes(setHours(startOfDay(date), endHours), endMinutes);
+  const dayStart = startOfDay(toZonedTime(date, TIMEZONE));
+  let current = setMinutes(setHours(dayStart, startHours), startMinutes);
+  const end = setMinutes(setHours(dayStart, endHours), endMinutes);
 
   while (isBefore(current, end)) {
     slots.push(format(current, "HH:mm"));
@@ -65,7 +66,7 @@ export function isTimeSlotAvailable(
 ): boolean {
   const slotDate = createTimeSlot(date, slotTime);
   return !bookedSlots.some(
-    (booked) => format(booked, "HH:mm") === format(slotDate, "HH:mm"),
+    (booked) => formatBrt(booked, "HH:mm") === formatBrt(slotDate, "HH:mm"),
   );
 }
 

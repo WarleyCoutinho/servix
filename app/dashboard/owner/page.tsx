@@ -7,7 +7,7 @@ import { hasActiveSubscription } from "@/lib/get-owner-subscription";
 import { getUserPlanInfo } from "@/lib/plan-limits";
 import { prisma } from "@/lib/prisma";
 import { formatCurrency } from "@/lib/utils";
-import { endOfMonth, startOfMonth } from "date-fns";
+import { startOfMonthBrt, endOfMonthBrt } from "@/lib/timezone";
 import {
   ArrowUpRight,
   Calendar,
@@ -52,8 +52,8 @@ export default async function OwnerDashboardPage() {
     redirect("/");
   }
   const now = new Date();
-  const monthStart = startOfMonth(now);
-  const monthEnd = endOfMonth(now);
+  const monthStart = startOfMonthBrt(now);
+  const monthEnd = endOfMonthBrt(now);
 
   const monthlyBookings = await prisma.booking.count({
     where: {

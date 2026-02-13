@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, DollarSign, TrendingUp, CreditCard } from "lucide-react";
-import { startOfMonth, endOfMonth, startOfDay, endOfDay } from "date-fns";
+import { startOfMonthBrt, endOfMonthBrt, startOfDayBrt, endOfDayBrt } from "@/lib/timezone";
 import { formatCurrency } from "@/lib/utils";
 import { StripeAccountStatus, PaymentStatus } from "@/generated/prisma/enums";
 
@@ -48,10 +48,10 @@ export default async function ProfessionalDashboardPage() {
 
   const professional = user.professional;
   const now = new Date();
-  const monthStart = startOfMonth(now);
-  const monthEnd = endOfMonth(now);
-  const todayStart = startOfDay(now);
-  const todayEnd = endOfDay(now);
+  const monthStart = startOfMonthBrt(now);
+  const monthEnd = endOfMonthBrt(now);
+  const todayStart = startOfDayBrt(now);
+  const todayEnd = endOfDayBrt(now);
 
   const [todayBookings, monthlyBookings, monthlyEarnings] = await Promise.all([
     prisma.booking.count({

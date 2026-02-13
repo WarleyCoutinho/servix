@@ -4,7 +4,6 @@ import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { formatCurrency } from "@/lib/utils";
 import {
@@ -15,7 +14,7 @@ import {
   ArrowUpRight,
 } from "lucide-react";
 import { PaymentStatus } from "@/generated/prisma/enums";
-import { startOfMonth, endOfMonth } from "date-fns";
+import { startOfMonthBrt, endOfMonthBrt, formatBrt } from "@/lib/timezone";
 
 function getPaymentStatusInfo(status: PaymentStatus) {
   switch (status) {
@@ -54,8 +53,8 @@ export default async function ProfessionalPaymentsPage() {
 
   const professional = user.professional;
   const now = new Date();
-  const monthStart = startOfMonth(now);
-  const monthEnd = endOfMonth(now);
+  const monthStart = startOfMonthBrt(now);
+  const monthEnd = endOfMonthBrt(now);
 
   const [payments, monthlyStats] = await Promise.all([
     prisma.payment.findMany({
@@ -190,7 +189,7 @@ export default async function ProfessionalPaymentsPage() {
                         {payment.booking.user.name}
                       </p>
                       <p className="text-muted-foreground text-xs">
-                        {format(payment.createdAt, "dd/MM/yyyy 'às' HH:mm", {
+                        {formatBrt(payment.createdAt, "dd/MM/yyyy 'às' HH:mm", {
                           locale: ptBR,
                         })}
                       </p>

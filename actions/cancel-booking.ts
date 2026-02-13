@@ -90,11 +90,9 @@ export const cancelBooking = protectedActionClient
       },
     });
 
-    if (booking.professionalId) {
-      sendDailyScheduleToGroup(booking.professionalId, booking.date).catch(
-        (err) => console.error("[WhatsApp] Erro ao enviar agenda:", err),
-      );
-    }
+    sendDailyScheduleToGroup(booking.professionalId, booking.date).catch(
+      (err) => console.error("[WhatsApp] Erro ao enviar agenda:", err),
+    );
 
     revalidatePath("/");
     revalidatePath("/bookings");

@@ -167,6 +167,7 @@ export const createBookingCheckoutSession = protectedActionClient
       };
 
       let checkoutSession;
+      let pixFallback = false;
       try {
         checkoutSession = await stripe.checkout.sessions.create(
           buildSessionParams(paymentMethods)
@@ -175,13 +176,14 @@ export const createBookingCheckoutSession = protectedActionClient
         console.error("Error creating checkout session:", error);
 
         const errorMessage = error instanceof Error ? error.message.toLowerCase() : "";
-        const isPaymentMethodError =
+        const isPixError =
           errorMessage.includes("pix") ||
           errorMessage.includes("payment_method") ||
           errorMessage.includes("payment method");
 
-        if (isPaymentMethodError && paymentMethods.includes("card")) {
-          console.log("Falling back to card-only checkout");
+        if (isPixError && paymentMethods.includes("pix")) {
+          console.warn("PIX unavailable for this account, falling back to card-only");
+          pixFallback = true;
           checkoutSession = await stripe.checkout.sessions.create(
             buildSessionParams(["card"])
           );
@@ -190,11 +192,12 @@ export const createBookingCheckoutSession = protectedActionClient
         }
       }
 
-      console.log(`Checkout session created: ${checkoutSession.id}`);
+      console.log(`Checkout session created: ${checkoutSession.id}${pixFallback ? " (PIX fallback to card)" : ""}`);
 
       return {
         id: checkoutSession.id,
         url: checkoutSession.url,
+        pixFallback,
       };
     },
   );

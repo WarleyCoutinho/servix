@@ -5,9 +5,9 @@ import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { formatCurrency } from "@/lib/utils";
+import { formatBrt } from "@/lib/timezone";
 import { Calendar, Clock, User } from "lucide-react";
 
 export default async function ProfessionalBookingsPage() {
@@ -109,11 +109,11 @@ export default async function ProfessionalBookingsPage() {
                   <div className="text-right">
                     <div className="flex items-center gap-1 text-sm">
                       <Calendar className="size-4" />
-                      {format(booking.date, "dd/MM/yyyy", { locale: ptBR })}
+                      {formatBrt(booking.date, "dd/MM/yyyy", { locale: ptBR })}
                     </div>
                     <div className="text-muted-foreground flex items-center gap-1 text-sm">
                       <Clock className="size-4" />
-                      {format(booking.date, "HH:mm", { locale: ptBR })}
+                      {formatBrt(booking.date, "HH:mm", { locale: ptBR })}
                     </div>
                   </div>
 

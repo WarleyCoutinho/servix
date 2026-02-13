@@ -6,7 +6,7 @@ import {
   DEFAULT_INTERVAL_MINUTES,
 } from "@/lib/schedule-utils";
 import { sendGroupMessage } from "@/lib/whatsapp";
-import { format, startOfDay, endOfDay } from "date-fns";
+import { startOfDayBrt, endOfDayBrt, formatBrt } from "@/lib/timezone";
 
 export async function sendDailyScheduleToGroup(
   professionalId: string,
@@ -41,8 +41,8 @@ export async function sendDailyScheduleToGroup(
       professionalId,
       cancelledAt: null,
       date: {
-        gte: startOfDay(date),
-        lt: endOfDay(date),
+        gte: startOfDayBrt(date),
+        lte: endOfDayBrt(date),
       },
     },
     include: {
@@ -57,7 +57,7 @@ export async function sendDailyScheduleToGroup(
     { serviceName: string; clientName: string }
   >();
   for (const booking of bookings) {
-    const timeKey = format(booking.date, "HH:mm");
+    const timeKey = formatBrt(booking.date, "HH:mm");
     bookedTimesMap.set(timeKey, {
       serviceName: booking.service.name,
       clientName: booking.user.name,
@@ -72,7 +72,7 @@ export async function sendDailyScheduleToGroup(
   );
 
   const dayLabel = DAY_OF_WEEK_LABELS[dayOfWeek];
-  const dateFormatted = format(date, "dd/MM/yyyy");
+  const dateFormatted = formatBrt(date, "dd/MM/yyyy");
   const professionalName =
     professional.displayName ?? professional.user.name ?? "Profissional";
 

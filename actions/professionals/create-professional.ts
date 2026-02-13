@@ -98,7 +98,7 @@ export const createProfessional = subscribedOwnerActionClient
           userId: targetUser.id,
           barbershopId: barbershop.id,
           acceptsPix: false,
-          acceptsCard: false,
+          acceptsCard: true,
           whatsappGroupName: parsedInput.whatsappGroupName || null,
         },
         include: {

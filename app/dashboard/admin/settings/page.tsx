@@ -11,14 +11,15 @@ import {
   Activity,
   PieChart,
 } from "lucide-react";
-import { format, subDays, startOfMonth, endOfMonth } from "date-fns";
+import { subDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { startOfMonthBrt, endOfMonthBrt, formatBrt } from "@/lib/timezone";
 
 export default async function AdminSettingsPage() {
   const now = new Date();
   const thirtyDaysAgo = subDays(now, 30);
-  const startMonth = startOfMonth(now);
-  const endMonth = endOfMonth(now);
+  const startMonth = startOfMonthBrt(now);
+  const endMonth = endOfMonthBrt(now);
 
   const [
     totalRevenue,
