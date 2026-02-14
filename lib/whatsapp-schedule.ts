@@ -16,14 +16,14 @@ interface BookingInfo {
 }
 
 interface ScheduleStats {
+  finishedCount: number;
   bookedCount: number;
   freeCount: number;
 }
 
-function filterSlotsByCurrentTime(allSlots: string[]): string[] {
+function getCurrentTimeBrt(): string {
   const nowBrt = toZonedTime(new Date(), TIMEZONE);
-  const currentTime = format(nowBrt, "HH:mm");
-  return allSlots.filter((slot) => slot >= currentTime);
+  return format(nowBrt, "HH:mm");
 }
 
 function buildScheduleMessage(
@@ -32,21 +32,35 @@ function buildScheduleMessage(
   professionalName: string,
   allSlots: string[],
   bookedTimesMap: Map<string, BookingInfo>,
+  currentTime: string,
   bookingUrl: string,
 ): string {
   const separator = "━━━━━━━━━━━━━━━━━━━━━━━";
 
   const morningSlots: string[] = [];
   const afternoonSlots: string[] = [];
-  const stats: ScheduleStats = { bookedCount: 0, freeCount: 0 };
+  const stats: ScheduleStats = { finishedCount: 0, bookedCount: 0, freeCount: 0 };
 
   for (const slot of allSlots) {
     const hour = Number(slot.split(":")[0]);
     const booking = bookedTimesMap.get(slot);
+    const isPast = slot < currentTime;
 
-    const line = booking
-      ? formatBookedSlot(slot, booking, stats)
-      : formatFreeSlot(slot, stats);
+    if (isPast && !booking) {
+      continue;
+    }
+
+    let line: string;
+    if (isPast && booking) {
+      stats.finishedCount++;
+      line = `  ✓ ${slot}  │ ~${booking.serviceName} - ${booking.clientName}~`;
+    } else if (booking) {
+      stats.bookedCount++;
+      line = `  *${slot}* │ ${booking.serviceName}\n           │ _${booking.clientName}_`;
+    } else {
+      stats.freeCount++;
+      line = `  ${slot}  │ ～`;
+    }
 
     if (hour < 12) {
       morningSlots.push(line);
@@ -55,42 +69,6 @@ function buildScheduleMessage(
     }
   }
 
-  return assembleMessage(
-    separator,
-    dayLabel,
-    dateFormatted,
-    professionalName,
-    morningSlots,
-    afternoonSlots,
-    stats,
-    bookingUrl,
-  );
-}
-
-function formatBookedSlot(
-  slot: string,
-  booking: BookingInfo,
-  stats: ScheduleStats,
-): string {
-  stats.bookedCount++;
-  return `  *${slot}* │ ${booking.serviceName}\n           │ _${booking.clientName}_`;
-}
-
-function formatFreeSlot(slot: string, stats: ScheduleStats): string {
-  stats.freeCount++;
-  return `  ${slot}  │ ～`;
-}
-
-function assembleMessage(
-  separator: string,
-  dayLabel: string,
-  dateFormatted: string,
-  professionalName: string,
-  morningSlots: string[],
-  afternoonSlots: string[],
-  stats: ScheduleStats,
-  bookingUrl: string,
-): string {
   const lines: string[] = [
     separator,
     `  📋  *AGENDA DO DIA*`,
@@ -107,13 +85,21 @@ function assembleMessage(
     lines.push("", `  🌙  *TARDE*`, "", ...afternoonSlots);
   }
 
-  const bookedLabel = stats.bookedCount !== 1 ? "agendados" : "agendado";
-  const freeLabel = stats.freeCount !== 1 ? "livres" : "livre";
+  const statsParts: string[] = [];
+  if (stats.finishedCount > 0) {
+    statsParts.push(`✓ *${stats.finishedCount}* finalizado${stats.finishedCount !== 1 ? "s" : ""}`);
+  }
+  if (stats.bookedCount > 0) {
+    statsParts.push(`*${stats.bookedCount}* agendado${stats.bookedCount !== 1 ? "s" : ""}`);
+  }
+  if (stats.freeCount > 0) {
+    statsParts.push(`*${stats.freeCount}* livre${stats.freeCount !== 1 ? "s" : ""}`);
+  }
 
   lines.push(
     "",
     separator,
-    `  📊  *${stats.bookedCount}* ${bookedLabel}  •  *${stats.freeCount}* ${freeLabel}`,
+    `  📊  ${statsParts.join("  •  ")}`,
     separator,
     "",
     `  📲  *Agende agora:*`,
@@ -174,9 +160,13 @@ export async function sendDailyScheduleToGroup(
     DEFAULT_INTERVAL_MINUTES,
   );
 
-  const visibleSlots = filterSlotsByCurrentTime(allSlots);
+  const currentTime = getCurrentTimeBrt();
 
-  if (visibleSlots.length === 0) {
+  const hasVisibleSlots = allSlots.some(
+    (slot) => slot >= currentTime || bookedTimesMap.has(slot),
+  );
+
+  if (!hasVisibleSlots) {
     return;
   }
 
@@ -192,8 +182,9 @@ export async function sendDailyScheduleToGroup(
     dayLabel,
     dateFormatted,
     professionalName,
-    visibleSlots,
+    allSlots,
     bookedTimesMap,
+    currentTime,
     bookingUrl,
   );
 
