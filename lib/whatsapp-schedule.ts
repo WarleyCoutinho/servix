@@ -8,6 +8,68 @@ import {
 import { sendGroupMessage } from "@/lib/whatsapp";
 import { startOfDayBrt, endOfDayBrt, formatBrt } from "@/lib/timezone";
 
+function buildScheduleMessage(
+  dayLabel: string,
+  dateFormatted: string,
+  professionalName: string,
+  allSlots: string[],
+  bookedTimesMap: Map<string, { serviceName: string; clientName: string }>,
+): string {
+  const separator = "━━━━━━━━━━━━━━━━━━━━━━━";
+
+  const morningSlots: string[] = [];
+  const afternoonSlots: string[] = [];
+  let bookedCount = 0;
+  let freeCount = 0;
+
+  for (const slot of allSlots) {
+    const hour = Number(slot.split(":")[0]);
+    const booking = bookedTimesMap.get(slot);
+
+    let line: string;
+    if (booking) {
+      bookedCount++;
+      line = `  *${slot}* │ ${booking.serviceName}\n           │ _${booking.clientName}_`;
+    } else {
+      freeCount++;
+      line = `  ${slot}  │ ～`;
+    }
+
+    if (hour < 12) {
+      morningSlots.push(line);
+    } else {
+      afternoonSlots.push(line);
+    }
+  }
+
+  const lines: string[] = [
+    separator,
+    `  📋  *AGENDA DO DIA*`,
+    `  📅  ${dayLabel}, ${dateFormatted}`,
+    `  💈  ${professionalName}`,
+    separator,
+  ];
+
+  if (morningSlots.length > 0) {
+    lines.push("", `  ☀️  *MANHÃ*`, "");
+    lines.push(...morningSlots);
+  }
+
+  if (afternoonSlots.length > 0) {
+    lines.push("", `  🌙  *TARDE*`, "");
+    lines.push(...afternoonSlots);
+  }
+
+  lines.push(
+    "",
+    separator,
+    `  📊  *${bookedCount}* agendado${bookedCount !== 1 ? "s" : ""}  •  *${freeCount}* livre${freeCount !== 1 ? "s" : ""}`,
+    separator,
+  );
+
+  return lines.join("\n");
+}
+
 export async function sendDailyScheduleToGroup(
   professionalId: string,
   bookingDate: Date | string,
@@ -76,27 +138,13 @@ export async function sendDailyScheduleToGroup(
   const professionalName =
     professional.displayName ?? professional.user.name ?? "Profissional";
 
-  let bookedCount = 0;
-  let freeCount = 0;
-
-  const slotLines = allSlots.map((slot) => {
-    const booking = bookedTimesMap.get(slot);
-    if (booking) {
-      bookedCount++;
-      return `⏰ ${slot} - ${booking.serviceName} - *${booking.clientName}*`;
-    }
-    freeCount++;
-    return `⏰ ${slot} - 🟢 Disponível`;
-  });
-
-  const message = [
-    `📋 *Agenda - ${dayLabel}, ${dateFormatted}*`,
-    `👤 *${professionalName}*`,
-    "",
-    ...slotLines,
-    "",
-    `📊 ${bookedCount} agendamento${bookedCount !== 1 ? "s" : ""} | ${freeCount} horário${freeCount !== 1 ? "s" : ""} livre${freeCount !== 1 ? "s" : ""}`,
-  ].join("\n");
+  const message = buildScheduleMessage(
+    dayLabel,
+    dateFormatted,
+    professionalName,
+    allSlots,
+    bookedTimesMap,
+  );
 
   await sendGroupMessage(professionalId, professional.whatsappGroupName, message);
 }

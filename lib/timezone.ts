@@ -5,6 +5,7 @@ import {
   startOfMonth,
   endOfMonth,
   getDay,
+  isSameDay,
 } from "date-fns";
 import type { Locale } from "date-fns";
 
@@ -40,4 +41,10 @@ export function endOfMonthBrt(date: Date): Date {
 
 export function getDayBrt(date: Date): number {
   return getDay(toZonedTime(date, TIMEZONE));
+}
+
+export function isTodayBrt(date: Date | string): boolean {
+  const nowBrt = toZonedTime(new Date(), TIMEZONE);
+  const dateBrt = toZonedTime(new Date(date), TIMEZONE);
+  return isSameDay(nowBrt, dateBrt);
 }

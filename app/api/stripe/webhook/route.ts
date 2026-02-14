@@ -10,6 +10,7 @@ import {
   updateUserRoleBasedOnPlan,
 } from "@/lib/role-sync";
 import { sendDailyScheduleToGroup } from "@/lib/whatsapp-schedule";
+import { isTodayBrt } from "@/lib/timezone";
 
 const PLAN_ORDER: Record<SubscriptionPlan, number> = {
   [SubscriptionPlan.BASIC]: 1,
@@ -150,9 +151,11 @@ export const POST = async (request: Request) => {
             );
           });
 
-          sendDailyScheduleToGroup(professionalId, metadata.data.date).catch(
-            (err) => console.error("[WhatsApp] Erro ao enviar agenda:", err),
-          );
+          if (isTodayBrt(metadata.data.date)) {
+            sendDailyScheduleToGroup(professionalId, metadata.data.date).catch(
+              (err) => console.error("[WhatsApp] Erro ao enviar agenda:", err),
+            );
+          }
         }
         break;
       }
