@@ -8,11 +8,18 @@ async function whatsappFetch<T>(
   path: string,
   options?: RequestInit,
 ): Promise<T> {
+  const headers: Record<string, string> = {
+    "x-api-key": WHATSAPP_SERVICE_API_KEY,
+  };
+
+  if (options?.body) {
+    headers["Content-Type"] = "application/json";
+  }
+
   const res = await fetch(`${WHATSAPP_SERVICE_URL}${path}`, {
     ...options,
     headers: {
-      "Content-Type": "application/json",
-      "x-api-key": WHATSAPP_SERVICE_API_KEY,
+      ...headers,
       ...options?.headers,
     },
   });
