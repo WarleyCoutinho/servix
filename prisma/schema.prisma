@@ -148,6 +148,7 @@ model Verification {
 model Barbershop {
   id          String   @id @default(uuid())
   name        String
+  slug        String?  @unique
   address     String
   description String
   imageUrl    String

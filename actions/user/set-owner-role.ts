@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { DayOfWeek, UserRole } from "@/generated/prisma/enums";
 import { DAY_OF_WEEK_ORDER } from "@/lib/day-of-week";
+import { slugify } from "@/lib/slugify";
 
 const cpfRegex = /^\d{11}$/;
 
@@ -58,9 +59,14 @@ export const setOwnerRole = protectedActionClient
         data: { role: UserRole.owner },
       });
 
+      const baseSlug = slugify(parsedInput.barbershopName);
+      const existingSlug = await tx.barbershop.findUnique({ where: { slug: baseSlug } });
+      const slug = existingSlug ? `${baseSlug}-${Date.now()}` : baseSlug;
+
       const barbershop = await tx.barbershop.create({
         data: {
           name: parsedInput.barbershopName,
+          slug,
           address: parsedInput.address,
           description: parsedInput.description,
           phones: [parsedInput.phone],

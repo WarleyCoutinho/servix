@@ -35,6 +35,19 @@ export const getBarbershopById = async (id: string) => {
   return barbershop;
 };
 
+export const getBarbershopBySlug = async (slug: string) => {
+  const barbershop = await prisma.barbershop.findUnique({
+    where: { slug },
+    include: {
+      services: {
+        where: { deletedAt: null },
+        orderBy: { name: "asc" },
+      },
+    },
+  });
+  return barbershop;
+};
+
 export const getBarbershopsByServiceName = async (serviceName: string) => {
   const barbershops = await prisma.barbershop.findMany({
     where: {

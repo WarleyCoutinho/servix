@@ -126,6 +126,7 @@ export async function sendDailyScheduleToGroup(
     where: { id: professionalId },
     include: {
       user: { select: { name: true } },
+      barbershop: { select: { slug: true } },
       schedules: true,
     },
   });
@@ -183,7 +184,10 @@ export async function sendDailyScheduleToGroup(
     professional.displayName ?? professional.user.name ?? "Profissional";
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://servixplatform.vercel.app";
-  const bookingUrl = `${appUrl}/agendar/${professionalId}`;
+  const bookingPath = professional.barbershop.slug
+    ? `/${professional.barbershop.slug}?ref=${professionalId}`
+    : `/agendar/${professionalId}`;
+  const bookingUrl = `${appUrl}${bookingPath}`;
 
   const message = buildScheduleMessage(
     dayLabel,

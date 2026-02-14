@@ -8,6 +8,7 @@ import { revalidatePath } from "next/cache";
 import { checkBarbershopLimit } from "@/lib/plan-limits";
 import { DayOfWeek } from "@/generated/prisma/enums";
 import { DAY_OF_WEEK_ORDER } from "@/lib/day-of-week";
+import { slugify } from "@/lib/slugify";
 
 const cpfRegex = /^\d{11}$/;
 
@@ -63,9 +64,14 @@ export const createBarbershop = subscribedOwnerActionClient
     }
 
     const result = await prisma.$transaction(async (tx) => {
+      const baseSlug = slugify(parsedInput.name);
+      const existingSlug = await tx.barbershop.findUnique({ where: { slug: baseSlug } });
+      const slug = existingSlug ? `${baseSlug}-${Date.now()}` : baseSlug;
+
       const barbershop = await tx.barbershop.create({
         data: {
           name: parsedInput.name,
+          slug,
           address: parsedInput.address,
           description: parsedInput.description || "",
           phones: [parsedInput.phone],

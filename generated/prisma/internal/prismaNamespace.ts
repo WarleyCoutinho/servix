@@ -1558,6 +1558,7 @@ export type VerificationScalarFieldEnum = (typeof VerificationScalarFieldEnum)[k
 export const BarbershopScalarFieldEnum = {
   id: 'id',
   name: 'name',
+  slug: 'slug',
   address: 'address',
   description: 'description',
   imageUrl: 'imageUrl',
