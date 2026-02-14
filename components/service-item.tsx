@@ -8,11 +8,13 @@ import { authClient } from "@/lib/auth-client";
 import { formatCurrency } from "@/lib/utils";
 import { loadStripe } from "@stripe/stripe-js";
 import { ptBR } from "date-fns/locale";
-import { Loader2, LogIn, User } from "lucide-react";
+import { AlertTriangle, Loader2, LogIn, User } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { Alert, AlertDescription } from "./ui/alert";
 import BookingSummary from "./booking-summary";
 import LoginModal from "./login-modal";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
@@ -33,6 +35,8 @@ interface ServiceItemProps {
 }
 
 const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
+  const searchParams = useSearchParams();
+  const refProfessionalId = searchParams.get("ref");
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedProfessional, setSelectedProfessional] = useState<
     string | undefined
@@ -285,6 +289,22 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
                       )}
                     </div>
                   )}
+
+                  {/* Warning for different professional */}
+                  {refProfessionalId &&
+                    selectedProfessional &&
+                    selectedProfessional !== refProfessionalId && (
+                      <div className="px-5 pt-2">
+                        <Alert variant="destructive" className="border-amber-500/50 bg-amber-500/10 text-amber-700 dark:text-amber-400 [&>svg]:text-amber-600">
+                          <AlertTriangle className="size-4" />
+                          <AlertDescription className="text-xs leading-relaxed">
+                            Se você não estiver no grupo desse profissional, não
+                            vai poder acompanhar a agenda pelo WhatsApp.
+                            Recomendamos agendar com o profissional do seu grupo.
+                          </AlertDescription>
+                        </Alert>
+                      </div>
+                    )}
 
                   {/* Time Selection */}
                   {selectedDate && selectedProfessional && (
