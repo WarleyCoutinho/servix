@@ -39,6 +39,7 @@ function buildScheduleMessage(
 
   const morningSlots: string[] = [];
   const afternoonSlots: string[] = [];
+  const eveningSlots: string[] = [];
   const stats: ScheduleStats = { finishedCount: 0, bookedCount: 0, freeCount: 0 };
 
   for (const slot of allSlots) {
@@ -64,8 +65,10 @@ function buildScheduleMessage(
 
     if (hour < 12) {
       morningSlots.push(line);
-    } else {
+    } else if (hour < 18) {
       afternoonSlots.push(line);
+    } else {
+      eveningSlots.push(line);
     }
   }
 
@@ -82,7 +85,11 @@ function buildScheduleMessage(
   }
 
   if (afternoonSlots.length > 0) {
-    lines.push("", `  🌙  *TARDE*`, "", ...afternoonSlots);
+    lines.push("", `  🌤️  *TARDE*`, "", ...afternoonSlots);
+  }
+
+  if (eveningSlots.length > 0) {
+    lines.push("", `  🌙  *NOITE*`, "", ...eveningSlots);
   }
 
   const statsParts: string[] = [];
@@ -176,7 +183,7 @@ export async function sendDailyScheduleToGroup(
     professional.displayName ?? professional.user.name ?? "Profissional";
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://servixplatform.vercel.app";
-  const bookingUrl = `${appUrl}/barbershops/${professional.barbershopId}?ref=${professionalId}`;
+  const bookingUrl = `${appUrl}/agendar/${professionalId}`;
 
   const message = buildScheduleMessage(
     dayLabel,
