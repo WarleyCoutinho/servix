@@ -24,18 +24,28 @@ async function whatsappFetch<T>(
   return res.json() as Promise<T>;
 }
 
-export function getConnectionStatus(
+export async function getStatus(
   professionalId: string,
-): Promise<ConnectionStatus> {
-  return whatsappFetch<{ status: ConnectionStatus; qrCode: string | null }>(
-    `/status/${professionalId}`,
-  ).then((data) => data.status).catch(() => "disconnected" as ConnectionStatus);
+): Promise<{ status: ConnectionStatus; qrCode: string | null }> {
+  try {
+    return await whatsappFetch<{ status: ConnectionStatus; qrCode: string | null }>(
+      `/status/${professionalId}`,
+    );
+  } catch {
+    return { status: "disconnected", qrCode: null };
+  }
 }
 
-export function getQRCode(professionalId: string): Promise<string | null> {
-  return whatsappFetch<{ status: ConnectionStatus; qrCode: string | null }>(
-    `/status/${professionalId}`,
-  ).then((data) => data.qrCode).catch(() => null);
+export async function getConnectionStatus(
+  professionalId: string,
+): Promise<ConnectionStatus> {
+  const data = await getStatus(professionalId);
+  return data.status;
+}
+
+export async function getQRCode(professionalId: string): Promise<string | null> {
+  const data = await getStatus(professionalId);
+  return data.qrCode;
 }
 
 export async function connectProfessional(
