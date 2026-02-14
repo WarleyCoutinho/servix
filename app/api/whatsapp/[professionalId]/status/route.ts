@@ -1,26 +1,25 @@
-import { getConnectionStatus, getQRCode } from "@/lib/whatsapp";
 import { NextResponse } from "next/server";
-import QRCode from "qrcode";
+
+const WHATSAPP_SERVICE_URL =
+  process.env.WHATSAPP_SERVICE_URL || "http://localhost:3001";
+const WHATSAPP_SERVICE_API_KEY = process.env.WHATSAPP_SERVICE_API_KEY || "";
 
 export const GET = async (
   _request: Request,
   { params }: { params: Promise<{ professionalId: string }> },
 ) => {
   const { professionalId } = await params;
-  const status = getConnectionStatus(professionalId);
-  const qrCode = getQRCode(professionalId);
 
-  let qrDataUrl: string | null = null;
-  if (qrCode) {
-    try {
-      qrDataUrl = await QRCode.toDataURL(qrCode, {
-        width: 256,
-        margin: 2,
-      });
-    } catch {
-      qrDataUrl = null;
-    }
+  try {
+    const res = await fetch(
+      `${WHATSAPP_SERVICE_URL}/status/${professionalId}`,
+      {
+        headers: { "x-api-key": WHATSAPP_SERVICE_API_KEY },
+      },
+    );
+    const data = await res.json();
+    return NextResponse.json(data);
+  } catch {
+    return NextResponse.json({ status: "disconnected", qrCode: null });
   }
-
-  return NextResponse.json({ status, qrCode: qrDataUrl });
 };
