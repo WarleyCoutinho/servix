@@ -1,17 +1,7 @@
-"use client";
-
 import Link from "next/link";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { ChevronLeft, Menu, type LucideIcon } from "lucide-react";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { ChevronLeft, type LucideIcon } from "lucide-react";
 import { SidebarNavLink } from "@/components/sidebar-nav-link";
+import { MobileSidebarSheet } from "@/components/mobile-sidebar-sheet";
 
 export interface NavItem {
   href: string;
@@ -61,15 +51,6 @@ function SidebarContent({
 }
 
 export function DashboardSidebar(props: DashboardSidebarProps) {
-  const [open, setOpen] = useState(false);
-
-  const handleContentClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    const target = (e.target as HTMLElement).closest("a");
-    if (target) {
-      setOpen(false);
-    }
-  };
-
   return (
     <>
       {/* Mobile: header com hamburger */}
@@ -80,24 +61,9 @@ export function DashboardSidebar(props: DashboardSidebarProps) {
             {props.subtitle}
           </p>
         </div>
-        <Sheet open={open} onOpenChange={setOpen}>
-          <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="shrink-0">
-              <Menu className="h-5 w-5" />
-              <span className="sr-only">Abrir menu</span>
-            </Button>
-          </SheetTrigger>
-          <SheetContent
-            side="left"
-            className="w-64 p-0"
-            onClick={handleContentClick}
-          >
-            <SheetHeader className="sr-only">
-              <SheetTitle>Menu de navegacao</SheetTitle>
-            </SheetHeader>
-            <SidebarContent {...props} />
-          </SheetContent>
-        </Sheet>
+        <MobileSidebarSheet>
+          <SidebarContent {...props} />
+        </MobileSidebarSheet>
       </div>
 
       {/* Desktop: sidebar fixa */}
