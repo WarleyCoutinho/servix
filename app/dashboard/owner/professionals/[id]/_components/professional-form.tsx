@@ -123,44 +123,33 @@ export default function ProfessionalForm({
     }
   }, []);
 
-  const fetchWhatsAppStatus = useCallback(async () => {
+  const pollWhatsAppStatus = useCallback(async () => {
     try {
       const res = await fetch(`/api/whatsapp/${professional.id}/status`);
-      if (!res.ok) return null;
-      return (await res.json()) as {
-        status: string;
-        qrCode: string | null;
-        pairingCode: string | null;
-      };
-    } catch {
-      return null;
-    }
-  }, [professional.id]);
-
-  const pollWhatsAppStatus = useCallback(async () => {
-    const data = await fetchWhatsAppStatus();
-    if (!data) return;
-    setWaStatus(data.status);
-    setWaQrCode(data.qrCode);
-    setWaPairingCode(data.pairingCode);
-    if (data.status === "connected" || data.status === "disconnected") {
-      setWaConnecting(false);
-      stopPolling();
-      if (data.status === "connected") {
-        toast.success("WhatsApp conectado com sucesso!");
+      const data = await res.json();
+      setWaStatus(data.status);
+      setWaQrCode(data.qrCode);
+      setWaPairingCode(data.pairingCode);
+      if (data.status === "connected" || data.status === "disconnected") {
+        setWaConnecting(false);
+        stopPolling();
+        if (data.status === "connected") {
+          toast.success("WhatsApp conectado com sucesso!");
+        }
       }
+    } catch {
+      /* ignore network errors during polling */
     }
-  }, [fetchWhatsAppStatus, stopPolling]);
+  }, [professional.id, stopPolling]);
 
   const startPolling = useCallback(() => {
     stopPolling();
-    pollingRef.current = setInterval(pollWhatsAppStatus, 2000);
+    pollingRef.current = setInterval(pollWhatsAppStatus, 1500);
     pollingTimeoutRef.current = setTimeout(() => {
       stopPolling();
       setWaConnecting(false);
       setWaStatus("disconnected");
       setWaQrCode(null);
-      setWaPairingCode(null);
       toast.error("Tempo esgotado. Tente conectar novamente.");
     }, 120000);
   }, [pollWhatsAppStatus, stopPolling]);
@@ -175,6 +164,7 @@ export default function ProfessionalForm({
         method: "POST",
       });
       startPolling();
+      pollWhatsAppStatus();
     } catch {
       setWaConnecting(false);
       toast.error("Erro ao conectar WhatsApp. Tente novamente.");
@@ -227,25 +217,17 @@ export default function ProfessionalForm({
     setWaConnecting(false);
   };
 
-  // CORREÇÃO: useEffect compatível com React 19
   useEffect(() => {
-    let cancelled = false;
-
-    const loadStatus = async () => {
-      const data = await fetchWhatsAppStatus();
-      if (cancelled || !data) return;
-      setWaStatus(data.status);
-      setWaQrCode(data.qrCode);
-      setWaPairingCode(data.pairingCode);
-    };
-
-    loadStatus();
+    // Usar setTimeout para evitar setState síncrono no useEffect
+    const timer = setTimeout(() => {
+      pollWhatsAppStatus();
+    }, 0);
 
     return () => {
-      cancelled = true;
+      clearTimeout(timer);
       stopPolling();
     };
-  }, [fetchWhatsAppStatus, stopPolling]);
+  }, [pollWhatsAppStatus, stopPolling]);
 
   const { execute: executeUpdate, isPending: isUpdating } = useAction(
     updateProfessional,
@@ -303,8 +285,7 @@ export default function ProfessionalForm({
     },
   );
 
-  // CORREÇÃO: Tipagem explícita do evento
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     executeUpdate({
       professionalId: professional.id,
@@ -671,13 +652,13 @@ export default function ProfessionalForm({
               ) : (
                 <div className="space-y-2">
                   <p className="text-muted-foreground text-sm">
-                    Digite o número do celular com codigo do País + DDD para
+                    Digite o número do celular com o codigo do Páis DDD para
                     receber o código de pareamento.
                   </p>
                   <div className="flex gap-2">
                     <Input
                       type="tel"
-                      placeholder="(11) 99999-9999"
+                      placeholder="55 62 99999-9999"
                       value={waPhoneNumber}
                       onChange={(e) => setWaPhoneNumber(e.target.value)}
                       disabled={waConnecting}
