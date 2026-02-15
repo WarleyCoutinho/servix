@@ -1,16 +1,8 @@
 "use client";
 
-import Image from "next/image";
-import { useAction } from "next-safe-action/hooks";
-import { useRouter } from "next/navigation";
-import { updateProfessional } from "@/actions/professionals/update-professional";
-import { toggleProfessionalStatus } from "@/actions/professionals/toggle-professional-status";
 import { removeProfessional } from "@/actions/professionals/remove-professional";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { toggleProfessionalStatus } from "@/actions/professionals/toggle-professional-status";
+import { updateProfessional } from "@/actions/professionals/update-professional";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,25 +15,33 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
-import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
+import { StripeAccountStatus } from "@/generated/prisma/enums";
 import {
-  Loader2,
-  UserCheck,
-  UserX,
-  Trash2,
-  CreditCard,
-  Banknote,
-  HandCoins,
   AlertTriangle,
+  Banknote,
+  CreditCard,
+  HandCoins,
+  Loader2,
   MessageCircle,
-  Wifi,
-  WifiOff,
   QrCode,
   Smartphone,
+  Trash2,
+  UserCheck,
+  UserX,
+  Wifi,
+  WifiOff,
 } from "lucide-react";
-import { useState, useCallback, useEffect, useRef } from "react";
-import { StripeAccountStatus } from "@/generated/prisma/enums";
+import { useAction } from "next-safe-action/hooks";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 
 interface ProfessionalFormProps {
   professional: {
@@ -105,7 +105,9 @@ export default function ProfessionalForm({
   const [waQrCode, setWaQrCode] = useState<string | null>(null);
   const [waPairingCode, setWaPairingCode] = useState<string | null>(null);
   const [waConnecting, setWaConnecting] = useState(false);
-  const [waConnectionMode, setWaConnectionMode] = useState<"qr" | "phone">("qr");
+  const [waConnectionMode, setWaConnectionMode] = useState<"qr" | "phone">(
+    "qr",
+  );
   const [waPhoneNumber, setWaPhoneNumber] = useState("");
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const pollingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -124,7 +126,8 @@ export default function ProfessionalForm({
   const fetchWhatsAppStatus = useCallback(async () => {
     try {
       const res = await fetch(`/api/whatsapp/${professional.id}/status`);
-      return await res.json() as {
+      if (!res.ok) return null;
+      return (await res.json()) as {
         status: string;
         qrCode: string | null;
         pairingCode: string | null;
@@ -168,7 +171,9 @@ export default function ProfessionalForm({
     setWaQrCode(null);
     setWaPairingCode(null);
     try {
-      await fetch(`/api/whatsapp/${professional.id}/connect`, { method: "POST" });
+      await fetch(`/api/whatsapp/${professional.id}/connect`, {
+        method: "POST",
+      });
       startPolling();
     } catch {
       setWaConnecting(false);
@@ -187,11 +192,14 @@ export default function ProfessionalForm({
     setWaQrCode(null);
     setWaPairingCode(null);
     try {
-      const res = await fetch(`/api/whatsapp/${professional.id}/connect-phone`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phoneNumber: cleanPhone }),
-      });
+      const res = await fetch(
+        `/api/whatsapp/${professional.id}/connect-phone`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phoneNumber: cleanPhone }),
+        },
+      );
       const data = await res.json();
       if (data.pairingCode) {
         setWaPairingCode(data.pairingCode);
@@ -207,7 +215,9 @@ export default function ProfessionalForm({
   const handleDisconnectWhatsApp = async () => {
     stopPolling();
     try {
-      await fetch(`/api/whatsapp/${professional.id}/disconnect`, { method: "POST" });
+      await fetch(`/api/whatsapp/${professional.id}/disconnect`, {
+        method: "POST",
+      });
     } catch {
       /* ignore */
     }
@@ -217,14 +227,20 @@ export default function ProfessionalForm({
     setWaConnecting(false);
   };
 
+  // CORREÇÃO: useEffect compatível com React 19
   useEffect(() => {
     let cancelled = false;
-    fetchWhatsAppStatus().then((data) => {
+
+    const loadStatus = async () => {
+      const data = await fetchWhatsAppStatus();
       if (cancelled || !data) return;
       setWaStatus(data.status);
       setWaQrCode(data.qrCode);
       setWaPairingCode(data.pairingCode);
-    });
+    };
+
+    loadStatus();
+
     return () => {
       cancelled = true;
       stopPolling();
@@ -287,7 +303,8 @@ export default function ProfessionalForm({
     },
   );
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // CORREÇÃO: Tipagem explícita do evento
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     executeUpdate({
       professionalId: professional.id,
@@ -406,12 +423,16 @@ export default function ProfessionalForm({
                 placeholder="Ex: Agenda - João Silva"
                 value={formData.whatsappGroupName}
                 onChange={(e) =>
-                  setFormData({ ...formData, whatsappGroupName: e.target.value })
+                  setFormData({
+                    ...formData,
+                    whatsappGroupName: e.target.value,
+                  })
                 }
                 disabled={isLoading}
               />
               <p className="text-muted-foreground text-xs">
-                Nome exato do grupo no WhatsApp onde a agenda será enviada automaticamente.
+                Nome exato do grupo no WhatsApp onde a agenda será enviada
+                automaticamente.
               </p>
             </div>
 
@@ -446,7 +467,12 @@ export default function ProfessionalForm({
               onCheckedChange={(checked) =>
                 setFormData({ ...formData, acceptsCard: checked })
               }
-              disabled={isLoading || (!formData.acceptsPix && !formData.acceptsPayAfterService && formData.acceptsCard)}
+              disabled={
+                isLoading ||
+                (!formData.acceptsPix &&
+                  !formData.acceptsPayAfterService &&
+                  formData.acceptsCard)
+              }
             />
           </div>
           <div className="flex items-center justify-between rounded-lg border p-4">
@@ -464,7 +490,12 @@ export default function ProfessionalForm({
               onCheckedChange={(checked) =>
                 setFormData({ ...formData, acceptsPix: checked })
               }
-              disabled={isLoading || (!formData.acceptsCard && !formData.acceptsPayAfterService && formData.acceptsPix)}
+              disabled={
+                isLoading ||
+                (!formData.acceptsCard &&
+                  !formData.acceptsPayAfterService &&
+                  formData.acceptsPix)
+              }
             />
           </div>
           <div className="flex items-center justify-between rounded-lg border p-4">
@@ -482,14 +513,21 @@ export default function ProfessionalForm({
               onCheckedChange={(checked) =>
                 setFormData({ ...formData, acceptsPayAfterService: checked })
               }
-              disabled={isLoading || (!formData.acceptsCard && !formData.acceptsPix && formData.acceptsPayAfterService)}
+              disabled={
+                isLoading ||
+                (!formData.acceptsCard &&
+                  !formData.acceptsPix &&
+                  formData.acceptsPayAfterService)
+              }
             />
           </div>
-          {!formData.acceptsCard && !formData.acceptsPix && !formData.acceptsPayAfterService && (
-            <p className="text-destructive text-sm">
-              O profissional deve aceitar pelo menos uma forma de pagamento.
-            </p>
-          )}
+          {!formData.acceptsCard &&
+            !formData.acceptsPix &&
+            !formData.acceptsPayAfterService && (
+              <p className="text-destructive text-sm">
+                O profissional deve aceitar pelo menos uma forma de pagamento.
+              </p>
+            )}
         </CardContent>
       </Card>
 
@@ -506,7 +544,9 @@ export default function ProfessionalForm({
                 profissional
               </p>
             </div>
-            <Badge variant={stripeStatus.variant} className="w-fit">{stripeStatus.label}</Badge>
+            <Badge variant={stripeStatus.variant} className="w-fit">
+              {stripeStatus.label}
+            </Badge>
           </div>
 
           {professional.stripeAccountStatus === StripeAccountStatus.PENDING && (
@@ -570,7 +610,10 @@ export default function ProfessionalForm({
               !waConnecting && (
                 <div className="flex w-full gap-2 sm:w-auto">
                   <Button
-                    onClick={() => { setWaConnectionMode("qr"); handleConnectWhatsApp(); }}
+                    onClick={() => {
+                      setWaConnectionMode("qr");
+                      handleConnectWhatsApp();
+                    }}
                     disabled={waConnecting}
                     variant={waConnectionMode === "qr" ? "default" : "outline"}
                     className="flex-1 sm:flex-initial"
@@ -628,7 +671,8 @@ export default function ProfessionalForm({
               ) : (
                 <div className="space-y-2">
                   <p className="text-muted-foreground text-sm">
-                    Digite o número do celular com DDD para receber o código de pareamento.
+                    Digite o número do celular com codigo do País + DDD para
+                    receber o código de pareamento.
                   </p>
                   <div className="flex gap-2">
                     <Input
@@ -640,7 +684,10 @@ export default function ProfessionalForm({
                     />
                     <Button
                       onClick={handleConnectWithPhone}
-                      disabled={waConnecting || waPhoneNumber.replace(/\D/g, "").length < 10}
+                      disabled={
+                        waConnecting ||
+                        waPhoneNumber.replace(/\D/g, "").length < 10
+                      }
                     >
                       Conectar
                     </Button>
@@ -666,7 +713,8 @@ export default function ProfessionalForm({
                 />
               </div>
               <p className="text-center text-xs text-muted-foreground">
-                Abra o WhatsApp {">"} Dispositivos conectados {">"} Conectar dispositivo
+                Abra o WhatsApp {">"} Dispositivos conectados {">"} Conectar
+                dispositivo
               </p>
             </div>
           )}
@@ -683,22 +731,28 @@ export default function ProfessionalForm({
                 </p>
               </div>
               <p className="text-center text-xs text-muted-foreground">
-                Abra o WhatsApp {">"} Dispositivos conectados {">"} Conectar dispositivo {">"} Conectar com número de telefone
+                Abra o WhatsApp {">"} Dispositivos conectados {">"} Conectar
+                dispositivo {">"} Conectar com número de telefone
               </p>
             </div>
           )}
 
-          {waConnecting && waStatus === "connecting" && !waQrCode && !waPairingCode && (
-            <div className="flex flex-col items-center gap-3 rounded-lg border p-6">
-              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-              <p className="text-center text-sm font-medium">
-                {waConnectionMode === "phone" ? "Gerando código de pareamento..." : "Gerando QR Code..."}
-              </p>
-              <p className="text-center text-xs text-muted-foreground">
-                Aguarde um momento
-              </p>
-            </div>
-          )}
+          {waConnecting &&
+            waStatus === "connecting" &&
+            !waQrCode &&
+            !waPairingCode && (
+              <div className="flex flex-col items-center gap-3 rounded-lg border p-6">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                <p className="text-center text-sm font-medium">
+                  {waConnectionMode === "phone"
+                    ? "Gerando código de pareamento..."
+                    : "Gerando QR Code..."}
+                </p>
+                <p className="text-center text-xs text-muted-foreground">
+                  Aguarde um momento
+                </p>
+              </div>
+            )}
         </CardContent>
       </Card>
 
@@ -766,7 +820,11 @@ export default function ProfessionalForm({
               </div>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button variant="destructive" disabled={isLoading} className="w-full sm:w-auto">
+                  <Button
+                    variant="destructive"
+                    disabled={isLoading}
+                    className="w-full sm:w-auto"
+                  >
                     Desativar
                   </Button>
                 </AlertDialogTrigger>
