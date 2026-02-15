@@ -8,16 +8,18 @@ import { isPast, addMinutes } from "date-fns";
 import { DEFAULT_INTERVAL_MINUTES } from "@/lib/schedule-utils";
 import { isTodayBrt, startOfDayBrt, endOfDayBrt } from "@/lib/timezone";
 import { sendDailyScheduleToGroup } from "@/lib/whatsapp-schedule";
+import { PaymentStatus } from "@/generated/prisma/enums";
 
 const inputSchema = z.object({
   serviceId: z.uuid(),
   professionalId: z.uuid(),
   date: z.date(),
+  payAfterService: z.boolean().optional(),
 });
 
 export const createBooking = protectedActionClient
   .inputSchema(inputSchema)
-  .action(async ({ parsedInput: { serviceId, professionalId, date }, ctx: { user } }) => {
+  .action(async ({ parsedInput: { serviceId, professionalId, date, payAfterService }, ctx: { user } }) => {
     if (isPast(date)) {
       returnValidationErrors(inputSchema, {
         _errors: ["Data e hora selecionadas já passaram."],
@@ -44,6 +46,12 @@ export const createBooking = protectedActionClient
     if (professional.barbershopId !== service.barbershopId) {
       returnValidationErrors(inputSchema, {
         _errors: ["Profissional não pertence a esta barbearia."],
+      });
+    }
+
+    if (payAfterService && !professional.acceptsPayAfterService) {
+      returnValidationErrors(inputSchema, {
+        _errors: ["Este profissional não aceita pagamento após o serviço."],
       });
     }
 
@@ -76,7 +84,7 @@ export const createBooking = protectedActionClient
         }
       }
 
-      return tx.booking.create({
+      const newBooking = await tx.booking.create({
         data: {
           serviceId,
           professionalId,
@@ -85,6 +93,21 @@ export const createBooking = protectedActionClient
           barbershopId: service.barbershopId,
         },
       });
+
+      if (payAfterService) {
+        await tx.payment.create({
+          data: {
+            bookingId: newBooking.id,
+            professionalId,
+            amountInCents: service.priceInCents,
+            applicationFeeInCents: 0,
+            status: PaymentStatus.PENDING,
+            paymentMethod: "pay_after_service",
+          },
+        });
+      }
+
+      return newBooking;
     }, { isolationLevel: "Serializable" });
 
     if (isTodayBrt(date)) {

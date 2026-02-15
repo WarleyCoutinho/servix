@@ -1581,6 +1581,7 @@ export const ProfessionalScalarFieldEnum = {
   isActive: 'isActive',
   acceptsPix: 'acceptsPix',
   acceptsCard: 'acceptsCard',
+  acceptsPayAfterService: 'acceptsPayAfterService',
   stripeAccountId: 'stripeAccountId',
   stripeAccountStatus: 'stripeAccountStatus',
   stripeOnboardingComplete: 'stripeOnboardingComplete',

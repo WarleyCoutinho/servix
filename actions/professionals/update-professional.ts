@@ -13,6 +13,7 @@ const inputSchema = z.object({
   email: z.email("Email inválido"),
   acceptsPix: z.boolean().optional(),
   acceptsCard: z.boolean().optional(),
+  acceptsPayAfterService: z.boolean().optional(),
   whatsappGroupName: z.string().optional(),
 });
 
@@ -20,7 +21,7 @@ export const updateProfessional = subscribedOwnerActionClient
   .inputSchema(inputSchema)
   .action(
     async ({
-      parsedInput: { professionalId, displayName, bio, email, acceptsPix, acceptsCard, whatsappGroupName },
+      parsedInput: { professionalId, displayName, bio, email, acceptsPix, acceptsCard, acceptsPayAfterService, whatsappGroupName },
       ctx: { barbershop },
     }) => {
       const professional = await prisma.professional.findUnique({
@@ -52,7 +53,7 @@ export const updateProfessional = subscribedOwnerActionClient
         }
       }
 
-      if (acceptsPix === false && acceptsCard === false) {
+      if (acceptsPix === false && acceptsCard === false && !acceptsPayAfterService) {
         throw new Error("O profissional deve aceitar pelo menos uma forma de pagamento.");
       }
 
@@ -64,6 +65,7 @@ export const updateProfessional = subscribedOwnerActionClient
             bio,
             ...(acceptsPix !== undefined && { acceptsPix }),
             ...(acceptsCard !== undefined && { acceptsCard }),
+            ...(acceptsPayAfterService !== undefined && { acceptsPayAfterService }),
             ...(whatsappGroupName !== undefined && { whatsappGroupName: whatsappGroupName || null }),
           },
           include: { user: true },

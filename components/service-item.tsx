@@ -1,6 +1,7 @@
 "use client";
 
 import { createBookingCheckoutSession } from "@/actions/create-booking-checkout-session";
+import { createBooking } from "@/actions/create-booking";
 import { Barbershop, BarbershopService } from "@/generated/prisma/client";
 import { useGetBarbershopProfessionals } from "@/hooks/data/use-get-barbershop-professionals";
 import { useGetDateAvailableTimeSlots } from "@/hooks/data/use-get-date-availabe-time-slots";
@@ -8,10 +9,10 @@ import { authClient } from "@/lib/auth-client";
 import { formatCurrency } from "@/lib/utils";
 import { loadStripe } from "@stripe/stripe-js";
 import { ptBR } from "date-fns/locale";
-import { AlertTriangle, Loader2, LogIn, User } from "lucide-react";
+import { AlertTriangle, CreditCard, HandCoins, Info, Loader2, LogIn, User } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "./ui/alert";
@@ -36,6 +37,7 @@ interface ServiceItemProps {
 
 const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const refProfessionalId = searchParams.get("ref");
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedProfessional, setSelectedProfessional] = useState<
@@ -44,11 +46,18 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
   const [selectedTime, setSelectedTime] = useState<string | undefined>(
     undefined,
   );
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<
+    "online" | "pay_after_service" | undefined
+  >(undefined);
   const [sheetIsOpen, setSheetIsOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const { data: session } = authClient.useSession();
-  const { executeAsync: executeCreateBooking, isPending: isCreatingBooking } =
+  const { executeAsync: executeCheckoutBooking, isPending: isCreatingCheckout } =
     useAction(createBookingCheckoutSession);
+  const { executeAsync: executeDirectBooking, isPending: isCreatingDirect } =
+    useAction(createBooking);
+
+  const isCreatingBooking = isCreatingCheckout || isCreatingDirect;
 
   const { data: professionals, isLoading: isLoadingProfessionals } =
     useGetBarbershopProfessionals(barbershop.id);
@@ -65,27 +74,83 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
     setSelectedDate(date);
     setSelectedProfessional(undefined);
     setSelectedTime(undefined);
+    setSelectedPaymentMethod(undefined);
   };
 
   const handleProfessionalSelect = (professionalId: string) => {
     setSelectedProfessional(professionalId);
     setSelectedTime(undefined);
+    setSelectedPaymentMethod(undefined);
   };
 
   const handleTimeSelect = (time: string) => {
     setSelectedTime(time);
+    setSelectedPaymentMethod(undefined);
   };
+
+  const selectedProfessionalData = professionals?.data?.find(
+    (p) => p.id === selectedProfessional,
+  );
+
+  const hasStripePayment =
+    selectedProfessionalData?.acceptsCard || selectedProfessionalData?.acceptsPix;
+  const hasPayAfterService = selectedProfessionalData?.acceptsPayAfterService;
 
   const handleConfirmBooking = async () => {
     if (!selectedDate || !selectedTime || !selectedProfessional) {
       return;
     }
+
+    const effectivePaymentMethod = hasPayAfterService && !hasStripePayment
+      ? "pay_after_service"
+      : selectedPaymentMethod;
+
+    if (!effectivePaymentMethod && hasPayAfterService && hasStripePayment) {
+      return toast.error("Selecione uma forma de pagamento.");
+    }
+
     const splittedTime = selectedTime.split(":");
     const hours = Number(splittedTime[0]);
     const minutes = Number(splittedTime[1]);
     const date = new Date(selectedDate);
     date.setHours(hours, minutes);
-    const result = await executeCreateBooking({
+
+    if (effectivePaymentMethod === "pay_after_service") {
+      const result = await executeDirectBooking({
+        date,
+        serviceId: service.id,
+        professionalId: selectedProfessional,
+        payAfterService: true,
+      });
+
+      if (!result) {
+        return toast.error("Erro ao criar agendamento. Por favor, tente novamente.");
+      }
+      if (result.validationErrors) {
+        const errors = result.validationErrors;
+        const firstError =
+          errors._errors?.[0] ||
+          Object.values(errors).find(
+            (v): v is { _errors: string[] } =>
+              v != null && typeof v === "object" && "_errors" in v && Array.isArray((v as { _errors?: unknown })._errors),
+          )?._errors?.[0];
+        return toast.error(firstError || "Erro ao criar agendamento. Por favor, tente novamente.");
+      }
+      if (result.serverError) {
+        return toast.error("Erro ao criar agendamento. Por favor, tente novamente.");
+      }
+
+      toast.success("Agendamento confirmado! O pagamento será feito após o serviço.");
+      setSheetIsOpen(false);
+      setSelectedDate(undefined);
+      setSelectedProfessional(undefined);
+      setSelectedTime(undefined);
+      setSelectedPaymentMethod(undefined);
+      router.push("/bookings?success=true");
+      return;
+    }
+
+    const result = await executeCheckoutBooking({
       date,
       serviceId: service.id,
       professionalId: selectedProfessional,
@@ -141,11 +206,8 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
     setSelectedDate(undefined);
     setSelectedProfessional(undefined);
     setSelectedTime(undefined);
+    setSelectedPaymentMethod(undefined);
   };
-
-  const selectedProfessionalData = professionals?.data?.find(
-    (p) => p.id === selectedProfessional,
-  );
 
   return (
     <div className="border-border bg-card flex gap-3 rounded-2xl border p-3 transition-shadow hover:shadow-sm">
@@ -342,6 +404,64 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
                     </div>
                   )}
 
+                  {/* Payment Method Selection */}
+                  {selectedDate && selectedProfessional && selectedTime && hasPayAfterService && (
+                    <div className="border-border border-b px-5 py-6">
+                      <p className="text-muted-foreground mb-3 text-sm font-medium">
+                        Forma de pagamento
+                      </p>
+                      <div className="space-y-2">
+                        {hasStripePayment && (
+                          <button
+                            type="button"
+                            onClick={() => setSelectedPaymentMethod("online")}
+                            className={`flex w-full items-center gap-3 rounded-lg border p-4 transition-colors ${
+                              selectedPaymentMethod === "online"
+                                ? "border-primary bg-primary/10"
+                                : "border-border hover:bg-muted"
+                            }`}
+                          >
+                            <CreditCard className="size-5 shrink-0 text-muted-foreground" />
+                            <div className="text-left">
+                              <p className="text-sm font-medium">Pagar agora</p>
+                              <p className="text-xs text-muted-foreground">
+                                PIX ou cartão via plataforma
+                              </p>
+                            </div>
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => setSelectedPaymentMethod("pay_after_service")}
+                          className={`flex w-full items-center gap-3 rounded-lg border p-4 transition-colors ${
+                            selectedPaymentMethod === "pay_after_service" || (!hasStripePayment && hasPayAfterService)
+                              ? "border-primary bg-primary/10"
+                              : "border-border hover:bg-muted"
+                          }`}
+                        >
+                          <HandCoins className="size-5 shrink-0 text-muted-foreground" />
+                          <div className="text-left">
+                            <p className="text-sm font-medium">Pagar após o serviço</p>
+                            <p className="text-xs text-muted-foreground">
+                              Pagamento presencial após a conclusão
+                            </p>
+                          </div>
+                        </button>
+                      </div>
+
+                      {(selectedPaymentMethod === "pay_after_service" || (!hasStripePayment && hasPayAfterService)) && (
+                        <Alert className="mt-3 border-blue-500/50 bg-blue-500/10 text-blue-700 dark:text-blue-400 [&>svg]:text-blue-600">
+                          <Info className="size-4" />
+                          <AlertDescription className="text-xs leading-relaxed">
+                            O pagamento poderá ser feito via PIX, dinheiro ou
+                            cartão na maquininha do estabelecimento após a
+                            finalização do serviço.
+                          </AlertDescription>
+                        </Alert>
+                      )}
+                    </div>
+                  )}
+
                   {/* Booking Summary */}
                   {selectedDate && selectedProfessional && selectedTime && (
                     <div className="px-5 py-6">
@@ -367,6 +487,7 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
                         !selectedDate ||
                         !selectedProfessional ||
                         !selectedTime ||
+                        (hasPayAfterService && hasStripePayment && !selectedPaymentMethod) ||
                         isCreatingBooking
                       }
                       onClick={handleConfirmBooking}

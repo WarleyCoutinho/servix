@@ -8,13 +8,14 @@ import { ptBR } from "date-fns/locale";
 import { formatCurrency } from "@/lib/utils";
 import {
   DollarSign,
-  TrendingUp,
   CreditCard,
   ArrowDownRight,
   ArrowUpRight,
 } from "lucide-react";
 import { PaymentStatus } from "@/generated/prisma/enums";
 import { startOfMonthBrt, endOfMonthBrt, formatBrt } from "@/lib/timezone";
+import PaymentFilters from "./_components/payment-filters";
+import type { Prisma } from "@/generated/prisma/client";
 
 function getPaymentStatusInfo(status: PaymentStatus) {
   switch (status) {
@@ -31,7 +32,11 @@ function getPaymentStatusInfo(status: PaymentStatus) {
   }
 }
 
-export default async function ProfessionalPaymentsPage() {
+interface PageProps {
+  searchParams: Promise<{ filter?: string }>;
+}
+
+export default async function ProfessionalPaymentsPage({ searchParams }: PageProps) {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -55,11 +60,24 @@ export default async function ProfessionalPaymentsPage() {
   const now = new Date();
   const monthStart = startOfMonthBrt(now);
   const monthEnd = endOfMonthBrt(now);
+  const { filter } = await searchParams;
+
+  const filterWhere: Prisma.PaymentWhereInput = (() => {
+    switch (filter) {
+      case "stripe":
+        return { stripePaymentIntentId: { not: null } };
+      case "manual":
+        return { paymentMethod: "pay_after_service" };
+      default:
+        return {};
+    }
+  })();
 
   const [payments, monthlyStats] = await Promise.all([
     prisma.payment.findMany({
       where: {
         professionalId: professional.id,
+        ...filterWhere,
       },
       include: {
         booking: {
@@ -155,8 +173,9 @@ export default async function ProfessionalPaymentsPage() {
       </div>
 
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <CardTitle>Histórico de Pagamentos</CardTitle>
+          <PaymentFilters />
         </CardHeader>
         <CardContent>
           {payments.length === 0 ? (
@@ -175,6 +194,7 @@ export default async function ProfessionalPaymentsPage() {
                 const statusInfo = getPaymentStatusInfo(payment.status);
                 const netAmount =
                   payment.amountInCents - payment.applicationFeeInCents;
+                const isManual = payment.paymentMethod === "pay_after_service";
 
                 return (
                   <div
@@ -196,15 +216,22 @@ export default async function ProfessionalPaymentsPage() {
                     </div>
 
                     <div className="text-right">
-                      <Badge variant={statusInfo.variant}>
-                        {statusInfo.label}
-                      </Badge>
+                      <div className="flex items-center justify-end gap-2">
+                        <Badge variant={statusInfo.variant}>
+                          {statusInfo.label}
+                        </Badge>
+                        <Badge variant="outline" className="text-xs">
+                          {isManual ? "Manual" : "Stripe"}
+                        </Badge>
+                      </div>
                       <p className="mt-1 font-semibold">
                         {formatCurrency(netAmount)}
                       </p>
-                      <p className="text-muted-foreground text-xs">
-                        de {formatCurrency(payment.amountInCents)}
-                      </p>
+                      {!isManual && (
+                        <p className="text-muted-foreground text-xs">
+                          de {formatCurrency(payment.amountInCents)}
+                        </p>
+                      )}
                     </div>
                   </div>
                 );

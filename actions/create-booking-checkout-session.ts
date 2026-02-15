@@ -117,11 +117,11 @@ export const createBookingCheckoutSession = protectedActionClient
 
       const paymentMethods: Stripe.Checkout.SessionCreateParams.PaymentMethodType[] = [];
 
-      if (professional.acceptsCard) {
-        paymentMethods.push("card");
-      }
       if (professional.acceptsPix) {
         paymentMethods.push("pix");
+      }
+      if (professional.acceptsCard) {
+        paymentMethods.push("card");
       }
 
       if (paymentMethods.length === 0) {

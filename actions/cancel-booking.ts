@@ -48,6 +48,14 @@ export const cancelBooking = protectedActionClient
     }
 
     if (
+      booking.payment?.paymentMethod === "pay_after_service" &&
+      booking.payment.status === PaymentStatus.PENDING
+    ) {
+      await prisma.payment.update({
+        where: { id: booking.payment.id },
+        data: { status: PaymentStatus.CANCELED },
+      });
+    } else if (
       booking.payment?.stripeChargeId &&
       booking.payment.status === PaymentStatus.SUCCEEDED
     ) {

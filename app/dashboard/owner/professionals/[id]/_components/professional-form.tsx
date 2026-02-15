@@ -31,6 +31,7 @@ import {
   Trash2,
   CreditCard,
   Banknote,
+  HandCoins,
   AlertTriangle,
   MessageCircle,
   Wifi,
@@ -49,6 +50,7 @@ interface ProfessionalFormProps {
     isActive: boolean;
     acceptsPix: boolean;
     acceptsCard: boolean;
+    acceptsPayAfterService: boolean;
     whatsappGroupName: string | null;
     stripeAccountStatus: StripeAccountStatus;
     stripeOnboardingComplete: boolean;
@@ -93,6 +95,7 @@ export default function ProfessionalForm({
     bio: professional.bio ?? "",
     acceptsPix: professional.acceptsPix,
     acceptsCard: professional.acceptsCard,
+    acceptsPayAfterService: professional.acceptsPayAfterService,
     whatsappGroupName: professional.whatsappGroupName ?? "",
   });
 
@@ -389,7 +392,7 @@ export default function ProfessionalForm({
               onCheckedChange={(checked) =>
                 setFormData({ ...formData, acceptsCard: checked })
               }
-              disabled={isLoading || (!formData.acceptsPix && formData.acceptsCard)}
+              disabled={isLoading || (!formData.acceptsPix && !formData.acceptsPayAfterService && formData.acceptsCard)}
             />
           </div>
           <div className="flex items-center justify-between rounded-lg border p-4">
@@ -407,10 +410,28 @@ export default function ProfessionalForm({
               onCheckedChange={(checked) =>
                 setFormData({ ...formData, acceptsPix: checked })
               }
-              disabled={isLoading || (!formData.acceptsCard && formData.acceptsPix)}
+              disabled={isLoading || (!formData.acceptsCard && !formData.acceptsPayAfterService && formData.acceptsPix)}
             />
           </div>
-          {!formData.acceptsCard && !formData.acceptsPix && (
+          <div className="flex items-center justify-between rounded-lg border p-4">
+            <div className="flex items-center gap-3">
+              <HandCoins className="text-muted-foreground h-5 w-5" />
+              <div>
+                <p className="font-medium">Pagar após o serviço</p>
+                <p className="text-muted-foreground text-sm">
+                  Permite agendar e pagar presencialmente após a conclusão
+                </p>
+              </div>
+            </div>
+            <Switch
+              checked={formData.acceptsPayAfterService}
+              onCheckedChange={(checked) =>
+                setFormData({ ...formData, acceptsPayAfterService: checked })
+              }
+              disabled={isLoading || (!formData.acceptsCard && !formData.acceptsPix && formData.acceptsPayAfterService)}
+            />
+          </div>
+          {!formData.acceptsCard && !formData.acceptsPix && !formData.acceptsPayAfterService && (
             <p className="text-destructive text-sm">
               O profissional deve aceitar pelo menos uma forma de pagamento.
             </p>

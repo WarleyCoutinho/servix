@@ -33,6 +33,7 @@ export type ProfessionalMinAggregateOutputType = {
   isActive: boolean | null
   acceptsPix: boolean | null
   acceptsCard: boolean | null
+  acceptsPayAfterService: boolean | null
   stripeAccountId: string | null
   stripeAccountStatus: $Enums.StripeAccountStatus | null
   stripeOnboardingComplete: boolean | null
@@ -52,6 +53,7 @@ export type ProfessionalMaxAggregateOutputType = {
   isActive: boolean | null
   acceptsPix: boolean | null
   acceptsCard: boolean | null
+  acceptsPayAfterService: boolean | null
   stripeAccountId: string | null
   stripeAccountStatus: $Enums.StripeAccountStatus | null
   stripeOnboardingComplete: boolean | null
@@ -71,6 +73,7 @@ export type ProfessionalCountAggregateOutputType = {
   isActive: number
   acceptsPix: number
   acceptsCard: number
+  acceptsPayAfterService: number
   stripeAccountId: number
   stripeAccountStatus: number
   stripeOnboardingComplete: number
@@ -92,6 +95,7 @@ export type ProfessionalMinAggregateInputType = {
   isActive?: true
   acceptsPix?: true
   acceptsCard?: true
+  acceptsPayAfterService?: true
   stripeAccountId?: true
   stripeAccountStatus?: true
   stripeOnboardingComplete?: true
@@ -111,6 +115,7 @@ export type ProfessionalMaxAggregateInputType = {
   isActive?: true
   acceptsPix?: true
   acceptsCard?: true
+  acceptsPayAfterService?: true
   stripeAccountId?: true
   stripeAccountStatus?: true
   stripeOnboardingComplete?: true
@@ -130,6 +135,7 @@ export type ProfessionalCountAggregateInputType = {
   isActive?: true
   acceptsPix?: true
   acceptsCard?: true
+  acceptsPayAfterService?: true
   stripeAccountId?: true
   stripeAccountStatus?: true
   stripeOnboardingComplete?: true
@@ -222,6 +228,7 @@ export type ProfessionalGroupByOutputType = {
   isActive: boolean
   acceptsPix: boolean
   acceptsCard: boolean
+  acceptsPayAfterService: boolean
   stripeAccountId: string | null
   stripeAccountStatus: $Enums.StripeAccountStatus
   stripeOnboardingComplete: boolean
@@ -262,6 +269,7 @@ export type ProfessionalWhereInput = {
   isActive?: Prisma.BoolFilter<"Professional"> | boolean
   acceptsPix?: Prisma.BoolFilter<"Professional"> | boolean
   acceptsCard?: Prisma.BoolFilter<"Professional"> | boolean
+  acceptsPayAfterService?: Prisma.BoolFilter<"Professional"> | boolean
   stripeAccountId?: Prisma.StringNullableFilter<"Professional"> | string | null
   stripeAccountStatus?: Prisma.EnumStripeAccountStatusFilter<"Professional"> | $Enums.StripeAccountStatus
   stripeOnboardingComplete?: Prisma.BoolFilter<"Professional"> | boolean
@@ -286,6 +294,7 @@ export type ProfessionalOrderByWithRelationInput = {
   isActive?: Prisma.SortOrder
   acceptsPix?: Prisma.SortOrder
   acceptsCard?: Prisma.SortOrder
+  acceptsPayAfterService?: Prisma.SortOrder
   stripeAccountId?: Prisma.SortOrderInput | Prisma.SortOrder
   stripeAccountStatus?: Prisma.SortOrder
   stripeOnboardingComplete?: Prisma.SortOrder
@@ -315,6 +324,7 @@ export type ProfessionalWhereUniqueInput = Prisma.AtLeast<{
   isActive?: Prisma.BoolFilter<"Professional"> | boolean
   acceptsPix?: Prisma.BoolFilter<"Professional"> | boolean
   acceptsCard?: Prisma.BoolFilter<"Professional"> | boolean
+  acceptsPayAfterService?: Prisma.BoolFilter<"Professional"> | boolean
   stripeAccountStatus?: Prisma.EnumStripeAccountStatusFilter<"Professional"> | $Enums.StripeAccountStatus
   stripeOnboardingComplete?: Prisma.BoolFilter<"Professional"> | boolean
   whatsappGroupName?: Prisma.StringNullableFilter<"Professional"> | string | null
@@ -337,6 +347,7 @@ export type ProfessionalOrderByWithAggregationInput = {
   isActive?: Prisma.SortOrder
   acceptsPix?: Prisma.SortOrder
   acceptsCard?: Prisma.SortOrder
+  acceptsPayAfterService?: Prisma.SortOrder
   stripeAccountId?: Prisma.SortOrderInput | Prisma.SortOrder
   stripeAccountStatus?: Prisma.SortOrder
   stripeOnboardingComplete?: Prisma.SortOrder
@@ -362,6 +373,7 @@ export type ProfessionalScalarWhereWithAggregatesInput = {
   isActive?: Prisma.BoolWithAggregatesFilter<"Professional"> | boolean
   acceptsPix?: Prisma.BoolWithAggregatesFilter<"Professional"> | boolean
   acceptsCard?: Prisma.BoolWithAggregatesFilter<"Professional"> | boolean
+  acceptsPayAfterService?: Prisma.BoolWithAggregatesFilter<"Professional"> | boolean
   stripeAccountId?: Prisma.StringNullableWithAggregatesFilter<"Professional"> | string | null
   stripeAccountStatus?: Prisma.EnumStripeAccountStatusWithAggregatesFilter<"Professional"> | $Enums.StripeAccountStatus
   stripeOnboardingComplete?: Prisma.BoolWithAggregatesFilter<"Professional"> | boolean
@@ -381,6 +393,7 @@ export type ProfessionalCreateInput = {
   isActive?: boolean
   acceptsPix?: boolean
   acceptsCard?: boolean
+  acceptsPayAfterService?: boolean
   stripeAccountId?: string | null
   stripeAccountStatus?: $Enums.StripeAccountStatus
   stripeOnboardingComplete?: boolean
@@ -403,6 +416,7 @@ export type ProfessionalUncheckedCreateInput = {
   isActive?: boolean
   acceptsPix?: boolean
   acceptsCard?: boolean
+  acceptsPayAfterService?: boolean
   stripeAccountId?: string | null
   stripeAccountStatus?: $Enums.StripeAccountStatus
   stripeOnboardingComplete?: boolean
@@ -425,6 +439,7 @@ export type ProfessionalUpdateInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   acceptsPix?: Prisma.BoolFieldUpdateOperationsInput | boolean
   acceptsCard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  acceptsPayAfterService?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stripeAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeAccountStatus?: Prisma.EnumStripeAccountStatusFieldUpdateOperationsInput | $Enums.StripeAccountStatus
   stripeOnboardingComplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -447,6 +462,7 @@ export type ProfessionalUncheckedUpdateInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   acceptsPix?: Prisma.BoolFieldUpdateOperationsInput | boolean
   acceptsCard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  acceptsPayAfterService?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stripeAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeAccountStatus?: Prisma.EnumStripeAccountStatusFieldUpdateOperationsInput | $Enums.StripeAccountStatus
   stripeOnboardingComplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -469,6 +485,7 @@ export type ProfessionalCreateManyInput = {
   isActive?: boolean
   acceptsPix?: boolean
   acceptsCard?: boolean
+  acceptsPayAfterService?: boolean
   stripeAccountId?: string | null
   stripeAccountStatus?: $Enums.StripeAccountStatus
   stripeOnboardingComplete?: boolean
@@ -488,6 +505,7 @@ export type ProfessionalUpdateManyMutationInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   acceptsPix?: Prisma.BoolFieldUpdateOperationsInput | boolean
   acceptsCard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  acceptsPayAfterService?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stripeAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeAccountStatus?: Prisma.EnumStripeAccountStatusFieldUpdateOperationsInput | $Enums.StripeAccountStatus
   stripeOnboardingComplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -505,6 +523,7 @@ export type ProfessionalUncheckedUpdateManyInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   acceptsPix?: Prisma.BoolFieldUpdateOperationsInput | boolean
   acceptsCard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  acceptsPayAfterService?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stripeAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeAccountStatus?: Prisma.EnumStripeAccountStatusFieldUpdateOperationsInput | $Enums.StripeAccountStatus
   stripeOnboardingComplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -539,6 +558,7 @@ export type ProfessionalCountOrderByAggregateInput = {
   isActive?: Prisma.SortOrder
   acceptsPix?: Prisma.SortOrder
   acceptsCard?: Prisma.SortOrder
+  acceptsPayAfterService?: Prisma.SortOrder
   stripeAccountId?: Prisma.SortOrder
   stripeAccountStatus?: Prisma.SortOrder
   stripeOnboardingComplete?: Prisma.SortOrder
@@ -558,6 +578,7 @@ export type ProfessionalMaxOrderByAggregateInput = {
   isActive?: Prisma.SortOrder
   acceptsPix?: Prisma.SortOrder
   acceptsCard?: Prisma.SortOrder
+  acceptsPayAfterService?: Prisma.SortOrder
   stripeAccountId?: Prisma.SortOrder
   stripeAccountStatus?: Prisma.SortOrder
   stripeOnboardingComplete?: Prisma.SortOrder
@@ -577,6 +598,7 @@ export type ProfessionalMinOrderByAggregateInput = {
   isActive?: Prisma.SortOrder
   acceptsPix?: Prisma.SortOrder
   acceptsCard?: Prisma.SortOrder
+  acceptsPayAfterService?: Prisma.SortOrder
   stripeAccountId?: Prisma.SortOrder
   stripeAccountStatus?: Prisma.SortOrder
   stripeOnboardingComplete?: Prisma.SortOrder
@@ -723,6 +745,7 @@ export type ProfessionalCreateWithoutUserInput = {
   isActive?: boolean
   acceptsPix?: boolean
   acceptsCard?: boolean
+  acceptsPayAfterService?: boolean
   stripeAccountId?: string | null
   stripeAccountStatus?: $Enums.StripeAccountStatus
   stripeOnboardingComplete?: boolean
@@ -744,6 +767,7 @@ export type ProfessionalUncheckedCreateWithoutUserInput = {
   isActive?: boolean
   acceptsPix?: boolean
   acceptsCard?: boolean
+  acceptsPayAfterService?: boolean
   stripeAccountId?: string | null
   stripeAccountStatus?: $Enums.StripeAccountStatus
   stripeOnboardingComplete?: boolean
@@ -781,6 +805,7 @@ export type ProfessionalUpdateWithoutUserInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   acceptsPix?: Prisma.BoolFieldUpdateOperationsInput | boolean
   acceptsCard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  acceptsPayAfterService?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stripeAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeAccountStatus?: Prisma.EnumStripeAccountStatusFieldUpdateOperationsInput | $Enums.StripeAccountStatus
   stripeOnboardingComplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -802,6 +827,7 @@ export type ProfessionalUncheckedUpdateWithoutUserInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   acceptsPix?: Prisma.BoolFieldUpdateOperationsInput | boolean
   acceptsCard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  acceptsPayAfterService?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stripeAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeAccountStatus?: Prisma.EnumStripeAccountStatusFieldUpdateOperationsInput | $Enums.StripeAccountStatus
   stripeOnboardingComplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -823,6 +849,7 @@ export type ProfessionalCreateWithoutBarbershopInput = {
   isActive?: boolean
   acceptsPix?: boolean
   acceptsCard?: boolean
+  acceptsPayAfterService?: boolean
   stripeAccountId?: string | null
   stripeAccountStatus?: $Enums.StripeAccountStatus
   stripeOnboardingComplete?: boolean
@@ -844,6 +871,7 @@ export type ProfessionalUncheckedCreateWithoutBarbershopInput = {
   isActive?: boolean
   acceptsPix?: boolean
   acceptsCard?: boolean
+  acceptsPayAfterService?: boolean
   stripeAccountId?: string | null
   stripeAccountStatus?: $Enums.StripeAccountStatus
   stripeOnboardingComplete?: boolean
@@ -894,6 +922,7 @@ export type ProfessionalScalarWhereInput = {
   isActive?: Prisma.BoolFilter<"Professional"> | boolean
   acceptsPix?: Prisma.BoolFilter<"Professional"> | boolean
   acceptsCard?: Prisma.BoolFilter<"Professional"> | boolean
+  acceptsPayAfterService?: Prisma.BoolFilter<"Professional"> | boolean
   stripeAccountId?: Prisma.StringNullableFilter<"Professional"> | string | null
   stripeAccountStatus?: Prisma.EnumStripeAccountStatusFilter<"Professional"> | $Enums.StripeAccountStatus
   stripeOnboardingComplete?: Prisma.BoolFilter<"Professional"> | boolean
@@ -913,6 +942,7 @@ export type ProfessionalCreateWithoutSchedulesInput = {
   isActive?: boolean
   acceptsPix?: boolean
   acceptsCard?: boolean
+  acceptsPayAfterService?: boolean
   stripeAccountId?: string | null
   stripeAccountStatus?: $Enums.StripeAccountStatus
   stripeOnboardingComplete?: boolean
@@ -934,6 +964,7 @@ export type ProfessionalUncheckedCreateWithoutSchedulesInput = {
   isActive?: boolean
   acceptsPix?: boolean
   acceptsCard?: boolean
+  acceptsPayAfterService?: boolean
   stripeAccountId?: string | null
   stripeAccountStatus?: $Enums.StripeAccountStatus
   stripeOnboardingComplete?: boolean
@@ -971,6 +1002,7 @@ export type ProfessionalUpdateWithoutSchedulesInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   acceptsPix?: Prisma.BoolFieldUpdateOperationsInput | boolean
   acceptsCard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  acceptsPayAfterService?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stripeAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeAccountStatus?: Prisma.EnumStripeAccountStatusFieldUpdateOperationsInput | $Enums.StripeAccountStatus
   stripeOnboardingComplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -992,6 +1024,7 @@ export type ProfessionalUncheckedUpdateWithoutSchedulesInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   acceptsPix?: Prisma.BoolFieldUpdateOperationsInput | boolean
   acceptsCard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  acceptsPayAfterService?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stripeAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeAccountStatus?: Prisma.EnumStripeAccountStatusFieldUpdateOperationsInput | $Enums.StripeAccountStatus
   stripeOnboardingComplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1013,6 +1046,7 @@ export type ProfessionalCreateWithoutBookingsInput = {
   isActive?: boolean
   acceptsPix?: boolean
   acceptsCard?: boolean
+  acceptsPayAfterService?: boolean
   stripeAccountId?: string | null
   stripeAccountStatus?: $Enums.StripeAccountStatus
   stripeOnboardingComplete?: boolean
@@ -1034,6 +1068,7 @@ export type ProfessionalUncheckedCreateWithoutBookingsInput = {
   isActive?: boolean
   acceptsPix?: boolean
   acceptsCard?: boolean
+  acceptsPayAfterService?: boolean
   stripeAccountId?: string | null
   stripeAccountStatus?: $Enums.StripeAccountStatus
   stripeOnboardingComplete?: boolean
@@ -1071,6 +1106,7 @@ export type ProfessionalUpdateWithoutBookingsInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   acceptsPix?: Prisma.BoolFieldUpdateOperationsInput | boolean
   acceptsCard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  acceptsPayAfterService?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stripeAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeAccountStatus?: Prisma.EnumStripeAccountStatusFieldUpdateOperationsInput | $Enums.StripeAccountStatus
   stripeOnboardingComplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1092,6 +1128,7 @@ export type ProfessionalUncheckedUpdateWithoutBookingsInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   acceptsPix?: Prisma.BoolFieldUpdateOperationsInput | boolean
   acceptsCard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  acceptsPayAfterService?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stripeAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeAccountStatus?: Prisma.EnumStripeAccountStatusFieldUpdateOperationsInput | $Enums.StripeAccountStatus
   stripeOnboardingComplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1113,6 +1150,7 @@ export type ProfessionalCreateWithoutPaymentsInput = {
   isActive?: boolean
   acceptsPix?: boolean
   acceptsCard?: boolean
+  acceptsPayAfterService?: boolean
   stripeAccountId?: string | null
   stripeAccountStatus?: $Enums.StripeAccountStatus
   stripeOnboardingComplete?: boolean
@@ -1134,6 +1172,7 @@ export type ProfessionalUncheckedCreateWithoutPaymentsInput = {
   isActive?: boolean
   acceptsPix?: boolean
   acceptsCard?: boolean
+  acceptsPayAfterService?: boolean
   stripeAccountId?: string | null
   stripeAccountStatus?: $Enums.StripeAccountStatus
   stripeOnboardingComplete?: boolean
@@ -1171,6 +1210,7 @@ export type ProfessionalUpdateWithoutPaymentsInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   acceptsPix?: Prisma.BoolFieldUpdateOperationsInput | boolean
   acceptsCard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  acceptsPayAfterService?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stripeAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeAccountStatus?: Prisma.EnumStripeAccountStatusFieldUpdateOperationsInput | $Enums.StripeAccountStatus
   stripeOnboardingComplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1192,6 +1232,7 @@ export type ProfessionalUncheckedUpdateWithoutPaymentsInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   acceptsPix?: Prisma.BoolFieldUpdateOperationsInput | boolean
   acceptsCard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  acceptsPayAfterService?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stripeAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeAccountStatus?: Prisma.EnumStripeAccountStatusFieldUpdateOperationsInput | $Enums.StripeAccountStatus
   stripeOnboardingComplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1213,6 +1254,7 @@ export type ProfessionalCreateManyBarbershopInput = {
   isActive?: boolean
   acceptsPix?: boolean
   acceptsCard?: boolean
+  acceptsPayAfterService?: boolean
   stripeAccountId?: string | null
   stripeAccountStatus?: $Enums.StripeAccountStatus
   stripeOnboardingComplete?: boolean
@@ -1231,6 +1273,7 @@ export type ProfessionalUpdateWithoutBarbershopInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   acceptsPix?: Prisma.BoolFieldUpdateOperationsInput | boolean
   acceptsCard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  acceptsPayAfterService?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stripeAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeAccountStatus?: Prisma.EnumStripeAccountStatusFieldUpdateOperationsInput | $Enums.StripeAccountStatus
   stripeOnboardingComplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1252,6 +1295,7 @@ export type ProfessionalUncheckedUpdateWithoutBarbershopInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   acceptsPix?: Prisma.BoolFieldUpdateOperationsInput | boolean
   acceptsCard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  acceptsPayAfterService?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stripeAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeAccountStatus?: Prisma.EnumStripeAccountStatusFieldUpdateOperationsInput | $Enums.StripeAccountStatus
   stripeOnboardingComplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1273,6 +1317,7 @@ export type ProfessionalUncheckedUpdateManyWithoutBarbershopInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   acceptsPix?: Prisma.BoolFieldUpdateOperationsInput | boolean
   acceptsCard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  acceptsPayAfterService?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stripeAccountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeAccountStatus?: Prisma.EnumStripeAccountStatusFieldUpdateOperationsInput | $Enums.StripeAccountStatus
   stripeOnboardingComplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1340,6 +1385,7 @@ export type ProfessionalSelect<ExtArgs extends runtime.Types.Extensions.Internal
   isActive?: boolean
   acceptsPix?: boolean
   acceptsCard?: boolean
+  acceptsPayAfterService?: boolean
   stripeAccountId?: boolean
   stripeAccountStatus?: boolean
   stripeOnboardingComplete?: boolean
@@ -1365,6 +1411,7 @@ export type ProfessionalSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   isActive?: boolean
   acceptsPix?: boolean
   acceptsCard?: boolean
+  acceptsPayAfterService?: boolean
   stripeAccountId?: boolean
   stripeAccountStatus?: boolean
   stripeOnboardingComplete?: boolean
@@ -1386,6 +1433,7 @@ export type ProfessionalSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   isActive?: boolean
   acceptsPix?: boolean
   acceptsCard?: boolean
+  acceptsPayAfterService?: boolean
   stripeAccountId?: boolean
   stripeAccountStatus?: boolean
   stripeOnboardingComplete?: boolean
@@ -1407,6 +1455,7 @@ export type ProfessionalSelectScalar = {
   isActive?: boolean
   acceptsPix?: boolean
   acceptsCard?: boolean
+  acceptsPayAfterService?: boolean
   stripeAccountId?: boolean
   stripeAccountStatus?: boolean
   stripeOnboardingComplete?: boolean
@@ -1417,7 +1466,7 @@ export type ProfessionalSelectScalar = {
   barbershopId?: boolean
 }
 
-export type ProfessionalOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "cpf" | "displayName" | "bio" | "imageUrl" | "isActive" | "acceptsPix" | "acceptsCard" | "stripeAccountId" | "stripeAccountStatus" | "stripeOnboardingComplete" | "whatsappGroupName" | "createdAt" | "updatedAt" | "userId" | "barbershopId", ExtArgs["result"]["professional"]>
+export type ProfessionalOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "cpf" | "displayName" | "bio" | "imageUrl" | "isActive" | "acceptsPix" | "acceptsCard" | "acceptsPayAfterService" | "stripeAccountId" | "stripeAccountStatus" | "stripeOnboardingComplete" | "whatsappGroupName" | "createdAt" | "updatedAt" | "userId" | "barbershopId", ExtArgs["result"]["professional"]>
 export type ProfessionalInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   barbershop?: boolean | Prisma.BarbershopDefaultArgs<ExtArgs>
@@ -1453,6 +1502,7 @@ export type $ProfessionalPayload<ExtArgs extends runtime.Types.Extensions.Intern
     isActive: boolean
     acceptsPix: boolean
     acceptsCard: boolean
+    acceptsPayAfterService: boolean
     stripeAccountId: string | null
     stripeAccountStatus: $Enums.StripeAccountStatus
     stripeOnboardingComplete: boolean
@@ -1897,6 +1947,7 @@ export interface ProfessionalFieldRefs {
   readonly isActive: Prisma.FieldRef<"Professional", 'Boolean'>
   readonly acceptsPix: Prisma.FieldRef<"Professional", 'Boolean'>
   readonly acceptsCard: Prisma.FieldRef<"Professional", 'Boolean'>
+  readonly acceptsPayAfterService: Prisma.FieldRef<"Professional", 'Boolean'>
   readonly stripeAccountId: Prisma.FieldRef<"Professional", 'String'>
   readonly stripeAccountStatus: Prisma.FieldRef<"Professional", 'StripeAccountStatus'>
   readonly stripeOnboardingComplete: Prisma.FieldRef<"Professional", 'Boolean'>

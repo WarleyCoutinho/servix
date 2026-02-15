@@ -2,13 +2,15 @@ import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ptBR } from "date-fns/locale";
 import { formatCurrency } from "@/lib/utils";
 import { formatBrt } from "@/lib/timezone";
 import { Calendar, Clock, User } from "lucide-react";
+import { PaymentStatus } from "@/generated/prisma/enums";
+import MarkReceivedButton from "./_components/mark-received-button";
 
 export default async function ProfessionalBookingsPage() {
   const session = await auth.api.getSession({
@@ -39,6 +41,7 @@ export default async function ProfessionalBookingsPage() {
     include: {
       user: true,
       service: true,
+      payment: true,
     },
     orderBy: {
       date: "desc",
@@ -74,11 +77,14 @@ export default async function ProfessionalBookingsPage() {
           {bookings.map((booking) => {
             const isPast = booking.date < now;
             const isCancelled = !!booking.cancelledAt;
+            const isPayAfterService = booking.payment?.paymentMethod === "pay_after_service";
+            const isPaymentPending = isPayAfterService && booking.payment?.status === PaymentStatus.PENDING;
+            const isPaymentReceived = isPayAfterService && booking.payment?.status === PaymentStatus.SUCCEEDED;
 
             return (
               <Card key={booking.id}>
-                <CardContent className="flex items-center gap-4 p-4">
-                  <Avatar className="size-12">
+                <CardContent className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center">
+                  <Avatar className="size-12 shrink-0">
                     <AvatarImage
                       src={booking.user.image ?? ""}
                       alt={booking.user.name}
@@ -89,16 +95,26 @@ export default async function ProfessionalBookingsPage() {
                   </Avatar>
 
                   <div className="flex-1 space-y-1">
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <p className="font-medium">{booking.user.name}</p>
                       {isCancelled && (
                         <Badge variant="destructive">Cancelado</Badge>
                       )}
-                      {!isCancelled && isPast && (
+                      {!isCancelled && isPast && !isPaymentPending && (
                         <Badge variant="secondary">Concluído</Badge>
                       )}
                       {!isCancelled && !isPast && (
                         <Badge variant="default">Agendado</Badge>
+                      )}
+                      {!isCancelled && isPaymentPending && (
+                        <Badge variant="outline" className="border-yellow-500/50 text-yellow-700 dark:text-yellow-400">
+                          Não pago
+                        </Badge>
+                      )}
+                      {!isCancelled && isPaymentReceived && (
+                        <Badge variant="outline" className="border-green-500/50 text-green-700 dark:text-green-400">
+                          Recebido
+                        </Badge>
                       )}
                     </div>
                     <p className="text-muted-foreground text-sm">
@@ -125,6 +141,12 @@ export default async function ProfessionalBookingsPage() {
                       {booking.service.durationMinutes} min
                     </p>
                   </div>
+
+                  {!isCancelled && isPaymentPending && booking.payment && (
+                    <div className="shrink-0">
+                      <MarkReceivedButton paymentId={booking.payment.id} />
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             );

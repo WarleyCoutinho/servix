@@ -182,6 +182,7 @@ model Professional {
   isActive                 Boolean             @default(true)
   acceptsPix               Boolean             @default(false)
   acceptsCard              Boolean             @default(true)
+  acceptsPayAfterService   Boolean             @default(false)
   stripeAccountId          String?             @unique
   stripeAccountStatus      StripeAccountStatus @default(PENDING)
   stripeOnboardingComplete Boolean             @default(false)
