@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useAction } from "next-safe-action/hooks";
 import { useRouter } from "next/navigation";
 import { updateProfessional } from "@/actions/professionals/update-professional";
@@ -120,33 +121,43 @@ export default function ProfessionalForm({
     }
   }, []);
 
-  const pollWhatsAppStatus = useCallback(async () => {
+  const fetchWhatsAppStatus = useCallback(async () => {
     try {
       const res = await fetch(`/api/whatsapp/${professional.id}/status`);
-      const data = await res.json();
-      setWaStatus(data.status);
-      setWaQrCode(data.qrCode);
-      setWaPairingCode(data.pairingCode);
-      if (data.status === "connected" || data.status === "disconnected") {
-        setWaConnecting(false);
-        stopPolling();
-        if (data.status === "connected") {
-          toast.success("WhatsApp conectado com sucesso!");
-        }
-      }
+      return await res.json() as {
+        status: string;
+        qrCode: string | null;
+        pairingCode: string | null;
+      };
     } catch {
-      /* ignore network errors during polling */
+      return null;
     }
-  }, [professional.id, stopPolling]);
+  }, [professional.id]);
+
+  const pollWhatsAppStatus = useCallback(async () => {
+    const data = await fetchWhatsAppStatus();
+    if (!data) return;
+    setWaStatus(data.status);
+    setWaQrCode(data.qrCode);
+    setWaPairingCode(data.pairingCode);
+    if (data.status === "connected" || data.status === "disconnected") {
+      setWaConnecting(false);
+      stopPolling();
+      if (data.status === "connected") {
+        toast.success("WhatsApp conectado com sucesso!");
+      }
+    }
+  }, [fetchWhatsAppStatus, stopPolling]);
 
   const startPolling = useCallback(() => {
     stopPolling();
-    pollingRef.current = setInterval(pollWhatsAppStatus, 1500);
+    pollingRef.current = setInterval(pollWhatsAppStatus, 2000);
     pollingTimeoutRef.current = setTimeout(() => {
       stopPolling();
       setWaConnecting(false);
       setWaStatus("disconnected");
       setWaQrCode(null);
+      setWaPairingCode(null);
       toast.error("Tempo esgotado. Tente conectar novamente.");
     }, 120000);
   }, [pollWhatsAppStatus, stopPolling]);
@@ -159,7 +170,6 @@ export default function ProfessionalForm({
     try {
       await fetch(`/api/whatsapp/${professional.id}/connect`, { method: "POST" });
       startPolling();
-      pollWhatsAppStatus();
     } catch {
       setWaConnecting(false);
       toast.error("Erro ao conectar WhatsApp. Tente novamente.");
@@ -208,9 +218,18 @@ export default function ProfessionalForm({
   };
 
   useEffect(() => {
-    pollWhatsAppStatus();
-    return () => stopPolling();
-  }, [pollWhatsAppStatus, stopPolling]);
+    let cancelled = false;
+    fetchWhatsAppStatus().then((data) => {
+      if (cancelled || !data) return;
+      setWaStatus(data.status);
+      setWaQrCode(data.qrCode);
+      setWaPairingCode(data.pairingCode);
+    });
+    return () => {
+      cancelled = true;
+      stopPolling();
+    };
+  }, [fetchWhatsAppStatus, stopPolling]);
 
   const { execute: executeUpdate, isPending: isUpdating } = useAction(
     updateProfessional,
@@ -638,11 +657,12 @@ export default function ProfessionalForm({
                 Escaneie o QR Code com o WhatsApp
               </p>
               <div className="rounded-lg border bg-white p-4">
-                <img
+                <Image
                   src={waQrCode}
                   alt="QR Code WhatsApp"
                   width={256}
                   height={256}
+                  unoptimized
                 />
               </div>
               <p className="text-center text-xs text-muted-foreground">
