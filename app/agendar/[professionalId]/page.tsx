@@ -17,9 +17,7 @@ const AgendarPage = async ({ params }: AgendarPageProps) => {
     notFound();
   }
 
-  redirect(
-    `/barbershops/${professional.barbershopId}?ref=${professionalId}`,
-  );
+  redirect(`/barbershops/${professional.barbershopId}`);
 };
 
 export default AgendarPage;

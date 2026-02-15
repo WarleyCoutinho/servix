@@ -189,7 +189,7 @@ export async function sendDailyScheduleToGroup(
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://servixplatform.vercel.app";
   const bookingPath = professional.barbershop.slug
-    ? `/${professional.barbershop.slug}?ref=${professionalId}`
+    ? `/${professional.barbershop.slug}`
     : `/agendar/${professionalId}`;
   const bookingUrl = `${appUrl}${bookingPath}`;
 
