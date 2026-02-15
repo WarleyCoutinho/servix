@@ -22,32 +22,38 @@ const BookingItem = ({ booking }: BookingItemProps) => {
   return (
     <Sheet open={sheetIsOpen} onOpenChange={setSheetIsOpen}>
       <SheetTrigger asChild>
-        <Card className="flex h-full w-full min-w-full cursor-pointer flex-row items-center justify-between p-0">
-          <div className="flex flex-1 flex-col gap-4 p-4">
+        <Card className="flex h-full w-full min-w-full cursor-pointer flex-row items-center justify-between overflow-hidden p-0 transition-shadow hover:shadow-md snap-start">
+          <div className="flex flex-1 flex-col gap-3 p-4">
             {status === "cancelled" ? (
-              <Badge variant="destructive">CANCELADO</Badge>
+              <Badge variant="destructive" className="w-fit">CANCELADO</Badge>
             ) : status === "confirmed" ? (
-              <Badge>CONFIRMADO</Badge>
+              <Badge className="w-fit">CONFIRMADO</Badge>
             ) : (
-              <Badge variant="secondary">FINALIZADO</Badge>
+              <Badge variant="secondary" className="w-fit">FINALIZADO</Badge>
             )}
-            <div className="flex flex-col gap-2">
-              <p className="font-bold">{booking.service.name}</p>
+            <div className="flex flex-col gap-1.5">
+              <p className="font-semibold leading-tight">{booking.service.name}</p>
               <div className="flex items-center gap-2">
-                <Avatar className="h-6 w-6">
+                <Avatar className="size-5 rounded-md">
                   <AvatarImage src={booking.barbershop.imageUrl} />
                 </Avatar>
-                <p className="text-sm font-medium">{booking.barbershop.name}</p>
+                <p className="text-sm text-muted-foreground">
+                  {booking.barbershop.name}
+                </p>
               </div>
             </div>
           </div>
 
-          <div className="flex h-full w-[6.625rem] flex-col items-center justify-center border-l py-3">
-            <p className="text-xs capitalize">
-              {format(booking.date, "MMMM", { locale: ptBR })}
+          <div className="flex h-full w-[5.5rem] shrink-0 flex-col items-center justify-center gap-0.5 border-l bg-muted/50 px-3 py-4 text-center">
+            <p className="text-xs font-medium capitalize text-muted-foreground">
+              {format(booking.date, "MMM", { locale: ptBR })}
             </p>
-            <p className="text-2xl">{format(booking.date, "dd")}</p>
-            <p className="text-xs">{format(booking.date, "HH:mm")}</p>
+            <p className="text-3xl font-bold leading-none tabular-nums">
+              {format(booking.date, "dd")}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {format(booking.date, "HH:mm")}
+            </p>
           </div>
         </Card>
       </SheetTrigger>

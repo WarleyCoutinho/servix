@@ -27,9 +27,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="pt-BR" suppressHydrationWarning>
       <body
-        className={`${plusJakartaSans.variable} ${merriweather.variable} antialiased`}
+        className={`${plusJakartaSans.variable} ${merriweather.variable} font-sans antialiased`}
       >
         <TanstackQueryProvider>
           {children}

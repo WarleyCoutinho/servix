@@ -17,7 +17,12 @@ const BookingsPage = async () => {
     <div>
       <Header categories={categories} />
       <PageContainer>
-        <h1 className="text-xl font-bold">Agendamentos</h1>
+        <div className="space-y-1">
+          <h1 className="text-2xl font-bold sm:text-3xl">Meus Agendamentos</h1>
+          <p className="text-sm text-muted-foreground">
+            Gerencie seus agendamentos confirmados e historico
+          </p>
+        </div>
 
         <PageSectionContent>
           <PageSectionTitle>Confirmados</PageSectionTitle>

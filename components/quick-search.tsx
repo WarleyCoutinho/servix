@@ -48,7 +48,7 @@ const QuickSearch = ({ categories = [] }: QuickSearchProps) => {
             <Link
               key={category.search}
               href={`/barbershops?search=${encodeURIComponent(category.search)}`}
-              className="border-border bg-card-background flex shrink-0 items-center justify-center gap-3 rounded-3xl border px-4 py-2"
+              className="flex shrink-0 items-center gap-2 rounded-full border border-border bg-background px-4 py-2 text-sm font-medium text-foreground/70 shadow-xs transition-all hover:border-primary hover:bg-primary/10 hover:text-primary"
             >
               <Tag className="size-4" />
               <span className="text-card-foreground text-sm font-medium">

@@ -20,6 +20,7 @@ import { toast } from "sonner";
 import ChatSheet from "./chat-sheet";
 import LoginModal from "./login-modal";
 import MenuSheet from "./menu-sheet";
+import { ThemeToggle } from "./theme-toggle";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import {
@@ -146,6 +147,7 @@ const Header = ({ categories = [] }: HeaderProps) => {
         </div>
 
         <div className="flex items-center gap-2">
+          <ThemeToggle />
           <ChatSheet triggerClassName="hidden sm:flex" iconOnly />
 
           <div className="hidden md:block">

@@ -191,3 +191,24 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  .alert-warning {
+    border-color: oklch(0.769 0.188 70.08 / 0.6);
+    background-color: oklch(0.962 0.059 95.617);
+    color: oklch(0.553 0.135 66.442);
+  }
+  .dark .alert-warning {
+    background-color: oklch(0.344 0.108 71.717 / 0.5);
+    color: oklch(0.905 0.093 84.717);
+  }
+  .alert-success {
+    border-color: oklch(0.696 0.17 162.48 / 0.6);
+    background-color: oklch(0.962 0.044 156.743);
+    color: oklch(0.438 0.127 151.711);
+  }
+  .dark .alert-success {
+    background-color: oklch(0.344 0.097 152.476 / 0.5);
+    color: oklch(0.905 0.093 164.717);
+  }
+}

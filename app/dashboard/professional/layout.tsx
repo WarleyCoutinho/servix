@@ -61,11 +61,11 @@ export default async function ProfessionalDashboardLayout({
         navItems={navItems}
       >
         {!professional.stripeOnboardingComplete && (
-          <div className="m-4 rounded-lg border border-yellow-500 bg-yellow-50 p-4 dark:bg-yellow-950">
-            <p className="mb-2 text-sm font-medium text-yellow-800 dark:text-yellow-200">
+          <div className="alert-warning m-4 rounded-lg border p-4">
+            <p className="mb-2 text-sm font-medium">
               Configure seu Stripe
             </p>
-            <p className="mb-3 text-xs text-yellow-700 dark:text-yellow-300">
+            <p className="mb-3 text-xs opacity-80">
               Para receber pagamentos, configure sua conta Stripe.
             </p>
             <Button size="sm" asChild className="w-full">
@@ -77,7 +77,11 @@ export default async function ProfessionalDashboardLayout({
           </div>
         )}
       </DashboardSidebar>
-      <main className="flex-1 p-4 pt-18 sm:p-6 md:pt-6">{children}</main>
+      <main className="flex-1 overflow-auto">
+        <div className="mx-auto max-w-6xl p-4 pt-16 sm:p-6 md:pt-6">
+          {children}
+        </div>
+      </main>
     </div>
   );
 }

@@ -96,10 +96,10 @@ export default async function OwnerDashboardPage() {
       </div>
 
       {!isSubscriptionActive && (
-        <Card className="border-yellow-500 bg-yellow-50 dark:bg-yellow-950">
+        <Card className="alert-warning border">
           <CardContent className="flex items-center justify-between pt-6">
-            <p className="text-yellow-800 dark:text-yellow-200">
-              Sua assinatura não está ativa. Ative para desbloquear todos os
+            <p>
+              Sua assinatura nao esta ativa. Ative para desbloquear todos os
               recursos.
             </p>
             <Button size="sm" asChild>
@@ -166,59 +166,71 @@ export default async function OwnerDashboardPage() {
       )}
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
+        <Card className="relative overflow-hidden transition-shadow hover:shadow-md">
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/60 to-transparent" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Profissionais</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Profissionais</CardTitle>
+            <div className="rounded-lg bg-primary/10 p-2">
+              <Users className="h-4 w-4 text-primary" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold tabular-nums">
               {barbershop.professionals.length}
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="mt-1 text-xs text-muted-foreground">
               {barbershop.professionals.filter((p) => p.isActive).length} ativos
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="relative overflow-hidden transition-shadow hover:shadow-md">
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/60 to-transparent" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Serviços</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Servicos</CardTitle>
+            <div className="rounded-lg bg-primary/10 p-2">
+              <TrendingUp className="h-4 w-4 text-primary" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold tabular-nums">
               {barbershop._count.services}
             </div>
-            <p className="text-xs text-muted-foreground">cadastrados</p>
+            <p className="mt-1 text-xs text-muted-foreground">cadastrados</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="relative overflow-hidden transition-shadow hover:shadow-md">
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/60 to-transparent" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Agendamentos (Mês)
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Agendamentos (Mes)
             </CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <div className="rounded-lg bg-primary/10 p-2">
+              <Calendar className="h-4 w-4 text-primary" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{monthlyBookings}</div>
-            <p className="text-xs text-muted-foreground">neste mês</p>
+            <div className="text-2xl font-bold tabular-nums">{monthlyBookings}</div>
+            <p className="mt-1 text-xs text-muted-foreground">neste mes</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="relative overflow-hidden transition-shadow hover:shadow-md">
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/60 to-transparent" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Taxa Plataforma (Mês)
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Taxa Plataforma (Mes)
             </CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <div className="rounded-lg bg-primary/10 p-2">
+              <DollarSign className="h-4 w-4 text-primary" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold tabular-nums">
               {formatCurrency(monthlyRevenue._sum.applicationFeeInCents ?? 0)}
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="mt-1 text-xs text-muted-foreground">
               receita da plataforma
             </p>
           </CardContent>

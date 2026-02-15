@@ -105,61 +105,73 @@ export default async function AdminSettingsPage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
+        <Card className="relative overflow-hidden transition-shadow hover:shadow-md">
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/60 to-transparent" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">MRR (Receita Mensal)</CardTitle>
-            <DollarSign className="h-4 w-4 text-green-600" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">MRR (Receita Mensal)</CardTitle>
+            <div className="rounded-lg bg-primary/10 p-2">
+              <DollarSign className="h-4 w-4 text-primary" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold tabular-nums">
               {new Intl.NumberFormat("pt-BR", {
                 style: "currency",
                 currency: "BRL",
               }).format(monthlyRecurringRevenue / 100)}
             </div>
-            <p className="text-muted-foreground text-xs">
+            <p className="text-muted-foreground mt-1 text-xs">
               {totalRevenue.length} assinaturas ativas
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="relative overflow-hidden transition-shadow hover:shadow-md">
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/60 to-transparent" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Novos este mês</CardTitle>
-            <TrendingUp className="h-4 w-4 text-blue-600" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Novos este mes</CardTitle>
+            <div className="rounded-lg bg-primary/10 p-2">
+              <TrendingUp className="h-4 w-4 text-primary" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{monthlyRevenue}</div>
-            <p className="text-muted-foreground text-xs">assinaturas</p>
+            <div className="text-2xl font-bold tabular-nums">{monthlyRevenue}</div>
+            <p className="text-muted-foreground mt-1 text-xs">assinaturas</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="relative overflow-hidden transition-shadow hover:shadow-md">
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/60 to-transparent" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Agendamentos (mês)</CardTitle>
-            <Calendar className="h-4 w-4 text-purple-600" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Agendamentos (mes)</CardTitle>
+            <div className="rounded-lg bg-primary/10 p-2">
+              <Calendar className="h-4 w-4 text-primary" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{bookingsThisMonth}</div>
-            <p className="text-muted-foreground text-xs">
+            <div className="text-2xl font-bold tabular-nums">{bookingsThisMonth}</div>
+            <p className="text-muted-foreground mt-1 text-xs">
               {activeBookings} total ativos
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="relative overflow-hidden transition-shadow hover:shadow-md">
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/60 to-transparent" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Crescimento (30d)</CardTitle>
-            <Activity className="h-4 w-4 text-orange-600" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Crescimento (30d)</CardTitle>
+            <div className="rounded-lg bg-primary/10 p-2">
+              <Activity className="h-4 w-4 text-primary" />
+            </div>
           </CardHeader>
           <CardContent>
             <div className="flex gap-4">
               <div>
-                <div className="text-xl font-bold">{recentUsers}</div>
-                <p className="text-muted-foreground text-xs">usuários</p>
+                <div className="text-xl font-bold tabular-nums">{recentUsers}</div>
+                <p className="text-muted-foreground text-xs">usuarios</p>
               </div>
               <div>
-                <div className="text-xl font-bold">{recentBarbershops}</div>
+                <div className="text-xl font-bold tabular-nums">{recentBarbershops}</div>
                 <p className="text-muted-foreground text-xs">barbearias</p>
               </div>
             </div>

@@ -148,7 +148,7 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
   );
 
   return (
-    <div className="border-border bg-card flex gap-3 rounded-2xl border p-3">
+    <div className="border-border bg-card flex gap-3 rounded-2xl border p-3 transition-shadow hover:shadow-sm">
       {/* Service Image */}
       <div className="relative h-27.5 w-27.5 shrink-0">
         <Image
@@ -319,14 +319,14 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
                         </div>
                       ) : availableTimeSlots?.data?.slots &&
                         availableTimeSlots.data.slots.length > 0 ? (
-                        <div className="flex gap-3 overflow-x-auto [&::-webkit-scrollbar]:hidden">
+                        <div className="flex gap-2 overflow-x-auto scroll-smooth snap-x pb-1 [&::-webkit-scrollbar]:hidden">
                           {availableTimeSlots.data.slots.map((time) => (
                             <Button
                               key={time}
                               variant={
                                 selectedTime === time ? "default" : "outline"
                               }
-                              className="rounded-full"
+                              className="shrink-0 snap-start rounded-full"
                               onClick={() => handleTimeSelect(time)}
                             >
                               {time}

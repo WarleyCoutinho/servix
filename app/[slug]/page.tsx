@@ -32,7 +32,7 @@ const SlugPage = async ({ params }: SlugPageProps) => {
     <div>
       <Header categories={categories} />
 
-      <div className="relative h-[250px] w-full">
+      <div className="relative h-[220px] w-full sm:h-[320px]">
         <Image
           src={barbershop.imageUrl}
           alt={barbershop.name}

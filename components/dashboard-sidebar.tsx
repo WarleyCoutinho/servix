@@ -1,5 +1,9 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { ChevronLeft, Menu, type LucideIcon } from "lucide-react";
 import {
   Sheet,
@@ -28,12 +32,14 @@ function SidebarContent({
   navItems,
   children,
 }: DashboardSidebarProps) {
+  const pathname = usePathname();
+
   return (
     <>
       <div className="flex h-16 items-center border-b px-4">
         <Link
           href="/"
-          className="text-muted-foreground hover:text-foreground flex items-center gap-2 text-sm"
+          className="text-muted-foreground hover:text-foreground flex items-center gap-2 text-sm transition-colors"
         >
           <ChevronLeft className="h-4 w-4" />
           Voltar
@@ -44,19 +50,26 @@ function SidebarContent({
         <p className="text-muted-foreground text-sm">{subtitle}</p>
       </div>
       <nav className="space-y-1 px-2">
-        {navItems.map((item) => (
-          <Button
-            key={item.href}
-            variant="ghost"
-            className="w-full justify-start"
-            asChild
-          >
-            <Link href={item.href}>
-              <item.icon className="mr-2 h-4 w-4" />
-              {item.label}
-            </Link>
-          </Button>
-        ))}
+        {navItems.map((item) => {
+          const isActive = pathname === item.href;
+          return (
+            <Button
+              key={item.href}
+              variant="ghost"
+              className={cn(
+                "w-full justify-start rounded-lg",
+                isActive &&
+                  "bg-primary/10 text-primary font-medium border-l-2 border-primary",
+              )}
+              asChild
+            >
+              <Link href={item.href}>
+                <item.icon className="mr-2 h-4 w-4" />
+                {item.label}
+              </Link>
+            </Button>
+          );
+        })}
       </nav>
       {children}
     </>
@@ -83,7 +96,7 @@ export function DashboardSidebar(props: DashboardSidebarProps) {
           </SheetTrigger>
           <SheetContent side="left" className="w-64 p-0">
             <SheetHeader className="sr-only">
-              <SheetTitle>Menu de navegação</SheetTitle>
+              <SheetTitle>Menu de navegacao</SheetTitle>
             </SheetHeader>
             <SidebarContent {...props} />
           </SheetContent>

@@ -99,51 +99,63 @@ export default async function ProfessionalDashboardPage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
+        <Card className="relative overflow-hidden transition-shadow hover:shadow-md">
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/60 to-transparent" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Hoje</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Hoje</CardTitle>
+            <div className="rounded-lg bg-primary/10 p-2">
+              <Calendar className="h-4 w-4 text-primary" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{todayBookings}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-2xl font-bold tabular-nums">{todayBookings}</div>
+            <p className="mt-1 text-xs text-muted-foreground">
               agendamentos para hoje
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="relative overflow-hidden transition-shadow hover:shadow-md">
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/60 to-transparent" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Este Mês</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Este Mes</CardTitle>
+            <div className="rounded-lg bg-primary/10 p-2">
+              <TrendingUp className="h-4 w-4 text-primary" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{monthlyBookings}</div>
-            <p className="text-xs text-muted-foreground">
-              agendamentos no mês
+            <div className="text-2xl font-bold tabular-nums">{monthlyBookings}</div>
+            <p className="mt-1 text-xs text-muted-foreground">
+              agendamentos no mes
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="relative overflow-hidden transition-shadow hover:shadow-md">
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/60 to-transparent" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Ganhos (Mês)</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Ganhos (Mes)</CardTitle>
+            <div className="rounded-lg bg-primary/10 p-2">
+              <DollarSign className="h-4 w-4 text-primary" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold tabular-nums">
               {formatCurrency(totalEarnings)}
             </div>
-            <p className="text-xs text-muted-foreground">
-              líquido após taxa da plataforma
+            <p className="mt-1 text-xs text-muted-foreground">
+              liquido apos taxa da plataforma
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="relative overflow-hidden transition-shadow hover:shadow-md">
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/60 to-transparent" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Status Stripe</CardTitle>
-            <CreditCard className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Status Stripe</CardTitle>
+            <div className="rounded-lg bg-primary/10 p-2">
+              <CreditCard className="h-4 w-4 text-primary" />
+            </div>
           </CardHeader>
           <CardContent>
             <Badge variant={stripeStatus.variant}>{stripeStatus.label}</Badge>

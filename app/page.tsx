@@ -28,19 +28,33 @@ export default async function Home() {
     ]);
 
   return (
-    <div>
+    <div className="flex min-h-screen flex-col">
       <Header categories={categories} />
       <PageContainer>
         <Suspense fallback={null}>
           <AuthErrorAlert />
         </Suspense>
         <QuickSearch categories={categories} />
-        <Image
-          src={banner}
-          alt="Agende nos melhores com a Servix"
-          sizes="100vw"
-          className="h-auto w-full"
-        />
+
+        <div className="relative overflow-hidden rounded-2xl">
+          <Image
+            src={banner}
+            alt="Agende nos melhores com a Servix"
+            sizes="(max-width: 768px) 100vw, 1024px"
+            className="h-auto w-full rounded-2xl"
+            priority
+          />
+          <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
+          <div className="absolute bottom-4 left-4 right-4 sm:bottom-8 sm:left-8">
+            <h2 className="text-xl font-bold text-white sm:text-3xl">
+              Encontre sua barbearia
+            </h2>
+            <p className="mt-1 text-sm text-white/80 sm:text-base">
+              Agende com os melhores profissionais da sua cidade
+            </p>
+          </div>
+        </div>
+
         {confirmedBookings.length > 0 && (
           <PageSectionContent>
             <PageSectionTitle>Agendamentos</PageSectionTitle>
@@ -68,7 +82,9 @@ export default async function Home() {
           </PageSectionScroller>
         </PageSectionContent>
       </PageContainer>
-      <Footer />
+      <div className="mt-auto">
+        <Footer />
+      </div>
     </div>
   );
 }
