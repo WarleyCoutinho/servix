@@ -7,7 +7,7 @@ import {
 } from "@/lib/schedule-utils";
 import { endOfDayBrt, formatBrt, startOfDayBrt, TIMEZONE } from "@/lib/timezone";
 import { sendGroupMessage } from "@/lib/whatsapp";
-import { format } from "date-fns";
+import { addMinutes, format } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 
 interface BookingInfo {
@@ -154,7 +154,7 @@ export async function sendDailyScheduleToGroup(
       },
     },
     include: {
-      service: { select: { name: true } },
+      service: { select: { name: true, durationMinutes: true } },
       user: { select: { name: true } },
     },
     orderBy: { date: "asc" },
@@ -209,18 +209,28 @@ export async function sendDailyScheduleToGroup(
 function buildBookedTimesMap(
   bookings: Array<{
     date: Date;
-    service: { name: string };
+    service: { name: string; durationMinutes: number };
     user: { name: string };
   }>,
 ): Map<string, BookingInfo> {
   const map = new Map<string, BookingInfo>();
 
   for (const booking of bookings) {
+    const slotsNeeded = Math.ceil(booking.service.durationMinutes / DEFAULT_INTERVAL_MINUTES);
     const timeKey = formatBrt(booking.date, "HH:mm");
     map.set(timeKey, {
       serviceName: booking.service.name,
       clientName: booking.user.name,
     });
+
+    for (let i = 1; i < slotsNeeded; i++) {
+      const nextSlotDate = addMinutes(booking.date, i * DEFAULT_INTERVAL_MINUTES);
+      const nextTimeKey = formatBrt(nextSlotDate, "HH:mm");
+      map.set(nextTimeKey, {
+        serviceName: `${booking.service.name} (cont.)`,
+        clientName: booking.user.name,
+      });
+    }
   }
 
   return map;

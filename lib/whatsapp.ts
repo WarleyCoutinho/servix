@@ -2,7 +2,24 @@ const WHATSAPP_SERVICE_URL =
   process.env.WHATSAPP_SERVICE_URL || "http://localhost:3001";
 const WHATSAPP_SERVICE_API_KEY = process.env.WHATSAPP_SERVICE_API_KEY || "";
 
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 type ConnectionStatus = "disconnected" | "connecting" | "qr_code" | "connected";
+
+function validateProfessionalId(professionalId: string): void {
+  if (!UUID_REGEX.test(professionalId)) {
+    throw new Error("Invalid professionalId format");
+  }
+}
+
+function buildUrl(path: string): string {
+  const url = new URL(path, WHATSAPP_SERVICE_URL);
+  const baseOrigin = new URL(WHATSAPP_SERVICE_URL).origin;
+  if (url.origin !== baseOrigin) {
+    throw new Error("URL origin mismatch");
+  }
+  return url.toString();
+}
 
 async function whatsappFetch<T>(
   path: string,
@@ -16,16 +33,19 @@ async function whatsappFetch<T>(
     headers["Content-Type"] = "application/json";
   }
 
-  const res = await fetch(`${WHATSAPP_SERVICE_URL}${path}`, {
+  const url = buildUrl(path);
+
+  const res = await fetch(url, {
     ...options,
     headers: {
       ...headers,
       ...options?.headers,
     },
+    redirect: "error",
   });
 
   if (!res.ok) {
-    throw new Error(`WhatsApp service error: ${res.status} ${res.statusText}`);
+    throw new Error(`WhatsApp service error: ${res.status}`);
   }
 
   return res.json() as Promise<T>;
@@ -35,6 +55,7 @@ export async function getStatus(
   professionalId: string,
 ): Promise<{ status: ConnectionStatus; qrCode: string | null }> {
   try {
+    validateProfessionalId(professionalId);
     return await whatsappFetch<{ status: ConnectionStatus; qrCode: string | null }>(
       `/status/${professionalId}`,
     );
@@ -59,12 +80,13 @@ export async function connectProfessional(
   professionalId: string,
 ): Promise<{ status: ConnectionStatus; qrCode: string | null }> {
   try {
+    validateProfessionalId(professionalId);
     return await whatsappFetch<{
       status: ConnectionStatus;
       qrCode: string | null;
     }>(`/connect/${professionalId}`, { method: "POST" });
   } catch (error) {
-    console.error("[WhatsApp Client] Erro ao conectar:", error);
+    console.error("[WhatsApp Client] Erro ao conectar:", error instanceof Error ? error.message : "Unknown error");
     return { status: "disconnected", qrCode: null };
   }
 }
@@ -73,9 +95,10 @@ export async function disconnectProfessional(
   professionalId: string,
 ): Promise<void> {
   try {
+    validateProfessionalId(professionalId);
     await whatsappFetch(`/disconnect/${professionalId}`, { method: "POST" });
   } catch (error) {
-    console.error("[WhatsApp Client] Erro ao desconectar:", error);
+    console.error("[WhatsApp Client] Erro ao desconectar:", error instanceof Error ? error.message : "Unknown error");
   }
 }
 
@@ -85,13 +108,14 @@ export async function sendGroupMessage(
   message: string,
 ): Promise<boolean> {
   try {
+    validateProfessionalId(professionalId);
     const result = await whatsappFetch<{ success: boolean }>("/send-message", {
       method: "POST",
       body: JSON.stringify({ professionalId, groupName, message }),
     });
     return result.success;
   } catch (error) {
-    console.error("[WhatsApp Client] Erro ao enviar mensagem:", error);
+    console.error("[WhatsApp Client] Erro ao enviar mensagem:", error instanceof Error ? error.message : "Unknown error");
     return false;
   }
 }

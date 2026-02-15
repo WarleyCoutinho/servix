@@ -1,5 +1,5 @@
 import { connectProfessional } from "@/lib/whatsapp";
-import { prisma } from "@/lib/prisma";
+import { requireOwnerOrProfessional } from "@/lib/api-auth";
 import { NextResponse } from "next/server";
 
 export const POST = async (
@@ -7,17 +7,10 @@ export const POST = async (
   { params }: { params: Promise<{ professionalId: string }> },
 ) => {
   const { professionalId } = await params;
+  const authResult = await requireOwnerOrProfessional(professionalId);
 
-  const professional = await prisma.professional.findUnique({
-    where: { id: professionalId },
-    select: { id: true },
-  });
-
-  if (!professional) {
-    return NextResponse.json(
-      { error: "Profissional não encontrado" },
-      { status: 404 },
-    );
+  if (!authResult.authorized) {
+    return authResult.response;
   }
 
   const result = await connectProfessional(professionalId);

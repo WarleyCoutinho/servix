@@ -8,7 +8,7 @@ import {
   getDayOfWeekFromDate,
 } from "@/lib/schedule-utils";
 import { TIMEZONE, startOfDayBrt, endOfDayBrt, formatBrt } from "@/lib/timezone";
-import { startOfDay } from "date-fns";
+import { addMinutes, startOfDay } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 import { returnValidationErrors } from "next-safe-action";
 import { z } from "zod";
@@ -17,11 +17,12 @@ const inputSchema = z.object({
   barbershopId: z.uuid(),
   professionalId: z.uuid(),
   date: z.date(),
+  serviceId: z.uuid().optional(),
 });
 
 export const getAvailableSlots = actionClient
   .inputSchema(inputSchema)
-  .action(async ({ parsedInput: { barbershopId, professionalId, date } }) => {
+  .action(async ({ parsedInput: { barbershopId, professionalId, date, serviceId } }) => {
     const now = new Date();
 
     const dayStart = startOfDayBrt(date);
@@ -76,6 +77,7 @@ export const getAvailableSlots = actionClient
       DEFAULT_INTERVAL_MINUTES,
     );
 
+    // Fetch booked bookings WITH service duration
     const bookedBookings = await prisma.booking.findMany({
       where: {
         professionalId,
@@ -85,15 +87,59 @@ export const getAvailableSlots = actionClient
         },
         cancelledAt: null,
       },
-      select: { date: true },
+      select: {
+        date: true,
+        service: { select: { durationMinutes: true } },
+      },
     });
 
-    const bookedTimeStrings = new Set(
-      bookedBookings.map((b) => formatBrt(b.date, "HH:mm")),
-    );
+    // Build a set of ALL occupied time slots (considering duration)
+    const occupiedSlots = new Set<string>();
+    for (const booking of bookedBookings) {
+      const duration = booking.service.durationMinutes;
+      const slotsNeeded = Math.ceil(duration / DEFAULT_INTERVAL_MINUTES);
+      const startTime = formatBrt(booking.date, "HH:mm");
+      occupiedSlots.add(startTime);
 
-    slots = slots.filter((slot) => !bookedTimeStrings.has(slot));
+      // Mark additional slots that the service occupies
+      for (let i = 1; i < slotsNeeded; i++) {
+        const nextSlotDate = addMinutes(booking.date, i * DEFAULT_INTERVAL_MINUTES);
+        occupiedSlots.add(formatBrt(nextSlotDate, "HH:mm"));
+      }
+    }
 
+    // Get the service being booked (if provided) for forward-looking check
+    let newServiceDuration = DEFAULT_INTERVAL_MINUTES;
+    if (serviceId) {
+      const service = await prisma.barbershopService.findUnique({
+        where: { id: serviceId },
+        select: { durationMinutes: true },
+      });
+      if (service) {
+        newServiceDuration = service.durationMinutes;
+      }
+    }
+
+    const newServiceSlotsNeeded = Math.ceil(newServiceDuration / DEFAULT_INTERVAL_MINUTES);
+
+    // Filter slots: a slot is available only if ALL slots it would occupy are free
+    slots = slots.filter((slot) => {
+      // Check if this slot itself is occupied
+      if (occupiedSlots.has(slot)) return false;
+
+      // For multi-slot services, check if trailing slots are also free
+      if (newServiceSlotsNeeded > 1) {
+        const slotIndex = slots.indexOf(slot);
+        for (let i = 1; i < newServiceSlotsNeeded; i++) {
+          const nextSlot = slots[slotIndex + i];
+          if (!nextSlot || occupiedSlots.has(nextSlot)) return false;
+        }
+      }
+
+      return true;
+    });
+
+    // Filter past slots if today
     const nowBrt = toZonedTime(now, TIMEZONE);
     const dateBrt = toZonedTime(date, TIMEZONE);
     const isToday =

@@ -58,6 +58,7 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
       barbershopId: barbershop.id,
       professionalId: selectedProfessional,
       date: selectedDate,
+      serviceId: service.id,
     });
 
   const handleDateSelect = (date: Date | undefined) => {

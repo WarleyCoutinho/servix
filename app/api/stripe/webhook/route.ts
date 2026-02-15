@@ -10,7 +10,9 @@ import {
   updateUserRoleBasedOnPlan,
 } from "@/lib/role-sync";
 import { sendDailyScheduleToGroup } from "@/lib/whatsapp-schedule";
-import { isTodayBrt } from "@/lib/timezone";
+import { isTodayBrt, startOfDayBrt, endOfDayBrt } from "@/lib/timezone";
+import { DEFAULT_INTERVAL_MINUTES } from "@/lib/schedule-utils";
+import { addMinutes } from "date-fns";
 
 const PLAN_ORDER: Record<SubscriptionPlan, number> = {
   [SubscriptionPlan.BASIC]: 1,
@@ -122,6 +124,40 @@ export const POST = async (request: Request) => {
           const professionalId = metadata.data.professionalId;
 
           await prisma.$transaction(async (tx) => {
+            const bookingDate = new Date(metadata.data.date);
+            const dayStart = startOfDayBrt(bookingDate);
+            const dayEnd = endOfDayBrt(bookingDate);
+
+            const existingBookings = await tx.booking.findMany({
+              where: {
+                professionalId,
+                date: { gte: dayStart, lte: dayEnd },
+                cancelledAt: null,
+              },
+              include: { service: { select: { durationMinutes: true } } },
+            });
+
+            const service = await tx.barbershopService.findUnique({
+              where: { id: metadata.data.serviceId },
+              select: { durationMinutes: true },
+            });
+
+            const newDuration = service?.durationMinutes ?? DEFAULT_INTERVAL_MINUTES;
+            const newSlotsNeeded = Math.ceil(newDuration / DEFAULT_INTERVAL_MINUTES);
+            const newStart = bookingDate.getTime();
+            const newEnd = addMinutes(bookingDate, newSlotsNeeded * DEFAULT_INTERVAL_MINUTES).getTime();
+
+            for (const existing of existingBookings) {
+              const existingDuration = existing.service.durationMinutes;
+              const existingSlotsNeeded = Math.ceil(existingDuration / DEFAULT_INTERVAL_MINUTES);
+              const existingStart = existing.date.getTime();
+              const existingEnd = addMinutes(existing.date, existingSlotsNeeded * DEFAULT_INTERVAL_MINUTES).getTime();
+
+              if (newStart < existingEnd && newEnd > existingStart) {
+                throw new Error(`Conflito de horário: profissional ${professionalId} já tem agendamento neste horário`);
+              }
+            }
+
             const booking = await tx.booking.create({
               data: {
                 serviceId: metadata.data.serviceId,

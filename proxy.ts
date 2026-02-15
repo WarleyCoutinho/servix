@@ -7,10 +7,13 @@ const publicRoutes = [
   "/api/auth",
   "/api/stripe/webhook",
   "/api/stripe/connect/webhook",
+  "/api/cron",
 ];
 
 const ownerRoutes = ["/dashboard/owner"];
 const professionalRoutes = ["/dashboard/professional"];
+
+const PROTECTED_ROUTES = ["/dashboard", "/bookings", "/api/whatsapp"];
 
 function isPublicRoute(pathname: string): boolean {
   return publicRoutes.some(
@@ -26,7 +29,10 @@ function isProfessionalRoute(pathname: string): boolean {
   return professionalRoutes.some((route) => pathname.startsWith(route));
 }
 
-// Função para decodificar o token e extrair o role do usuário
+function isProtectedRoute(pathname: string): boolean {
+  return PROTECTED_ROUTES.some((route) => pathname.startsWith(route));
+}
+
 async function getUserRole(request: NextRequest): Promise<string | null> {
   const sessionCookie =
     request.cookies.get("better-auth.session_token") ||
@@ -37,7 +43,6 @@ async function getUserRole(request: NextRequest): Promise<string | null> {
   }
 
   try {
-    // Faz uma requisição interna para obter os dados da sessão
     const response = await fetch(
       `${process.env.BETTER_AUTH_URL}/api/auth/get-session`,
       {
@@ -53,47 +58,78 @@ async function getUserRole(request: NextRequest): Promise<string | null> {
 
     const data = await response.json();
     return data?.user?.role || null;
-  } catch (error) {
-    console.error("Erro ao verificar role do usuário:", error);
+  } catch {
     return null;
   }
 }
 
-// MUDANÇA AQUI: Renomeie de "middleware" para "proxy"
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Permite rotas públicas
+  if (pathname.startsWith("/api/auth")) {
+    return NextResponse.next();
+  }
+
+  if (
+    pathname.startsWith("/api/stripe") ||
+    pathname.startsWith("/api/cron")
+  ) {
+    return NextResponse.next();
+  }
+
+  if (
+    request.method !== "GET" &&
+    request.method !== "HEAD" &&
+    pathname.startsWith("/api/") &&
+    !pathname.startsWith("/api/stripe") &&
+    !pathname.startsWith("/api/cron") &&
+    !pathname.startsWith("/api/auth")
+  ) {
+    const origin = request.headers.get("origin");
+    const allowedOrigin = process.env.NEXT_PUBLIC_APP_URL;
+
+    if (allowedOrigin && origin && origin !== allowedOrigin) {
+      return NextResponse.json(
+        { error: "CSRF validation failed" },
+        { status: 403 },
+      );
+    }
+  }
+
   if (isPublicRoute(pathname)) {
     return NextResponse.next();
   }
 
-  // Verifica se existe sessão
   const sessionCookie =
     request.cookies.get("better-auth.session_token") ||
     request.cookies.get("__Secure-better-auth.session_token");
 
-  if (!sessionCookie) {
+  if (isProtectedRoute(pathname) && !sessionCookie) {
+    if (pathname.startsWith("/api/")) {
+      return NextResponse.json(
+        { error: "Não autenticado" },
+        { status: 401 },
+      );
+    }
     const loginUrl = new URL("/", request.url);
     loginUrl.searchParams.set("redirect", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
-  // Verifica permissões para rotas específicas
+  if (!sessionCookie) {
+    return NextResponse.next();
+  }
+
   const userRole = await getUserRole(request);
 
-  // Proteção de rotas do Owner
   if (isOwnerRoute(pathname)) {
     if (userRole !== "owner") {
-      // Redireciona para a página inicial se não for owner
       return NextResponse.redirect(new URL("/", request.url));
     }
   }
 
-  // Proteção de rotas do Professional
   if (isProfessionalRoute(pathname)) {
     if (userRole !== "professional" && userRole !== "owner") {
-      // Owner também pode acessar rotas de professional
       return NextResponse.redirect(new URL("/", request.url));
     }
   }
@@ -102,5 +138,7 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|public).*)"],
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
+  ],
 };

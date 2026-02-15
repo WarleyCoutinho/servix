@@ -4,9 +4,11 @@ import { protectedActionClient } from "@/lib/action-client";
 import z from "zod";
 import { prisma } from "@/lib/prisma";
 import { returnValidationErrors } from "next-safe-action";
-import { isPast } from "date-fns";
+import { isPast, addMinutes } from "date-fns";
 import { stripe, calculatePlatformFee } from "@/lib/stripe";
 import { isAccountReadyForPayments } from "@/lib/stripe-connect";
+import { DEFAULT_INTERVAL_MINUTES } from "@/lib/schedule-utils";
+import { startOfDayBrt, endOfDayBrt } from "@/lib/timezone";
 import type Stripe from "stripe";
 
 const inputSchema = z.object({
@@ -79,22 +81,36 @@ export const createBookingCheckoutSession = protectedActionClient
         });
       }
 
-      const existingBooking = await prisma.booking.findFirst({
+      const dayStart = startOfDayBrt(date);
+      const dayEnd = endOfDayBrt(date);
+
+      const existingBookings = await prisma.booking.findMany({
         where: {
           professionalId,
-          date,
+          date: { gte: dayStart, lte: dayEnd },
           cancelledAt: null,
         },
+        include: { service: { select: { durationMinutes: true } } },
       });
 
-      if (existingBooking) {
-        returnValidationErrors(inputSchema, {
-          date: {
-            _errors: [
-              "Este profissional já possui agendamento neste horário.",
-            ],
-          },
-        });
+      const newDuration = service.durationMinutes;
+      const newSlotsNeeded = Math.ceil(newDuration / DEFAULT_INTERVAL_MINUTES);
+      const newStart = date.getTime();
+      const newEnd = addMinutes(date, newSlotsNeeded * DEFAULT_INTERVAL_MINUTES).getTime();
+
+      for (const existing of existingBookings) {
+        const existingDuration = existing.service.durationMinutes;
+        const existingSlotsNeeded = Math.ceil(existingDuration / DEFAULT_INTERVAL_MINUTES);
+        const existingStart = existing.date.getTime();
+        const existingEnd = addMinutes(existing.date, existingSlotsNeeded * DEFAULT_INTERVAL_MINUTES).getTime();
+
+        if (newStart < existingEnd && newEnd > existingStart) {
+          returnValidationErrors(inputSchema, {
+            date: {
+              _errors: ["Este profissional já possui agendamento neste horário."],
+            },
+          });
+        }
       }
 
       const applicationFeeAmount = calculatePlatformFee(service.priceInCents);

@@ -7,6 +7,18 @@ import { prisma } from "./prisma";
 
 const ACTIVE_BARBERSHOP_COOKIE = "active-barbershop-id";
 
+const SAFE_ERROR_MESSAGES = new Set([
+  "Não autorizado. Por favor, faça login para continuar.",
+  "Acesso negado. Apenas proprietários podem acessar este recurso.",
+  "Acesso negado. Apenas profissionais podem acessar este recurso.",
+  "Acesso negado. Apenas administradores podem acessar este recurso.",
+  "Nenhum estabelecimento ativo. Faça upgrade do seu plano para reativar.",
+  "Sua conta de profissional está desativada. Entre em contato com o proprietário da barbearia.",
+  "Assinatura inativa. Por favor, renove sua assinatura para continuar.",
+  "Este profissional já possui agendamento neste horário.",
+  "Nenhuma forma de pagamento disponível para este profissional.",
+]);
+
 export const actionClient = createSafeActionClient({
   handleServerError: (error) => {
     if (isConnectionError(error)) {
@@ -16,7 +28,7 @@ export const actionClient = createSafeActionClient({
 
     console.error("[Server Action Error]", error);
 
-    if (error instanceof Error) {
+    if (error instanceof Error && SAFE_ERROR_MESSAGES.has(error.message)) {
       return error.message;
     }
 

@@ -7,6 +7,16 @@ import { createBooking } from "@/actions/create-booking";
 import { formatBrt } from "@/lib/timezone";
 
 export const POST = async (request: Request) => {
+  const { auth: authLib } = await import("@/lib/auth");
+  const { headers } = await import("next/headers");
+  const session = await authLib.api.getSession({ headers: await headers() });
+  if (!session?.user) {
+    return new Response(JSON.stringify({ error: "Não autenticado" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
   const { messages } = await request.json();
   const result = streamText({
     model: openai("gpt-4o-mini"),

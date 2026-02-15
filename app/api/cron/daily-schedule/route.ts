@@ -1,9 +1,17 @@
+import { timingSafeEqual } from "crypto";
 import { prisma } from "@/lib/prisma";
 import { sendDailyScheduleToGroup } from "@/lib/whatsapp-schedule";
 
+function verifyBearerToken(authHeader: string | null, secret: string | undefined): boolean {
+  if (!secret || !authHeader) return false;
+  const token = authHeader.replace("Bearer ", "");
+  if (token.length !== secret.length) return false;
+  return timingSafeEqual(Buffer.from(token), Buffer.from(secret));
+}
+
 export async function GET(request: Request) {
   const authHeader = request.headers.get("authorization");
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (!verifyBearerToken(authHeader, process.env.CRON_SECRET)) {
     return new Response("Unauthorized", { status: 401 });
   }
 
