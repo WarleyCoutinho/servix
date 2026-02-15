@@ -5,7 +5,7 @@ import {
   generateTimeSlots,
   getDayOfWeekFromDate,
 } from "@/lib/schedule-utils";
-import { endOfDayBrt, formatBrt, startOfDayBrt, TIMEZONE } from "@/lib/timezone";
+import { endOfDayBrt, formatBrt, isTodayBrt, startOfDayBrt, TIMEZONE } from "@/lib/timezone";
 import { sendGroupMessage } from "@/lib/whatsapp";
 import { addMinutes, format } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
@@ -144,6 +144,12 @@ export async function sendDailyScheduleToGroup(
     return;
   }
 
+  const currentTime = getCurrentTimeBrt();
+
+  if (isTodayBrt(date) && currentTime >= schedule.endTime) {
+    return;
+  }
+
   const bookings = await prisma.booking.findMany({
     where: {
       professionalId,
@@ -167,8 +173,6 @@ export async function sendDailyScheduleToGroup(
     schedule.endTime,
     DEFAULT_INTERVAL_MINUTES,
   );
-
-  const currentTime = getCurrentTimeBrt();
 
   const hasVisibleSlots = allSlots.some(
     (slot) => slot >= currentTime || bookedTimesMap.has(slot),
