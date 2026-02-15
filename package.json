@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev --port 3319",
+    "dev": "next dev",
     "build": "next build",
-    "start": "next start --port 3319  ",
+    "start": "next start",
     "lint": "eslint",
     "postinstall": "prisma generate"
   },
