@@ -6,7 +6,8 @@ import { returnValidationErrors } from "next-safe-action";
 import { prisma } from "@/lib/prisma";
 import { isPast, addMinutes } from "date-fns";
 import { DEFAULT_INTERVAL_MINUTES } from "@/lib/schedule-utils";
-import { startOfDayBrt, endOfDayBrt } from "@/lib/timezone";
+import { isTodayBrt, startOfDayBrt, endOfDayBrt } from "@/lib/timezone";
+import { sendDailyScheduleToGroup } from "@/lib/whatsapp-schedule";
 
 const inputSchema = z.object({
   serviceId: z.uuid(),
@@ -85,6 +86,12 @@ export const createBooking = protectedActionClient
         },
       });
     }, { isolationLevel: "Serializable" });
+
+    if (isTodayBrt(date)) {
+      sendDailyScheduleToGroup(professionalId, date).catch(
+        (err) => console.error("[WhatsApp] Erro ao enviar agenda:", err),
+      );
+    }
 
     return booking;
   });
