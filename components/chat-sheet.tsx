@@ -3,7 +3,8 @@
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { BotMessageSquare, Send, Sparkles } from "lucide-react";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useCallback, useState } from "react";
 import { Streamdown } from "streamdown";
 
 import { Button } from "@/components/ui/button";
@@ -22,12 +23,39 @@ interface ChatSheetProps {
 
 const ChatSheet = ({ triggerClassName, iconOnly = false }: ChatSheetProps) => {
   const [open, setOpen] = useState(false);
+  const router = useRouter();
   const { messages, sendMessage, status } = useChat({
     transport: new DefaultChatTransport({
       api: "/api/chat",
     }),
   });
   const [input, setInput] = useState("");
+
+  const handleLinkClick = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      const target = (e.target as HTMLElement).closest("a");
+      if (!target) return;
+
+      const href = target.getAttribute("href");
+      if (!href) return;
+
+      const isInternal =
+        href.startsWith("/") ||
+        href.startsWith(window.location.origin);
+
+      if (isInternal) {
+        e.preventDefault();
+        setOpen(false);
+        const path = href.startsWith("/")
+          ? href
+          : href.replace(window.location.origin, "");
+        router.push(path);
+      } else {
+        setOpen(false);
+      }
+    },
+    [router],
+  );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,7 +103,7 @@ const ChatSheet = ({ triggerClassName, iconOnly = false }: ChatSheetProps) => {
           </p>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-4 pb-4 sm:px-6">
+        <div className="flex-1 overflow-y-auto px-4 pb-4 sm:px-6" onClick={handleLinkClick}>
           <div className="flex gap-2 pt-6 pr-8">
             <div className="bg-primary/12 flex size-8 shrink-0 items-center justify-center rounded-full border">
               <BotMessageSquare className="text-primary size-3.5" />

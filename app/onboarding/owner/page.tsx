@@ -27,6 +27,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { ImageUpload } from "@/components/image-upload";
 import { Building2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -38,6 +39,7 @@ const formSchema = z.object({
     .string()
     .min(10, "Telefone inválido")
     .transform((val) => val.replace(/\D/g, "")),
+  imageUrl: z.string().optional().or(z.literal("")),
   ownerCpf: z.string().min(11, "CPF deve conter 11 dígitos"),
 });
 
@@ -55,6 +57,7 @@ export default function OwnerOnboardingPage() {
       address: "",
       description: "",
       phone: "",
+      imageUrl: "",
       ownerCpf: "",
     },
   });
@@ -106,8 +109,13 @@ export default function OwnerOnboardingPage() {
     checkOwnerStatus();
   }, [session, isSessionLoading, router]);
 
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+
   const onSubmit = (data: FormData) => {
-    execute(data);
+    execute({
+      ...data,
+      imageUrl: imageUrl || undefined,
+    });
   };
 
   if (isSessionLoading || isChecking) {
@@ -215,6 +223,31 @@ export default function OwnerOnboardingPage() {
                         placeholder="Descreva sua barbearia, serviços oferecidos, diferenciais..."
                         rows={4}
                         {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="imageUrl"
+                render={() => (
+                  <FormItem>
+                    <FormLabel>Imagem da Barbearia (opcional)</FormLabel>
+                    <FormControl>
+                      <ImageUpload
+                        value={imageUrl}
+                        onChange={(url) => {
+                          form.setValue("imageUrl", url);
+                          setImageUrl(url);
+                        }}
+                        onRemove={() => {
+                          form.setValue("imageUrl", "");
+                          setImageUrl(null);
+                        }}
+                        disabled={isPending}
                       />
                     </FormControl>
                     <FormMessage />

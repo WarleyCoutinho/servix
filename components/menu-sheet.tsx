@@ -42,7 +42,7 @@ const MenuSheet = ({ categories = [], onLoginClick }: MenuSheetProps) => {
 
   const handleNavigation = (href: string) => {
     setOpen(false);
-    router.push(href);
+    setTimeout(() => router.push(href), 150);
   };
 
   const handleLogin = () => {

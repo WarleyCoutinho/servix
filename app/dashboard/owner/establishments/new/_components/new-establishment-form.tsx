@@ -12,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { ImageUpload } from "@/components/image-upload";
 import { Loader2, Store } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
 import { useRouter } from "next/navigation";
@@ -39,6 +40,7 @@ export function NewEstablishmentForm({ showCpfField }: NewEstablishmentFormProps
     description: "",
     phone: "",
     cpf: "",
+    imageUrl: "",
   });
 
   const { execute, isPending } = useAction(createBarbershop, {
@@ -56,9 +58,10 @@ export function NewEstablishmentForm({ showCpfField }: NewEstablishmentFormProps
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const { cpf, ...rest } = formData;
+    const { cpf, imageUrl, ...rest } = formData;
     execute({
       ...rest,
+      ...(imageUrl ? { imageUrl } : {}),
       ...(showCpfField ? { cpf } : {}),
     });
   };
@@ -137,6 +140,20 @@ export function NewEstablishmentForm({ showCpfField }: NewEstablishmentFormProps
               value={formData.description}
               onChange={handleChange}
               rows={3}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Imagem da Loja (opcional)</Label>
+            <ImageUpload
+              value={formData.imageUrl || null}
+              onChange={(url) =>
+                setFormData((prev) => ({ ...prev, imageUrl: url }))
+              }
+              onRemove={() =>
+                setFormData((prev) => ({ ...prev, imageUrl: "" }))
+              }
+              disabled={isPending}
             />
           </div>
 

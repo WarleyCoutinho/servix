@@ -53,14 +53,14 @@ async function whatsappFetch<T>(
 
 export async function getStatus(
   professionalId: string,
-): Promise<{ status: ConnectionStatus; qrCode: string | null }> {
+): Promise<{ status: ConnectionStatus; qrCode: string | null; pairingCode: string | null }> {
   try {
     validateProfessionalId(professionalId);
-    return await whatsappFetch<{ status: ConnectionStatus; qrCode: string | null }>(
+    return await whatsappFetch<{ status: ConnectionStatus; qrCode: string | null; pairingCode: string | null }>(
       `/status/${professionalId}`,
     );
   } catch {
-    return { status: "disconnected", qrCode: null };
+    return { status: "disconnected", qrCode: null, pairingCode: null };
   }
 }
 
@@ -88,6 +88,25 @@ export async function connectProfessional(
   } catch (error) {
     console.error("[WhatsApp Client] Erro ao conectar:", error instanceof Error ? error.message : "Unknown error");
     return { status: "disconnected", qrCode: null };
+  }
+}
+
+export async function connectWithPhone(
+  professionalId: string,
+  phoneNumber: string,
+): Promise<{ status: ConnectionStatus; pairingCode: string | null }> {
+  try {
+    validateProfessionalId(professionalId);
+    return await whatsappFetch<{
+      status: ConnectionStatus;
+      pairingCode: string | null;
+    }>(`/connect-phone/${professionalId}`, {
+      method: "POST",
+      body: JSON.stringify({ phoneNumber }),
+    });
+  } catch (error) {
+    console.error("[WhatsApp Client] Erro ao conectar via telefone:", error instanceof Error ? error.message : "Unknown error");
+    return { status: "disconnected", pairingCode: null };
   }
 }
 

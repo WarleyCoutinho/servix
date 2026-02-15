@@ -37,6 +37,7 @@ import {
   Wifi,
   WifiOff,
   QrCode,
+  Smartphone,
 } from "lucide-react";
 import { useState, useCallback, useEffect, useRef } from "react";
 import { StripeAccountStatus } from "@/generated/prisma/enums";
@@ -101,7 +102,10 @@ export default function ProfessionalForm({
 
   const [waStatus, setWaStatus] = useState<string>("disconnected");
   const [waQrCode, setWaQrCode] = useState<string | null>(null);
+  const [waPairingCode, setWaPairingCode] = useState<string | null>(null);
   const [waConnecting, setWaConnecting] = useState(false);
+  const [waConnectionMode, setWaConnectionMode] = useState<"qr" | "phone">("qr");
+  const [waPhoneNumber, setWaPhoneNumber] = useState("");
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const pollingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -122,6 +126,7 @@ export default function ProfessionalForm({
       const data = await res.json();
       setWaStatus(data.status);
       setWaQrCode(data.qrCode);
+      setWaPairingCode(data.pairingCode);
       if (data.status === "connected" || data.status === "disconnected") {
         setWaConnecting(false);
         stopPolling();
@@ -150,10 +155,39 @@ export default function ProfessionalForm({
     if (waConnecting) return;
     setWaConnecting(true);
     setWaQrCode(null);
+    setWaPairingCode(null);
     try {
       await fetch(`/api/whatsapp/${professional.id}/connect`, { method: "POST" });
       startPolling();
       pollWhatsAppStatus();
+    } catch {
+      setWaConnecting(false);
+      toast.error("Erro ao conectar WhatsApp. Tente novamente.");
+    }
+  };
+
+  const handleConnectWithPhone = async () => {
+    const cleanPhone = waPhoneNumber.replace(/\D/g, "");
+    if (cleanPhone.length < 10) {
+      toast.error("Digite um número de celular válido com DDD.");
+      return;
+    }
+    if (waConnecting) return;
+    setWaConnecting(true);
+    setWaQrCode(null);
+    setWaPairingCode(null);
+    try {
+      const res = await fetch(`/api/whatsapp/${professional.id}/connect-phone`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phoneNumber: cleanPhone }),
+      });
+      const data = await res.json();
+      if (data.pairingCode) {
+        setWaPairingCode(data.pairingCode);
+        setWaStatus(data.status);
+      }
+      startPolling();
     } catch {
       setWaConnecting(false);
       toast.error("Erro ao conectar WhatsApp. Tente novamente.");
@@ -169,6 +203,7 @@ export default function ProfessionalForm({
     }
     setWaStatus("disconnected");
     setWaQrCode(null);
+    setWaPairingCode(null);
     setWaConnecting(false);
   };
 
@@ -513,20 +548,90 @@ export default function ProfessionalForm({
                 Desconectar
               </Button>
             ) : (
-              <Button
-                onClick={handleConnectWhatsApp}
-                disabled={waConnecting}
-                className="w-full sm:w-auto"
-              >
-                {waConnecting && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                )}
-                Conectar WhatsApp
-              </Button>
+              !waConnecting && (
+                <div className="flex w-full gap-2 sm:w-auto">
+                  <Button
+                    onClick={() => { setWaConnectionMode("qr"); handleConnectWhatsApp(); }}
+                    disabled={waConnecting}
+                    variant={waConnectionMode === "qr" ? "default" : "outline"}
+                    className="flex-1 sm:flex-initial"
+                  >
+                    <QrCode className="mr-2 h-4 w-4" />
+                    QR Code
+                  </Button>
+                </div>
+              )
             )}
           </div>
 
-          {waStatus === "qr_code" && waQrCode && (
+          {waStatus !== "connected" && !waConnecting && (
+            <div className="space-y-3 rounded-lg border p-4">
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setWaConnectionMode("qr")}
+                  className={`flex flex-1 items-center justify-center gap-2 rounded-lg border p-3 text-sm font-medium transition-colors ${
+                    waConnectionMode === "qr"
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "hover:bg-accent"
+                  }`}
+                >
+                  <QrCode className="h-4 w-4" />
+                  QR Code
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setWaConnectionMode("phone")}
+                  className={`flex flex-1 items-center justify-center gap-2 rounded-lg border p-3 text-sm font-medium transition-colors ${
+                    waConnectionMode === "phone"
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "hover:bg-accent"
+                  }`}
+                >
+                  <Smartphone className="h-4 w-4" />
+                  Número do Celular
+                </button>
+              </div>
+
+              {waConnectionMode === "qr" ? (
+                <div className="space-y-2">
+                  <p className="text-muted-foreground text-sm">
+                    Clique para gerar o QR Code e escaneie com o WhatsApp.
+                  </p>
+                  <Button
+                    onClick={handleConnectWhatsApp}
+                    disabled={waConnecting}
+                    className="w-full"
+                  >
+                    Gerar QR Code
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <p className="text-muted-foreground text-sm">
+                    Digite o número do celular com DDD para receber o código de pareamento.
+                  </p>
+                  <div className="flex gap-2">
+                    <Input
+                      type="tel"
+                      placeholder="(11) 99999-9999"
+                      value={waPhoneNumber}
+                      onChange={(e) => setWaPhoneNumber(e.target.value)}
+                      disabled={waConnecting}
+                    />
+                    <Button
+                      onClick={handleConnectWithPhone}
+                      disabled={waConnecting || waPhoneNumber.replace(/\D/g, "").length < 10}
+                    >
+                      Conectar
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {waStatus === "qr_code" && waQrCode && !waPairingCode && (
             <div className="flex flex-col items-center gap-3 rounded-lg border p-6">
               <QrCode className="h-8 w-8 text-muted-foreground" />
               <p className="text-center text-sm font-medium">
@@ -546,14 +651,31 @@ export default function ProfessionalForm({
             </div>
           )}
 
-          {waConnecting && waStatus === "connecting" && !waQrCode && (
+          {waPairingCode && waStatus !== "connected" && (
+            <div className="flex flex-col items-center gap-3 rounded-lg border p-6">
+              <Smartphone className="h-8 w-8 text-muted-foreground" />
+              <p className="text-center text-sm font-medium">
+                Código de Pareamento
+              </p>
+              <div className="rounded-lg border bg-white px-6 py-4">
+                <p className="text-center font-mono text-2xl font-bold tracking-widest text-black">
+                  {waPairingCode}
+                </p>
+              </div>
+              <p className="text-center text-xs text-muted-foreground">
+                Abra o WhatsApp {">"} Dispositivos conectados {">"} Conectar dispositivo {">"} Conectar com número de telefone
+              </p>
+            </div>
+          )}
+
+          {waConnecting && waStatus === "connecting" && !waQrCode && !waPairingCode && (
             <div className="flex flex-col items-center gap-3 rounded-lg border p-6">
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
               <p className="text-center text-sm font-medium">
-                Gerando QR Code...
+                {waConnectionMode === "phone" ? "Gerando código de pareamento..." : "Gerando QR Code..."}
               </p>
               <p className="text-center text-xs text-muted-foreground">
-                Aguarde enquanto o QR Code é gerado
+                Aguarde um momento
               </p>
             </div>
           )}

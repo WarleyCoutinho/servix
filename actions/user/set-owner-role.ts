@@ -15,6 +15,7 @@ const inputSchema = z.object({
   address: z.string().min(5, "Endereço deve ter pelo menos 5 caracteres"),
   description: z.string().min(10, "Descrição deve ter pelo menos 10 caracteres"),
   phone: z.string().min(10, "Telefone inválido"),
+  imageUrl: z.string().optional(),
   ownerCpf: z
     .string()
     .transform((val) => val.replace(/\D/g, ""))
@@ -70,7 +71,7 @@ export const setOwnerRole = protectedActionClient
           address: parsedInput.address,
           description: parsedInput.description,
           phones: [parsedInput.phone],
-          imageUrl: "/banner.png",
+          imageUrl: parsedInput.imageUrl || "/banner.png",
           ownerId: user.id,
         },
       });

@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, useImperativeHandle } from "react";
+import { forwardRef, useImperativeHandle, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -25,13 +25,14 @@ import {
 } from "@/components/ui/card";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { ImageUpload } from "./image-upload";
 
 const formSchema = z.object({
   name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
   description: z.string().min(10, "Descrição deve ter pelo menos 10 caracteres"),
   price: z.string().min(1, "Preço é obrigatório"),
   durationMinutes: z.string().min(1, "Duração é obrigatória"),
-  imageUrl: z.string().url("URL inválida").optional().or(z.literal("")),
+  imageUrl: z.string().optional().or(z.literal("")),
 });
 
 export type ServiceFormValues = z.infer<typeof formSchema>;
@@ -81,12 +82,17 @@ export const ServiceForm = forwardRef<ServiceFormRef, ServiceFormProps>(
       },
     });
 
+    const [imageUrl, setImageUrl] = useState<string | null>(
+      defaultValues?.imageUrl || null,
+    );
+
     useImperativeHandle(ref, () => ({
       setFieldError: (field: keyof ServiceFormValues, message: string) => {
         form.setError(field, { message });
       },
       reset: (values: ServiceFormValues) => {
         form.reset(values);
+        setImageUrl(values.imageUrl || null);
       },
     }));
 
@@ -205,19 +211,23 @@ export const ServiceForm = forwardRef<ServiceFormRef, ServiceFormProps>(
                 <FormField
                   control={form.control}
                   name="imageUrl"
-                  render={({ field }) => (
+                  render={() => (
                     <FormItem>
-                      <FormLabel>URL da Imagem (opcional)</FormLabel>
+                      <FormLabel>Imagem do Serviço (opcional)</FormLabel>
                       <FormControl>
-                        <Input
-                          type="url"
-                          placeholder="https://exemplo.com/imagem.jpg"
-                          {...field}
+                        <ImageUpload
+                          value={imageUrl}
+                          onChange={(url) => {
+                            form.setValue("imageUrl", url);
+                            setImageUrl(url);
+                          }}
+                          onRemove={() => {
+                            form.setValue("imageUrl", "");
+                            setImageUrl(null);
+                          }}
+                          disabled={isPending}
                         />
                       </FormControl>
-                      <FormDescription>
-                        URL de uma imagem para representar o serviço
-                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
