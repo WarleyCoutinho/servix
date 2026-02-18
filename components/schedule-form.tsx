@@ -90,9 +90,13 @@ export function ScheduleForm({
       <div className="space-y-2">
         <div className="flex items-center gap-2">
           <CalendarDays className="h-6 w-6 shrink-0 sm:h-8 sm:w-8" />
-          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{config.title}</h1>
+          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+            {config.title}
+          </h1>
         </div>
-        <p className="text-muted-foreground text-sm sm:text-base">{config.subtitle}</p>
+        <p className="text-muted-foreground text-sm sm:text-base">
+          {config.subtitle}
+        </p>
       </div>
 
       <Card>

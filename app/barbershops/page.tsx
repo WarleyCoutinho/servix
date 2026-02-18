@@ -1,13 +1,13 @@
-import Header from "@/components/header";
-import Footer from "@/components/footer";
 import BarbershopItem from "@/components/barbershop-item";
-import { getBarbershopsByServiceName } from "@/data/barbershops";
-import { getServiceCategories } from "@/data/services";
+import Footer from "@/components/footer";
+import Header from "@/components/header";
 import {
   PageContainer,
   PageSectionContent,
   PageSectionTitle,
 } from "@/components/ui/page";
+import { getBarbershopsByServiceName } from "@/data/barbershops";
+import { getServiceCategories } from "@/data/services";
 
 interface BarbershopsPageProps {
   searchParams: Promise<{
@@ -32,12 +32,16 @@ const BarbershopsPage = async ({ searchParams }: BarbershopsPageProps) => {
           </PageSectionTitle>
           {barbershops.length === 0 ? (
             <p className="text-muted-foreground text-sm">
-              Nenhuma barbearia encontrada.
+              Nenhuma barbearia ou salão de beleza encontrado.
             </p>
           ) : (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {barbershops.map((barbershop) => (
-                <BarbershopItem key={barbershop.id} barbershop={barbershop} className="w-full" />
+                <BarbershopItem
+                  key={barbershop.id}
+                  barbershop={barbershop}
+                  className="w-full"
+                />
               ))}
             </div>
           )}

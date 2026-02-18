@@ -1,24 +1,40 @@
-import { redirect } from "next/navigation";
-import { headers } from "next/headers";
+import { DashboardSidebar, type NavItem } from "@/components/dashboard-sidebar";
+import { Button } from "@/components/ui/button";
+import { UserRole } from "@/generated/prisma/enums";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { UserRole } from "@/generated/prisma/enums";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import {
-  LayoutDashboard,
-  Clock,
   Calendar,
-  DollarSign,
+  Clock,
   CreditCard,
+  DollarSign,
+  LayoutDashboard,
 } from "lucide-react";
-import { DashboardSidebar, type NavItem } from "@/components/dashboard-sidebar";
+import { headers } from "next/headers";
+import Link from "next/link";
+import { redirect } from "next/navigation";
 
 const navItems: NavItem[] = [
-  { href: "/dashboard/professional", label: "Visão Geral", icon: LayoutDashboard },
-  { href: "/dashboard/professional/schedule", label: "Minha Agenda", icon: Clock },
-  { href: "/dashboard/professional/bookings", label: "Agendamentos", icon: Calendar },
-  { href: "/dashboard/professional/payments", label: "Pagamentos", icon: DollarSign },
+  {
+    href: "/dashboard/professional",
+    label: "Visão Geral",
+    icon: LayoutDashboard,
+  },
+  {
+    href: "/dashboard/professional/schedule",
+    label: "Minha Agenda",
+    icon: Clock,
+  },
+  {
+    href: "/dashboard/professional/bookings",
+    label: "Agendamentos",
+    icon: Calendar,
+  },
+  {
+    href: "/dashboard/professional/payments",
+    label: "Pagamentos",
+    icon: DollarSign,
+  },
 ];
 
 export default async function ProfessionalDashboardLayout({
@@ -63,10 +79,12 @@ export default async function ProfessionalDashboardLayout({
         {!professional.stripeOnboardingComplete && (
           <div className="alert-warning m-4 rounded-lg border p-4">
             <p className="mb-2 text-sm font-medium">
-              Configure seu Stripe
+              Configure sua conta para receber pagamentos
             </p>
             <p className="mb-3 text-xs opacity-80">
-              Para receber pagamentos, configure sua conta Stripe.
+              Para receber pagamentos, configure sua conta para transferências
+              diretas. Assim, você pode receber seus ganhos diretamente em sua
+              conta bancária, sem intermediários.
             </p>
             <Button size="sm" asChild className="w-full">
               <Link href="/onboarding/professional">

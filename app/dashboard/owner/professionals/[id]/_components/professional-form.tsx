@@ -534,9 +534,7 @@ export default function ProfessionalForm({
             <div className="bg-muted/50 flex items-start gap-3 rounded-lg p-4">
               <AlertTriangle className="mt-0.5 h-5 w-5 text-yellow-600" />
               <div>
-                <p className="text-sm font-medium">
-                  Conta Stripe não configurada
-                </p>
+                <p className="text-sm font-medium">Conta não configurada</p>
                 <p className="text-muted-foreground text-sm">
                   O profissional precisa acessar o painel e configurar sua conta
                   Stripe para receber pagamentos diretamente.
@@ -658,7 +656,7 @@ export default function ProfessionalForm({
                   <div className="flex gap-2">
                     <Input
                       type="tel"
-                      placeholder="55 62 99999-9999"
+                      placeholder="5562999999999"
                       value={waPhoneNumber}
                       onChange={(e) => setWaPhoneNumber(e.target.value)}
                       disabled={waConnecting}

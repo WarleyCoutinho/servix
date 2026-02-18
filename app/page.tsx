@@ -1,8 +1,8 @@
-import { Suspense } from "react";
 import BookingItem from "@/components/booking-item";
 import Header from "@/components/header";
 import banner from "@/public/logo-marca-sem-fundo.png";
 import Image from "next/image";
+import { Suspense } from "react";
 
 import { AuthErrorAlert } from "@/components/auth-error-alert";
 import BarbershopItem from "@/components/barbershop-item";
@@ -44,10 +44,10 @@ export default async function Home() {
             className="h-auto w-full rounded-2xl"
             priority
           />
-          <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
+          <div className="absolute inset-0 rounded-2xl bg-linear-to-r from-black/60 via-black/30 to-transparent" />
           <div className="absolute bottom-4 left-4 right-4 sm:bottom-8 sm:left-8">
             <h2 className="text-xl font-bold text-white sm:text-3xl">
-              Encontre sua barbearia
+              Encontre barbearias e salões de beleza perto de você.
             </h2>
             <p className="mt-1 text-sm text-white/80 sm:text-base">
               Agende com os melhores profissionais da sua cidade
@@ -66,7 +66,7 @@ export default async function Home() {
           </PageSectionContent>
         )}
         <PageSectionContent>
-          <PageSectionTitle>Barbearias</PageSectionTitle>
+          <PageSectionTitle>Barbearias e Salões</PageSectionTitle>
           <PageSectionScroller>
             {barbershops.map((barbershop) => (
               <BarbershopItem key={barbershop.id} barbershop={barbershop} />
@@ -74,7 +74,7 @@ export default async function Home() {
           </PageSectionScroller>
         </PageSectionContent>
         <PageSectionContent>
-          <PageSectionTitle>Barbearias populares</PageSectionTitle>
+          <PageSectionTitle>Barbearias e Salões populares</PageSectionTitle>
           <PageSectionScroller>
             {popularBarbershops.map((barbershop) => (
               <BarbershopItem key={barbershop.id} barbershop={barbershop} />

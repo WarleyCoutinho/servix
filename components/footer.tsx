@@ -60,7 +60,7 @@ const Footer = () => {
             &copy; 2026 Servix. Todos os direitos reservados.
           </p>
           <p className="text-xs text-muted-foreground">
-            Feito com cuidado para barbearias.
+            Feito com cuidado para barbearias e salões de beleza.
           </p>
         </div>
       </div>
