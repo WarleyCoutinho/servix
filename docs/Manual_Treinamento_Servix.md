@@ -1,0 +1,270 @@
+# SERVIX — Manual do Proprietário
+
+Bem-vindo ao Servix! Este guia vai te ajudar a configurar tudo do zero de forma simples e rápida.
+
+---
+
+## Índice
+
+1. [Primeiro Acesso e Login](#1-primeiro-acesso-e-login)
+2. [Criando sua Loja](#2-criando-sua-loja)
+3. [Ativando seu Plano](#3-ativando-seu-plano)
+4. [Gerenciando Profissionais](#4-gerenciando-profissionais)
+5. [Configurando o Perfil do Profissional](#5-configurando-o-perfil-do-profissional)
+6. [Formas de Pagamento](#6-formas-de-pagamento)
+7. [Conectando o WhatsApp](#7-conectando-o-whatsapp)
+8. [Cadastrando Serviços](#8-cadastrando-serviços)
+9. [Painel Profissional e Stripe](#9-painel-profissional-e-stripe)
+10. [Checklist Final](#10-checklist-final)
+
+> ⚠️ Seus serviços só aparecem para os clientes quando há pelo menos um profissional **ativo** configurado.
+
+---
+
+## 1. Primeiro Acesso e Login
+
+Abra o link que foi enviado para você e toque no ícone de menu **≡** no canto superior direito.
+
+Toque em **Login** → **Entrar com Google** → autorize o acesso.
+
+Na primeira vez, o sistema vai perguntar se você é **Cliente** ou **Proprietário**. Escolha **Proprietário** e toque em **Continuar**.
+
+---
+
+## 2. Criando sua Loja
+
+Preencha os dados do seu negócio com suas informações reais:
+
+| Campo | Exemplo |
+|-------|---------|
+| **Nome do Negócio** ✱ | Barbearia do João / Salão da Ana |
+| **Endereço** ✱ | Rua das Flores, 123 — Centro |
+| **Telefone** ✱ | (62) 99999-9999 |
+| **CPF** ✱ | 000.000.000-00 |
+| **Descrição** ✱ | O que você oferece e seus diferenciais |
+| **Foto do Negócio** | Opcional, mas recomendado! |
+
+✱ Campo obrigatório
+
+> 💡 Uma boa descrição ajuda muito os clientes a te encontrarem. Fale sobre seus serviços, como você atende e o que te diferencia.
+
+Após salvar, você vai para o **Dashboard** — a tela principal da sua loja.
+
+---
+
+## 3. Ativando seu Plano
+
+Sem plano ativo, o sistema fica bloqueado. Para assinar, toque na **mensagem amarela** no Dashboard ou vá em **menu ≡ → Assinatura**.
+
+**Planos disponíveis:**
+
+| Plano | Preço | Profissionais | Serviços |
+|-------|-------|:---:|:---:|
+| **Básico** | R$ 39,90/mês | 1 | 3 |
+| **Padrão** | R$ 79,90/mês | 3 | 10 |
+| **Profissional** | R$ 129,90/mês | 20 | 50 |
+
+Escolha o plano, clique em **Assinar**, preencha os dados do cartão e confirme. Pronto — assinatura ativa na hora!
+
+> 💡 No Plano Básico, você é o dono e também o único profissional da loja.
+
+---
+
+## 4. Gerenciando Profissionais
+
+### No Plano Básico
+Você mesmo é o profissional. Configure seu perfil em **menu ≡ → Profissionais → Gerenciar**.
+
+Para dados da loja: **menu ≡ → Estabelecimentos**
+Para dados de profissionais: **menu ≡ → Profissionais**
+
+### No Plano Padrão ou Profissional
+Você pode adicionar outros profissionais. Vá em **Profissionais → Adicionar profissional** e informe:
+
+- Nome do profissional
+- E-mail (o mesmo que ele usa no Google)
+- Nome do grupo do WhatsApp da agenda dele
+
+**Depois é só enviar o link da sua loja para ele!** 🎉
+
+Quando o profissional abrir o link e fazer login com o Google usando o e-mail que você cadastrou, o sistema já o reconhece automaticamente como profissional da sua loja — sem precisar aprovar nada. Ele segue o próprio cadastro a partir daí.
+
+> ⚠️ Cada profissional configura apenas o próprio perfil: conta bancária, horários e agendamentos são dele.
+
+**Como dono, você acompanha:**
+- A agenda e os agendamentos de cada profissional
+- O desempenho da equipe
+- O status do Stripe de cada um
+
+---
+
+## 5. Configurando o Perfil do Profissional
+
+Acesse: **menu ≡ → Profissionais → Gerenciar**
+
+Preencha:
+- **Nome de Exibição** — como vai aparecer para os clientes
+- **Biografia** — sua experiência e especialidades (opcional)
+- **Nome do Grupo WhatsApp** — nome exato do grupo onde você quer receber as notificações
+
+Toque em **Salvar Alterações**.
+
+---
+
+## 6. Formas de Pagamento
+
+Acesse: **Profissionais → Gerenciar → Formas de Pagamento**
+
+| Forma | Status | Como funciona |
+|-------|:------:|--------------|
+| **Cartão de Crédito** | ✅ Já vem ativo | Cliente paga online na hora do agendamento |
+| **Pagar após o serviço** | ❌ Desativado | Você ativa se quiser cobrar presencialmente |
+| **PIX** | 🔄 Em breve | Ainda em desenvolvimento |
+
+**Quer receber presencialmente (maquininha, PIX, dinheiro)?**
+Mantenha o cartão ativo **e** ative também "Pagar após o serviço". O cliente agenda sem pagar, você atende, recebe o pagamento e marca o atendimento como **Finalizado** no sistema.
+
+> 💡 Sempre marque como **Finalizado** — isso atualiza o histórico de vocês dois.
+
+---
+
+## 7. Conectando o WhatsApp
+
+O Servix envia notificações de agendamento automaticamente para um grupo do WhatsApp.
+
+> ⚠️ O nome do grupo no sistema precisa ser **idêntico** ao nome do grupo no WhatsApp — letra por letra, incluindo maiúsculas e espaços.
+
+> 💡 Coloque o grupo como **"Somente admins enviam mensagens"** para as notificações ficarem organizadas.
+
+**Opção A — QR Code:**
+No perfil do profissional, toque em **QR Code** → abra o WhatsApp → **Dispositivos Conectados → Conectar dispositivo** → escaneie o código.
+
+**Opção B — Número de telefone:**
+Toque em **Número do Celular** → digite seu número → toque em **Conectar** → use o código de pareamento no WhatsApp (**Dispositivos Conectados → Conectar com número de telefone**).
+
+Quando aparecer **"Conectado"**, está funcionando! ✅
+
+---
+
+## 8. Cadastrando Serviços
+
+Acesse: **menu ≡ → Serviços → + Novo Serviço**
+
+Preencha:
+- **Nome** — ex: Corte Masculino
+- **Descrição** — o que está incluso
+- **Preço** — ex: 50,00
+- **Duração** — ex: 30 minutos (controla os horários disponíveis)
+- **Foto** — opcional, mas aumenta muito as reservas!
+
+Toque em **Criar Serviço**. Pronto!
+
+> ⚠️ No Plano Básico você cadastra até 3 serviços. O contador aparece no topo da tela.
+
+---
+
+## 9. Painel Profissional e Stripe
+
+### Painel Profissional
+Acesse pelo **menu ≡ → Painel Profissional**. Aqui você acompanha agendamentos do dia, do mês, seus ganhos e o status do Stripe.
+
+### Configurando o Stripe — Receber pagamentos online
+
+O Stripe é a plataforma de pagamentos do Servix. Você configura uma única vez para começar a receber pelo cartão direto na sua conta bancária.
+
+**Antes de começar, tenha em mãos:**
+- RG ou CNH
+- CPF
+- Dados bancários (banco, agência, conta)
+- Comprovante de endereço dos últimos 3 meses (conta de água, luz, internet etc.)
+
+**Para iniciar:** No Painel Profissional, toque no aviso amarelo → **Configurar** → **Configurar conta Stripe**.
+
+> ⚠️ O link do Stripe tem prazo de validade. Se der erro, basta recarregar a página (F5) para gerar um novo.
+
+---
+
+### Passo 1 — "Vamos começar"
+Informe seu **e-mail** e **telefone** com DDD (ex: +55 62 99999-9999) e toque em **Enviar**.
+
+---
+
+### Passo 2 — Dados da Empresa
+Preencha os 3 campos:
+
+**Setor:** Toque no campo e selecione:
+> ✅ **Serviços pessoais → Salões de beleza ou barbearias**
+> 💡 Digite "salão" ou "barbearia" na busca para achar rápido.
+
+**Renda mensal:** Escolha a faixa que representa seu faturamento.
+
+**Descrição:** 2 a 3 frases sobre seu negócio.
+> 💡 Ex: *"Barbearia especializada em cortes masculinos e barba. Atendo por agendamento pelo Servix e presencialmente. Cobro via cartão ou após o serviço."*
+
+Toque em **Continuar**.
+
+---
+
+### Passo 3 — Dados Pessoais
+Preencha nome completo, e-mail, data de nascimento, endereço, telefone e CPF.
+
+Na pergunta sobre **cargo governamental**, selecione **Não** (a menos que se aplique à sua situação).
+
+Toque em **Continuar**.
+
+---
+
+### Passo 4 — Verificação de Identidade
+Selecione o tipo de documento (RG, CNH ou Passaporte) e toque em **Digitalizar identificação com foto**. Siga as instruções na tela.
+
+> ⚠️ Se der erro "Documento não legível": tire a foto em local bem iluminado, com o documento inteiro visível e sem reflexo.
+
+---
+
+### Passo 5 — Conta Bancária
+Escolha seu banco, informe a agência e o número da conta.
+
+> ⚠️ A conta precisa estar no mesmo CPF informado no cadastro.
+
+---
+
+### Passo 6 — Comprovante de Endereço (se solicitado)
+Documentos aceitos (dos últimos 12 meses): conta de água, luz, internet, telefone fixo, extrato bancário, contrato de locação, IRPF, documento do INSS, IPTU ou IPVA.
+
+> ⚠️ Print de tela não é aceito.
+
+---
+
+### Passo 7 — Revisão Final
+O Stripe mostra um resumo de tudo. Se aparecer **"Inválido"** em alguma seção, toque em **Editar** e corrija. Quando estiver tudo certo, toque em **Concordar e enviar**.
+
+---
+
+### Pronto!
+Você verá a mensagem **"Conta integrada"** — o cadastro foi enviado! ✅
+
+Se aparecer **"Configuração pendente"**, é normal. O Stripe está analisando. Toque em **"Ir para o Dashboard"** e aguarde — quando aprovado, o status muda automaticamente de **Pendente** para **Ativo** no seu Painel Profissional.
+
+---
+
+## 10. Checklist Final
+
+| # | O que fazer | Feito? |
+|---|-------------|:------:|
+| 1 | Login com Google e selecionar perfil Proprietário | ☐ |
+| 2 | Criar a loja (nome, endereço, CPF, descrição, foto) | ☐ |
+| 3 | Ativar o plano de assinatura | ☐ |
+| 4 | Configurar perfil do profissional (nome, biografia, WhatsApp) | ☐ |
+| 5 | Definir formas de pagamento | ☐ |
+| 6 | Conectar o WhatsApp | ☐ |
+| 7 | Cadastrar os serviços (nome, preço, duração, foto) | ☐ |
+| 8 | Configurar conta Stripe no Painel Profissional | ☐ |
+| 9 | Configurar horários de atendimento (menu Horários) | ☐ |
+
+---
+
+> ✅ **Tudo pronto! Sua loja está no ar.**
+> Os clientes já podem te encontrar e fazer agendamentos pelo Servix. Boas vendas! 🚀
+
+---
+*Servix — Gestão Profissional para Negócios de Beleza*
