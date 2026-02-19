@@ -1,16 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { useAction } from "next-safe-action/hooks";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { setOwnerRole } from "@/actions/user/set-owner-role";
-import { authClient } from "@/lib/auth-client";
+import { ImageUpload } from "@/components/image-upload";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -20,21 +19,24 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { ImageUpload } from "@/components/image-upload";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { authClient } from "@/lib/auth-client";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Building2, Loader2 } from "lucide-react";
+import { useAction } from "next-safe-action/hooks";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { z } from "zod";
 
 const formSchema = z.object({
   barbershopName: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
   address: z.string().min(5, "Endereço deve ter pelo menos 5 caracteres"),
-  description: z.string().min(10, "Descrição deve ter pelo menos 10 caracteres"),
+  description: z
+    .string()
+    .min(10, "Descrição deve ter pelo menos 10 caracteres"),
   phone: z
     .string()
     .min(10, "Telefone inválido")
@@ -47,7 +49,8 @@ type FormData = z.infer<typeof formSchema>;
 
 export default function OwnerOnboardingPage() {
   const router = useRouter();
-  const { data: session, isPending: isSessionLoading } = authClient.useSession();
+  const { data: session, isPending: isSessionLoading } =
+    authClient.useSession();
   const [isChecking, setIsChecking] = useState(true);
 
   const form = useForm<FormData>({
@@ -133,7 +136,7 @@ export default function OwnerOnboardingPage() {
           <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-primary/10">
             <Building2 className="size-8 text-primary" />
           </div>
-          <CardTitle className="text-2xl">Configure sua barbearia</CardTitle>
+          <CardTitle className="text-2xl">Configure seu negócio</CardTitle>
           <CardDescription>
             Preencha as informações básicas para começar a usar a plataforma
           </CardDescription>
@@ -146,9 +149,9 @@ export default function OwnerOnboardingPage() {
                 name="barbershopName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Nome da Barbearia</FormLabel>
+                    <FormLabel>Nome do Negócio</FormLabel>
                     <FormControl>
-                      <Input placeholder="Ex: Barbearia do João" {...field} />
+                      <Input placeholder="Ex: Negocio do Fulano" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -179,10 +182,7 @@ export default function OwnerOnboardingPage() {
                   <FormItem>
                     <FormLabel>Telefone</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="(11) 99999-9999"
-                        {...field}
-                      />
+                      <Input placeholder="(11) 99999-9999" {...field} />
                     </FormControl>
                     <FormDescription>
                       Telefone para contato dos clientes
@@ -199,10 +199,7 @@ export default function OwnerOnboardingPage() {
                   <FormItem>
                     <FormLabel>Seu CPF</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="000.000.000-00"
-                        {...field}
-                      />
+                      <Input placeholder="000.000.000-00" {...field} />
                     </FormControl>
                     <FormDescription>
                       Necessário para seu cadastro como profissional
@@ -220,7 +217,7 @@ export default function OwnerOnboardingPage() {
                     <FormLabel>Descrição</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="Descreva sua barbearia, serviços oferecidos, diferenciais..."
+                        placeholder="Descreva seu negócio, serviços oferecidos, diferenciais..."
                         rows={4}
                         {...field}
                       />
@@ -235,7 +232,7 @@ export default function OwnerOnboardingPage() {
                 name="imageUrl"
                 render={() => (
                   <FormItem>
-                    <FormLabel>Imagem da Barbearia (opcional)</FormLabel>
+                    <FormLabel>Imagem do Negócio (opcional)</FormLabel>
                     <FormControl>
                       <ImageUpload
                         value={imageUrl}
@@ -255,14 +252,19 @@ export default function OwnerOnboardingPage() {
                 )}
               />
 
-              <Button type="submit" className="w-full" size="lg" disabled={isPending}>
+              <Button
+                type="submit"
+                className="w-full"
+                size="lg"
+                disabled={isPending}
+              >
                 {isPending ? (
                   <>
                     <Loader2 className="mr-2 size-4 animate-spin" />
                     Criando...
                   </>
                 ) : (
-                  "Criar Barbearia"
+                  "Criar Negócio"
                 )}
               </Button>
             </form>

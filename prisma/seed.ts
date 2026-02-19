@@ -16,79 +16,95 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 const plans = [
   {
     plan: SubscriptionPlan.BASIC,
-    name: "Básico",
-    description: "Organize sua agenda e comece a atender online",
+    name: "Solo",
+    description:
+      "Para o profissional autônomo que quer parecer grande sem complicação",
     priceInCents: 3990,
     stripePriceId: "price_placeholder_basic",
     maxBarbershops: 1,
     maxProfessionals: 1,
-    maxServices: 3,
+    maxServices: 4,
     features: [
-      "1 estabelecimento",
-      "1 profissional (proprietário)",
-      "Até 3 serviços",
+      "1 loja",
+      "1 profissional",
+      "Até 4 serviços",
       "Agendamento online 24/7",
-      "Pagamentos via Stripe Connect",
-      "Controle básico de agenda",
+      "Página pública do seu negócio",
+      "Pagamentos online integrados",
+      "Suporte via chat",
     ],
   },
   {
     plan: SubscriptionPlan.STANDARD,
-    name: "Padrão",
-    description: "Mais equipe, mais organização e menos bagunça",
-    priceInCents: 5990,
+    name: "Equipe",
+    description:
+      "Sua equipe cresceu — organize horários, comissões e clientes em um só lugar",
+    priceInCents: 7990,
     stripePriceId: "price_placeholder_standard",
     maxBarbershops: 1,
-    maxProfessionals: 3,
-    maxServices: 10,
+    maxProfessionals: 5,
+    maxServices: 20,
     features: [
-      "1 estabelecimento",
-      "Até 3 profissionais",
-      "Até 10 serviços",
-      "Agendamento online 24/7",
-      "Pagamentos via Stripe Connect",
-      "Gerenciamento básico da equipe",
+      "1 loja",
+      "Até 5 profissionais",
+      "Até 20 serviços",
+      "Agendamento online por profissional",
+      "Página pública do seu negócio",
+      "Pagamentos online integrados",
+      "Comissão automática por profissional",
+      "Relatórios de faturamento",
+      "Suporte prioritário",
     ],
   },
   {
     plan: SubscriptionPlan.PROFESSIONAL,
     name: "Profissional",
-    description: "Controle total para crescer com dados",
-    priceInCents: 9990,
+    description:
+      "Gestão completa para quem quer crescer com dados e não no escuro",
+    priceInCents: 12990,
     stripePriceId: "price_placeholder_professional",
     maxBarbershops: 1,
-    maxProfessionals: 10,
-    maxServices: 30,
+    maxProfessionals: 20,
+    maxServices: 50,
     features: [
-      "1 estabelecimento",
-      "Até 10 profissionais",
-      "Até 30 serviços",
-      "Agendamento online 24/7",
-      "Relatórios avançados",
-      "Desempenho por profissional",
-      "Pagamentos via Stripe Connect",
+      "1 loja",
+      "20 profissionais ",
+      "Até 50 serviços",
+      "Agendamento online por profissional",
+      "Página pública por estabelecimento",
+      "Pagamentos online integrados",
+      "Comissão automática por profissional",
+      "Relatórios avançados por unidade",
+      "Ranking de desempenho por profissional",
+      "Histórico completo de clientes",
       "Suporte prioritário",
     ],
   },
-  {
-    plan: SubscriptionPlan.ENTERPRISE,
-    name: "Empresarial",
-    description: "Escala, padronização e gestão profissional",
-    priceInCents: 24990,
-    stripePriceId: "price_placeholder_enterprise",
-    maxBarbershops: 5,
-    maxProfessionals: 50,
-    maxServices: null,
-    features: [
-      "Até 5 estabelecimentos",
-      "Até 50 profissionais por unidade",
-      "Serviços ilimitados",
-      "Agendamento online 24/7",
-      "Pagamentos via Stripe Connect",
-      "Gestão avançada de equipe",
-      "Suporte prioritário VIP",
-    ],
-  },
+  // {
+  //   plan: SubscriptionPlan.ENTERPRISE,
+  //   name: "Rede",
+  //   description:
+  //     "Múltiplas unidades, gestão centralizada e controle total da operação",
+  //   priceInCents: 24990,
+  //   stripePriceId: "price_placeholder_enterprise",
+  //   maxBarbershops: 5,
+  //   maxProfessionals: 100,
+  //   maxServices: 999,
+  //   features: [
+  //     "Até 5 lojas",
+  //     "Até 100 profissionais por unidade",
+  //     "Ate 999 serviços por unidade",
+  //     "Agendamento online por profissional",
+  //     "Página pública por estabelecimento",
+  //     "Pagamentos online integrados",
+  //     "Comissão automática por profissional",
+  //     "Dashboard centralizado — todas as unidades",
+  //     "Relatórios consolidados da rede",
+  //     "Gestão de permissões por unidade",
+  //     "Integração dedicado",
+  //     "Suporte VIP com gerente de conta",
+  //   ],
+  // },
 ];
 
 async function seedPlanConfigs() {
@@ -149,24 +165,22 @@ async function createStripePrices() {
         continue;
       }
 
-      // Busca produto existente no Stripe pelo metadata
+      // ─── Produto ────────────────────────────────────────────────────────────
+
       const products = await stripe.products.search({
         query: `metadata['plan']:'${planData.plan}'`,
       });
 
-      let product;
+      let product: Stripe.Product;
 
       if (products.data.length > 0) {
-        // Usa o produto existente
         product = products.data[0];
 
-        // Reativa se necessário
         if (!product.active) {
           console.log(`  ↻ Reativando produto ${planData.name}...`);
           await stripe.products.update(product.id, { active: true });
         }
 
-        // Atualiza informações do produto
         await stripe.products.update(product.id, {
           name: `Servix - Plano ${planData.name}`,
           description: planData.description,
@@ -174,20 +188,18 @@ async function createStripePrices() {
 
         console.log(`  ✓ Produto encontrado: ${product.id}`);
       } else {
-        // Cria novo produto apenas se não existir
         console.log(`  + Criando novo produto para ${planData.name}...`);
         product = await stripe.products.create({
           name: `Servix - Plano ${planData.name}`,
           description: planData.description,
           active: true,
-          metadata: {
-            plan: planData.plan,
-          },
+          metadata: { plan: planData.plan },
         });
         console.log(`  ✓ Produto criado: ${product.id}`);
       }
 
-      // Lista todos os preços ATIVOS deste produto
+      // ─── Preços ─────────────────────────────────────────────────────────────
+
       const activePrices = await stripe.prices.list({
         product: product.id,
         active: true,
@@ -198,21 +210,24 @@ async function createStripePrices() {
         `  📋 Preços ativos encontrados: ${activePrices.data.length}`,
       );
 
-      // Procura um preço ativo com o valor correto
+      // Preço ativo com o valor exato já existe → reutiliza
       const correctPrice = activePrices.data.find(
-        (p) => p.unit_amount === planData.priceInCents && p.currency === "brl",
+        (p) =>
+          p.unit_amount === planData.priceInCents &&
+          p.currency === "brl" &&
+          p.recurring?.interval === "month",
       );
 
       let targetPriceId: string;
 
       if (correctPrice) {
-        // Preço correto já existe, reutiliza
         targetPriceId = correctPrice.id;
         console.log(
-          `  ✓ Preço correto encontrado: ${targetPriceId} (R$ ${(planData.priceInCents / 100).toFixed(2)})`,
+          `  ✓ Preço correto já existe: ${targetPriceId} (R$ ${(planData.priceInCents / 100).toFixed(2)})`,
         );
       } else {
-        // Não existe preço correto, cria um novo
+        // Cria o novo preço ANTES de arquivar os antigos
+        // (garante que nunca ficamos sem preço ativo)
         console.log(
           `  + Criando novo preço: R$ ${(planData.priceInCents / 100).toFixed(2)}`,
         );
@@ -220,18 +235,33 @@ async function createStripePrices() {
           product: product.id,
           unit_amount: planData.priceInCents,
           currency: "brl",
-          recurring: {
-            interval: "month",
-          },
-          metadata: {
-            plan: planData.plan,
-          },
+          recurring: { interval: "month" },
+          metadata: { plan: planData.plan },
         });
         targetPriceId = newPrice.id;
         console.log(`  ✓ Preço criado: ${targetPriceId}`);
+
+        // Arquiva preços antigos com valor diferente
+        // (não os deleta — o Stripe não permite deleção de preços usados em assinaturas)
+        const outdatedPrices = activePrices.data.filter(
+          (p) => p.id !== targetPriceId,
+        );
+
+        if (outdatedPrices.length > 0) {
+          console.log(
+            `  🗂️  Arquivando ${outdatedPrices.length} preço(s) antigo(s)...`,
+          );
+          for (const old of outdatedPrices) {
+            await stripe.prices.update(old.id, { active: false });
+            console.log(
+              `     - Arquivado: ${old.id} (R$ ${((old.unit_amount ?? 0) / 100).toFixed(2)})`,
+            );
+          }
+        }
       }
 
-      // Sincroniza o ID do preço no banco
+      // ─── Sincroniza banco ────────────────────────────────────────────────────
+
       if (existingPlan.stripePriceId !== targetPriceId) {
         await prisma.planConfig.update({
           where: { plan: planData.plan },

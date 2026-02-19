@@ -11,12 +11,13 @@ import {
 } from "@/components/ui/card";
 import {
   AlertCircle,
-  RefreshCw,
-  Home,
-  WifiOff,
-  DatabaseZap,
   Clock,
+  DatabaseZap,
+  Home,
+  RefreshCw,
+  WifiOff,
 } from "lucide-react";
+import Link from "next/link";
 import { useEffect } from "react";
 
 interface ErrorProps {
@@ -93,8 +94,7 @@ const errorConfig: Record<
     iconColor: "text-red-600",
     bgColor: "bg-red-100 dark:bg-red-950",
     title: "Sem conexão com o banco de dados",
-    description:
-      "O servidor de banco de dados não está acessível no momento.",
+    description: "O servidor de banco de dados não está acessível no momento.",
     suggestion:
       "O banco de dados pode estar em manutenção ou hibernação. Aguarde alguns segundos e tente novamente.",
   },
@@ -103,8 +103,7 @@ const errorConfig: Record<
     iconColor: "text-yellow-600",
     bgColor: "bg-yellow-100 dark:bg-yellow-950",
     title: "Tempo de conexão esgotado",
-    description:
-      "O servidor está demorando muito para responder.",
+    description: "O servidor está demorando muito para responder.",
     suggestion:
       "Isso pode acontecer quando o banco está hibernando. Aguarde alguns segundos e tente novamente.",
   },
@@ -152,10 +151,10 @@ export default function ErrorPage({ error, reset }: ErrorProps) {
 
         <CardFooter className="flex gap-3">
           <Button variant="outline" className="flex-1" asChild>
-            <a href="/">
+            <Link href="/">
               <Home className="mr-2 h-4 w-4" />
               Início
-            </a>
+            </Link>
           </Button>
           <Button className="flex-1" onClick={reset}>
             <RefreshCw className="mr-2 h-4 w-4" />
