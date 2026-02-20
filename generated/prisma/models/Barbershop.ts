@@ -20,8 +20,18 @@ export type BarbershopModel = runtime.Types.Result.DefaultSelection<Prisma.$Barb
 
 export type AggregateBarbershop = {
   _count: BarbershopCountAggregateOutputType | null
+  _avg: BarbershopAvgAggregateOutputType | null
+  _sum: BarbershopSumAggregateOutputType | null
   _min: BarbershopMinAggregateOutputType | null
   _max: BarbershopMaxAggregateOutputType | null
+}
+
+export type BarbershopAvgAggregateOutputType = {
+  platformFeePercentage: number | null
+}
+
+export type BarbershopSumAggregateOutputType = {
+  platformFeePercentage: number | null
 }
 
 export type BarbershopMinAggregateOutputType = {
@@ -34,6 +44,7 @@ export type BarbershopMinAggregateOutputType = {
   description: string | null
   imageUrl: string | null
   isActive: boolean | null
+  platformFeePercentage: number | null
   createdAt: Date | null
   updatedAt: Date | null
   ownerId: string | null
@@ -49,6 +60,7 @@ export type BarbershopMaxAggregateOutputType = {
   description: string | null
   imageUrl: string | null
   isActive: boolean | null
+  platformFeePercentage: number | null
   createdAt: Date | null
   updatedAt: Date | null
   ownerId: string | null
@@ -65,12 +77,21 @@ export type BarbershopCountAggregateOutputType = {
   imageUrl: number
   phones: number
   isActive: number
+  platformFeePercentage: number
   createdAt: number
   updatedAt: number
   ownerId: number
   _all: number
 }
 
+
+export type BarbershopAvgAggregateInputType = {
+  platformFeePercentage?: true
+}
+
+export type BarbershopSumAggregateInputType = {
+  platformFeePercentage?: true
+}
 
 export type BarbershopMinAggregateInputType = {
   id?: true
@@ -82,6 +103,7 @@ export type BarbershopMinAggregateInputType = {
   description?: true
   imageUrl?: true
   isActive?: true
+  platformFeePercentage?: true
   createdAt?: true
   updatedAt?: true
   ownerId?: true
@@ -97,6 +119,7 @@ export type BarbershopMaxAggregateInputType = {
   description?: true
   imageUrl?: true
   isActive?: true
+  platformFeePercentage?: true
   createdAt?: true
   updatedAt?: true
   ownerId?: true
@@ -113,6 +136,7 @@ export type BarbershopCountAggregateInputType = {
   imageUrl?: true
   phones?: true
   isActive?: true
+  platformFeePercentage?: true
   createdAt?: true
   updatedAt?: true
   ownerId?: true
@@ -157,6 +181,18 @@ export type BarbershopAggregateArgs<ExtArgs extends runtime.Types.Extensions.Int
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: BarbershopAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: BarbershopSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: BarbershopMinAggregateInputType
@@ -187,6 +223,8 @@ export type BarbershopGroupByArgs<ExtArgs extends runtime.Types.Extensions.Inter
   take?: number
   skip?: number
   _count?: BarbershopCountAggregateInputType | true
+  _avg?: BarbershopAvgAggregateInputType
+  _sum?: BarbershopSumAggregateInputType
   _min?: BarbershopMinAggregateInputType
   _max?: BarbershopMaxAggregateInputType
 }
@@ -202,10 +240,13 @@ export type BarbershopGroupByOutputType = {
   imageUrl: string
   phones: string[]
   isActive: boolean
+  platformFeePercentage: number | null
   createdAt: Date
   updatedAt: Date
   ownerId: string | null
   _count: BarbershopCountAggregateOutputType | null
+  _avg: BarbershopAvgAggregateOutputType | null
+  _sum: BarbershopSumAggregateOutputType | null
   _min: BarbershopMinAggregateOutputType | null
   _max: BarbershopMaxAggregateOutputType | null
 }
@@ -239,6 +280,7 @@ export type BarbershopWhereInput = {
   imageUrl?: Prisma.StringFilter<"Barbershop"> | string
   phones?: Prisma.StringNullableListFilter<"Barbershop">
   isActive?: Prisma.BoolFilter<"Barbershop"> | boolean
+  platformFeePercentage?: Prisma.IntNullableFilter<"Barbershop"> | number | null
   createdAt?: Prisma.DateTimeFilter<"Barbershop"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Barbershop"> | Date | string
   ownerId?: Prisma.StringNullableFilter<"Barbershop"> | string | null
@@ -261,6 +303,7 @@ export type BarbershopOrderByWithRelationInput = {
   imageUrl?: Prisma.SortOrder
   phones?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  platformFeePercentage?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   ownerId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -286,6 +329,7 @@ export type BarbershopWhereUniqueInput = Prisma.AtLeast<{
   imageUrl?: Prisma.StringFilter<"Barbershop"> | string
   phones?: Prisma.StringNullableListFilter<"Barbershop">
   isActive?: Prisma.BoolFilter<"Barbershop"> | boolean
+  platformFeePercentage?: Prisma.IntNullableFilter<"Barbershop"> | number | null
   createdAt?: Prisma.DateTimeFilter<"Barbershop"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Barbershop"> | Date | string
   ownerId?: Prisma.StringNullableFilter<"Barbershop"> | string | null
@@ -308,12 +352,15 @@ export type BarbershopOrderByWithAggregationInput = {
   imageUrl?: Prisma.SortOrder
   phones?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  platformFeePercentage?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   ownerId?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.BarbershopCountOrderByAggregateInput
+  _avg?: Prisma.BarbershopAvgOrderByAggregateInput
   _max?: Prisma.BarbershopMaxOrderByAggregateInput
   _min?: Prisma.BarbershopMinOrderByAggregateInput
+  _sum?: Prisma.BarbershopSumOrderByAggregateInput
 }
 
 export type BarbershopScalarWhereWithAggregatesInput = {
@@ -330,6 +377,7 @@ export type BarbershopScalarWhereWithAggregatesInput = {
   imageUrl?: Prisma.StringWithAggregatesFilter<"Barbershop"> | string
   phones?: Prisma.StringNullableListFilter<"Barbershop">
   isActive?: Prisma.BoolWithAggregatesFilter<"Barbershop"> | boolean
+  platformFeePercentage?: Prisma.IntNullableWithAggregatesFilter<"Barbershop"> | number | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Barbershop"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Barbershop"> | Date | string
   ownerId?: Prisma.StringNullableWithAggregatesFilter<"Barbershop"> | string | null
@@ -346,6 +394,7 @@ export type BarbershopCreateInput = {
   imageUrl: string
   phones?: Prisma.BarbershopCreatephonesInput | string[]
   isActive?: boolean
+  platformFeePercentage?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   owner?: Prisma.UserCreateNestedOneWithoutOwnedBarbershopsInput
@@ -367,6 +416,7 @@ export type BarbershopUncheckedCreateInput = {
   imageUrl: string
   phones?: Prisma.BarbershopCreatephonesInput | string[]
   isActive?: boolean
+  platformFeePercentage?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownerId?: string | null
@@ -388,6 +438,7 @@ export type BarbershopUpdateInput = {
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  platformFeePercentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneWithoutOwnedBarbershopsNestedInput
@@ -409,6 +460,7 @@ export type BarbershopUncheckedUpdateInput = {
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  platformFeePercentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -430,6 +482,7 @@ export type BarbershopCreateManyInput = {
   imageUrl: string
   phones?: Prisma.BarbershopCreatephonesInput | string[]
   isActive?: boolean
+  platformFeePercentage?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownerId?: string | null
@@ -446,6 +499,7 @@ export type BarbershopUpdateManyMutationInput = {
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  platformFeePercentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -461,6 +515,7 @@ export type BarbershopUncheckedUpdateManyInput = {
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  platformFeePercentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -495,9 +550,14 @@ export type BarbershopCountOrderByAggregateInput = {
   imageUrl?: Prisma.SortOrder
   phones?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  platformFeePercentage?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
+}
+
+export type BarbershopAvgOrderByAggregateInput = {
+  platformFeePercentage?: Prisma.SortOrder
 }
 
 export type BarbershopMaxOrderByAggregateInput = {
@@ -510,6 +570,7 @@ export type BarbershopMaxOrderByAggregateInput = {
   description?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  platformFeePercentage?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
@@ -525,9 +586,14 @@ export type BarbershopMinOrderByAggregateInput = {
   description?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  platformFeePercentage?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
+}
+
+export type BarbershopSumOrderByAggregateInput = {
+  platformFeePercentage?: Prisma.SortOrder
 }
 
 export type BarbershopScalarRelationFilter = {
@@ -584,6 +650,14 @@ export type BarbershopCreatephonesInput = {
 export type BarbershopUpdatephonesInput = {
   set?: string[]
   push?: string | string[]
+}
+
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
 }
 
 export type BarbershopCreateNestedOneWithoutProfessionalsInput = {
@@ -667,6 +741,7 @@ export type BarbershopCreateWithoutOwnerInput = {
   imageUrl: string
   phones?: Prisma.BarbershopCreatephonesInput | string[]
   isActive?: boolean
+  platformFeePercentage?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   services?: Prisma.BarbershopServiceCreateNestedManyWithoutBarbershopInput
@@ -687,6 +762,7 @@ export type BarbershopUncheckedCreateWithoutOwnerInput = {
   imageUrl: string
   phones?: Prisma.BarbershopCreatephonesInput | string[]
   isActive?: boolean
+  platformFeePercentage?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   services?: Prisma.BarbershopServiceUncheckedCreateNestedManyWithoutBarbershopInput
@@ -736,6 +812,7 @@ export type BarbershopScalarWhereInput = {
   imageUrl?: Prisma.StringFilter<"Barbershop"> | string
   phones?: Prisma.StringNullableListFilter<"Barbershop">
   isActive?: Prisma.BoolFilter<"Barbershop"> | boolean
+  platformFeePercentage?: Prisma.IntNullableFilter<"Barbershop"> | number | null
   createdAt?: Prisma.DateTimeFilter<"Barbershop"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Barbershop"> | Date | string
   ownerId?: Prisma.StringNullableFilter<"Barbershop"> | string | null
@@ -752,6 +829,7 @@ export type BarbershopCreateWithoutProfessionalsInput = {
   imageUrl: string
   phones?: Prisma.BarbershopCreatephonesInput | string[]
   isActive?: boolean
+  platformFeePercentage?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   owner?: Prisma.UserCreateNestedOneWithoutOwnedBarbershopsInput
@@ -772,6 +850,7 @@ export type BarbershopUncheckedCreateWithoutProfessionalsInput = {
   imageUrl: string
   phones?: Prisma.BarbershopCreatephonesInput | string[]
   isActive?: boolean
+  platformFeePercentage?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownerId?: string | null
@@ -808,6 +887,7 @@ export type BarbershopUpdateWithoutProfessionalsInput = {
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  platformFeePercentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneWithoutOwnedBarbershopsNestedInput
@@ -828,6 +908,7 @@ export type BarbershopUncheckedUpdateWithoutProfessionalsInput = {
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  platformFeePercentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -848,6 +929,7 @@ export type BarbershopCreateWithoutSubscriptionInput = {
   imageUrl: string
   phones?: Prisma.BarbershopCreatephonesInput | string[]
   isActive?: boolean
+  platformFeePercentage?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   owner?: Prisma.UserCreateNestedOneWithoutOwnedBarbershopsInput
@@ -868,6 +950,7 @@ export type BarbershopUncheckedCreateWithoutSubscriptionInput = {
   imageUrl: string
   phones?: Prisma.BarbershopCreatephonesInput | string[]
   isActive?: boolean
+  platformFeePercentage?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownerId?: string | null
@@ -904,6 +987,7 @@ export type BarbershopUpdateWithoutSubscriptionInput = {
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  platformFeePercentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneWithoutOwnedBarbershopsNestedInput
@@ -924,6 +1008,7 @@ export type BarbershopUncheckedUpdateWithoutSubscriptionInput = {
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  platformFeePercentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -944,6 +1029,7 @@ export type BarbershopCreateWithoutServicesInput = {
   imageUrl: string
   phones?: Prisma.BarbershopCreatephonesInput | string[]
   isActive?: boolean
+  platformFeePercentage?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   owner?: Prisma.UserCreateNestedOneWithoutOwnedBarbershopsInput
@@ -964,6 +1050,7 @@ export type BarbershopUncheckedCreateWithoutServicesInput = {
   imageUrl: string
   phones?: Prisma.BarbershopCreatephonesInput | string[]
   isActive?: boolean
+  platformFeePercentage?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownerId?: string | null
@@ -1000,6 +1087,7 @@ export type BarbershopUpdateWithoutServicesInput = {
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  platformFeePercentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneWithoutOwnedBarbershopsNestedInput
@@ -1020,6 +1108,7 @@ export type BarbershopUncheckedUpdateWithoutServicesInput = {
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  platformFeePercentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1040,6 +1129,7 @@ export type BarbershopCreateWithoutBookingsInput = {
   imageUrl: string
   phones?: Prisma.BarbershopCreatephonesInput | string[]
   isActive?: boolean
+  platformFeePercentage?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   owner?: Prisma.UserCreateNestedOneWithoutOwnedBarbershopsInput
@@ -1060,6 +1150,7 @@ export type BarbershopUncheckedCreateWithoutBookingsInput = {
   imageUrl: string
   phones?: Prisma.BarbershopCreatephonesInput | string[]
   isActive?: boolean
+  platformFeePercentage?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownerId?: string | null
@@ -1096,6 +1187,7 @@ export type BarbershopUpdateWithoutBookingsInput = {
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  platformFeePercentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneWithoutOwnedBarbershopsNestedInput
@@ -1116,6 +1208,7 @@ export type BarbershopUncheckedUpdateWithoutBookingsInput = {
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  platformFeePercentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1136,6 +1229,7 @@ export type BarbershopCreateWithoutPlanHistoryInput = {
   imageUrl: string
   phones?: Prisma.BarbershopCreatephonesInput | string[]
   isActive?: boolean
+  platformFeePercentage?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   owner?: Prisma.UserCreateNestedOneWithoutOwnedBarbershopsInput
@@ -1156,6 +1250,7 @@ export type BarbershopUncheckedCreateWithoutPlanHistoryInput = {
   imageUrl: string
   phones?: Prisma.BarbershopCreatephonesInput | string[]
   isActive?: boolean
+  platformFeePercentage?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownerId?: string | null
@@ -1192,6 +1287,7 @@ export type BarbershopUpdateWithoutPlanHistoryInput = {
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  platformFeePercentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneWithoutOwnedBarbershopsNestedInput
@@ -1212,6 +1308,7 @@ export type BarbershopUncheckedUpdateWithoutPlanHistoryInput = {
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  platformFeePercentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1232,6 +1329,7 @@ export type BarbershopCreateManyOwnerInput = {
   imageUrl: string
   phones?: Prisma.BarbershopCreatephonesInput | string[]
   isActive?: boolean
+  platformFeePercentage?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1247,6 +1345,7 @@ export type BarbershopUpdateWithoutOwnerInput = {
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  platformFeePercentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   services?: Prisma.BarbershopServiceUpdateManyWithoutBarbershopNestedInput
@@ -1267,6 +1366,7 @@ export type BarbershopUncheckedUpdateWithoutOwnerInput = {
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  platformFeePercentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   services?: Prisma.BarbershopServiceUncheckedUpdateManyWithoutBarbershopNestedInput
@@ -1287,6 +1387,7 @@ export type BarbershopUncheckedUpdateManyWithoutOwnerInput = {
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  platformFeePercentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1360,6 +1461,7 @@ export type BarbershopSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   imageUrl?: boolean
   phones?: boolean
   isActive?: boolean
+  platformFeePercentage?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   ownerId?: boolean
@@ -1383,6 +1485,7 @@ export type BarbershopSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   imageUrl?: boolean
   phones?: boolean
   isActive?: boolean
+  platformFeePercentage?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   ownerId?: boolean
@@ -1400,6 +1503,7 @@ export type BarbershopSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   imageUrl?: boolean
   phones?: boolean
   isActive?: boolean
+  platformFeePercentage?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   ownerId?: boolean
@@ -1417,12 +1521,13 @@ export type BarbershopSelectScalar = {
   imageUrl?: boolean
   phones?: boolean
   isActive?: boolean
+  platformFeePercentage?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   ownerId?: boolean
 }
 
-export type BarbershopOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "address" | "city" | "state" | "description" | "imageUrl" | "phones" | "isActive" | "createdAt" | "updatedAt" | "ownerId", ExtArgs["result"]["barbershop"]>
+export type BarbershopOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "address" | "city" | "state" | "description" | "imageUrl" | "phones" | "isActive" | "platformFeePercentage" | "createdAt" | "updatedAt" | "ownerId", ExtArgs["result"]["barbershop"]>
 export type BarbershopInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   owner?: boolean | Prisma.Barbershop$ownerArgs<ExtArgs>
   services?: boolean | Prisma.Barbershop$servicesArgs<ExtArgs>
@@ -1460,6 +1565,7 @@ export type $BarbershopPayload<ExtArgs extends runtime.Types.Extensions.Internal
     imageUrl: string
     phones: string[]
     isActive: boolean
+    platformFeePercentage: number | null
     createdAt: Date
     updatedAt: Date
     ownerId: string | null
@@ -1902,6 +2008,7 @@ export interface BarbershopFieldRefs {
   readonly imageUrl: Prisma.FieldRef<"Barbershop", 'String'>
   readonly phones: Prisma.FieldRef<"Barbershop", 'String[]'>
   readonly isActive: Prisma.FieldRef<"Barbershop", 'Boolean'>
+  readonly platformFeePercentage: Prisma.FieldRef<"Barbershop", 'Int'>
   readonly createdAt: Prisma.FieldRef<"Barbershop", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Barbershop", 'DateTime'>
   readonly ownerId: Prisma.FieldRef<"Barbershop", 'String'>

@@ -53,7 +53,7 @@ const plans = [
       "Pagamentos online integrados",
       "Comissão automática por profissional",
       "Relatórios de faturamento",
-      "Suporte prioritário",
+      "Suporte via chat",
     ],
   },
   {

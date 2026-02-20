@@ -19,7 +19,7 @@ const Footer = () => {
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
                 <Link
-                  href="/"
+                  href="/home"
                   className="transition-colors hover:text-foreground"
                 >
                   Inicio
@@ -39,6 +39,14 @@ const Footer = () => {
                   className="transition-colors hover:text-foreground"
                 >
                   Agendamentos
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/"
+                  className="transition-colors hover:text-foreground"
+                >
+                  Conheça o Servix
                 </Link>
               </li>
             </ul>

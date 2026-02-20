@@ -113,7 +113,10 @@ export const createBookingCheckoutSession = protectedActionClient
         }
       }
 
-      const applicationFeeAmount = calculatePlatformFee(service.priceInCents);
+      const applicationFeeAmount = calculatePlatformFee(
+        service.priceInCents,
+        service.barbershop.platformFeePercentage,
+      );
 
       const paymentMethods: Stripe.Checkout.SessionCreateParams.PaymentMethodType[] = [];
 

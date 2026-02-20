@@ -42,10 +42,12 @@ export const stripe = {
   },
 };
 
-export function calculatePlatformFee(amountInCents: number): number {
-  const feePercentage = parseInt(
-    process.env.PLATFORM_FEE_PERCENTAGE ?? "10",
-    10,
-  );
+export function calculatePlatformFee(
+  amountInCents: number,
+  ownerFeePercentage?: number | null,
+): number {
+  const feePercentage =
+    ownerFeePercentage ??
+    parseInt(process.env.PLATFORM_FEE_PERCENTAGE ?? "10", 10);
   return Math.round((amountInCents * feePercentage) / 100);
 }

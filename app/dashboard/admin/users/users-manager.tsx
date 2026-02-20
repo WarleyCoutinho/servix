@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useAction } from "next-safe-action/hooks";
+import { updateBarbershopFee } from "@/actions/admin/update-barbershop-fee";
 import { updateUserRole } from "@/actions/admin/update-user-role";
 import { toggleUserBan } from "@/actions/admin/toggle-user-ban";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -45,6 +46,7 @@ import {
   Ban,
   Search,
   Loader2,
+  Percent,
 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -59,7 +61,7 @@ interface UserData {
   banned: boolean;
   banReason: string | null;
   createdAt: Date;
-  ownedBarbershops: { id: string; name: string }[];
+  ownedBarbershops: { id: string; name: string; platformFeePercentage: number | null }[];
   professional: { id: string; barbershopId: string; isActive: boolean } | null;
 }
 
@@ -94,6 +96,7 @@ export function UsersManager({ initialUsers, stats }: UsersManagerProps) {
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [banReason, setBanReason] = useState("");
+  const [editingFee, setEditingFee] = useState<{ barbershopId: string; value: string } | null>(null);
 
   const { execute: executeUpdateRole, isPending: isUpdatingRole } = useAction(
     updateUserRole,
@@ -112,6 +115,36 @@ export function UsersManager({ initialUsers, stats }: UsersManagerProps) {
           error.validationErrors?.userId?._errors?.[0] ||
           error.serverError ||
           "Erro ao atualizar role";
+        toast.error(message);
+      },
+    },
+  );
+
+  const { execute: executeUpdateFee, isPending: isUpdatingFee } = useAction(
+    updateBarbershopFee,
+    {
+      onSuccess: ({ data }) => {
+        if (data) {
+          setUsers((prev) =>
+            prev.map((u) => ({
+              ...u,
+              ownedBarbershops: u.ownedBarbershops.map((b) =>
+                b.id === data.id
+                  ? { ...b, platformFeePercentage: data.platformFeePercentage }
+                  : b,
+              ),
+            })),
+          );
+          toast.success(`Taxa de ${data.name} atualizada!`);
+          setEditingFee(null);
+        }
+      },
+      onError: ({ error }) => {
+        const message =
+          error.validationErrors?.barbershopId?._errors?.[0] ||
+          error.validationErrors?.platformFeePercentage?._errors?.[0] ||
+          error.serverError ||
+          "Erro ao atualizar taxa";
         toast.error(message);
       },
     },
@@ -153,7 +186,7 @@ export function UsersManager({ initialUsers, stats }: UsersManagerProps) {
     return matchesSearch && matchesRole;
   });
 
-  const isLoading = isUpdatingRole || isTogglingBan;
+  const isLoading = isUpdatingRole || isTogglingBan || isUpdatingFee;
 
   return (
     <div className="space-y-6">
@@ -252,6 +285,7 @@ export function UsersManager({ initialUsers, stats }: UsersManagerProps) {
                 <TableRow>
                   <TableHead>Usuário</TableHead>
                   <TableHead>Role</TableHead>
+                  <TableHead>Taxa</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Criado em</TableHead>
                   <TableHead className="text-right">Ações</TableHead>
@@ -307,6 +341,79 @@ export function UsersManager({ initialUsers, stats }: UsersManagerProps) {
                           </SelectItem>
                         </SelectContent>
                       </Select>
+                    </TableCell>
+                    <TableCell>
+                      {user.ownedBarbershops.length > 0 ? (
+                        <div className="flex items-center gap-2">
+                          {editingFee?.barbershopId === user.ownedBarbershops[0].id ? (
+                            <div className="flex items-center gap-1">
+                              <Input
+                                type="number"
+                                min={0}
+                                max={100}
+                                value={editingFee.value}
+                                onChange={(e) =>
+                                  setEditingFee({ ...editingFee, value: e.target.value })
+                                }
+                                className="w-20"
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") {
+                                    const val = editingFee.value.trim();
+                                    executeUpdateFee({
+                                      barbershopId: editingFee.barbershopId,
+                                      platformFeePercentage: val === "" ? null : parseInt(val, 10),
+                                    });
+                                  }
+                                  if (e.key === "Escape") setEditingFee(null);
+                                }}
+                                disabled={isUpdatingFee}
+                                autoFocus
+                              />
+                              <span className="text-muted-foreground text-xs">%</span>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-7 px-2"
+                                disabled={isUpdatingFee}
+                                onClick={() => {
+                                  const val = editingFee.value.trim();
+                                  executeUpdateFee({
+                                    barbershopId: editingFee.barbershopId,
+                                    platformFeePercentage: val === "" ? null : parseInt(val, 10),
+                                  });
+                                }}
+                              >
+                                {isUpdatingFee ? (
+                                  <Loader2 className="h-3 w-3 animate-spin" />
+                                ) : (
+                                  "OK"
+                                )}
+                              </Button>
+                            </div>
+                          ) : (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="gap-1"
+                              onClick={() =>
+                                setEditingFee({
+                                  barbershopId: user.ownedBarbershops[0].id,
+                                  value:
+                                    user.ownedBarbershops[0].platformFeePercentage?.toString() ?? "",
+                                })
+                              }
+                              disabled={isLoading}
+                            >
+                              <Percent className="h-3 w-3" />
+                              {user.ownedBarbershops[0].platformFeePercentage != null
+                                ? `${user.ownedBarbershops[0].platformFeePercentage}%`
+                                : "Padrão"}
+                            </Button>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground text-xs">—</span>
+                      )}
                     </TableCell>
                     <TableCell>
                       {user.banned ? (

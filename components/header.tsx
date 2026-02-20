@@ -3,13 +3,14 @@
 import { authClient } from "@/lib/auth-client";
 import logo from "@/public/logo-sem-fundo.png";
 import {
-  BotMessageSquare,
   CalendarDays,
   ChevronDown,
+  FileText,
   Home,
   LayoutDashboard,
   LogIn,
   LogOut,
+  Megaphone,
   Scissors,
   Shield,
   User,
@@ -61,7 +62,7 @@ const Header = ({ categories = [] }: HeaderProps) => {
           {/* <Link href="/" className="shrink-0">
             <Image src="/logo.svg" alt="Servix" width={91} height={24} />
           </Link> */}
-          <Link href="/" className="shrink-0">
+          <Link href={isLoggedIn ? "/home" : "/"} className="shrink-0">
             <Image
               src={logo}
               alt="logo marca para negócios de beleza"
@@ -73,7 +74,7 @@ const Header = ({ categories = [] }: HeaderProps) => {
 
           <nav className="hidden items-center gap-1 md:flex">
             <Button variant="ghost" size="sm" asChild>
-              <Link href="/">
+              <Link href="/home">
                 <Home className="mr-2 size-4" />
                 Início
               </Link>
@@ -102,20 +103,30 @@ const Header = ({ categories = [] }: HeaderProps) => {
             )}
 
             {isLoggedIn && (
-              <>
-                <Button variant="ghost" size="sm" asChild>
-                  <Link href="/bookings">
-                    <CalendarDays className="mr-2 size-4" />
-                    Agendamentos
-                  </Link>
-                </Button>
-                <Button variant="ghost" size="sm" asChild>
-                  <Link href="/chat">
-                    <BotMessageSquare className="mr-2 size-4" />
-                    Agendar via Chat
-                  </Link>
-                </Button>
-              </>
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/bookings">
+                  <CalendarDays className="mr-2 size-4" />
+                  Agendamentos
+                </Link>
+              </Button>
+            )}
+
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/">
+                <Megaphone className="mr-2 size-4" />
+                Conheça o Servix
+              </Link>
+            </Button>
+
+            {(session?.user?.role === "owner" ||
+              session?.user?.role === "professional" ||
+              session?.user?.role === "admin") && (
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/manual">
+                  <FileText className="mr-2 size-4" />
+                  Manual
+                </Link>
+              </Button>
             )}
 
             {session?.user?.role === "admin" && (
@@ -157,7 +168,9 @@ const Header = ({ categories = [] }: HeaderProps) => {
 
         <div className="flex items-center gap-2">
           <ThemeToggle />
-          <ChatSheet triggerClassName="hidden sm:flex" iconOnly />
+          {isLoggedIn && (
+            <ChatSheet triggerClassName="hidden sm:flex" iconOnly />
+          )}
 
           <div className="hidden md:block">
             {isLoggedIn ? (
@@ -234,6 +247,19 @@ const Header = ({ categories = [] }: HeaderProps) => {
                       </Link>
                     </DropdownMenuItem>
                   )}
+                  {(session.user.role === "owner" ||
+                    session.user.role === "professional" ||
+                    session.user.role === "admin") && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link href="/manual">
+                          <FileText className="mr-2 size-4" />
+                          Manual
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
+                  )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout}>
                     <LogOut className="mr-2 size-4" />
@@ -250,7 +276,7 @@ const Header = ({ categories = [] }: HeaderProps) => {
           </div>
 
           <div className="flex items-center gap-2 md:hidden">
-            <ChatSheet iconOnly />
+            {isLoggedIn && <ChatSheet iconOnly />}
             <MenuSheet
               categories={categories}
               onLoginClick={() => setLoginModalOpen(true)}

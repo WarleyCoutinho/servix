@@ -4,15 +4,16 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev --port 3320",
+    "dev": "next dev --port 3319",
     "build": "next build",
-    "start": "next start --port 3320",
+    "start": "next start --port 3319",
     "lint": "eslint",
     "postinstall": "prisma generate"
   },
   "dependencies": {
     "@ai-sdk/openai": "2.0.85",
     "@ai-sdk/react": "2.0.114",
+    "@google/generative-ai": "^0.24.1",
     "@hookform/resolvers": "^5.2.2",
     "@prisma/adapter-pg": "7.4.0",
     "@prisma/client": "7.4.0",

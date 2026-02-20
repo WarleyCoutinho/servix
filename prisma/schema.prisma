@@ -149,9 +149,10 @@ model Barbershop {
   description String
   imageUrl    String
   phones      String[]
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  isActive                 Boolean  @default(true)
+  platformFeePercentage    Int?
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
 
   ownerId String?
   owner   User?   @relation("BarbershopOwner", fields: [ownerId], references: [id], onDelete: SetNull)

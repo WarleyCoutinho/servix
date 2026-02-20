@@ -157,6 +157,7 @@ export const BarbershopScalarFieldEnum = {
   imageUrl: 'imageUrl',
   phones: 'phones',
   isActive: 'isActive',
+  platformFeePercentage: 'platformFeePercentage',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   ownerId: 'ownerId'

@@ -2,12 +2,13 @@
 
 import { authClient } from "@/lib/auth-client";
 import {
-  BotMessageSquare,
   CalendarDays,
+  FileText,
   Home,
   LayoutDashboard,
   LogIn,
   LogOut,
+  Megaphone,
   MenuIcon,
   Scissors,
   Shield,
@@ -16,6 +17,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import ChatSheet from "./chat-sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import {
@@ -122,12 +124,34 @@ const MenuSheet = ({ categories = [], onLoginClick }: MenuSheetProps) => {
             <nav className="flex flex-col">
               <button
                 type="button"
-                onClick={() => handleNavigation("/")}
+                onClick={() => handleNavigation("/home")}
                 className="hover:bg-accent flex items-center gap-3 px-4 py-3 text-left text-sm font-medium transition-colors sm:px-6"
               >
                 <Home className="size-4 shrink-0" />
                 Início
               </button>
+
+              <button
+                type="button"
+                onClick={() => handleNavigation("/")}
+                className="hover:bg-accent flex items-center gap-3 px-4 py-3 text-left text-sm font-medium transition-colors sm:px-6"
+              >
+                <Megaphone className="size-4 shrink-0" />
+                Conheça o Servix
+              </button>
+
+              {(session?.user?.role === "owner" ||
+                session?.user?.role === "professional" ||
+                session?.user?.role === "admin") && (
+                <button
+                  type="button"
+                  onClick={() => handleNavigation("/manual")}
+                  className="hover:bg-accent flex items-center gap-3 px-4 py-3 text-left text-sm font-medium transition-colors sm:px-6"
+                >
+                  <FileText className="size-4 shrink-0" />
+                  Manual
+                </button>
+              )}
 
               {session?.user?.role === "admin" && (
                 <button
@@ -193,14 +217,9 @@ const MenuSheet = ({ categories = [], onLoginClick }: MenuSheetProps) => {
                     <CalendarDays className="size-4 shrink-0" />
                     Meus Agendamentos
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => handleNavigation("/chat")}
-                    className="hover:bg-accent flex items-center gap-3 px-4 py-3 text-left text-sm font-medium transition-colors sm:px-6"
-                  >
-                    <BotMessageSquare className="size-4 shrink-0" />
-                    Agendar via Chat
-                  </button>
+                  <ChatSheet
+                    triggerClassName="hover:bg-accent flex items-center gap-3 px-4 py-3 text-left text-sm font-medium transition-colors sm:px-6"
+                  />
                 </>
               )}
             </nav>
