@@ -50,6 +50,7 @@ export default function ProfessionalSettingsClient({
     "qr",
   );
   const [waPhoneNumber, setWaPhoneNumber] = useState("");
+  const [waAuthenticating, setWaAuthenticating] = useState(false);
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const pollingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isConnectingRef = useRef(false);
@@ -78,14 +79,28 @@ export default function ProfessionalSettingsClient({
         gotQrOrPairingRef.current = true;
       }
 
+      // Detect authentication phase: QR/pairing was shown, now gone but not connected
+      if (
+        gotQrOrPairingRef.current &&
+        !data.qrCode &&
+        !data.pairingCode &&
+        data.status === "connecting"
+      ) {
+        setWaAuthenticating(true);
+      } else {
+        setWaAuthenticating(false);
+      }
+
       if (data.status === "connected") {
         isConnectingRef.current = false;
         gotQrOrPairingRef.current = false;
         setWaConnecting(false);
+        setWaAuthenticating(false);
         stopPolling();
         toast.success("WhatsApp conectado com sucesso!");
       } else if (data.status === "disconnected" && !isConnectingRef.current) {
         setWaConnecting(false);
+        setWaAuthenticating(false);
         stopPolling();
       }
     } catch {
@@ -95,7 +110,7 @@ export default function ProfessionalSettingsClient({
 
   const startPolling = useCallback(() => {
     stopPolling();
-    pollingRef.current = setInterval(pollWhatsAppStatus, 1500);
+    pollingRef.current = setInterval(pollWhatsAppStatus, 3000);
     pollingTimeoutRef.current = setTimeout(() => {
       stopPolling();
       isConnectingRef.current = false;
@@ -104,7 +119,7 @@ export default function ProfessionalSettingsClient({
       setWaStatus("disconnected");
       setWaQrCode(null);
       toast.error("Tempo esgotado. Tente conectar novamente.");
-    }, 120000);
+    }, 180000);
   }, [pollWhatsAppStatus, stopPolling]);
 
   const handleConnectWhatsApp = async () => {
@@ -345,11 +360,13 @@ export default function ProfessionalSettingsClient({
                 <p className="font-medium">
                   {waStatus === "connected"
                     ? "Conectado"
-                    : waStatus === "qr_code"
-                      ? "Aguardando QR Code"
-                      : waStatus === "connecting"
-                        ? "Conectando..."
-                        : "Desconectado"}
+                    : waAuthenticating
+                      ? "Autenticando..."
+                      : waStatus === "qr_code"
+                        ? "Aguardando QR Code"
+                        : waStatus === "connecting"
+                          ? "Conectando..."
+                          : "Desconectado"}
                 </p>
                 <p className="text-muted-foreground text-sm">
                   {waStatus === "connected"
@@ -497,10 +514,23 @@ export default function ProfessionalSettingsClient({
             </div>
           )}
 
+          {waAuthenticating && (
+            <div className="flex flex-col items-center gap-3 rounded-lg border border-green-200 bg-green-50 p-6 dark:border-green-900 dark:bg-green-950">
+              <Loader2 className="h-8 w-8 animate-spin text-green-600" />
+              <p className="text-center text-sm font-medium text-green-700 dark:text-green-400">
+                Autenticando com o WhatsApp...
+              </p>
+              <p className="text-center text-xs text-green-600 dark:text-green-500">
+                Confirme no seu celular se solicitado
+              </p>
+            </div>
+          )}
+
           {waConnecting &&
             waStatus === "connecting" &&
             !waQrCode &&
-            !waPairingCode && (
+            !waPairingCode &&
+            !waAuthenticating && (
               <div className="flex flex-col items-center gap-3 rounded-lg border p-6">
                 <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
                 <p className="text-center text-sm font-medium">
