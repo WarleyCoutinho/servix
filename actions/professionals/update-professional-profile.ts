@@ -11,14 +11,16 @@ const inputSchema = z.object({
   imageUrl: z.string().url("URL inválida").optional().nullable(),
   acceptsPix: z.boolean().optional(),
   acceptsCard: z.boolean().optional(),
+  acceptsPayAfterService: z.boolean().optional(),
+  whatsappGroupName: z.string().optional(),
 });
 
 export const updateProfessionalProfile = professionalActionClient
   .inputSchema(inputSchema)
   .action(async ({ parsedInput, ctx: { professional } }) => {
-    const { displayName, bio, imageUrl, acceptsPix, acceptsCard } = parsedInput;
+    const { displayName, bio, imageUrl, acceptsPix, acceptsCard, acceptsPayAfterService, whatsappGroupName } = parsedInput;
 
-    if (acceptsPix === false && acceptsCard === false) {
+    if (acceptsPix === false && acceptsCard === false && acceptsPayAfterService === false) {
       throw new Error(
         "Você deve aceitar pelo menos uma forma de pagamento.",
       );
@@ -32,6 +34,8 @@ export const updateProfessionalProfile = professionalActionClient
         ...(imageUrl !== undefined && { imageUrl }),
         ...(acceptsPix !== undefined && { acceptsPix }),
         ...(acceptsCard !== undefined && { acceptsCard }),
+        ...(acceptsPayAfterService !== undefined && { acceptsPayAfterService }),
+        ...(whatsappGroupName !== undefined && { whatsappGroupName: whatsappGroupName || null }),
       },
       include: {
         user: true,
@@ -40,5 +44,6 @@ export const updateProfessionalProfile = professionalActionClient
     });
 
     revalidatePath("/dashboard/professional");
+    revalidatePath("/dashboard/professional/settings");
     return updated;
   });

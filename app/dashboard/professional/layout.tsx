@@ -9,6 +9,7 @@ import {
   CreditCard,
   DollarSign,
   LayoutDashboard,
+  Settings,
 } from "lucide-react";
 import { headers } from "next/headers";
 import Link from "next/link";
@@ -34,6 +35,11 @@ const navItems: NavItem[] = [
     href: "/dashboard/professional/payments",
     label: "Pagamentos",
     icon: DollarSign,
+  },
+  {
+    href: "/dashboard/professional/settings",
+    label: "Configurações",
+    icon: Settings,
   },
 ];
 

@@ -19,28 +19,18 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { StripeAccountStatus } from "@/generated/prisma/enums";
 import {
   AlertTriangle,
-  Banknote,
-  CreditCard,
-  HandCoins,
   Loader2,
-  MessageCircle,
-  QrCode,
-  Smartphone,
   Trash2,
   UserCheck,
   UserX,
-  Wifi,
-  WifiOff,
 } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 interface ProfessionalFormProps {
@@ -50,9 +40,6 @@ interface ProfessionalFormProps {
     displayName: string | null;
     bio: string | null;
     isActive: boolean;
-    acceptsPix: boolean;
-    acceptsCard: boolean;
-    acceptsPayAfterService: boolean;
     whatsappGroupName: string | null;
     stripeAccountStatus: StripeAccountStatus;
     stripeOnboardingComplete: boolean;
@@ -95,139 +82,8 @@ export default function ProfessionalForm({
     displayName: professional.displayName ?? professional.user.name,
     email: professional.user.email,
     bio: professional.bio ?? "",
-    acceptsPix: professional.acceptsPix,
-    acceptsCard: professional.acceptsCard,
-    acceptsPayAfterService: professional.acceptsPayAfterService,
     whatsappGroupName: professional.whatsappGroupName ?? "",
   });
-
-  const [waStatus, setWaStatus] = useState<string>("disconnected");
-  const [waQrCode, setWaQrCode] = useState<string | null>(null);
-  const [waPairingCode, setWaPairingCode] = useState<string | null>(null);
-  const [waConnecting, setWaConnecting] = useState(false);
-  const [waConnectionMode, setWaConnectionMode] = useState<"qr" | "phone">(
-    "qr",
-  );
-  const [waPhoneNumber, setWaPhoneNumber] = useState("");
-  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const pollingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const stopPolling = useCallback(() => {
-    if (pollingRef.current) {
-      clearInterval(pollingRef.current);
-      pollingRef.current = null;
-    }
-    if (pollingTimeoutRef.current) {
-      clearTimeout(pollingTimeoutRef.current);
-      pollingTimeoutRef.current = null;
-    }
-  }, []);
-
-  const pollWhatsAppStatus = useCallback(async () => {
-    try {
-      const res = await fetch(`/api/whatsapp/${professional.id}/status`);
-      const data = await res.json();
-      setWaStatus(data.status);
-      setWaQrCode(data.qrCode);
-      setWaPairingCode(data.pairingCode);
-      if (data.status === "connected" || data.status === "disconnected") {
-        setWaConnecting(false);
-        stopPolling();
-        if (data.status === "connected") {
-          toast.success("WhatsApp conectado com sucesso!");
-        }
-      }
-    } catch {
-      /* ignore network errors during polling */
-    }
-  }, [professional.id, stopPolling]);
-
-  const startPolling = useCallback(() => {
-    stopPolling();
-    pollingRef.current = setInterval(pollWhatsAppStatus, 1500);
-    pollingTimeoutRef.current = setTimeout(() => {
-      stopPolling();
-      setWaConnecting(false);
-      setWaStatus("disconnected");
-      setWaQrCode(null);
-      toast.error("Tempo esgotado. Tente conectar novamente.");
-    }, 120000);
-  }, [pollWhatsAppStatus, stopPolling]);
-
-  const handleConnectWhatsApp = async () => {
-    if (waConnecting) return;
-    setWaConnecting(true);
-    setWaQrCode(null);
-    setWaPairingCode(null);
-    try {
-      await fetch(`/api/whatsapp/${professional.id}/connect`, {
-        method: "POST",
-      });
-      startPolling();
-      pollWhatsAppStatus();
-    } catch {
-      setWaConnecting(false);
-      toast.error("Erro ao conectar WhatsApp. Tente novamente.");
-    }
-  };
-
-  const handleConnectWithPhone = async () => {
-    const cleanPhone = waPhoneNumber.replace(/\D/g, "");
-    if (cleanPhone.length < 10) {
-      toast.error("Digite um número de celular válido com DDD.");
-      return;
-    }
-    if (waConnecting) return;
-    setWaConnecting(true);
-    setWaQrCode(null);
-    setWaPairingCode(null);
-    try {
-      const res = await fetch(
-        `/api/whatsapp/${professional.id}/connect-phone`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ phoneNumber: cleanPhone }),
-        },
-      );
-      const data = await res.json();
-      if (data.pairingCode) {
-        setWaPairingCode(data.pairingCode);
-        setWaStatus(data.status);
-      }
-      startPolling();
-    } catch {
-      setWaConnecting(false);
-      toast.error("Erro ao conectar WhatsApp. Tente novamente.");
-    }
-  };
-
-  const handleDisconnectWhatsApp = async () => {
-    stopPolling();
-    try {
-      await fetch(`/api/whatsapp/${professional.id}/disconnect`, {
-        method: "POST",
-      });
-    } catch {
-      /* ignore */
-    }
-    setWaStatus("disconnected");
-    setWaQrCode(null);
-    setWaPairingCode(null);
-    setWaConnecting(false);
-  };
-
-  useEffect(() => {
-    // Usar setTimeout para evitar setState síncrono no useEffect
-    const timer = setTimeout(() => {
-      pollWhatsAppStatus();
-    }, 0);
-
-    return () => {
-      clearTimeout(timer);
-      stopPolling();
-    };
-  }, [pollWhatsAppStatus, stopPolling]);
 
   const { execute: executeUpdate, isPending: isUpdating } = useAction(
     updateProfessional,
@@ -427,93 +283,6 @@ export default function ProfessionalForm({
 
       <Card>
         <CardHeader>
-          <CardTitle>Formas de Pagamento</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-muted-foreground text-sm">
-            Configure quais formas de pagamento este profissional aceita.
-          </p>
-          <div className="flex items-center justify-between rounded-lg border p-4">
-            <div className="flex items-center gap-3">
-              <CreditCard className="text-muted-foreground h-5 w-5" />
-              <div>
-                <p className="font-medium">Cartão de Crédito</p>
-                <p className="text-muted-foreground text-sm">
-                  Pagamentos via cartão
-                </p>
-              </div>
-            </div>
-            <Switch
-              checked={formData.acceptsCard}
-              onCheckedChange={(checked) =>
-                setFormData({ ...formData, acceptsCard: checked })
-              }
-              disabled={
-                isLoading ||
-                (!formData.acceptsPix &&
-                  !formData.acceptsPayAfterService &&
-                  formData.acceptsCard)
-              }
-            />
-          </div>
-          <div className="flex items-center justify-between rounded-lg border p-4">
-            <div className="flex items-center gap-3">
-              <Banknote className="text-muted-foreground h-5 w-5" />
-              <div>
-                <p className="font-medium">PIX</p>
-                <p className="text-muted-foreground text-sm">
-                  Pagamentos via PIX
-                </p>
-              </div>
-            </div>
-            <Switch
-              checked={formData.acceptsPix}
-              onCheckedChange={(checked) =>
-                setFormData({ ...formData, acceptsPix: checked })
-              }
-              disabled={
-                isLoading ||
-                (!formData.acceptsCard &&
-                  !formData.acceptsPayAfterService &&
-                  formData.acceptsPix)
-              }
-            />
-          </div>
-          <div className="flex items-center justify-between rounded-lg border p-4">
-            <div className="flex items-center gap-3">
-              <HandCoins className="text-muted-foreground h-5 w-5" />
-              <div>
-                <p className="font-medium">Pagar após o serviço</p>
-                <p className="text-muted-foreground text-sm">
-                  Permite agendar e pagar presencialmente após a conclusão
-                </p>
-              </div>
-            </div>
-            <Switch
-              checked={formData.acceptsPayAfterService}
-              onCheckedChange={(checked) =>
-                setFormData({ ...formData, acceptsPayAfterService: checked })
-              }
-              disabled={
-                isLoading ||
-                (!formData.acceptsCard &&
-                  !formData.acceptsPix &&
-                  formData.acceptsPayAfterService)
-              }
-            />
-          </div>
-          {!formData.acceptsCard &&
-            !formData.acceptsPix &&
-            !formData.acceptsPayAfterService && (
-              <p className="text-destructive text-sm">
-                O profissional deve aceitar pelo menos uma forma de pagamento.
-              </p>
-            )}
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
           <CardTitle>Conta Stripe</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -542,196 +311,6 @@ export default function ProfessionalForm({
               </div>
             </div>
           )}
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MessageCircle className="h-5 w-5" />
-            WhatsApp
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex flex-col gap-3 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-3">
-              {waStatus === "connected" ? (
-                <Wifi className="h-5 w-5 shrink-0 text-green-600" />
-              ) : (
-                <WifiOff className="h-5 w-5 shrink-0 text-muted-foreground" />
-              )}
-              <div>
-                <p className="font-medium">
-                  {waStatus === "connected"
-                    ? "Conectado"
-                    : waStatus === "qr_code"
-                      ? "Aguardando QR Code"
-                      : waStatus === "connecting"
-                        ? "Conectando..."
-                        : "Desconectado"}
-                </p>
-                <p className="text-muted-foreground text-sm">
-                  {waStatus === "connected"
-                    ? "WhatsApp conectado. A agenda será enviada automaticamente."
-                    : "Conecte o WhatsApp para enviar a agenda no grupo."}
-                </p>
-              </div>
-            </div>
-            {waStatus === "connected" ? (
-              <Button
-                variant="destructive"
-                onClick={handleDisconnectWhatsApp}
-                className="w-full sm:w-auto"
-              >
-                Desconectar
-              </Button>
-            ) : (
-              !waConnecting && (
-                <div className="flex w-full gap-2 sm:w-auto">
-                  <Button
-                    onClick={() => {
-                      setWaConnectionMode("qr");
-                      handleConnectWhatsApp();
-                    }}
-                    disabled={waConnecting}
-                    variant={waConnectionMode === "qr" ? "default" : "outline"}
-                    className="flex-1 sm:flex-initial"
-                  >
-                    <QrCode className="mr-2 h-4 w-4" />
-                    QR Code
-                  </Button>
-                </div>
-              )
-            )}
-          </div>
-
-          {waStatus !== "connected" && !waConnecting && (
-            <div className="space-y-3 rounded-lg border p-4">
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => setWaConnectionMode("qr")}
-                  className={`flex flex-1 items-center justify-center gap-2 rounded-lg border p-3 text-sm font-medium transition-colors ${
-                    waConnectionMode === "qr"
-                      ? "border-primary bg-primary/10 text-primary"
-                      : "hover:bg-accent"
-                  }`}
-                >
-                  <QrCode className="h-4 w-4" />
-                  QR Code
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setWaConnectionMode("phone")}
-                  className={`flex flex-1 items-center justify-center gap-2 rounded-lg border p-3 text-sm font-medium transition-colors ${
-                    waConnectionMode === "phone"
-                      ? "border-primary bg-primary/10 text-primary"
-                      : "hover:bg-accent"
-                  }`}
-                >
-                  <Smartphone className="h-4 w-4" />
-                  Número do Celular
-                </button>
-              </div>
-
-              {waConnectionMode === "qr" ? (
-                <div className="space-y-2">
-                  <p className="text-muted-foreground text-sm">
-                    Clique para gerar o QR Code e escaneie com o WhatsApp.
-                  </p>
-                  <Button
-                    onClick={handleConnectWhatsApp}
-                    disabled={waConnecting}
-                    className="w-full"
-                  >
-                    Gerar QR Code
-                  </Button>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  <p className="text-muted-foreground text-sm">
-                    Digite o número do celular com o codigo do Páis DDD para
-                    receber o código de pareamento.
-                  </p>
-                  <div className="flex gap-2">
-                    <Input
-                      type="tel"
-                      placeholder="5562999999999"
-                      value={waPhoneNumber}
-                      onChange={(e) => setWaPhoneNumber(e.target.value)}
-                      disabled={waConnecting}
-                    />
-                    <Button
-                      onClick={handleConnectWithPhone}
-                      disabled={
-                        waConnecting ||
-                        waPhoneNumber.replace(/\D/g, "").length < 10
-                      }
-                    >
-                      Conectar
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {waStatus === "qr_code" && waQrCode && !waPairingCode && (
-            <div className="flex flex-col items-center gap-3 rounded-lg border p-6">
-              <QrCode className="h-8 w-8 text-muted-foreground" />
-              <p className="text-center text-sm font-medium">
-                Escaneie o QR Code com o WhatsApp
-              </p>
-              <div className="rounded-lg border bg-white p-4">
-                <Image
-                  src={waQrCode}
-                  alt="QR Code WhatsApp"
-                  width={256}
-                  height={256}
-                  unoptimized
-                />
-              </div>
-              <p className="text-center text-xs text-muted-foreground">
-                Abra o WhatsApp {">"} Dispositivos conectados {">"} Conectar
-                dispositivo
-              </p>
-            </div>
-          )}
-
-          {waPairingCode && waStatus !== "connected" && (
-            <div className="flex flex-col items-center gap-3 rounded-lg border p-6">
-              <Smartphone className="h-8 w-8 text-muted-foreground" />
-              <p className="text-center text-sm font-medium">
-                Código de Pareamento
-              </p>
-              <div className="rounded-lg border bg-white px-6 py-4">
-                <p className="text-center font-mono text-2xl font-bold tracking-widest text-black">
-                  {waPairingCode}
-                </p>
-              </div>
-              <p className="text-center text-xs text-muted-foreground">
-                Abra o WhatsApp {">"} Dispositivos conectados {">"} Conectar
-                dispositivo {">"} Conectar com número de telefone
-              </p>
-            </div>
-          )}
-
-          {waConnecting &&
-            waStatus === "connecting" &&
-            !waQrCode &&
-            !waPairingCode && (
-              <div className="flex flex-col items-center gap-3 rounded-lg border p-6">
-                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                <p className="text-center text-sm font-medium">
-                  {waConnectionMode === "phone"
-                    ? "Gerando código de pareamento..."
-                    : "Gerando QR Code..."}
-                </p>
-                <p className="text-center text-xs text-muted-foreground">
-                  Aguarde um momento
-                </p>
-              </div>
-            )}
         </CardContent>
       </Card>
 

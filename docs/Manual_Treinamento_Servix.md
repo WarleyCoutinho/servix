@@ -11,12 +11,11 @@ Bem-vindo ao Servix! Este guia vai te ajudar a configurar tudo do zero de forma 
 3. [Ativando seu Plano](#3-ativando-seu-plano)
 4. [Gerenciando Profissionais](#4-gerenciando-profissionais)
 5. [Configurando o Perfil do Profissional](#5-configurando-o-perfil-do-profissional)
-6. [Formas de Pagamento](#6-formas-de-pagamento)
-7. [Conectando o WhatsApp](#7-conectando-o-whatsapp)
-8. [Cadastrando Serviços](#8-cadastrando-serviços)
-9. [Configurando Horários e Intervalo de Almoço](#9-configurando-horários-e-intervalo-de-almoço)
-10. [Painel Profissional e Stripe](#10-painel-profissional-e-stripe)
-11. [Checklist Final](#11-checklist-final)
+6. [Configurações do Profissional (Pagamento e WhatsApp)](#6-configurações-do-profissional-pagamento-e-whatsapp)
+7. [Cadastrando Serviços](#7-cadastrando-serviços)
+8. [Configurando Horários e Intervalo de Almoço](#8-configurando-horários-e-intervalo-de-almoço)
+9. [Painel Profissional e Stripe](#9-painel-profissional-e-stripe)
+10. [Checklist Final](#10-checklist-final)
 
 > Os seus serviços só aparecem para os clientes quando há pelo menos um profissional **ativo** configurado.
 
@@ -105,25 +104,32 @@ Quando o profissional abrir o link e fazer login com o Google usando o e-mail qu
 
 ## 5. Configurando o Perfil do Profissional
 
-Acesse: **menu ≡ → Profissionais → Gerenciar**
+**Para o proprietário:** Acesse **menu ≡ → Profissionais → Gerenciar**
 
-Preencha:
+Aqui o proprietário pode editar os dados básicos do profissional:
 - **Nome de Exibição** — como vai aparecer para os clientes
-- **Biografia** — sua experiência e especialidades (opcional)
-- **Nome do Grupo WhatsApp** — nome exato do grupo onde você quer receber as notificações
+- **Email** — email de acesso do profissional
+- **Biografia** — experiência e especialidades (opcional)
+- **Nome do Grupo WhatsApp** — nome exato do grupo de notificações
+
+O proprietário também visualiza o **status do Stripe** e pode **ativar/desativar** o profissional.
 
 Toque em **Salvar Alterações**.
 
 ---
 
-## 6. Formas de Pagamento
+## 6. Configurações do Profissional (Pagamento e WhatsApp)
 
-Acesse: **Profissionais → Gerenciar → Formas de Pagamento**
+> As configurações de formas de pagamento e WhatsApp são de responsabilidade do **profissional**. O proprietário não precisa configurar isso.
+
+**Para o profissional:** Acesse **Painel Profissional → menu ≡ → Configurações**
+
+### Formas de Pagamento
 
 | Forma | Status | Como funciona |
 |-------|:------:|--------------|
 | **Cartão de Crédito** | Já vem ativo | Cliente paga online na hora do agendamento |
-| **Pagar após o serviço** | Desativado | Você ativa se quiser cobrar presencialmente |
+| **Pagar após o serviço** | Desativado | Ative se quiser cobrar presencialmente |
 | **PIX** | Em breve | Ainda em desenvolvimento |
 
 **Quer receber presencialmente (maquininha, PIX, dinheiro)?**
@@ -131,9 +137,11 @@ Mantenha o cartão ativo **e** ative também "Pagar após o serviço". O cliente
 
 > Sempre marque como **Finalizado** — isso atualiza o histórico de vocês dois.
 
----
+Na mesma tela, configure o **Nome do Grupo WhatsApp** — o nome exato do grupo onde as notificações de agendamento serão enviadas.
 
-## 7. Conectando o WhatsApp
+Toque em **Salvar Configurações**.
+
+### Conectando o WhatsApp
 
 O Servix envia notificações de agendamento automaticamente para um grupo do WhatsApp. Após cada agendamento ou cancelamento (em qualquer data), a agenda atualizada é enviada ao grupo.
 
@@ -142,7 +150,7 @@ O Servix envia notificações de agendamento automaticamente para um grupo do Wh
 > Coloque o grupo como **"Somente admins enviam mensagens"** para as notificações ficarem organizadas.
 
 **Opção A — QR Code:**
-No perfil do profissional, toque em **QR Code** → abra o WhatsApp → **Dispositivos Conectados → Conectar dispositivo** → escaneie o código.
+Na tela de Configurações, toque em **QR Code** → abra o WhatsApp → **Dispositivos Conectados → Conectar dispositivo** → escaneie o código.
 
 **Opção B — Número de telefone:**
 Toque em **Número do Celular** → digite seu número → toque em **Conectar** → use o código de pareamento no WhatsApp (**Dispositivos Conectados → Conectar com número de telefone**).
@@ -153,7 +161,7 @@ Quando aparecer **"Conectado"**, está funcionando!
 
 ---
 
-## 8. Cadastrando Serviços
+## 7. Cadastrando Serviços
 
 Acesse: **menu ≡ → Serviços → + Novo Serviço**
 
@@ -170,7 +178,7 @@ Toque em **Criar Serviço**. Pronto!
 
 ---
 
-## 9. Configurando Horários e Intervalo de Almoço
+## 8. Configurando Horários e Intervalo de Almoço
 
 Acesse pelo **Painel Profissional → Minha Agenda**.
 
@@ -201,7 +209,7 @@ Toque em **Salvar Alterações** após configurar.
 
 ---
 
-## 10. Painel Profissional e Stripe
+## 9. Painel Profissional e Stripe
 
 ### Painel Profissional
 Acesse pelo **menu ≡ → Painel Profissional**. Aqui você acompanha agendamentos do dia, do mês, seus ganhos e o status do Stripe.
@@ -285,19 +293,20 @@ Se aparecer **"Configuração pendente"**, é normal. O Stripe está analisando.
 
 ---
 
-## 11. Checklist Final
+## 10. Checklist Final
 
-| # | O que fazer | Feito? |
-|---|-------------|:------:|
-| 1 | Login com Google e selecionar perfil Proprietário | |
-| 2 | Criar a loja (nome, endereço, cidade, estado, CPF, descrição, foto) | |
-| 3 | Ativar o plano de assinatura | |
-| 4 | Configurar perfil do profissional (nome, biografia, WhatsApp) | |
-| 5 | Definir formas de pagamento | |
-| 6 | Conectar o WhatsApp | |
-| 7 | Cadastrar os serviços (nome, preço, duração, foto) | |
-| 8 | Configurar horários de atendimento e intervalo de almoço | |
-| 9 | Configurar conta Stripe no Painel Profissional | |
+| # | Quem faz | O que fazer | Feito? |
+|---|---------|-------------|:------:|
+| 1 | Proprietário | Login com Google e selecionar perfil Proprietário | |
+| 2 | Proprietário | Criar a loja (nome, endereço, cidade, estado, CPF, descrição, foto) | |
+| 3 | Proprietário | Ativar o plano de assinatura | |
+| 4 | Proprietário | Cadastrar profissionais (nome, email) | |
+| 5 | Proprietário | Cadastrar os serviços (nome, preço, duração, foto) | |
+| 6 | Profissional | Configurar perfil (nome, biografia) | |
+| 7 | Profissional | Definir formas de pagamento e nome do grupo WhatsApp (Configurações) | |
+| 8 | Profissional | Conectar o WhatsApp (Configurações) | |
+| 9 | Profissional | Configurar horários de atendimento e intervalo de almoço | |
+| 10 | Profissional | Configurar conta Stripe no Painel Profissional | |
 
 ---
 
