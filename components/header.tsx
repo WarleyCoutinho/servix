@@ -3,6 +3,7 @@
 import { authClient } from "@/lib/auth-client";
 import logo from "@/public/logo-sem-fundo.png";
 import {
+  BotMessageSquare,
   CalendarDays,
   ChevronDown,
   Home,
@@ -101,12 +102,20 @@ const Header = ({ categories = [] }: HeaderProps) => {
             )}
 
             {isLoggedIn && (
-              <Button variant="ghost" size="sm" asChild>
-                <Link href="/bookings">
-                  <CalendarDays className="mr-2 size-4" />
-                  Agendamentos
-                </Link>
-              </Button>
+              <>
+                <Button variant="ghost" size="sm" asChild>
+                  <Link href="/bookings">
+                    <CalendarDays className="mr-2 size-4" />
+                    Agendamentos
+                  </Link>
+                </Button>
+                <Button variant="ghost" size="sm" asChild>
+                  <Link href="/chat">
+                    <BotMessageSquare className="mr-2 size-4" />
+                    Agendar via Chat
+                  </Link>
+                </Button>
+              </>
             )}
 
             {session?.user?.role === "admin" && (

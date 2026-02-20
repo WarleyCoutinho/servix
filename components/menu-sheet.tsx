@@ -2,6 +2,7 @@
 
 import { authClient } from "@/lib/auth-client";
 import {
+  BotMessageSquare,
   CalendarDays,
   Home,
   LayoutDashboard,
@@ -183,14 +184,24 @@ const MenuSheet = ({ categories = [], onLoginClick }: MenuSheetProps) => {
               )}
 
               {isLoggedIn && (
-                <button
-                  type="button"
-                  onClick={() => handleNavigation("/bookings")}
-                  className="hover:bg-accent flex items-center gap-3 px-4 py-3 text-left text-sm font-medium transition-colors sm:px-6"
-                >
-                  <CalendarDays className="size-4 shrink-0" />
-                  Meus Agendamentos
-                </button>
+                <>
+                  <button
+                    type="button"
+                    onClick={() => handleNavigation("/bookings")}
+                    className="hover:bg-accent flex items-center gap-3 px-4 py-3 text-left text-sm font-medium transition-colors sm:px-6"
+                  >
+                    <CalendarDays className="size-4 shrink-0" />
+                    Meus Agendamentos
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleNavigation("/chat")}
+                    className="hover:bg-accent flex items-center gap-3 px-4 py-3 text-left text-sm font-medium transition-colors sm:px-6"
+                  >
+                    <BotMessageSquare className="size-4 shrink-0" />
+                    Agendar via Chat
+                  </button>
+                </>
               )}
             </nav>
 

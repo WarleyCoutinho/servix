@@ -276,12 +276,6 @@ export function EstablishmentDetails({
                     Ver Serviços
                   </Link>
                 </Button>
-                <Button variant="outline" asChild>
-                  <Link href="/dashboard/owner/schedule">
-                    <Calendar className="mr-2 h-4 w-4" />
-                    Horários
-                  </Link>
-                </Button>
               </>
             )}
           </div>

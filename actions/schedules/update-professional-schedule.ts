@@ -119,6 +119,5 @@ export const updateProfessionalSchedule = professionalActionClient
     await prisma.$transaction(operations);
 
     revalidatePath("/dashboard/professional/schedule");
-    revalidatePath("/dashboard/owner/schedule");
     return { success: true };
   });
