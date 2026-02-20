@@ -6,7 +6,6 @@ import { UserRole } from "@/generated/prisma/enums";
 import {
   Users,
   Scissors,
-  Clock,
   CreditCard,
   LayoutDashboard,
   Store,
@@ -87,7 +86,6 @@ export default async function OwnerDashboardLayout({
 
   navItems.push(
     { href: "/dashboard/owner/services", label: "Serviços", icon: Scissors },
-    { href: "/dashboard/owner/schedule", label: "Horários", icon: Clock },
     { href: "/dashboard/owner/subscription", label: "Assinatura", icon: CreditCard },
   );
 

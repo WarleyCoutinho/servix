@@ -32,6 +32,9 @@ const BarbershopItem = ({ barbershop, className }: BarbershopItemProps) => {
         </h3>
         <p className="mt-0.5 truncate text-xs text-white/70">
           {barbershop.address}
+          {barbershop.city && barbershop.state
+            ? ` — ${barbershop.city}/${barbershop.state}`
+            : ""}
         </p>
       </div>
     </Link>

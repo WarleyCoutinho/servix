@@ -10,9 +10,10 @@ import {
   updateUserRoleBasedOnPlan,
 } from "@/lib/role-sync";
 import { sendDailyScheduleToGroup } from "@/lib/whatsapp-schedule";
-import { isTodayBrt, startOfDayBrt, endOfDayBrt } from "@/lib/timezone";
+import { startOfDayBrt, endOfDayBrt } from "@/lib/timezone";
 import { DEFAULT_INTERVAL_MINUTES } from "@/lib/schedule-utils";
 import { addMinutes } from "date-fns";
+import type Stripe from "stripe";
 
 const PLAN_ORDER: Record<SubscriptionPlan, number> = {
   [SubscriptionPlan.BASIC]: 1,
@@ -187,11 +188,10 @@ export const POST = async (request: Request) => {
             );
           });
 
-          if (isTodayBrt(metadata.data.date)) {
-            sendDailyScheduleToGroup(professionalId, metadata.data.date).catch(
-              (err) => console.error("[WhatsApp] Erro ao enviar agenda:", err),
-            );
-          }
+          // Enviar agenda atualizada ao WhatsApp para qualquer data
+          sendDailyScheduleToGroup(professionalId, metadata.data.date).catch(
+            (err) => console.error("[WhatsApp] Erro ao enviar agenda:", err),
+          );
         }
         break;
       }
@@ -358,8 +358,25 @@ export const POST = async (request: Request) => {
         break;
       }
 
+      case "payment_intent.succeeded": {
+        const paymentIntent = event.data.object as Stripe.PaymentIntent;
+
+        const payment = await prisma.payment.findUnique({
+          where: { stripePaymentIntentId: paymentIntent.id },
+        });
+
+        if (payment && payment.status !== PaymentStatus.SUCCEEDED) {
+          await prisma.payment.update({
+            where: { id: payment.id },
+            data: { status: PaymentStatus.SUCCEEDED },
+          });
+          console.log(`Payment ${payment.id} confirmed via payment_intent.succeeded`);
+        }
+        break;
+      }
+
       case "charge.refunded": {
-        const charge = event.data.object;
+        const charge = event.data.object as Stripe.Charge;
 
         const payment = await prisma.payment.findUnique({
           where: { stripeChargeId: charge.id },
@@ -373,6 +390,23 @@ export const POST = async (request: Request) => {
               refundedAt: new Date(),
             },
           });
+
+          const booking = await prisma.booking.findUnique({
+            where: { id: payment.bookingId },
+          });
+
+          if (booking) {
+            await prisma.booking.update({
+              where: { id: booking.id },
+              data: { cancelledAt: new Date() },
+            });
+
+            sendDailyScheduleToGroup(booking.professionalId, booking.date).catch(
+              (err) => console.error("[WhatsApp] Erro ao enviar agenda após reembolso:", err),
+            );
+          }
+
+          console.log(`Payment ${payment.id} refunded, booking cancelled`);
         }
         break;
       }

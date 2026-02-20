@@ -26,14 +26,7 @@ export default function OwnerScheduleClient({
   });
 
   function handleSubmit(schedules: DaySchedule[]) {
-    const convertedSchedules = schedules.map((s) => ({
-      dayOfWeek: s.dayOfWeek,
-      startTime: s.startTime,
-      endTime: s.endTime,
-      isAvailable: s.isAvailable,
-    }));
-
-    execute({ schedules: convertedSchedules });
+    execute({ schedules });
   }
 
   return (

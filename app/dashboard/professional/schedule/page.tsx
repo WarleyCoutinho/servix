@@ -36,9 +36,9 @@ export default async function ProfessionalSchedulePage() {
       isAvailable:
         existing?.isAvailable ??
         (day !== DayOfWeek.SATURDAY && day !== DayOfWeek.SUNDAY),
-      hasLunchBreak: false,
-      lunchStartTime: "12:00",
-      lunchEndTime: "13:00",
+      hasLunchBreak: existing?.hasLunchBreak ?? false,
+      lunchStartTime: existing?.lunchStartTime ?? "12:00",
+      lunchEndTime: existing?.lunchEndTime ?? "13:00",
     };
   });
 

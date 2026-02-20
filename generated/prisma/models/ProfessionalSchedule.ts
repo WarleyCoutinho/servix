@@ -30,6 +30,9 @@ export type ProfessionalScheduleMinAggregateOutputType = {
   startTime: string | null
   endTime: string | null
   isAvailable: boolean | null
+  hasLunchBreak: boolean | null
+  lunchStartTime: string | null
+  lunchEndTime: string | null
   professionalId: string | null
 }
 
@@ -39,6 +42,9 @@ export type ProfessionalScheduleMaxAggregateOutputType = {
   startTime: string | null
   endTime: string | null
   isAvailable: boolean | null
+  hasLunchBreak: boolean | null
+  lunchStartTime: string | null
+  lunchEndTime: string | null
   professionalId: string | null
 }
 
@@ -48,6 +54,9 @@ export type ProfessionalScheduleCountAggregateOutputType = {
   startTime: number
   endTime: number
   isAvailable: number
+  hasLunchBreak: number
+  lunchStartTime: number
+  lunchEndTime: number
   professionalId: number
   _all: number
 }
@@ -59,6 +68,9 @@ export type ProfessionalScheduleMinAggregateInputType = {
   startTime?: true
   endTime?: true
   isAvailable?: true
+  hasLunchBreak?: true
+  lunchStartTime?: true
+  lunchEndTime?: true
   professionalId?: true
 }
 
@@ -68,6 +80,9 @@ export type ProfessionalScheduleMaxAggregateInputType = {
   startTime?: true
   endTime?: true
   isAvailable?: true
+  hasLunchBreak?: true
+  lunchStartTime?: true
+  lunchEndTime?: true
   professionalId?: true
 }
 
@@ -77,6 +92,9 @@ export type ProfessionalScheduleCountAggregateInputType = {
   startTime?: true
   endTime?: true
   isAvailable?: true
+  hasLunchBreak?: true
+  lunchStartTime?: true
+  lunchEndTime?: true
   professionalId?: true
   _all?: true
 }
@@ -159,6 +177,9 @@ export type ProfessionalScheduleGroupByOutputType = {
   startTime: string
   endTime: string
   isAvailable: boolean
+  hasLunchBreak: boolean
+  lunchStartTime: string
+  lunchEndTime: string
   professionalId: string
   _count: ProfessionalScheduleCountAggregateOutputType | null
   _min: ProfessionalScheduleMinAggregateOutputType | null
@@ -189,6 +210,9 @@ export type ProfessionalScheduleWhereInput = {
   startTime?: Prisma.StringFilter<"ProfessionalSchedule"> | string
   endTime?: Prisma.StringFilter<"ProfessionalSchedule"> | string
   isAvailable?: Prisma.BoolFilter<"ProfessionalSchedule"> | boolean
+  hasLunchBreak?: Prisma.BoolFilter<"ProfessionalSchedule"> | boolean
+  lunchStartTime?: Prisma.StringFilter<"ProfessionalSchedule"> | string
+  lunchEndTime?: Prisma.StringFilter<"ProfessionalSchedule"> | string
   professionalId?: Prisma.StringFilter<"ProfessionalSchedule"> | string
   professional?: Prisma.XOR<Prisma.ProfessionalScalarRelationFilter, Prisma.ProfessionalWhereInput>
 }
@@ -199,6 +223,9 @@ export type ProfessionalScheduleOrderByWithRelationInput = {
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
   isAvailable?: Prisma.SortOrder
+  hasLunchBreak?: Prisma.SortOrder
+  lunchStartTime?: Prisma.SortOrder
+  lunchEndTime?: Prisma.SortOrder
   professionalId?: Prisma.SortOrder
   professional?: Prisma.ProfessionalOrderByWithRelationInput
 }
@@ -213,6 +240,9 @@ export type ProfessionalScheduleWhereUniqueInput = Prisma.AtLeast<{
   startTime?: Prisma.StringFilter<"ProfessionalSchedule"> | string
   endTime?: Prisma.StringFilter<"ProfessionalSchedule"> | string
   isAvailable?: Prisma.BoolFilter<"ProfessionalSchedule"> | boolean
+  hasLunchBreak?: Prisma.BoolFilter<"ProfessionalSchedule"> | boolean
+  lunchStartTime?: Prisma.StringFilter<"ProfessionalSchedule"> | string
+  lunchEndTime?: Prisma.StringFilter<"ProfessionalSchedule"> | string
   professionalId?: Prisma.StringFilter<"ProfessionalSchedule"> | string
   professional?: Prisma.XOR<Prisma.ProfessionalScalarRelationFilter, Prisma.ProfessionalWhereInput>
 }, "id" | "professionalId_dayOfWeek">
@@ -223,6 +253,9 @@ export type ProfessionalScheduleOrderByWithAggregationInput = {
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
   isAvailable?: Prisma.SortOrder
+  hasLunchBreak?: Prisma.SortOrder
+  lunchStartTime?: Prisma.SortOrder
+  lunchEndTime?: Prisma.SortOrder
   professionalId?: Prisma.SortOrder
   _count?: Prisma.ProfessionalScheduleCountOrderByAggregateInput
   _max?: Prisma.ProfessionalScheduleMaxOrderByAggregateInput
@@ -238,6 +271,9 @@ export type ProfessionalScheduleScalarWhereWithAggregatesInput = {
   startTime?: Prisma.StringWithAggregatesFilter<"ProfessionalSchedule"> | string
   endTime?: Prisma.StringWithAggregatesFilter<"ProfessionalSchedule"> | string
   isAvailable?: Prisma.BoolWithAggregatesFilter<"ProfessionalSchedule"> | boolean
+  hasLunchBreak?: Prisma.BoolWithAggregatesFilter<"ProfessionalSchedule"> | boolean
+  lunchStartTime?: Prisma.StringWithAggregatesFilter<"ProfessionalSchedule"> | string
+  lunchEndTime?: Prisma.StringWithAggregatesFilter<"ProfessionalSchedule"> | string
   professionalId?: Prisma.StringWithAggregatesFilter<"ProfessionalSchedule"> | string
 }
 
@@ -247,6 +283,9 @@ export type ProfessionalScheduleCreateInput = {
   startTime: string
   endTime: string
   isAvailable?: boolean
+  hasLunchBreak?: boolean
+  lunchStartTime?: string
+  lunchEndTime?: string
   professional: Prisma.ProfessionalCreateNestedOneWithoutSchedulesInput
 }
 
@@ -256,6 +295,9 @@ export type ProfessionalScheduleUncheckedCreateInput = {
   startTime: string
   endTime: string
   isAvailable?: boolean
+  hasLunchBreak?: boolean
+  lunchStartTime?: string
+  lunchEndTime?: string
   professionalId: string
 }
 
@@ -265,6 +307,9 @@ export type ProfessionalScheduleUpdateInput = {
   startTime?: Prisma.StringFieldUpdateOperationsInput | string
   endTime?: Prisma.StringFieldUpdateOperationsInput | string
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  hasLunchBreak?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lunchStartTime?: Prisma.StringFieldUpdateOperationsInput | string
+  lunchEndTime?: Prisma.StringFieldUpdateOperationsInput | string
   professional?: Prisma.ProfessionalUpdateOneRequiredWithoutSchedulesNestedInput
 }
 
@@ -274,6 +319,9 @@ export type ProfessionalScheduleUncheckedUpdateInput = {
   startTime?: Prisma.StringFieldUpdateOperationsInput | string
   endTime?: Prisma.StringFieldUpdateOperationsInput | string
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  hasLunchBreak?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lunchStartTime?: Prisma.StringFieldUpdateOperationsInput | string
+  lunchEndTime?: Prisma.StringFieldUpdateOperationsInput | string
   professionalId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
@@ -283,6 +331,9 @@ export type ProfessionalScheduleCreateManyInput = {
   startTime: string
   endTime: string
   isAvailable?: boolean
+  hasLunchBreak?: boolean
+  lunchStartTime?: string
+  lunchEndTime?: string
   professionalId: string
 }
 
@@ -292,6 +343,9 @@ export type ProfessionalScheduleUpdateManyMutationInput = {
   startTime?: Prisma.StringFieldUpdateOperationsInput | string
   endTime?: Prisma.StringFieldUpdateOperationsInput | string
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  hasLunchBreak?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lunchStartTime?: Prisma.StringFieldUpdateOperationsInput | string
+  lunchEndTime?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type ProfessionalScheduleUncheckedUpdateManyInput = {
@@ -300,6 +354,9 @@ export type ProfessionalScheduleUncheckedUpdateManyInput = {
   startTime?: Prisma.StringFieldUpdateOperationsInput | string
   endTime?: Prisma.StringFieldUpdateOperationsInput | string
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  hasLunchBreak?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lunchStartTime?: Prisma.StringFieldUpdateOperationsInput | string
+  lunchEndTime?: Prisma.StringFieldUpdateOperationsInput | string
   professionalId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
@@ -324,6 +381,9 @@ export type ProfessionalScheduleCountOrderByAggregateInput = {
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
   isAvailable?: Prisma.SortOrder
+  hasLunchBreak?: Prisma.SortOrder
+  lunchStartTime?: Prisma.SortOrder
+  lunchEndTime?: Prisma.SortOrder
   professionalId?: Prisma.SortOrder
 }
 
@@ -333,6 +393,9 @@ export type ProfessionalScheduleMaxOrderByAggregateInput = {
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
   isAvailable?: Prisma.SortOrder
+  hasLunchBreak?: Prisma.SortOrder
+  lunchStartTime?: Prisma.SortOrder
+  lunchEndTime?: Prisma.SortOrder
   professionalId?: Prisma.SortOrder
 }
 
@@ -342,6 +405,9 @@ export type ProfessionalScheduleMinOrderByAggregateInput = {
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
   isAvailable?: Prisma.SortOrder
+  hasLunchBreak?: Prisma.SortOrder
+  lunchStartTime?: Prisma.SortOrder
+  lunchEndTime?: Prisma.SortOrder
   professionalId?: Prisma.SortOrder
 }
 
@@ -397,6 +463,9 @@ export type ProfessionalScheduleCreateWithoutProfessionalInput = {
   startTime: string
   endTime: string
   isAvailable?: boolean
+  hasLunchBreak?: boolean
+  lunchStartTime?: string
+  lunchEndTime?: string
 }
 
 export type ProfessionalScheduleUncheckedCreateWithoutProfessionalInput = {
@@ -405,6 +474,9 @@ export type ProfessionalScheduleUncheckedCreateWithoutProfessionalInput = {
   startTime: string
   endTime: string
   isAvailable?: boolean
+  hasLunchBreak?: boolean
+  lunchStartTime?: string
+  lunchEndTime?: string
 }
 
 export type ProfessionalScheduleCreateOrConnectWithoutProfessionalInput = {
@@ -442,6 +514,9 @@ export type ProfessionalScheduleScalarWhereInput = {
   startTime?: Prisma.StringFilter<"ProfessionalSchedule"> | string
   endTime?: Prisma.StringFilter<"ProfessionalSchedule"> | string
   isAvailable?: Prisma.BoolFilter<"ProfessionalSchedule"> | boolean
+  hasLunchBreak?: Prisma.BoolFilter<"ProfessionalSchedule"> | boolean
+  lunchStartTime?: Prisma.StringFilter<"ProfessionalSchedule"> | string
+  lunchEndTime?: Prisma.StringFilter<"ProfessionalSchedule"> | string
   professionalId?: Prisma.StringFilter<"ProfessionalSchedule"> | string
 }
 
@@ -451,6 +526,9 @@ export type ProfessionalScheduleCreateManyProfessionalInput = {
   startTime: string
   endTime: string
   isAvailable?: boolean
+  hasLunchBreak?: boolean
+  lunchStartTime?: string
+  lunchEndTime?: string
 }
 
 export type ProfessionalScheduleUpdateWithoutProfessionalInput = {
@@ -459,6 +537,9 @@ export type ProfessionalScheduleUpdateWithoutProfessionalInput = {
   startTime?: Prisma.StringFieldUpdateOperationsInput | string
   endTime?: Prisma.StringFieldUpdateOperationsInput | string
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  hasLunchBreak?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lunchStartTime?: Prisma.StringFieldUpdateOperationsInput | string
+  lunchEndTime?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type ProfessionalScheduleUncheckedUpdateWithoutProfessionalInput = {
@@ -467,6 +548,9 @@ export type ProfessionalScheduleUncheckedUpdateWithoutProfessionalInput = {
   startTime?: Prisma.StringFieldUpdateOperationsInput | string
   endTime?: Prisma.StringFieldUpdateOperationsInput | string
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  hasLunchBreak?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lunchStartTime?: Prisma.StringFieldUpdateOperationsInput | string
+  lunchEndTime?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type ProfessionalScheduleUncheckedUpdateManyWithoutProfessionalInput = {
@@ -475,6 +559,9 @@ export type ProfessionalScheduleUncheckedUpdateManyWithoutProfessionalInput = {
   startTime?: Prisma.StringFieldUpdateOperationsInput | string
   endTime?: Prisma.StringFieldUpdateOperationsInput | string
   isAvailable?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  hasLunchBreak?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lunchStartTime?: Prisma.StringFieldUpdateOperationsInput | string
+  lunchEndTime?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 
@@ -485,6 +572,9 @@ export type ProfessionalScheduleSelect<ExtArgs extends runtime.Types.Extensions.
   startTime?: boolean
   endTime?: boolean
   isAvailable?: boolean
+  hasLunchBreak?: boolean
+  lunchStartTime?: boolean
+  lunchEndTime?: boolean
   professionalId?: boolean
   professional?: boolean | Prisma.ProfessionalDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["professionalSchedule"]>
@@ -495,6 +585,9 @@ export type ProfessionalScheduleSelectCreateManyAndReturn<ExtArgs extends runtim
   startTime?: boolean
   endTime?: boolean
   isAvailable?: boolean
+  hasLunchBreak?: boolean
+  lunchStartTime?: boolean
+  lunchEndTime?: boolean
   professionalId?: boolean
   professional?: boolean | Prisma.ProfessionalDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["professionalSchedule"]>
@@ -505,6 +598,9 @@ export type ProfessionalScheduleSelectUpdateManyAndReturn<ExtArgs extends runtim
   startTime?: boolean
   endTime?: boolean
   isAvailable?: boolean
+  hasLunchBreak?: boolean
+  lunchStartTime?: boolean
+  lunchEndTime?: boolean
   professionalId?: boolean
   professional?: boolean | Prisma.ProfessionalDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["professionalSchedule"]>
@@ -515,10 +611,13 @@ export type ProfessionalScheduleSelectScalar = {
   startTime?: boolean
   endTime?: boolean
   isAvailable?: boolean
+  hasLunchBreak?: boolean
+  lunchStartTime?: boolean
+  lunchEndTime?: boolean
   professionalId?: boolean
 }
 
-export type ProfessionalScheduleOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "dayOfWeek" | "startTime" | "endTime" | "isAvailable" | "professionalId", ExtArgs["result"]["professionalSchedule"]>
+export type ProfessionalScheduleOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "dayOfWeek" | "startTime" | "endTime" | "isAvailable" | "hasLunchBreak" | "lunchStartTime" | "lunchEndTime" | "professionalId", ExtArgs["result"]["professionalSchedule"]>
 export type ProfessionalScheduleInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   professional?: boolean | Prisma.ProfessionalDefaultArgs<ExtArgs>
 }
@@ -540,6 +639,9 @@ export type $ProfessionalSchedulePayload<ExtArgs extends runtime.Types.Extension
     startTime: string
     endTime: string
     isAvailable: boolean
+    hasLunchBreak: boolean
+    lunchStartTime: string
+    lunchEndTime: string
     professionalId: string
   }, ExtArgs["result"]["professionalSchedule"]>
   composites: {}
@@ -970,6 +1072,9 @@ export interface ProfessionalScheduleFieldRefs {
   readonly startTime: Prisma.FieldRef<"ProfessionalSchedule", 'String'>
   readonly endTime: Prisma.FieldRef<"ProfessionalSchedule", 'String'>
   readonly isAvailable: Prisma.FieldRef<"ProfessionalSchedule", 'Boolean'>
+  readonly hasLunchBreak: Prisma.FieldRef<"ProfessionalSchedule", 'Boolean'>
+  readonly lunchStartTime: Prisma.FieldRef<"ProfessionalSchedule", 'String'>
+  readonly lunchEndTime: Prisma.FieldRef<"ProfessionalSchedule", 'String'>
   readonly professionalId: Prisma.FieldRef<"ProfessionalSchedule", 'String'>
 }
     

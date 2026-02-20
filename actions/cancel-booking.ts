@@ -9,7 +9,6 @@ import { revalidatePath } from "next/cache";
 import Stripe from "stripe";
 import { PaymentStatus } from "@/generated/prisma/enums";
 import { sendDailyScheduleToGroup } from "@/lib/whatsapp-schedule";
-import { isTodayBrt } from "@/lib/timezone";
 
 const inputSchema = z.object({
   bookingId: z.uuid(),
@@ -99,11 +98,10 @@ export const cancelBooking = protectedActionClient
       },
     });
 
-    if (isTodayBrt(booking.date)) {
-      sendDailyScheduleToGroup(booking.professionalId, booking.date).catch(
-        (err) => console.error("[WhatsApp] Erro ao enviar agenda:", err),
-      );
-    }
+    // Enviar agenda atualizada ao WhatsApp para qualquer data
+    sendDailyScheduleToGroup(booking.professionalId, booking.date).catch(
+      (err) => console.error("[WhatsApp] Erro ao enviar agenda:", err),
+    );
 
     revalidatePath("/");
     revalidatePath("/bookings");

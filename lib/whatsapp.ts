@@ -81,6 +81,8 @@ export async function connectProfessional(
 ): Promise<{ status: ConnectionStatus; qrCode: string | null }> {
   try {
     validateProfessionalId(professionalId);
+    // Desconectar sessão anterior antes de nova tentativa
+    await disconnectProfessional(professionalId);
     return await whatsappFetch<{
       status: ConnectionStatus;
       qrCode: string | null;
@@ -97,6 +99,8 @@ export async function connectWithPhone(
 ): Promise<{ status: ConnectionStatus; pairingCode: string | null }> {
   try {
     validateProfessionalId(professionalId);
+    // Desconectar sessão anterior antes de nova tentativa
+    await disconnectProfessional(professionalId);
     return await whatsappFetch<{
       status: ConnectionStatus;
       pairingCode: string | null;

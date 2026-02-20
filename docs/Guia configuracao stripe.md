@@ -75,7 +75,7 @@ Isso criara os seguintes planos:
 | Plano        | Preco           | Max Estabelecimentos | Max Profissionais | Max Servicos |
 | ------------ | --------------- | -------------------- | ----------------- | ------------ |
 | Basico       | R$ 39,90/mes    | 1                    | 1                 | 3            |
-| Padrao       | R$ 79,90,90/mes | 1                    | 5                 | 20           |
+| Padrao       | R$ 79,90/mes    | 1                    | 5                 | 20           |
 | Profissional | R$ 129,90/mes   | 1                    | 20                | 50           |
 | Empresarial  | R$ 249,90/mes   | 5                    | 100               | 999          |
 
@@ -144,20 +144,20 @@ Isso criara os seguintes planos:
 
 **Eventos de Assinatura:**
 
-- [x] `checkout.session.completed` — finaliza checkout e sincroniza assinatura ou agendamento
-- [x] `customer.subscription.created` — registra nova assinatura e ativa plano do proprietario
-- [x] `customer.subscription.updated` — atualiza plano em caso de upgrade ou downgrade
-- [x] `customer.subscription.deleted` — cancela assinatura e bloqueia acesso a plataforma
-- [x] `customer.subscription.trial_will_end` — notifica proprietario 3 dias antes do trial expirar
-- [x] `invoice.paid` — confirma pagamento da fatura e mantem assinatura ativa
-- [x] `invoice.payment_failed` — registra falha, notifica proprietario e inicia fluxo de inadimplencia
-- [x] `invoice.upcoming` — notifica proprietario sobre proxima cobranca
+- [x] `checkout.session.completed` — finaliza checkout e sincroniza assinatura (mode: subscription) ou cria agendamento com pagamento (mode: payment). Envia notificacao WhatsApp apos agendamento.
+- [x] `customer.subscription.created` — registra nova assinatura, ativa plano do proprietario e registra historico de plano (`PlanHistory`).
+- [x] `customer.subscription.updated` — atualiza plano em caso de upgrade ou downgrade. Gerencia limites (profissionais/servicos) e registra historico.
+- [x] `customer.subscription.deleted` — cancela assinatura e bloqueia acesso a plataforma (desativa barbershop).
+- [x] `invoice.paid` — confirma pagamento da fatura e mantem assinatura ativa via `syncSubscriptionFromStripe`.
+- [x] `invoice.payment_failed` — registra falha e sincroniza status da assinatura no banco.
 
 **Eventos de Pagamento (Agendamentos):**
 
-- [x] `payment_intent.succeeded` — confirma pagamento e libera o slot do agendamento
-- [x] `payment_intent.payment_failed` — registra falha e notifica cliente e profissional
-- [x] `charge.refunded` — processa reembolso e atualiza status do agendamento (cartao e PIX)
+- [x] `payment_intent.succeeded` — confirma pagamento atualizando status para `SUCCEEDED` no banco.
+- [x] `payment_intent.payment_failed` — registra falha atualizando status para `FAILED` no banco.
+- [x] `charge.refunded` — processa reembolso, cancela o agendamento associado e envia agenda atualizada via WhatsApp.
+
+> **Nota**: Os eventos `customer.subscription.trial_will_end` e `invoice.upcoming` podem ser adicionados futuramente para notificacoes proativas. Atualmente nao estao implementados no codigo.
 
 #### Obter a chave (Metodo 1 — Dashboard, producao):
 
@@ -209,13 +209,14 @@ STRIPE_WEBHOOK_SECRET_KEY="whsec_xxxxxxxxxxxxx"
 
 **Eventos de Conta do Profissional:**
 
-- [x] `account.updated` — verifica `charges_enabled`, `payouts_enabled` e `details_submitted` para ativar ou manter conta pendente
-- [x] `account.external_account.created` — confirma que conta bancaria foi adicionada com sucesso
+- [x] `account.updated` — verifica `charges_enabled`, `payouts_enabled` e `details_submitted`. Atualiza status no banco via `updateProfessionalStripeStatus`. Loga status ACTIVE ou PENDING com os tres campos.
+- [x] `account.application.deauthorized` — revoga acesso do profissional, marcando conta como `DISABLED` e `stripeOnboardingComplete: false`.
+- [x] `account.external_account.created` — loga confirmacao de que conta bancaria foi adicionada com sucesso.
 
 **Eventos de Repasse:**
 
-- [x] `payout.paid` — registra repasse realizado com sucesso ao profissional
-- [x] `payout.failed` — registra falha no repasse e notifica profissional
+- [x] `payout.paid` — loga repasse realizado com sucesso (valor e moeda).
+- [x] `payout.failed` — loga falha no repasse com motivo (`failure_message`).
 
 #### Obter a chave (Metodo 1 — Dashboard, producao):
 
@@ -231,7 +232,7 @@ STRIPE_CONNECT_WEBHOOK_SECRET="whsec_xxxxxxxxxxxxxxxxxxxxxxxxxx"
 #### Obter a chave (Metodo 2 — Stripe CLI, desenvolvimento local):
 
 ```bash
-stripe listen --forward-to localhost:3000/api/stripe/connect/webhook --events account.updated,account.external_account.created,payout.paid,payout.failed
+stripe listen --forward-to localhost:3000/api/stripe/connect/webhook --events account.updated,account.application.deauthorized,account.external_account.created,payout.paid,payout.failed
 ```
 
 O terminal exibira:
@@ -353,6 +354,7 @@ STRIPE_SECRET_KEY="sk_test_xxxxxxxxxxxxxxxxxxxxxxxxxx"
 
 # Stripe - Webhooks
 STRIPE_WEBHOOK_SECRET_KEY="whsec_xxxxxxxxxxxxxxxxxxxxxxxxxx"
+STRIPE_CONNECT_WEBHOOK_SECRET="whsec_xxxxxxxxxxxxxxxxxxxxxxxxxx"
 
 # Stripe - Taxa da Plataforma (10%)
 PLATFORM_FEE_PERCENTAGE=10
@@ -465,7 +467,7 @@ Sistema verifica os tres campos obrigatorios:
 > **IMPORTANTE**: A ativacao da conta depende exclusivamente do evento `account.updated`.
 > Nao confiar apenas no retorno da API do onboarding — sempre aguardar o webhook para atualizar o status no banco.
 
-### Fluxo 3: Agendamento de Servico (Cliente)
+### Fluxo 3: Agendamento com Cartao (Cliente)
 
 ```
 Cliente seleciona servico + profissional + data/hora
@@ -477,10 +479,7 @@ Verifica se profissional tem Stripe Connect ATIVO
 Checkout Session (mode: payment)
         |
         v
-Cliente escolhe: CARTAO ou PIX
-        |
-        v
-Pagamento processado
+Cliente paga com CARTAO
         |
         v
 Stripe divide automaticamente:
@@ -488,39 +487,107 @@ Stripe divide automaticamente:
   - 10% -> Plataforma (application_fee)
         |
         v
-Webhook: payment_intent.succeeded
-        |
-        v
-Confirma pagamento e libera o slot do agendamento
-        |
-        v
 Webhook: checkout.session.completed
         |
         v
-Cria Booking + Payment no banco
+Cria Booking + Payment no banco (com verificacao de conflito de horario)
+        |
+        v
+Envia agenda atualizada via WhatsApp
+        |
+        v
+Webhook: payment_intent.succeeded
+        |
+        v
+Confirma status do pagamento como SUCCEEDED no banco
+```
+
+### Fluxo 4: Agendamento "Pagar apos o servico"
+
+```
+Cliente seleciona servico + profissional + data/hora
+        |
+        v
+Escolhe "Pagar apos o servico" (se profissional aceitar)
+        |
+        v
+Server Action: createBooking (com payAfterService: true)
+        |
+        v
+Cria Booking + Payment (status: PENDING, paymentMethod: "pay_after_service")
+        |
+        v
+Envia agenda atualizada via WhatsApp
+        |
+        v
+Profissional atende e marca como Finalizado
+```
+
+### Fluxo 5: Cancelamento e Reembolso
+
+```
+Cliente cancela agendamento futuro
+        |
+        v
+Server Action: cancelBooking
+        |
+        +-- Pagamento "pay_after_service" (PENDING):
+        |     Atualiza status para CANCELED
+        |
+        +-- Pagamento com cartao (SUCCEEDED + stripeChargeId):
+        |     Cria refund no Stripe
+        |     Atualiza status para REFUNDED
+        |
+        v
+Marca booking com cancelledAt
+        |
+        v
+Envia agenda atualizada via WhatsApp
+        |
+        v
+(Se cartao) Webhook: charge.refunded
+        |
+        v
+Confirma reembolso no banco + cancela booking (redundancia segura)
 ```
 
 ---
 
 ## IDEMPOTENCIA - EVITAR EVENTOS DUPLICADOS
 
-O Stripe pode reenviar o mesmo evento em caso de falha na entrega. Para evitar processar o mesmo evento duas vezes, salvar o `event.id` no banco antes de executar qualquer logica:
+O Stripe pode reenviar o mesmo evento em caso de falha na entrega. Ambos os webhooks (principal e Connect) implementam idempotencia usando a tabela `StripeEvent`:
 
 ```typescript
-// Verificar se evento ja foi processado
-const alreadyProcessed = await db.stripeEvent.findUnique({
-  where: { eventId: event.id },
+// 1. Verificar se evento ja foi processado
+const existingEvent = await prisma.stripeEvent.findUnique({
+  where: { stripeEventId: event.id },
 });
 
-if (alreadyProcessed) return reply.status(200).send({ received: true });
+if (existingEvent) {
+  return NextResponse.json({ received: true, skipped: true });
+}
 
-// Registrar evento antes de processar
-await db.stripeEvent.create({ data: { eventId: event.id } });
+// 2. Registrar evento ANTES de processar
+await prisma.stripeEvent.create({
+  data: {
+    stripeEventId: event.id,
+    eventType: event.type,
+  },
+});
 
-// processar logica de negocio...
+// 3. Processar logica de negocio...
+// Se falhar, remover o evento para permitir retry:
+try {
+  // processar...
+} catch (error) {
+  await prisma.stripeEvent.delete({
+    where: { stripeEventId: event.id },
+  }).catch(() => {});
+  return NextResponse.json({ error: "Error processing event" }, { status: 500 });
+}
 ```
 
-> Criar a tabela `StripeEvent` no schema do Prisma com os campos `eventId` (unique) e `createdAt`.
+> A tabela `StripeEvent` ja existe no schema do Prisma com os campos `stripeEventId` (unique) e `eventType`.
 
 ---
 
@@ -599,11 +666,11 @@ stripe trigger checkout.session.completed
 2. Verifique se o profissional tem Stripe Connect ativo
 3. Verifique os logs do webhook
 
-### Erro: Agendamento criado mas slot nao liberado
+### Erro: Pagamento confirmado mas status diferente no banco
 
-**Causa provavel**: O evento `payment_intent.succeeded` nao esta sendo tratado ou a logica de liberacao do slot esta apenas no `checkout.session.completed`.
+**Causa provavel**: O evento `payment_intent.succeeded` chegou antes do `checkout.session.completed` criar o Payment no banco. O handler de `payment_intent.succeeded` so atualiza pagamentos que ja existem.
 
-**Solucao**: Garantir que a liberacao do slot esteja no handler do `payment_intent.succeeded`, que e disparado antes do `checkout.session.completed`.
+**Solucao**: Isso e normal — o `checkout.session.completed` cria o Payment com status `SUCCEEDED`. O `payment_intent.succeeded` serve como confirmacao redundante. Verifique se ambos os webhooks estao configurados.
 
 ---
 
@@ -697,6 +764,67 @@ Antes de ir para producao:
 | ---------------- | ------ | --- | ----------------------------------- |
 | **Assinaturas**  | Sim    | Nao | PIX nao suporta cobranca recorrente |
 | **Agendamentos** | Sim    | Sim | Pagamento unico                     |
+
+---
+
+## RELATORIO DA REVISAO STRIPE (Fevereiro 2026)
+
+### O que esta implementado corretamente
+
+| Item | Status | Detalhes |
+|------|:------:|---------|
+| Validacao de assinatura do webhook | OK | Usa `stripe.webhooks.constructEvent` com `rawBody` via `request.text()` |
+| Retorno rapido (200) | OK | Retorna `NextResponse.json({ received: true })` apos processar |
+| Idempotencia (webhook principal) | OK | Verifica/salva `event.id` na tabela `StripeEvent` com rollback em caso de erro |
+| Idempotencia (webhook Connect) | OK | Mesmo padrao implementado |
+| Tipagem TypeScript | OK | Usa `import type Stripe from "stripe"` com type assertions corretos. Zero `any` |
+| `checkout.session.completed` (subscription) | OK | Sincroniza assinatura e atualiza role do usuario |
+| `checkout.session.completed` (payment) | OK | Cria booking + payment com verificacao de conflito em transacao |
+| `customer.subscription.created` | OK | Registra assinatura, ativa plano e cria historico |
+| `customer.subscription.updated` | OK | Trata upgrade/downgrade com ajuste de limites e historico |
+| `customer.subscription.deleted` | OK | Cancela assinatura e desativa barbershop |
+| `invoice.paid` | OK | Sincroniza assinatura ativa |
+| `invoice.payment_failed` | OK | Sincroniza status de falha |
+| `payment_intent.payment_failed` | OK | Atualiza status para `FAILED` |
+| `payment_intent.succeeded` | OK | Confirma status `SUCCEEDED` no banco |
+| `charge.refunded` | OK | Marca reembolso, cancela booking e envia WhatsApp |
+| `account.updated` | OK | Verifica 3 campos obrigatorios e atualiza status via `updateProfessionalStripeStatus` |
+| `account.application.deauthorized` | OK | Marca conta como `DISABLED` |
+| `account.external_account.created` | OK | Loga confirmacao de conta bancaria |
+| `payout.paid` / `payout.failed` | OK | Loga sucesso/falha de repasse |
+| Fluxo de ativacao Connect | OK | Aguarda `account.updated` para ativar. Verifica `charges_enabled`, `payouts_enabled`, `details_submitted` |
+| Notificacao WhatsApp | OK | Enviada em agendamento e cancelamento (qualquer data) |
+
+### Eventos nao implementados (recomendados para futuro)
+
+| Evento | Prioridade | Descricao |
+|--------|:----------:|-----------|
+| `customer.subscription.trial_will_end` | Baixa | Notificar 3 dias antes do trial expirar (sistema nao usa trial atualmente) |
+| `invoice.upcoming` | Baixa | Notificar sobre proxima cobranca futura |
+
+### Correcoes aplicadas nesta revisao
+
+1. **Webhook Connect**: Adicionada idempotencia (verificacao de `StripeEvent` + rollback em erro)
+2. **`payment_intent.succeeded`**: Adicionado handler para confirmar pagamento no banco
+3. **`charge.refunded`**: Expandido para cancelar booking associado e enviar WhatsApp
+4. **`account.external_account.created`**: Adicionado handler para logar conta bancaria
+5. **`account.updated`**: Melhorado log para mostrar valores dos 3 campos de ativacao
+6. **WhatsApp**: Corrigido envio de agenda para qualquer data (nao apenas "hoje")
+7. **Tipagem**: Adicionado `import type Stripe from "stripe"` e type assertions corretos em todos os handlers
+
+### Arquivos da integracao Stripe
+
+| Arquivo | Responsabilidade |
+|---------|-----------------|
+| `app/api/stripe/webhook/route.ts` | Webhook principal (assinaturas + pagamentos) |
+| `app/api/stripe/connect/webhook/route.ts` | Webhook Connect (contas profissionais) |
+| `lib/stripe.ts` | Instancia do Stripe SDK |
+| `lib/stripe-webhook.ts` | Validacao de assinatura do webhook (compartilhado) |
+| `lib/stripe-connect.ts` | Funcoes de Stripe Connect (criar conta, onboarding, status) |
+| `lib/stripe-subscriptions.ts` | Funcoes de assinatura (checkout, sync, portal) |
+| `lib/role-sync.ts` | Sincronizacao de roles apos upgrade/downgrade |
+| `actions/cancel-booking.ts` | Cancelamento com reembolso Stripe |
+| `actions/create-booking.ts` | Criacao com opcao "pagar apos servico" |
 
 ---
 

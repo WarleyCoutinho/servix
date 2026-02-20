@@ -13,6 +13,8 @@ const cpfRegex = /^\d{11}$/;
 const inputSchema = z.object({
   barbershopName: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
   address: z.string().min(5, "Endereço deve ter pelo menos 5 caracteres"),
+  city: z.string().min(2, "Cidade é obrigatória"),
+  state: z.string().min(2, "Estado é obrigatório"),
   description: z.string().min(10, "Descrição deve ter pelo menos 10 caracteres"),
   phone: z.string().min(10, "Telefone inválido"),
   imageUrl: z.string().optional(),
@@ -69,6 +71,8 @@ export const setOwnerRole = protectedActionClient
           name: parsedInput.barbershopName,
           slug,
           address: parsedInput.address,
+          city: parsedInput.city,
+          state: parsedInput.state,
           description: parsedInput.description,
           phones: [parsedInput.phone],
           imageUrl: parsedInput.imageUrl || "/banner.png",

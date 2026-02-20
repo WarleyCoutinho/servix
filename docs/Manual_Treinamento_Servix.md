@@ -14,10 +14,11 @@ Bem-vindo ao Servix! Este guia vai te ajudar a configurar tudo do zero de forma 
 6. [Formas de Pagamento](#6-formas-de-pagamento)
 7. [Conectando o WhatsApp](#7-conectando-o-whatsapp)
 8. [Cadastrando Serviços](#8-cadastrando-serviços)
-9. [Painel Profissional e Stripe](#9-painel-profissional-e-stripe)
-10. [Checklist Final](#10-checklist-final)
+9. [Configurando Horários e Intervalo de Almoço](#9-configurando-horários-e-intervalo-de-almoço)
+10. [Painel Profissional e Stripe](#10-painel-profissional-e-stripe)
+11. [Checklist Final](#11-checklist-final)
 
-> ⚠️ Seus serviços só aparecem para os clientes quando há pelo menos um profissional **ativo** configurado.
+> Os seus serviços só aparecem para os clientes quando há pelo menos um profissional **ativo** configurado.
 
 ---
 
@@ -39,6 +40,8 @@ Preencha os dados do seu negócio com suas informações reais:
 |-------|---------|
 | **Nome do Negócio** ✱ | Barbearia do João / Salão da Ana |
 | **Endereço** ✱ | Rua das Flores, 123 — Centro |
+| **Cidade** ✱ | Anápolis |
+| **Estado** ✱ | GO |
 | **Telefone** ✱ | (62) 99999-9999 |
 | **CPF** ✱ | 000.000.000-00 |
 | **Descrição** ✱ | O que você oferece e seus diferenciais |
@@ -46,7 +49,9 @@ Preencha os dados do seu negócio com suas informações reais:
 
 ✱ Campo obrigatório
 
-> 💡 Uma boa descrição ajuda muito os clientes a te encontrarem. Fale sobre seus serviços, como você atende e o que te diferencia.
+> A **Cidade** e o **Estado** são obrigatórios e são usados para que os clientes encontrem sua loja ao filtrar por localização na página inicial.
+
+> Uma boa descrição ajuda muito os clientes a te encontrarem. Fale sobre seus serviços, como você atende e o que te diferencia.
 
 Após salvar, você vai para o **Dashboard** — a tela principal da sua loja.
 
@@ -66,7 +71,7 @@ Sem plano ativo, o sistema fica bloqueado. Para assinar, toque na **mensagem ama
 
 Escolha o plano, clique em **Assinar**, preencha os dados do cartão e confirme. Pronto — assinatura ativa na hora!
 
-> 💡 No Plano Básico, você é o dono e também o único profissional da loja.
+> No Plano Básico, você é o dono e também o único profissional da loja.
 
 ---
 
@@ -85,11 +90,11 @@ Você pode adicionar outros profissionais. Vá em **Profissionais → Adicionar 
 - E-mail (o mesmo que ele usa no Google)
 - Nome do grupo do WhatsApp da agenda dele
 
-**Depois é só enviar o link da sua loja para ele!** 🎉
+**Depois é só enviar o link da sua loja para ele!**
 
 Quando o profissional abrir o link e fazer login com o Google usando o e-mail que você cadastrou, o sistema já o reconhece automaticamente como profissional da sua loja — sem precisar aprovar nada. Ele segue o próprio cadastro a partir daí.
 
-> ⚠️ Cada profissional configura apenas o próprio perfil: conta bancária, horários e agendamentos são dele.
+> Cada profissional configura apenas o próprio perfil: conta bancária, horários e agendamentos são dele.
 
 **Como dono, você acompanha:**
 - A agenda e os agendamentos de cada profissional
@@ -117,24 +122,24 @@ Acesse: **Profissionais → Gerenciar → Formas de Pagamento**
 
 | Forma | Status | Como funciona |
 |-------|:------:|--------------|
-| **Cartão de Crédito** | ✅ Já vem ativo | Cliente paga online na hora do agendamento |
-| **Pagar após o serviço** | ❌ Desativado | Você ativa se quiser cobrar presencialmente |
-| **PIX** | 🔄 Em breve | Ainda em desenvolvimento |
+| **Cartão de Crédito** | Já vem ativo | Cliente paga online na hora do agendamento |
+| **Pagar após o serviço** | Desativado | Você ativa se quiser cobrar presencialmente |
+| **PIX** | Em breve | Ainda em desenvolvimento |
 
 **Quer receber presencialmente (maquininha, PIX, dinheiro)?**
 Mantenha o cartão ativo **e** ative também "Pagar após o serviço". O cliente agenda sem pagar, você atende, recebe o pagamento e marca o atendimento como **Finalizado** no sistema.
 
-> 💡 Sempre marque como **Finalizado** — isso atualiza o histórico de vocês dois.
+> Sempre marque como **Finalizado** — isso atualiza o histórico de vocês dois.
 
 ---
 
 ## 7. Conectando o WhatsApp
 
-O Servix envia notificações de agendamento automaticamente para um grupo do WhatsApp.
+O Servix envia notificações de agendamento automaticamente para um grupo do WhatsApp. Após cada agendamento ou cancelamento (em qualquer data), a agenda atualizada é enviada ao grupo.
 
-> ⚠️ O nome do grupo no sistema precisa ser **idêntico** ao nome do grupo no WhatsApp — letra por letra, incluindo maiúsculas e espaços.
+> O nome do grupo no sistema precisa ser **idêntico** ao nome do grupo no WhatsApp — letra por letra, incluindo maiúsculas e espaços.
 
-> 💡 Coloque o grupo como **"Somente admins enviam mensagens"** para as notificações ficarem organizadas.
+> Coloque o grupo como **"Somente admins enviam mensagens"** para as notificações ficarem organizadas.
 
 **Opção A — QR Code:**
 No perfil do profissional, toque em **QR Code** → abra o WhatsApp → **Dispositivos Conectados → Conectar dispositivo** → escaneie o código.
@@ -142,7 +147,9 @@ No perfil do profissional, toque em **QR Code** → abra o WhatsApp → **Dispos
 **Opção B — Número de telefone:**
 Toque em **Número do Celular** → digite seu número → toque em **Conectar** → use o código de pareamento no WhatsApp (**Dispositivos Conectados → Conectar com número de telefone**).
 
-Quando aparecer **"Conectado"**, está funcionando! ✅
+Quando aparecer **"Conectado"**, está funcionando!
+
+> Se o QR Code expirar ou a tela abrir e fechar rapidamente, basta solicitar novamente — o sistema automaticamente limpa a sessão anterior antes de criar uma nova.
 
 ---
 
@@ -159,11 +166,42 @@ Preencha:
 
 Toque em **Criar Serviço**. Pronto!
 
-> ⚠️ No Plano Básico você cadastra até 3 serviços. O contador aparece no topo da tela.
+> No Plano Básico você cadastra até 3 serviços. O contador aparece no topo da tela.
 
 ---
 
-## 9. Painel Profissional e Stripe
+## 9. Configurando Horários e Intervalo de Almoço
+
+Acesse pelo **Painel Profissional → Minha Agenda**.
+
+> A configuração de horários está disponível exclusivamente no painel do profissional.
+
+### Horários de Trabalho
+Para cada dia da semana, configure:
+- **Ativar/desativar o dia** — marque os dias em que você trabalha
+- **Horário de início e fim** — defina seu expediente (ex: 08:00 às 18:00)
+
+### Intervalo de Almoço
+Para cada dia, você pode ativar o **intervalo de almoço**:
+- Ative o botão "Intervalo de almoço"
+- Defina o horário de início e fim (ex: 12:00 às 13:00)
+- Os horários de almoço serão **automaticamente removidos** da agenda disponível para o cliente
+
+**Exemplo:** Se você trabalha das 08:00 às 18:00 com almoço das 12:00 às 13:00, o cliente verá slots das 08:00 às 12:00 e das 13:00 às 18:00.
+
+### Proteção de Agendamentos
+Se você tentar alterar o horário de almoço e já existir um agendamento confirmado naquele horário, o sistema vai bloquear a alteração e informar qual agendamento está em conflito (data, horário e nome do cliente).
+
+### Sincronização com WhatsApp
+Qualquer alteração nos horários de trabalho ou intervalo de almoço é refletida imediatamente:
+- Na agenda disponível para o cliente
+- Nas mensagens enviadas ao grupo do WhatsApp
+
+Toque em **Salvar Alterações** após configurar.
+
+---
+
+## 10. Painel Profissional e Stripe
 
 ### Painel Profissional
 Acesse pelo **menu ≡ → Painel Profissional**. Aqui você acompanha agendamentos do dia, do mês, seus ganhos e o status do Stripe.
@@ -180,7 +218,7 @@ O Stripe é a plataforma de pagamentos do Servix. Você configura uma única vez
 
 **Para iniciar:** No Painel Profissional, toque no aviso amarelo → **Configurar** → **Configurar conta Stripe**.
 
-> ⚠️ O link do Stripe tem prazo de validade. Se der erro, basta recarregar a página (F5) para gerar um novo.
+> O link do Stripe tem prazo de validade. Se der erro, basta recarregar a página (F5) para gerar um novo.
 
 ---
 
@@ -193,13 +231,13 @@ Informe seu **e-mail** e **telefone** com DDD (ex: +55 62 99999-9999) e toque em
 Preencha os 3 campos:
 
 **Setor:** Toque no campo e selecione:
-> ✅ **Serviços pessoais → Salões de beleza ou barbearias**
-> 💡 Digite "salão" ou "barbearia" na busca para achar rápido.
+> **Serviços pessoais → Salões de beleza ou barbearias**
+> Digite "salão" ou "barbearia" na busca para achar rápido.
 
 **Renda mensal:** Escolha a faixa que representa seu faturamento.
 
 **Descrição:** 2 a 3 frases sobre seu negócio.
-> 💡 Ex: *"Barbearia especializada em cortes masculinos e barba. Atendo por agendamento pelo Servix e presencialmente. Cobro via cartão ou após o serviço."*
+> Ex: *"Barbearia especializada em cortes masculinos e barba. Atendo por agendamento pelo Servix e presencialmente. Cobro via cartão ou após o serviço."*
 
 Toque em **Continuar**.
 
@@ -217,21 +255,21 @@ Toque em **Continuar**.
 ### Passo 4 — Verificação de Identidade
 Selecione o tipo de documento (RG, CNH ou Passaporte) e toque em **Digitalizar identificação com foto**. Siga as instruções na tela.
 
-> ⚠️ Se der erro "Documento não legível": tire a foto em local bem iluminado, com o documento inteiro visível e sem reflexo.
+> Se der erro "Documento não legível": tire a foto em local bem iluminado, com o documento inteiro visível e sem reflexo.
 
 ---
 
 ### Passo 5 — Conta Bancária
 Escolha seu banco, informe a agência e o número da conta.
 
-> ⚠️ A conta precisa estar no mesmo CPF informado no cadastro.
+> A conta precisa estar no mesmo CPF informado no cadastro.
 
 ---
 
 ### Passo 6 — Comprovante de Endereço (se solicitado)
 Documentos aceitos (dos últimos 12 meses): conta de água, luz, internet, telefone fixo, extrato bancário, contrato de locação, IRPF, documento do INSS, IPTU ou IPVA.
 
-> ⚠️ Print de tela não é aceito.
+> Print de tela não é aceito.
 
 ---
 
@@ -241,30 +279,30 @@ O Stripe mostra um resumo de tudo. Se aparecer **"Inválido"** em alguma seção
 ---
 
 ### Pronto!
-Você verá a mensagem **"Conta integrada"** — o cadastro foi enviado! ✅
+Você verá a mensagem **"Conta integrada"** — o cadastro foi enviado!
 
 Se aparecer **"Configuração pendente"**, é normal. O Stripe está analisando. Toque em **"Ir para o Dashboard"** e aguarde — quando aprovado, o status muda automaticamente de **Pendente** para **Ativo** no seu Painel Profissional.
 
 ---
 
-## 10. Checklist Final
+## 11. Checklist Final
 
 | # | O que fazer | Feito? |
 |---|-------------|:------:|
-| 1 | Login com Google e selecionar perfil Proprietário | ☐ |
-| 2 | Criar a loja (nome, endereço, CPF, descrição, foto) | ☐ |
-| 3 | Ativar o plano de assinatura | ☐ |
-| 4 | Configurar perfil do profissional (nome, biografia, WhatsApp) | ☐ |
-| 5 | Definir formas de pagamento | ☐ |
-| 6 | Conectar o WhatsApp | ☐ |
-| 7 | Cadastrar os serviços (nome, preço, duração, foto) | ☐ |
-| 8 | Configurar conta Stripe no Painel Profissional | ☐ |
-| 9 | Configurar horários de atendimento (menu Horários) | ☐ |
+| 1 | Login com Google e selecionar perfil Proprietário | |
+| 2 | Criar a loja (nome, endereço, cidade, estado, CPF, descrição, foto) | |
+| 3 | Ativar o plano de assinatura | |
+| 4 | Configurar perfil do profissional (nome, biografia, WhatsApp) | |
+| 5 | Definir formas de pagamento | |
+| 6 | Conectar o WhatsApp | |
+| 7 | Cadastrar os serviços (nome, preço, duração, foto) | |
+| 8 | Configurar horários de atendimento e intervalo de almoço | |
+| 9 | Configurar conta Stripe no Painel Profissional | |
 
 ---
 
-> ✅ **Tudo pronto! Sua loja está no ar.**
-> Os clientes já podem te encontrar e fazer agendamentos pelo Servix. Boas vendas! 🚀
+> **Tudo pronto! Sua loja está no ar.**
+> Os clientes já podem te encontrar e fazer agendamentos pelo Servix. Boas vendas!
 
 ---
 *Servix — Gestão Profissional para Negócios de Beleza*

@@ -1,18 +1,42 @@
 // Data Access Layer
 import { prisma, safeQuery } from "@/lib/prisma";
 
-export const getBarbershops = async () => {
+interface BarbershopFilters {
+  city?: string;
+  state?: string;
+}
+
+export const getBarbershops = async (filters?: BarbershopFilters) => {
+  const where: Record<string, unknown> = {};
+
+  if (filters?.city) {
+    where.city = { equals: filters.city, mode: "insensitive" };
+  }
+  if (filters?.state) {
+    where.state = { equals: filters.state, mode: "insensitive" };
+  }
+
   const { data } = await safeQuery(
-    () => prisma.barbershop.findMany(),
+    () => prisma.barbershop.findMany({ where }),
     []
   );
   return data;
 };
 
-export const getPopularBarbershops = async () => {
+export const getPopularBarbershops = async (filters?: BarbershopFilters) => {
+  const where: Record<string, unknown> = {};
+
+  if (filters?.city) {
+    where.city = { equals: filters.city, mode: "insensitive" };
+  }
+  if (filters?.state) {
+    where.state = { equals: filters.state, mode: "insensitive" };
+  }
+
   const { data } = await safeQuery(
     () =>
       prisma.barbershop.findMany({
+        where,
         orderBy: {
           name: "desc",
         },
@@ -20,6 +44,21 @@ export const getPopularBarbershops = async () => {
     []
   );
   return data;
+};
+
+export const getAvailableLocations = async () => {
+  const barbershops = await prisma.barbershop.findMany({
+    where: {
+      isActive: true,
+      city: { not: "" },
+      state: { not: "" },
+    },
+    select: { city: true, state: true },
+    distinct: ["city", "state"],
+    orderBy: [{ state: "asc" }, { city: "asc" }],
+  });
+
+  return barbershops;
 };
 
 export const getBarbershopById = async (id: string) => {

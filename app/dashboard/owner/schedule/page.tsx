@@ -41,9 +41,9 @@ export default async function OwnerSchedulePage() {
       startTime: existing?.startTime ?? "09:00",
       endTime: existing?.endTime ?? "18:00",
       isAvailable: existing?.isAvailable ?? day !== DayOfWeek.SUNDAY,
-      hasLunchBreak: false,
-      lunchStartTime: "12:00",
-      lunchEndTime: "13:00",
+      hasLunchBreak: existing?.hasLunchBreak ?? false,
+      lunchStartTime: existing?.lunchStartTime ?? "12:00",
+      lunchEndTime: existing?.lunchEndTime ?? "13:00",
     };
   });
 

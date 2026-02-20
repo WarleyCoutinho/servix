@@ -144,6 +144,8 @@ model Barbershop {
   name        String
   slug        String?  @unique
   address     String
+  city        String   @default("")
+  state       String   @default("")
   description String
   imageUrl    String
   phones      String[]
@@ -246,11 +248,14 @@ model Subscription {
 // =====================
 
 model ProfessionalSchedule {
-  id          String    @id @default(uuid())
-  dayOfWeek   DayOfWeek
-  startTime   String
-  endTime     String
-  isAvailable Boolean   @default(true)
+  id             String    @id @default(uuid())
+  dayOfWeek      DayOfWeek
+  startTime      String
+  endTime        String
+  isAvailable    Boolean   @default(true)
+  hasLunchBreak  Boolean   @default(false)
+  lunchStartTime String    @default("12:00")
+  lunchEndTime   String    @default("13:00")
 
   professionalId String
   professional   Professional @relation(fields: [professionalId], references: [id], onDelete: Cascade)

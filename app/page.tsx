@@ -7,6 +7,7 @@ import { Suspense } from "react";
 import { AuthErrorAlert } from "@/components/auth-error-alert";
 import BarbershopItem from "@/components/barbershop-item";
 import Footer from "@/components/footer";
+import { LocationFilter } from "@/components/location-filter";
 import QuickSearch from "@/components/quick-search";
 import {
   PageContainer,
@@ -14,17 +15,32 @@ import {
   PageSectionScroller,
   PageSectionTitle,
 } from "@/components/ui/page";
-import { getBarbershops, getPopularBarbershops } from "@/data/barbershops";
+import {
+  getAvailableLocations,
+  getBarbershops,
+  getPopularBarbershops,
+} from "@/data/barbershops";
 import { getUserBookings } from "@/data/bookings";
 import { getServiceCategories } from "@/data/services";
 
-export default async function Home() {
-  const [barbershops, popularBarbershops, { confirmedBookings }, categories] =
+interface HomeProps {
+  searchParams: Promise<{ city?: string; state?: string }>;
+}
+
+export default async function Home({ searchParams }: HomeProps) {
+  const params = await searchParams;
+  const filters = {
+    city: params.city,
+    state: params.state,
+  };
+
+  const [barbershops, popularBarbershops, { confirmedBookings }, categories, locations] =
     await Promise.all([
-      getBarbershops(),
-      getPopularBarbershops(),
+      getBarbershops(filters),
+      getPopularBarbershops(filters),
       getUserBookings(),
       getServiceCategories(),
+      getAvailableLocations(),
     ]);
 
   return (
@@ -55,6 +71,16 @@ export default async function Home() {
           </div>
         </div>
 
+        {locations.length > 0 && (
+          <Suspense fallback={null}>
+            <LocationFilter
+              locations={locations}
+              currentCity={params.city}
+              currentState={params.state}
+            />
+          </Suspense>
+        )}
+
         {confirmedBookings.length > 0 && (
           <PageSectionContent>
             <PageSectionTitle>Agendamentos</PageSectionTitle>
@@ -67,19 +93,31 @@ export default async function Home() {
         )}
         <PageSectionContent>
           <PageSectionTitle>Barbearias e Salões</PageSectionTitle>
-          <PageSectionScroller>
-            {barbershops.map((barbershop) => (
-              <BarbershopItem key={barbershop.id} barbershop={barbershop} />
-            ))}
-          </PageSectionScroller>
+          {barbershops.length > 0 ? (
+            <PageSectionScroller>
+              {barbershops.map((barbershop) => (
+                <BarbershopItem key={barbershop.id} barbershop={barbershop} />
+              ))}
+            </PageSectionScroller>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Nenhum estabelecimento encontrado para a localização selecionada.
+            </p>
+          )}
         </PageSectionContent>
         <PageSectionContent>
           <PageSectionTitle>Barbearias e Salões populares</PageSectionTitle>
-          <PageSectionScroller>
-            {popularBarbershops.map((barbershop) => (
-              <BarbershopItem key={barbershop.id} barbershop={barbershop} />
-            ))}
-          </PageSectionScroller>
+          {popularBarbershops.length > 0 ? (
+            <PageSectionScroller>
+              {popularBarbershops.map((barbershop) => (
+                <BarbershopItem key={barbershop.id} barbershop={barbershop} />
+              ))}
+            </PageSectionScroller>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Nenhum estabelecimento popular encontrado para a localização selecionada.
+            </p>
+          )}
         </PageSectionContent>
       </PageContainer>
       <div className="mt-auto">

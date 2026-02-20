@@ -1560,6 +1560,8 @@ export const BarbershopScalarFieldEnum = {
   name: 'name',
   slug: 'slug',
   address: 'address',
+  city: 'city',
+  state: 'state',
   description: 'description',
   imageUrl: 'imageUrl',
   phones: 'phones',
@@ -1639,6 +1641,9 @@ export const ProfessionalScheduleScalarFieldEnum = {
   startTime: 'startTime',
   endTime: 'endTime',
   isAvailable: 'isAvailable',
+  hasLunchBreak: 'hasLunchBreak',
+  lunchStartTime: 'lunchStartTime',
+  lunchEndTime: 'lunchEndTime',
   professionalId: 'professionalId'
 } as const
 

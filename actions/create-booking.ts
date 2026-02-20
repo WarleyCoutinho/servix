@@ -6,7 +6,7 @@ import { returnValidationErrors } from "next-safe-action";
 import { prisma } from "@/lib/prisma";
 import { isPast, addMinutes } from "date-fns";
 import { DEFAULT_INTERVAL_MINUTES } from "@/lib/schedule-utils";
-import { isTodayBrt, startOfDayBrt, endOfDayBrt } from "@/lib/timezone";
+import { startOfDayBrt, endOfDayBrt } from "@/lib/timezone";
 import { sendDailyScheduleToGroup } from "@/lib/whatsapp-schedule";
 import { PaymentStatus } from "@/generated/prisma/enums";
 
@@ -110,11 +110,10 @@ export const createBooking = protectedActionClient
       return newBooking;
     }, { isolationLevel: "Serializable" });
 
-    if (isTodayBrt(date)) {
-      sendDailyScheduleToGroup(professionalId, date).catch(
-        (err) => console.error("[WhatsApp] Erro ao enviar agenda:", err),
-      );
-    }
+    // Enviar agenda atualizada ao WhatsApp para qualquer data agendada
+    sendDailyScheduleToGroup(professionalId, date).catch(
+      (err) => console.error("[WhatsApp] Erro ao enviar agenda:", err),
+    );
 
     return booking;
   });

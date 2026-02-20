@@ -167,12 +167,20 @@ export async function sendDailyScheduleToGroup(
   });
 
   const bookedTimesMap = buildBookedTimesMap(bookings);
-  const allSlots = generateTimeSlots(
+  let allSlots = generateTimeSlots(
     date,
     schedule.startTime,
     schedule.endTime,
     DEFAULT_INTERVAL_MINUTES,
   );
+
+  // Respeitar intervalo de almoço configurado
+  if (schedule.hasLunchBreak) {
+    allSlots = allSlots.filter(
+      (slot) =>
+        slot < schedule.lunchStartTime || slot >= schedule.lunchEndTime,
+    );
+  }
 
   const hasVisibleSlots = allSlots.some(
     (slot) => slot >= currentTime || bookedTimesMap.has(slot),

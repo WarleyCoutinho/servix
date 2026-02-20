@@ -29,6 +29,8 @@ export type BarbershopMinAggregateOutputType = {
   name: string | null
   slug: string | null
   address: string | null
+  city: string | null
+  state: string | null
   description: string | null
   imageUrl: string | null
   isActive: boolean | null
@@ -42,6 +44,8 @@ export type BarbershopMaxAggregateOutputType = {
   name: string | null
   slug: string | null
   address: string | null
+  city: string | null
+  state: string | null
   description: string | null
   imageUrl: string | null
   isActive: boolean | null
@@ -55,6 +59,8 @@ export type BarbershopCountAggregateOutputType = {
   name: number
   slug: number
   address: number
+  city: number
+  state: number
   description: number
   imageUrl: number
   phones: number
@@ -71,6 +77,8 @@ export type BarbershopMinAggregateInputType = {
   name?: true
   slug?: true
   address?: true
+  city?: true
+  state?: true
   description?: true
   imageUrl?: true
   isActive?: true
@@ -84,6 +92,8 @@ export type BarbershopMaxAggregateInputType = {
   name?: true
   slug?: true
   address?: true
+  city?: true
+  state?: true
   description?: true
   imageUrl?: true
   isActive?: true
@@ -97,6 +107,8 @@ export type BarbershopCountAggregateInputType = {
   name?: true
   slug?: true
   address?: true
+  city?: true
+  state?: true
   description?: true
   imageUrl?: true
   phones?: true
@@ -184,6 +196,8 @@ export type BarbershopGroupByOutputType = {
   name: string
   slug: string | null
   address: string
+  city: string
+  state: string
   description: string
   imageUrl: string
   phones: string[]
@@ -219,6 +233,8 @@ export type BarbershopWhereInput = {
   name?: Prisma.StringFilter<"Barbershop"> | string
   slug?: Prisma.StringNullableFilter<"Barbershop"> | string | null
   address?: Prisma.StringFilter<"Barbershop"> | string
+  city?: Prisma.StringFilter<"Barbershop"> | string
+  state?: Prisma.StringFilter<"Barbershop"> | string
   description?: Prisma.StringFilter<"Barbershop"> | string
   imageUrl?: Prisma.StringFilter<"Barbershop"> | string
   phones?: Prisma.StringNullableListFilter<"Barbershop">
@@ -239,6 +255,8 @@ export type BarbershopOrderByWithRelationInput = {
   name?: Prisma.SortOrder
   slug?: Prisma.SortOrderInput | Prisma.SortOrder
   address?: Prisma.SortOrder
+  city?: Prisma.SortOrder
+  state?: Prisma.SortOrder
   description?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   phones?: Prisma.SortOrder
@@ -262,6 +280,8 @@ export type BarbershopWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.BarbershopWhereInput | Prisma.BarbershopWhereInput[]
   name?: Prisma.StringFilter<"Barbershop"> | string
   address?: Prisma.StringFilter<"Barbershop"> | string
+  city?: Prisma.StringFilter<"Barbershop"> | string
+  state?: Prisma.StringFilter<"Barbershop"> | string
   description?: Prisma.StringFilter<"Barbershop"> | string
   imageUrl?: Prisma.StringFilter<"Barbershop"> | string
   phones?: Prisma.StringNullableListFilter<"Barbershop">
@@ -282,6 +302,8 @@ export type BarbershopOrderByWithAggregationInput = {
   name?: Prisma.SortOrder
   slug?: Prisma.SortOrderInput | Prisma.SortOrder
   address?: Prisma.SortOrder
+  city?: Prisma.SortOrder
+  state?: Prisma.SortOrder
   description?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   phones?: Prisma.SortOrder
@@ -302,6 +324,8 @@ export type BarbershopScalarWhereWithAggregatesInput = {
   name?: Prisma.StringWithAggregatesFilter<"Barbershop"> | string
   slug?: Prisma.StringNullableWithAggregatesFilter<"Barbershop"> | string | null
   address?: Prisma.StringWithAggregatesFilter<"Barbershop"> | string
+  city?: Prisma.StringWithAggregatesFilter<"Barbershop"> | string
+  state?: Prisma.StringWithAggregatesFilter<"Barbershop"> | string
   description?: Prisma.StringWithAggregatesFilter<"Barbershop"> | string
   imageUrl?: Prisma.StringWithAggregatesFilter<"Barbershop"> | string
   phones?: Prisma.StringNullableListFilter<"Barbershop">
@@ -316,6 +340,8 @@ export type BarbershopCreateInput = {
   name: string
   slug?: string | null
   address: string
+  city?: string
+  state?: string
   description: string
   imageUrl: string
   phones?: Prisma.BarbershopCreatephonesInput | string[]
@@ -335,6 +361,8 @@ export type BarbershopUncheckedCreateInput = {
   name: string
   slug?: string | null
   address: string
+  city?: string
+  state?: string
   description: string
   imageUrl: string
   phones?: Prisma.BarbershopCreatephonesInput | string[]
@@ -354,6 +382,8 @@ export type BarbershopUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
@@ -373,6 +403,8 @@ export type BarbershopUncheckedUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
@@ -392,6 +424,8 @@ export type BarbershopCreateManyInput = {
   name: string
   slug?: string | null
   address: string
+  city?: string
+  state?: string
   description: string
   imageUrl: string
   phones?: Prisma.BarbershopCreatephonesInput | string[]
@@ -406,6 +440,8 @@ export type BarbershopUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
@@ -419,6 +455,8 @@ export type BarbershopUncheckedUpdateManyInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
@@ -451,6 +489,8 @@ export type BarbershopCountOrderByAggregateInput = {
   name?: Prisma.SortOrder
   slug?: Prisma.SortOrder
   address?: Prisma.SortOrder
+  city?: Prisma.SortOrder
+  state?: Prisma.SortOrder
   description?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   phones?: Prisma.SortOrder
@@ -465,6 +505,8 @@ export type BarbershopMaxOrderByAggregateInput = {
   name?: Prisma.SortOrder
   slug?: Prisma.SortOrder
   address?: Prisma.SortOrder
+  city?: Prisma.SortOrder
+  state?: Prisma.SortOrder
   description?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
@@ -478,6 +520,8 @@ export type BarbershopMinOrderByAggregateInput = {
   name?: Prisma.SortOrder
   slug?: Prisma.SortOrder
   address?: Prisma.SortOrder
+  city?: Prisma.SortOrder
+  state?: Prisma.SortOrder
   description?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
@@ -617,6 +661,8 @@ export type BarbershopCreateWithoutOwnerInput = {
   name: string
   slug?: string | null
   address: string
+  city?: string
+  state?: string
   description: string
   imageUrl: string
   phones?: Prisma.BarbershopCreatephonesInput | string[]
@@ -635,6 +681,8 @@ export type BarbershopUncheckedCreateWithoutOwnerInput = {
   name: string
   slug?: string | null
   address: string
+  city?: string
+  state?: string
   description: string
   imageUrl: string
   phones?: Prisma.BarbershopCreatephonesInput | string[]
@@ -682,6 +730,8 @@ export type BarbershopScalarWhereInput = {
   name?: Prisma.StringFilter<"Barbershop"> | string
   slug?: Prisma.StringNullableFilter<"Barbershop"> | string | null
   address?: Prisma.StringFilter<"Barbershop"> | string
+  city?: Prisma.StringFilter<"Barbershop"> | string
+  state?: Prisma.StringFilter<"Barbershop"> | string
   description?: Prisma.StringFilter<"Barbershop"> | string
   imageUrl?: Prisma.StringFilter<"Barbershop"> | string
   phones?: Prisma.StringNullableListFilter<"Barbershop">
@@ -696,6 +746,8 @@ export type BarbershopCreateWithoutProfessionalsInput = {
   name: string
   slug?: string | null
   address: string
+  city?: string
+  state?: string
   description: string
   imageUrl: string
   phones?: Prisma.BarbershopCreatephonesInput | string[]
@@ -714,6 +766,8 @@ export type BarbershopUncheckedCreateWithoutProfessionalsInput = {
   name: string
   slug?: string | null
   address: string
+  city?: string
+  state?: string
   description: string
   imageUrl: string
   phones?: Prisma.BarbershopCreatephonesInput | string[]
@@ -748,6 +802,8 @@ export type BarbershopUpdateWithoutProfessionalsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
@@ -766,6 +822,8 @@ export type BarbershopUncheckedUpdateWithoutProfessionalsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
@@ -784,6 +842,8 @@ export type BarbershopCreateWithoutSubscriptionInput = {
   name: string
   slug?: string | null
   address: string
+  city?: string
+  state?: string
   description: string
   imageUrl: string
   phones?: Prisma.BarbershopCreatephonesInput | string[]
@@ -802,6 +862,8 @@ export type BarbershopUncheckedCreateWithoutSubscriptionInput = {
   name: string
   slug?: string | null
   address: string
+  city?: string
+  state?: string
   description: string
   imageUrl: string
   phones?: Prisma.BarbershopCreatephonesInput | string[]
@@ -836,6 +898,8 @@ export type BarbershopUpdateWithoutSubscriptionInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
@@ -854,6 +918,8 @@ export type BarbershopUncheckedUpdateWithoutSubscriptionInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
@@ -872,6 +938,8 @@ export type BarbershopCreateWithoutServicesInput = {
   name: string
   slug?: string | null
   address: string
+  city?: string
+  state?: string
   description: string
   imageUrl: string
   phones?: Prisma.BarbershopCreatephonesInput | string[]
@@ -890,6 +958,8 @@ export type BarbershopUncheckedCreateWithoutServicesInput = {
   name: string
   slug?: string | null
   address: string
+  city?: string
+  state?: string
   description: string
   imageUrl: string
   phones?: Prisma.BarbershopCreatephonesInput | string[]
@@ -924,6 +994,8 @@ export type BarbershopUpdateWithoutServicesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
@@ -942,6 +1014,8 @@ export type BarbershopUncheckedUpdateWithoutServicesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
@@ -960,6 +1034,8 @@ export type BarbershopCreateWithoutBookingsInput = {
   name: string
   slug?: string | null
   address: string
+  city?: string
+  state?: string
   description: string
   imageUrl: string
   phones?: Prisma.BarbershopCreatephonesInput | string[]
@@ -978,6 +1054,8 @@ export type BarbershopUncheckedCreateWithoutBookingsInput = {
   name: string
   slug?: string | null
   address: string
+  city?: string
+  state?: string
   description: string
   imageUrl: string
   phones?: Prisma.BarbershopCreatephonesInput | string[]
@@ -1012,6 +1090,8 @@ export type BarbershopUpdateWithoutBookingsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
@@ -1030,6 +1110,8 @@ export type BarbershopUncheckedUpdateWithoutBookingsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
@@ -1048,6 +1130,8 @@ export type BarbershopCreateWithoutPlanHistoryInput = {
   name: string
   slug?: string | null
   address: string
+  city?: string
+  state?: string
   description: string
   imageUrl: string
   phones?: Prisma.BarbershopCreatephonesInput | string[]
@@ -1066,6 +1150,8 @@ export type BarbershopUncheckedCreateWithoutPlanHistoryInput = {
   name: string
   slug?: string | null
   address: string
+  city?: string
+  state?: string
   description: string
   imageUrl: string
   phones?: Prisma.BarbershopCreatephonesInput | string[]
@@ -1100,6 +1186,8 @@ export type BarbershopUpdateWithoutPlanHistoryInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
@@ -1118,6 +1206,8 @@ export type BarbershopUncheckedUpdateWithoutPlanHistoryInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
@@ -1136,6 +1226,8 @@ export type BarbershopCreateManyOwnerInput = {
   name: string
   slug?: string | null
   address: string
+  city?: string
+  state?: string
   description: string
   imageUrl: string
   phones?: Prisma.BarbershopCreatephonesInput | string[]
@@ -1149,6 +1241,8 @@ export type BarbershopUpdateWithoutOwnerInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
@@ -1167,6 +1261,8 @@ export type BarbershopUncheckedUpdateWithoutOwnerInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
@@ -1185,6 +1281,8 @@ export type BarbershopUncheckedUpdateManyWithoutOwnerInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
@@ -1256,6 +1354,8 @@ export type BarbershopSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   name?: boolean
   slug?: boolean
   address?: boolean
+  city?: boolean
+  state?: boolean
   description?: boolean
   imageUrl?: boolean
   phones?: boolean
@@ -1277,6 +1377,8 @@ export type BarbershopSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   name?: boolean
   slug?: boolean
   address?: boolean
+  city?: boolean
+  state?: boolean
   description?: boolean
   imageUrl?: boolean
   phones?: boolean
@@ -1292,6 +1394,8 @@ export type BarbershopSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   name?: boolean
   slug?: boolean
   address?: boolean
+  city?: boolean
+  state?: boolean
   description?: boolean
   imageUrl?: boolean
   phones?: boolean
@@ -1307,6 +1411,8 @@ export type BarbershopSelectScalar = {
   name?: boolean
   slug?: boolean
   address?: boolean
+  city?: boolean
+  state?: boolean
   description?: boolean
   imageUrl?: boolean
   phones?: boolean
@@ -1316,7 +1422,7 @@ export type BarbershopSelectScalar = {
   ownerId?: boolean
 }
 
-export type BarbershopOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "address" | "description" | "imageUrl" | "phones" | "isActive" | "createdAt" | "updatedAt" | "ownerId", ExtArgs["result"]["barbershop"]>
+export type BarbershopOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "address" | "city" | "state" | "description" | "imageUrl" | "phones" | "isActive" | "createdAt" | "updatedAt" | "ownerId", ExtArgs["result"]["barbershop"]>
 export type BarbershopInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   owner?: boolean | Prisma.Barbershop$ownerArgs<ExtArgs>
   services?: boolean | Prisma.Barbershop$servicesArgs<ExtArgs>
@@ -1348,6 +1454,8 @@ export type $BarbershopPayload<ExtArgs extends runtime.Types.Extensions.Internal
     name: string
     slug: string | null
     address: string
+    city: string
+    state: string
     description: string
     imageUrl: string
     phones: string[]
@@ -1788,6 +1896,8 @@ export interface BarbershopFieldRefs {
   readonly name: Prisma.FieldRef<"Barbershop", 'String'>
   readonly slug: Prisma.FieldRef<"Barbershop", 'String'>
   readonly address: Prisma.FieldRef<"Barbershop", 'String'>
+  readonly city: Prisma.FieldRef<"Barbershop", 'String'>
+  readonly state: Prisma.FieldRef<"Barbershop", 'String'>
   readonly description: Prisma.FieldRef<"Barbershop", 'String'>
   readonly imageUrl: Prisma.FieldRef<"Barbershop", 'String'>
   readonly phones: Prisma.FieldRef<"Barbershop", 'String[]'>

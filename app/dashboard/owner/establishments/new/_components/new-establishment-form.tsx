@@ -11,7 +11,20 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+
+const BRAZILIAN_STATES = [
+  "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA",
+  "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN",
+  "RS", "RO", "RR", "SC", "SP", "SE", "TO",
+];
 import { ImageUpload } from "@/components/image-upload";
 import { Loader2, Store } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
@@ -37,6 +50,8 @@ export function NewEstablishmentForm({ showCpfField }: NewEstablishmentFormProps
   const [formData, setFormData] = useState({
     name: "",
     address: "",
+    city: "",
+    state: "",
     description: "",
     phone: "",
     cpf: "",
@@ -116,6 +131,42 @@ export function NewEstablishmentForm({ showCpfField }: NewEstablishmentFormProps
               required
               minLength={5}
             />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="city">Cidade *</Label>
+              <Input
+                id="city"
+                name="city"
+                placeholder="Ex: Anápolis"
+                value={formData.city}
+                onChange={handleChange}
+                required
+                minLength={2}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="state">Estado *</Label>
+              <Select
+                value={formData.state}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({ ...prev, state: value }))
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione" />
+                </SelectTrigger>
+                <SelectContent>
+                  {BRAZILIAN_STATES.map((uf) => (
+                    <SelectItem key={uf} value={uf}>
+                      {uf}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div className="space-y-2">

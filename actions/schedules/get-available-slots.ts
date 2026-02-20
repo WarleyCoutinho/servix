@@ -7,9 +7,8 @@ import {
   generateTimeSlots,
   getDayOfWeekFromDate,
 } from "@/lib/schedule-utils";
-import { TIMEZONE, startOfDayBrt, endOfDayBrt, formatBrt } from "@/lib/timezone";
-import { addMinutes, startOfDay } from "date-fns";
-import { toZonedTime } from "date-fns-tz";
+import { startOfDayBrt, endOfDayBrt, formatBrt } from "@/lib/timezone";
+import { addMinutes } from "date-fns";
 import { returnValidationErrors } from "next-safe-action";
 import { z } from "zod";
 
@@ -77,6 +76,15 @@ export const getAvailableSlots = actionClient
       DEFAULT_INTERVAL_MINUTES,
     );
 
+    // Filtrar slots que caem no intervalo de almoço
+    if (professionalSchedule.hasLunchBreak) {
+      slots = slots.filter(
+        (slot) =>
+          slot < professionalSchedule.lunchStartTime ||
+          slot >= professionalSchedule.lunchEndTime,
+      );
+    }
+
     // Fetch booked bookings WITH service duration
     const bookedBookings = await prisma.booking.findMany({
       where: {
@@ -138,17 +146,6 @@ export const getAvailableSlots = actionClient
 
       return true;
     });
-
-    // Filter past slots if today
-    const nowBrt = toZonedTime(now, TIMEZONE);
-    const dateBrt = toZonedTime(date, TIMEZONE);
-    const isToday =
-      startOfDay(nowBrt).getTime() === startOfDay(dateBrt).getTime();
-
-    if (isToday) {
-      const currentTime = formatBrt(now, "HH:mm");
-      slots = slots.filter((slot) => slot > currentTime);
-    }
 
     return { slots };
   });
