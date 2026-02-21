@@ -77,11 +77,15 @@ export function SupportChat({ userPlan, userName }: SupportChatProps) {
       setStatus("loading");
 
       try {
+        const messagesForApi = updatedMessages.filter(
+          (_, i) => !(i === 0 && updatedMessages[0].role === "assistant"),
+        );
+
         const res = await fetch("/api/support/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            messages: updatedMessages,
+            messages: messagesForApi,
             userPlan,
           }),
         });

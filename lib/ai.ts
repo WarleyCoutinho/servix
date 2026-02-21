@@ -51,7 +51,7 @@ async function responderGemini(
   const historyForChat = history.slice(0, -1);
   const firstUserIndex = historyForChat.findIndex((m) => m.role === "user");
   const sanitizedHistory =
-    firstUserIndex > 0 ? historyForChat.slice(firstUserIndex) : historyForChat;
+    firstUserIndex >= 0 ? historyForChat.slice(firstUserIndex) : [];
 
   const chat = model.startChat({
     history: sanitizedHistory,

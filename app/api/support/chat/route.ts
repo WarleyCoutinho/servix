@@ -85,7 +85,11 @@ export const POST = async (request: Request) => {
 
     const systemPrompt = SERVIX_SUPPORT_PROMPT + contextInfo;
 
-    const text = await responder(messages, systemPrompt, 800);
+    const firstUserIdx = messages.findIndex((m) => m.role === "user");
+    const sanitizedMessages =
+      firstUserIdx >= 0 ? messages.slice(firstUserIdx) : messages;
+
+    const text = await responder(sanitizedMessages, systemPrompt, 800);
 
     return NextResponse.json({
       type: "ai_response",
