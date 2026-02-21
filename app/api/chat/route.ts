@@ -7,6 +7,23 @@ import { createBooking } from "@/actions/create-booking";
 import { createBookingCheckoutSession } from "@/actions/create-booking-checkout-session";
 import { formatBrt } from "@/lib/timezone";
 
+function levenshtein(a: string, b: string): number {
+  const m = a.length;
+  const n = b.length;
+  const dp: number[][] = Array.from({ length: m + 1 }, () => Array(n + 1).fill(0));
+  for (let i = 0; i <= m; i++) dp[i][0] = i;
+  for (let j = 0; j <= n; j++) dp[0][j] = j;
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      dp[i][j] =
+        a[i - 1] === b[j - 1]
+          ? dp[i - 1][j - 1]
+          : 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+    }
+  }
+  return dp[m][n];
+}
+
 function getAIModel() {
   const model = process.env.AI_MODEL ?? "gemini-2.5-flash-lite";
   const apiKey = process.env.AI_API_KEY;
@@ -127,20 +144,37 @@ export const POST = async (request: Request) => {
         }),
         execute: async ({ name }) => {
           console.log("searchBarbershops", name);
+          const trimmed = name?.trim();
+
+          if (!trimmed) {
+            const { data: barbershops, error } = await safeQuery(
+              () =>
+                prisma.barbershop.findMany({
+                  where: { isActive: true },
+                  include: { services: true },
+                }),
+              []
+            );
+            if (error) {
+              return { error: "Não foi possível buscar as barbearias. Por favor, tente novamente." };
+            }
+            return barbershops;
+          }
+
+          const words = trimmed.split(/\s+/);
+          const searchConditions = words.flatMap((word) => [
+            { name: { contains: word, mode: "insensitive" as const } },
+            { name: { startsWith: word, mode: "insensitive" as const } },
+          ]);
+
           const { data: barbershops, error } = await safeQuery(
             () =>
               prisma.barbershop.findMany({
-                where: name?.trim()
-                  ? {
-                      name: {
-                        contains: name,
-                        mode: "insensitive",
-                      },
-                    }
-                  : undefined,
-                include: {
-                  services: true,
+                where: {
+                  isActive: true,
+                  OR: searchConditions,
                 },
+                include: { services: true },
               }),
             []
           );
@@ -149,7 +183,48 @@ export const POST = async (request: Request) => {
             return { error: "Não foi possível buscar as barbearias. Por favor, tente novamente." };
           }
 
-          return barbershops;
+          if (barbershops.length > 0) {
+            return barbershops;
+          }
+
+          // Fallback: busca todas e filtra por similaridade (fuzzy)
+          const { data: allBarbershops, error: allError } = await safeQuery(
+            () =>
+              prisma.barbershop.findMany({
+                where: { isActive: true },
+                include: { services: true },
+              }),
+            []
+          );
+
+          if (allError) {
+            return { error: "Não foi possível buscar as barbearias. Por favor, tente novamente." };
+          }
+
+          const normalize = (s: string) =>
+            s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+          const normalizedSearch = normalize(trimmed);
+          const fuzzyResults = allBarbershops.filter((b) => {
+            const normalizedName = normalize(b.name);
+            // Checa se alguma palavra do nome começa com o termo buscado ou vice-versa
+            const nameWords = normalizedName.split(/\s+/);
+            return (
+              normalizedName.includes(normalizedSearch) ||
+              normalizedSearch.includes(normalizedName) ||
+              nameWords.some(
+                (w) => w.startsWith(normalizedSearch) || normalizedSearch.startsWith(w)
+              ) ||
+              words.some((searchWord) => {
+                const nw = normalize(searchWord);
+                return nameWords.some(
+                  (w) => w.startsWith(nw) || nw.startsWith(w) || levenshtein(w, nw) <= 2
+                );
+              })
+            );
+          });
+
+          return fuzzyResults;
         },
       }),
       getProfessionalsForBarbershop: tool({
