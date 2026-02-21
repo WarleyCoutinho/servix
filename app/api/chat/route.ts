@@ -6,8 +6,6 @@ import {
   tool,
 } from "ai";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
-import { createOpenAI } from "@ai-sdk/openai";
-import { createAnthropic } from "@ai-sdk/anthropic";
 import z from "zod";
 import { prisma, safeQuery } from "@/lib/prisma";
 import { getAvailableSlots } from "@/actions/schedules/get-available-slots";
@@ -21,10 +19,10 @@ function getAIModel(): LanguageModel {
   const apiKey = process.env.AI_API_KEY;
 
   switch (provider) {
-    case "openai":
-      return createOpenAI({ apiKey })(model) as LanguageModel;
-    case "anthropic":
-      return createAnthropic({ apiKey })(model) as LanguageModel;
+    // case "openai":
+    //   return createOpenAI({ apiKey })(model) as LanguageModel;
+    // case "anthropic":
+    //   return createAnthropic({ apiKey })(model) as LanguageModel;
     case "gemini":
     default:
       return createGoogleGenerativeAI({ apiKey })(model) as LanguageModel;
