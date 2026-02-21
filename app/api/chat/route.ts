@@ -1,10 +1,4 @@
-import {
-  convertToModelMessages,
-  type LanguageModel,
-  stepCountIs,
-  streamText,
-  tool,
-} from "ai";
+import { convertToModelMessages, stepCountIs, streamText, tool } from "ai";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import z from "zod";
 import { prisma, safeQuery } from "@/lib/prisma";
@@ -13,20 +7,11 @@ import { createBooking } from "@/actions/create-booking";
 import { createBookingCheckoutSession } from "@/actions/create-booking-checkout-session";
 import { formatBrt } from "@/lib/timezone";
 
-function getAIModel(): LanguageModel {
-  const provider = process.env.AI_PROVIDER ?? "gemini";
+function getAIModel() {
   const model = process.env.AI_MODEL ?? "gemini-1.5-flash";
   const apiKey = process.env.AI_API_KEY;
 
-  switch (provider) {
-    // case "openai":
-    //   return createOpenAI({ apiKey })(model) as LanguageModel;
-    // case "anthropic":
-    //   return createAnthropic({ apiKey })(model) as LanguageModel;
-    case "gemini":
-    default:
-      return createGoogleGenerativeAI({ apiKey })(model) as LanguageModel;
-  }
+  return createGoogleGenerativeAI({ apiKey })(model);
 }
 
 export const POST = async (request: Request) => {
@@ -43,7 +28,7 @@ export const POST = async (request: Request) => {
   const { messages } = await request.json();
   const result = streamText({
     model: getAIModel(),
-    messages: convertToModelMessages(messages),
+    messages: await convertToModelMessages(messages),
     stopWhen: stepCountIs(10),
     system: `Você é o Agenda.ai, assistente virtual de agendamento do Servix — plataforma SaaS para barbearias, salões de beleza e estética.
 
