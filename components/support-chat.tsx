@@ -185,6 +185,7 @@ export function SupportChat({ userPlan, userName }: SupportChatProps) {
                 >
                   {m.content}
                   {m.role === "assistant" &&
+                    isPremiumPlan &&
                     (m.content.includes("suporte") || m.content.includes("encaminhar")) &&
                     i > 0 && <ContactButtons />}
                 </div>

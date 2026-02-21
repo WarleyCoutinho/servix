@@ -60,7 +60,7 @@ export const POST = async (request: Request) => {
     });
   }
 
-  if (shouldEscalate(lastMessage.content)) {
+  if (shouldEscalate(lastMessage.content) && isPremiumPlan) {
     return NextResponse.json({
       type: "escalate",
       message:
@@ -93,12 +93,21 @@ export const POST = async (request: Request) => {
     });
   } catch (error) {
     console.error("AI support error:", error);
+
+    if (isPremiumPlan) {
+      return NextResponse.json({
+        type: "escalate",
+        message:
+          "Desculpe, houve um problema ao processar sua mensagem. Entre em contato com nosso suporte:",
+        whatsapp: SUPPORT_WHATSAPP,
+        email: SUPPORT_EMAIL,
+      });
+    }
+
     return NextResponse.json({
-      type: "escalate",
+      type: "ai_response",
       message:
-        "Desculpe, houve um problema ao processar sua mensagem. Entre em contato com nosso suporte:",
-      whatsapp: SUPPORT_WHATSAPP,
-      email: SUPPORT_EMAIL,
+        "Desculpe, houve um problema ao processar sua mensagem. Por favor, tente novamente em alguns instantes.",
     });
   }
 };

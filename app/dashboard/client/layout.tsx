@@ -6,14 +6,12 @@ import { UserRole } from "@/generated/prisma/enums";
 import {
   LayoutDashboard,
   CalendarDays,
-  Store,
 } from "lucide-react";
 import { DashboardSidebar, type NavItem } from "@/components/dashboard-sidebar";
 
 const navItems: NavItem[] = [
   { href: "/dashboard/client", label: "Visão Geral", icon: LayoutDashboard },
   { href: "/bookings", label: "Meus Agendamentos", icon: CalendarDays },
-  { href: "/barbershops", label: "Estabelecimentos", icon: Store },
 ];
 
 export default async function ClientDashboardLayout({

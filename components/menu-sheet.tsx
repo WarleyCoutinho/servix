@@ -131,14 +131,16 @@ const MenuSheet = ({ categories = [], onLoginClick }: MenuSheetProps) => {
                 Início
               </button>
 
-              <button
-                type="button"
-                onClick={() => handleNavigation("/")}
-                className="hover:bg-accent flex items-center gap-3 px-4 py-3 text-left text-sm font-medium transition-colors sm:px-6"
-              >
-                <Megaphone className="size-4 shrink-0" />
-                Conheça o Servix
-              </button>
+              {!isLoggedIn && (
+                <button
+                  type="button"
+                  onClick={() => handleNavigation("/")}
+                  className="hover:bg-accent flex items-center gap-3 px-4 py-3 text-left text-sm font-medium transition-colors sm:px-6"
+                >
+                  <Megaphone className="size-4 shrink-0" />
+                  Conheça o Servix
+                </button>
+              )}
 
               {(session?.user?.role === "owner" ||
                 session?.user?.role === "professional" ||

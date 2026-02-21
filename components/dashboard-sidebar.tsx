@@ -26,7 +26,7 @@ function SidebarContent({
     <>
       <div className="flex h-16 items-center border-b px-4">
         <Link
-          href="/"
+          href="/home"
           className="text-muted-foreground hover:text-foreground flex items-center gap-2 text-sm transition-colors"
         >
           <ChevronLeft className="h-4 w-4" />

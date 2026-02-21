@@ -111,12 +111,14 @@ const Header = ({ categories = [] }: HeaderProps) => {
               </Button>
             )}
 
-            <Button variant="ghost" size="sm" asChild>
-              <Link href="/">
-                <Megaphone className="mr-2 size-4" />
-                Conheça o Servix
-              </Link>
-            </Button>
+            {!isLoggedIn && (
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/">
+                  <Megaphone className="mr-2 size-4" />
+                  Conheça o Servix
+                </Link>
+              </Button>
+            )}
 
             {(session?.user?.role === "owner" ||
               session?.user?.role === "professional" ||
