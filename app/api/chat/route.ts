@@ -1,11 +1,35 @@
-import { convertToModelMessages, stepCountIs, streamText, tool } from "ai";
-import { openai } from "@ai-sdk/openai";
+import {
+  convertToModelMessages,
+  type LanguageModel,
+  stepCountIs,
+  streamText,
+  tool,
+} from "ai";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { createOpenAI } from "@ai-sdk/openai";
+import { createAnthropic } from "@ai-sdk/anthropic";
 import z from "zod";
 import { prisma, safeQuery } from "@/lib/prisma";
 import { getAvailableSlots } from "@/actions/schedules/get-available-slots";
 import { createBooking } from "@/actions/create-booking";
 import { createBookingCheckoutSession } from "@/actions/create-booking-checkout-session";
 import { formatBrt } from "@/lib/timezone";
+
+function getAIModel(): LanguageModel {
+  const provider = process.env.AI_PROVIDER ?? "gemini";
+  const model = process.env.AI_MODEL ?? "gemini-1.5-flash";
+  const apiKey = process.env.AI_API_KEY;
+
+  switch (provider) {
+    case "openai":
+      return createOpenAI({ apiKey })(model) as LanguageModel;
+    case "anthropic":
+      return createAnthropic({ apiKey })(model) as LanguageModel;
+    case "gemini":
+    default:
+      return createGoogleGenerativeAI({ apiKey })(model) as LanguageModel;
+  }
+}
 
 export const POST = async (request: Request) => {
   const { auth: authLib } = await import("@/lib/auth");
@@ -20,7 +44,7 @@ export const POST = async (request: Request) => {
 
   const { messages } = await request.json();
   const result = streamText({
-    model: openai("gpt-4o-mini"),
+    model: getAIModel(),
     messages: convertToModelMessages(messages),
     stopWhen: stepCountIs(10),
     system: `Você é o Agenda.ai, assistente virtual de agendamento do Servix — plataforma SaaS para barbearias, salões de beleza e estética.

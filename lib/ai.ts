@@ -18,12 +18,9 @@ function getProvider(): AIProvider {
 }
 
 function getApiKey(): string {
-  const key =
-    process.env.AI_API_KEY ?? process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+  const key = process.env.AI_API_KEY;
   if (!key) {
-    throw new Error(
-      "AI_API_KEY ou GOOGLE_GENERATIVE_AI_API_KEY não configurada",
-    );
+    throw new Error("AI_API_KEY não configurada");
   }
   return key;
 }
