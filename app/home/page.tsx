@@ -19,9 +19,12 @@ import {
   getAvailableLocations,
   getBarbershops,
   getPopularBarbershops,
+  getUserBarbershops,
 } from "@/data/barbershops";
 import { getUserBookings } from "@/data/bookings";
 import { getServiceCategories } from "@/data/services";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 interface HomeProps {
   searchParams: Promise<{ city?: string; state?: string }>;
@@ -33,6 +36,87 @@ export default async function Home({ searchParams }: HomeProps) {
     city: params.city,
     state: params.state,
   };
+
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  const role = session?.user?.role as string | undefined;
+  const userId = session?.user?.id;
+  const isRestricted = role === "owner" || role === "professional";
+
+  if (isRestricted && userId) {
+    const [myBarbershops, { confirmedBookings }, categories] = await Promise.all([
+      getUserBarbershops(userId, role!),
+      getUserBookings(),
+      getServiceCategories(),
+    ]);
+
+    return (
+      <div className="flex min-h-screen flex-col">
+        <Header categories={categories} />
+        <PageContainer>
+          <Suspense fallback={null}>
+            <AuthErrorAlert />
+          </Suspense>
+
+          <div className="relative overflow-hidden rounded-2xl">
+            <Image
+              src={banner}
+              alt="Agende nos melhores com a Servix"
+              sizes="(max-width: 768px) 100vw, 1024px"
+              className="h-auto w-full rounded-2xl"
+              priority
+            />
+            <div className="absolute inset-0 rounded-2xl bg-linear-to-r from-black/60 via-black/30 to-transparent" />
+            <div className="absolute bottom-4 left-4 right-4 sm:bottom-8 sm:left-8">
+              <h2 className="text-xl font-bold text-white sm:text-3xl">
+                {role === "owner"
+                  ? "Gerencie seu estabelecimento"
+                  : "Seu local de trabalho"}
+              </h2>
+              <p className="mt-1 text-sm text-white/80 sm:text-base">
+                {role === "owner"
+                  ? "Veja seus estabelecimentos e serviços cadastrados"
+                  : "Veja o estabelecimento onde você trabalha"}
+              </p>
+            </div>
+          </div>
+
+          {confirmedBookings.length > 0 && (
+            <PageSectionContent>
+              <PageSectionTitle>Agendamentos</PageSectionTitle>
+              <PageSectionScroller>
+                {confirmedBookings.map((booking) => (
+                  <BookingItem key={booking.id} booking={booking} />
+                ))}
+              </PageSectionScroller>
+            </PageSectionContent>
+          )}
+
+          <PageSectionContent>
+            <PageSectionTitle>
+              {role === "owner" ? "Meus Estabelecimentos" : "Meu Estabelecimento"}
+            </PageSectionTitle>
+            {myBarbershops.length > 0 ? (
+              <PageSectionScroller>
+                {myBarbershops.map((barbershop) => (
+                  <BarbershopItem key={barbershop.id} barbershop={barbershop} />
+                ))}
+              </PageSectionScroller>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                Nenhum estabelecimento encontrado.
+              </p>
+            )}
+          </PageSectionContent>
+        </PageContainer>
+        <div className="mt-auto">
+          <Footer />
+        </div>
+      </div>
+    );
+  }
 
   const [barbershops, popularBarbershops, { confirmedBookings }, categories, locations] =
     await Promise.all([

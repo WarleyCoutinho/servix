@@ -87,6 +87,32 @@ export const getBarbershopBySlug = async (slug: string) => {
   return barbershop;
 };
 
+export const getUserBarbershops = async (userId: string, role: string) => {
+  if (role === "owner") {
+    const { data } = await safeQuery(
+      () =>
+        prisma.barbershop.findMany({
+          where: { ownerId: userId, isActive: true },
+        }),
+      [],
+    );
+    return data;
+  }
+
+  if (role === "professional") {
+    const professional = await prisma.professional.findUnique({
+      where: { userId },
+      include: { barbershop: true },
+    });
+    if (professional?.barbershop) {
+      return [professional.barbershop];
+    }
+    return [];
+  }
+
+  return [];
+};
+
 export const getBarbershopsByServiceName = async (serviceName: string) => {
   const barbershops = await prisma.barbershop.findMany({
     where: {
