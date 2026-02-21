@@ -8,7 +8,7 @@ import { createBookingCheckoutSession } from "@/actions/create-booking-checkout-
 import { formatBrt } from "@/lib/timezone";
 
 function getAIModel() {
-  const model = process.env.AI_MODEL ?? "gemini-1.5-flash";
+  const model = process.env.AI_MODEL ?? "gemini-2.5-flash-lite";
   const apiKey = process.env.AI_API_KEY;
 
   return createGoogleGenerativeAI({ apiKey })(model);

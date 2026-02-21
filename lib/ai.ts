@@ -26,7 +26,7 @@ function getApiKey(): string {
 }
 
 function getModel(): string {
-  return process.env.AI_MODEL ?? "gemini-1.5-flash";
+  return process.env.AI_MODEL ?? "gemini-2.5-flash-lite";
 }
 
 async function responderGemini(
