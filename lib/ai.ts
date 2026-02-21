@@ -37,6 +37,10 @@ async function responderGemini(
   const genAI = new GoogleGenerativeAI(getApiKey());
   const model = genAI.getGenerativeModel({
     model: getModel(),
+    systemInstruction: {
+      role: "user",
+      parts: [{ text: systemPrompt }],
+    },
     generationConfig: {
       temperature: 0.7,
       maxOutputTokens: maxTokens,
@@ -55,7 +59,6 @@ async function responderGemini(
 
   const chat = model.startChat({
     history: sanitizedHistory,
-    systemInstruction: systemPrompt,
   });
 
   const lastMessage = messages[messages.length - 1];
