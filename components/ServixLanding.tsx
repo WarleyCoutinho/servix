@@ -409,6 +409,73 @@ export default function ServixLanding() {
         </div>
       </section>
 
+      {/* PRIMEIRO ACESSO */}
+      <section className="bg-[#111111] px-6 py-24">
+        <div className="mx-auto max-w-275">
+          <RevealSection>
+            <div className="mb-14 text-center">
+              <p className="mb-3 text-[0.68rem] uppercase tracking-[0.2em] text-gold">
+                🔐 Primeiro Acesso e Login
+              </p>
+              <h2 className="font-serif text-[clamp(1.9rem,3.5vw,3rem)] font-bold leading-tight">
+                Comece a usar
+                <br />
+                <em className="italic text-gold">em 3 passos simples.</em>
+              </h2>
+            </div>
+          </RevealSection>
+
+          <div className="mx-auto grid max-w-200 grid-cols-1 gap-6 md:grid-cols-3">
+            {[
+              {
+                step: 1,
+                text: (
+                  <>
+                    Abra o link enviado para você e toque no ícone de menu{" "}
+                    <strong className="text-gold">≡</strong> no canto superior
+                    direito.
+                  </>
+                ),
+              },
+              {
+                step: 2,
+                text: (
+                  <>
+                    Toque em{" "}
+                    <strong className="text-gold">
+                      Login → Entrar com Google
+                    </strong>{" "}
+                    → autorize o acesso.
+                  </>
+                ),
+              },
+              {
+                step: 3,
+                text: (
+                  <>
+                    Na primeira vez, escolha{" "}
+                    <strong className="text-gold">Proprietário</strong> e toque
+                    em <strong className="text-gold">Continuar</strong>.
+                  </>
+                ),
+              },
+            ].map(({ step, text }) => (
+              <RevealSection key={step} delay={step * 120}>
+                <div className="group relative overflow-hidden rounded-lg border border-white/6 bg-[#0a0a0a] p-8 text-center transition-all duration-300 hover:-translate-y-1 hover:border-gold/30">
+                  <div className="absolute inset-x-0 top-0 h-0.5 bg-linear-to-r from-transparent via-gold to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+                  <span className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full border border-gold/30 font-serif text-xl font-bold text-gold">
+                    {step}
+                  </span>
+                  <p className="mt-4 text-sm leading-relaxed text-white/60">
+                    {text}
+                  </p>
+                </div>
+              </RevealSection>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* PLANOS */}
       <section className="bg-[#111111] px-6 py-24" id="planos">
         <div className="mx-auto max-w-275">
