@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { authClient } from "@/lib/auth-client";
 import { Button } from "./ui/button";
 
 const PLANS = [
@@ -159,7 +159,7 @@ interface PlanCardProps {
   plan: (typeof PLANS)[number];
 }
 
-function PlanCard({ plan }: PlanCardProps) {
+function PlanCard({ plan, onCtaClick }: PlanCardProps & { onCtaClick: () => void }) {
   return (
     <div
       className={`relative flex flex-col gap-4 rounded-lg p-8 transition-transform duration-300 ${
@@ -208,15 +208,15 @@ function PlanCard({ plan }: PlanCardProps) {
         ))}
       </ul>
       <Button
-        asChild
         variant={plan.highlight ? "default" : "outline"}
         className={`mt-6 w-full uppercase tracking-wide ${
           plan.highlight
             ? "bg-gold text-gold-foreground hover:bg-gold/90"
             : "border-gold/50 text-gold hover:bg-gold/10"
         }`}
+        onClick={onCtaClick}
       >
-        <Link href="/home">Começar agora</Link>
+        Começar agora
       </Button>
     </div>
   );
@@ -230,6 +230,10 @@ export default function ServixLanding() {
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  const handleCtaClick = () => {
+    authClient.signIn.social({ provider: "google", callbackURL: "/auth/callback" });
+  };
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-[#0A0A0A] font-sans text-white">
@@ -245,11 +249,11 @@ export default function ServixLanding() {
           Servix
         </span>
         <Button
-          asChild
           size="sm"
           className="bg-gold text-gold-foreground hover:bg-gold/90 uppercase tracking-wide text-xs font-bold"
+          onClick={handleCtaClick}
         >
-          <Link href="/home">Começar agora</Link>
+          Começar agora
         </Button>
       </nav>
 
@@ -277,17 +281,17 @@ export default function ServixLanding() {
 
         <div className="animate-fade-up relative mt-10 flex flex-wrap justify-center gap-4 [animation-delay:450ms]">
           <Button
-            asChild
             size="lg"
             className="bg-gold text-gold-foreground shadow-lg shadow-gold/25 hover:bg-gold/90 uppercase tracking-wide font-bold"
+            onClick={handleCtaClick}
           >
-            <Link href="/home">Quero começar agora →</Link>
+            Quero começar agora →
           </Button>
           <Button
-            asChild
             variant="outline"
             size="lg"
             className="border-gold/40 text-gold hover:bg-gold/10 uppercase tracking-wide"
+            asChild
           >
             <a href="#como-funciona">Ver como funciona</a>
           </Button>
@@ -428,7 +432,7 @@ export default function ServixLanding() {
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {PLANS.map((plan, i) => (
               <RevealSection key={plan.name} delay={i * 120}>
-                <PlanCard plan={plan} />
+                <PlanCard plan={plan} onCtaClick={handleCtaClick} />
               </RevealSection>
             ))}
           </div>
@@ -460,11 +464,11 @@ export default function ServixLanding() {
                 receber agendamentos hoje.
               </p>
               <Button
-                asChild
                 size="lg"
                 className="bg-gold text-gold-foreground shadow-lg shadow-gold/25 hover:bg-gold/90 px-12 text-base uppercase tracking-wide font-bold"
+                onClick={handleCtaClick}
               >
-                <Link href="/home">Assinar o Servix agora →</Link>
+                Assinar o Servix agora →
               </Button>
               <p className="mt-5 text-xs text-white/25">
                 A partir de R$ 39,90/mês &bull; Cancele quando quiser
@@ -477,26 +481,6 @@ export default function ServixLanding() {
       {/* FOOTER */}
       <footer className="border-t border-white/5 px-6 pb-8 pt-12 text-center">
         <p className="mb-4 font-serif text-xl text-gold">Servix</p>
-        <div className="mb-6 flex flex-wrap justify-center gap-8">
-          <Link
-            href="/home"
-            className="text-sm text-white/45 transition-colors hover:text-white/70"
-          >
-            Acessar Plataforma
-          </Link>
-          <a
-            href="#planos"
-            className="text-sm text-white/45 transition-colors hover:text-white/70"
-          >
-            Planos
-          </a>
-          <a
-            href="#como-funciona"
-            className="text-sm text-white/45 transition-colors hover:text-white/70"
-          >
-            Como Funciona
-          </a>
-        </div>
         <p className="text-xs uppercase tracking-wider text-white/20">
           Gestão Profissional para Negócios de Beleza
         </p>

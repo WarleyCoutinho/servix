@@ -207,7 +207,7 @@ const MenuSheet = ({ categories = [], onLoginClick }: MenuSheetProps) => {
                 </button>
               )}
 
-              {isLoggedIn && (
+              {session?.user?.role === "client" && (
                 <>
                   <button
                     type="button"

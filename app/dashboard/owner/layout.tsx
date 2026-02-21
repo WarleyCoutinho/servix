@@ -14,6 +14,7 @@ import { DashboardSidebar, type NavItem } from "@/components/dashboard-sidebar";
 import { BarbershopSelector } from "@/components/barbershop-selector";
 import { getUserPlanInfo } from "@/lib/plan-limits";
 import { PlanBadge } from "@/components/plan-badge";
+import { SupportChat } from "@/components/support-chat";
 
 const ACTIVE_BARBERSHOP_COOKIE = "active-barbershop-id";
 
@@ -118,6 +119,10 @@ export default async function OwnerDashboardLayout({
           {children}
         </div>
       </main>
+      <SupportChat
+        userPlan={planInfo?.plan ?? "BASIC"}
+        userName={user.name}
+      />
     </div>
   );
 }

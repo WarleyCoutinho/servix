@@ -102,11 +102,11 @@ const Header = ({ categories = [] }: HeaderProps) => {
               </DropdownMenu>
             )}
 
-            {isLoggedIn && (
+            {session?.user?.role === "client" && (
               <Button variant="ghost" size="sm" asChild>
                 <Link href="/bookings">
                   <CalendarDays className="mr-2 size-4" />
-                  Agendamentos
+                  Meus Agendamentos
                 </Link>
               </Button>
             )}
@@ -168,7 +168,7 @@ const Header = ({ categories = [] }: HeaderProps) => {
 
         <div className="flex items-center gap-2">
           <ThemeToggle />
-          {isLoggedIn && (
+          {session?.user?.role === "client" && (
             <ChatSheet triggerClassName="hidden sm:flex" iconOnly />
           )}
 
@@ -201,12 +201,14 @@ const Header = ({ categories = [] }: HeaderProps) => {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link href="/bookings">
-                      <CalendarDays className="mr-2 size-4" />
-                      Meus Agendamentos
-                    </Link>
-                  </DropdownMenuItem>
+                  {session.user.role === "client" && (
+                    <DropdownMenuItem asChild>
+                      <Link href="/bookings">
+                        <CalendarDays className="mr-2 size-4" />
+                        Meus Agendamentos
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
                   {session.user.role === "admin" && (
                     <DropdownMenuItem asChild>
                       <Link href="/dashboard/admin">
@@ -276,7 +278,7 @@ const Header = ({ categories = [] }: HeaderProps) => {
           </div>
 
           <div className="flex items-center gap-2 md:hidden">
-            {isLoggedIn && <ChatSheet iconOnly />}
+            {session?.user?.role === "client" && <ChatSheet iconOnly />}
             <MenuSheet
               categories={categories}
               onLoginClick={() => setLoginModalOpen(true)}

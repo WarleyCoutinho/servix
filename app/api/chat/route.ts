@@ -25,6 +25,13 @@ export const POST = async (request: Request) => {
     });
   }
 
+  if (session.user.role !== "client") {
+    return new Response(JSON.stringify({ error: "Acesso restrito a clientes" }), {
+      status: 403,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
   const { messages } = await request.json();
   const result = streamText({
     model: getAIModel(),
