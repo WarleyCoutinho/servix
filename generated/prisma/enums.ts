@@ -11,6 +11,7 @@
 
 export const UserRole = {
   admin: 'admin',
+  support: 'support',
   owner: 'owner',
   professional: 'professional',
   client: 'client'
@@ -73,3 +74,12 @@ export const StripeAccountStatus = {
 } as const
 
 export type StripeAccountStatus = (typeof StripeAccountStatus)[keyof typeof StripeAccountStatus]
+
+
+export const SupportTicketStatus = {
+  OPEN: 'OPEN',
+  WAITING_ADMIN: 'WAITING_ADMIN',
+  RESOLVED: 'RESOLVED'
+} as const
+
+export type SupportTicketStatus = (typeof SupportTicketStatus)[keyof typeof SupportTicketStatus]

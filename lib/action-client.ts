@@ -177,3 +177,24 @@ export const adminActionClient = protectedActionClient.use(
     });
   },
 );
+
+export const supportActionClient = protectedActionClient.use(
+  async ({ next, ctx }) => {
+    const user = await prisma.user.findUnique({
+      where: { id: ctx.user.id },
+    });
+
+    if (user?.role !== UserRole.support && user?.role !== UserRole.admin) {
+      throw new Error(
+        "Acesso negado. Apenas equipe de suporte pode acessar este recurso.",
+      );
+    }
+
+    return next({
+      ctx: {
+        ...ctx,
+        user,
+      },
+    });
+  },
+);

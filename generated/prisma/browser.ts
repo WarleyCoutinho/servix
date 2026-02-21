@@ -87,3 +87,18 @@ export type PlanHistory = Prisma.PlanHistoryModel
  * 
  */
 export type StripeEvent = Prisma.StripeEventModel
+/**
+ * Model SupportTicket
+ * 
+ */
+export type SupportTicket = Prisma.SupportTicketModel
+/**
+ * Model SupportMessage
+ * 
+ */
+export type SupportMessage = Prisma.SupportMessageModel
+/**
+ * Model SupportInvite
+ * 
+ */
+export type SupportInvite = Prisma.SupportInviteModel

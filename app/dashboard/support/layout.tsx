@@ -3,21 +3,18 @@ import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { prisma, safeQuery } from "@/lib/prisma";
 import { UserRole } from "@/generated/prisma/enums";
-import { LayoutDashboard, CreditCard, Users, Settings, Headset } from "lucide-react";
+import { LayoutDashboard, Headset } from "lucide-react";
 import {
   DashboardSidebar,
   type NavItem,
 } from "@/components/dashboard-sidebar";
 
 const navItems: NavItem[] = [
-  { href: "/dashboard/admin", label: "Visao Geral", icon: LayoutDashboard },
-  { href: "/dashboard/admin/plans", label: "Planos", icon: CreditCard },
-  { href: "/dashboard/admin/users", label: "Usuarios", icon: Users },
-  { href: "/dashboard/admin/support", label: "Suporte", icon: Headset },
-  { href: "/dashboard/admin/settings", label: "Configuracoes", icon: Settings },
+  { href: "/dashboard/support", label: "Visao Geral", icon: LayoutDashboard },
+  { href: "/dashboard/support/tickets", label: "Tickets", icon: Headset },
 ];
 
-export default async function AdminDashboardLayout({
+export default async function SupportDashboardLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -37,18 +34,18 @@ export default async function AdminDashboardLayout({
 
   const { data: user } = await safeQuery(
     () => prisma.user.findUnique({ where: { id: session.user.id } }),
-    null
+    null,
   );
 
-  if (user?.role !== UserRole.admin) {
+  if (user?.role !== UserRole.support && user?.role !== UserRole.admin) {
     redirect("/");
   }
 
   return (
     <div className="flex min-h-screen">
       <DashboardSidebar
-        title="Servix Admin"
-        subtitle="Painel Administrativo"
+        title="Servix Suporte"
+        subtitle="Painel de Atendimento"
         navItems={navItems}
       />
       <main className="flex-1 overflow-auto">

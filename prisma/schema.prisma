@@ -13,6 +13,7 @@ datasource db {
 
 enum UserRole {
   admin
+  support
   owner
   professional
   client
@@ -59,6 +60,12 @@ enum StripeAccountStatus {
   DISABLED
 }
 
+enum SupportTicketStatus {
+  OPEN
+  WAITING_ADMIN
+  RESOLVED
+}
+
 // =====================
 // USER & AUTH
 // =====================
@@ -80,8 +87,11 @@ model User {
   sessions         Session[]
   accounts         Account[]
   bookings         Booking[]
-  ownedBarbershops Barbershop[]  @relation("BarbershopOwner")
+  ownedBarbershops Barbershop[]     @relation("BarbershopOwner")
   professional     Professional?
+  supportTickets   SupportTicket[]
+  sentSupportMsgs  SupportMessage[] @relation("SupportMessageSender")
+  sentInvites      SupportInvite[]  @relation("SupportInvites")
 
   @@unique([email])
   @@map("user")
@@ -369,4 +379,59 @@ model StripeEvent {
 
   @@index([stripeEventId])
   @@map("stripe_event")
+}
+
+// =====================
+// SUPPORT TICKETS
+// =====================
+
+model SupportTicket {
+  id        String              @id @default(uuid())
+  status    SupportTicketStatus @default(OPEN)
+  createdAt DateTime            @default(now()) @db.Timestamptz()
+  updatedAt DateTime            @updatedAt @db.Timestamptz()
+  closedAt  DateTime?           @db.Timestamptz()
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  messages SupportMessage[]
+
+  @@index([userId])
+  @@index([status])
+  @@map("support_ticket")
+}
+
+model SupportMessage {
+  id          String   @id @default(uuid())
+  content     String
+  imageUrl    String?
+  isFromAdmin Boolean  @default(false)
+  isFromAI    Boolean  @default(false)
+  readByUser  Boolean  @default(false)
+  createdAt   DateTime @default(now()) @db.Timestamptz()
+
+  ticketId String
+  ticket   SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  senderId String?
+  sender   User?   @relation("SupportMessageSender", fields: [senderId], references: [id], onDelete: SetNull)
+
+  @@index([ticketId])
+  @@map("support_message")
+}
+
+// =====================
+// SUPPORT INVITES
+// =====================
+
+model SupportInvite {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  invitedBy String
+  admin     User     @relation("SupportInvites", fields: [invitedBy], references: [id], onDelete: Cascade)
+  accepted  Boolean  @default(false)
+  createdAt DateTime @default(now()) @db.Timestamptz()
+
+  @@map("support_invite")
 }

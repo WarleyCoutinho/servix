@@ -50,6 +50,8 @@ export const POST = async (request: Request) => {
   }
 
   const { messages } = await request.json();
+
+  try {
   const result = streamText({
     model: getAIModel(),
     messages: await convertToModelMessages(messages),
@@ -355,4 +357,35 @@ export const POST = async (request: Request) => {
     },
   });
   return result.toUIMessageStreamResponse();
+  } catch (error) {
+    console.error("Chat AI error:", error);
+
+    const isRateLimit =
+      error instanceof Error &&
+      (error.message?.includes("429") ||
+        error.message?.includes("RESOURCE_EXHAUSTED") ||
+        error.message?.includes("quota"));
+
+    if (isRateLimit) {
+      return new Response(
+        JSON.stringify({
+          error:
+            "Nosso assistente está temporariamente indisponível devido ao alto número de atendimentos. " +
+            "Mas não se preocupe! Você pode agendar normalmente pela plataforma: " +
+            "acesse o menu 'Barbearias e salões', escolha o estabelecimento, selecione o profissional e horário desejado. " +
+            "É rápido e fácil! 😊",
+        }),
+        { status: 429, headers: { "Content-Type": "application/json" } },
+      );
+    }
+
+    return new Response(
+      JSON.stringify({
+        error:
+          "Ops! Ocorreu um erro no assistente. Tente novamente em alguns instantes ou agende pelo modo convencional " +
+          "acessando 'Barbearias e salões' no menu.",
+      }),
+      { status: 500, headers: { "Content-Type": "application/json" } },
+    );
+  }
 };

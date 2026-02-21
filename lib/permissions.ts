@@ -28,6 +28,14 @@ export const professionalRole = ac.newRole({
   schedule: ["read", "update"],
 });
 
+export const supportRole = ac.newRole({
+  barbershop: ["read"],
+  professional: ["read"],
+  booking: ["read"],
+  service: ["read"],
+  schedule: ["read"],
+});
+
 export const clientRole = ac.newRole({
   barbershop: ["read"],
   professional: ["read"],

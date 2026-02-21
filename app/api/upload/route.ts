@@ -49,14 +49,16 @@ export const POST = async (request: Request) => {
     const fileName = `${crypto.randomUUID()}.${extension}`;
     const buffer = Buffer.from(await file.arrayBuffer());
 
-    const uploadDir = join(process.cwd(), "public", "uploads", "services");
+    const folder = formData.get("folder") as string | null;
+    const subDir = folder === "support" ? "support" : "services";
+    const uploadDir = join(process.cwd(), "public", "uploads", subDir);
 
     await mkdir(uploadDir, { recursive: true });
 
     const filePath = join(uploadDir, fileName);
     await writeFile(filePath, buffer);
 
-    const imageUrl = `/uploads/services/${fileName}`;
+    const imageUrl = `/uploads/${subDir}/${fileName}`;
 
     return NextResponse.json({ imageUrl });
   } catch (error) {

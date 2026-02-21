@@ -42,6 +42,7 @@ const rolePermissions: Record<UserRole, Feature[]> = {
     "view_professionals",
     "manage_subscription",
   ],
+  [UserRole.support]: [],
   [UserRole.professional]: ["access_professional_dashboard"],
   [UserRole.client]: [],
 };

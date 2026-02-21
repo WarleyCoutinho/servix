@@ -243,6 +243,9 @@ export type UserWhereInput = {
   bookings?: Prisma.BookingListRelationFilter
   ownedBarbershops?: Prisma.BarbershopListRelationFilter
   professional?: Prisma.XOR<Prisma.ProfessionalNullableScalarRelationFilter, Prisma.ProfessionalWhereInput> | null
+  supportTickets?: Prisma.SupportTicketListRelationFilter
+  sentSupportMsgs?: Prisma.SupportMessageListRelationFilter
+  sentInvites?: Prisma.SupportInviteListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -263,6 +266,9 @@ export type UserOrderByWithRelationInput = {
   bookings?: Prisma.BookingOrderByRelationAggregateInput
   ownedBarbershops?: Prisma.BarbershopOrderByRelationAggregateInput
   professional?: Prisma.ProfessionalOrderByWithRelationInput
+  supportTickets?: Prisma.SupportTicketOrderByRelationAggregateInput
+  sentSupportMsgs?: Prisma.SupportMessageOrderByRelationAggregateInput
+  sentInvites?: Prisma.SupportInviteOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -286,6 +292,9 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   bookings?: Prisma.BookingListRelationFilter
   ownedBarbershops?: Prisma.BarbershopListRelationFilter
   professional?: Prisma.XOR<Prisma.ProfessionalNullableScalarRelationFilter, Prisma.ProfessionalWhereInput> | null
+  supportTickets?: Prisma.SupportTicketListRelationFilter
+  sentSupportMsgs?: Prisma.SupportMessageListRelationFilter
+  sentInvites?: Prisma.SupportInviteListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -342,6 +351,9 @@ export type UserCreateInput = {
   bookings?: Prisma.BookingCreateNestedManyWithoutUserInput
   ownedBarbershops?: Prisma.BarbershopCreateNestedManyWithoutOwnerInput
   professional?: Prisma.ProfessionalCreateNestedOneWithoutUserInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
+  sentSupportMsgs?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  sentInvites?: Prisma.SupportInviteCreateNestedManyWithoutAdminInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -362,6 +374,9 @@ export type UserUncheckedCreateInput = {
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutUserInput
   ownedBarbershops?: Prisma.BarbershopUncheckedCreateNestedManyWithoutOwnerInput
   professional?: Prisma.ProfessionalUncheckedCreateNestedOneWithoutUserInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
+  sentSupportMsgs?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  sentInvites?: Prisma.SupportInviteUncheckedCreateNestedManyWithoutAdminInput
 }
 
 export type UserUpdateInput = {
@@ -382,6 +397,9 @@ export type UserUpdateInput = {
   bookings?: Prisma.BookingUpdateManyWithoutUserNestedInput
   ownedBarbershops?: Prisma.BarbershopUpdateManyWithoutOwnerNestedInput
   professional?: Prisma.ProfessionalUpdateOneWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
+  sentSupportMsgs?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  sentInvites?: Prisma.SupportInviteUpdateManyWithoutAdminNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -402,6 +420,9 @@ export type UserUncheckedUpdateInput = {
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutUserNestedInput
   ownedBarbershops?: Prisma.BarbershopUncheckedUpdateManyWithoutOwnerNestedInput
   professional?: Prisma.ProfessionalUncheckedUpdateOneWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
+  sentSupportMsgs?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  sentInvites?: Prisma.SupportInviteUncheckedUpdateManyWithoutAdminNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -600,6 +621,50 @@ export type UserUpdateOneRequiredWithoutBookingsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutBookingsInput, Prisma.UserUpdateWithoutBookingsInput>, Prisma.UserUncheckedUpdateWithoutBookingsInput>
 }
 
+export type UserCreateNestedOneWithoutSupportTicketsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSupportTicketsInput, Prisma.UserUncheckedCreateWithoutSupportTicketsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSupportTicketsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutSupportTicketsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSupportTicketsInput, Prisma.UserUncheckedCreateWithoutSupportTicketsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSupportTicketsInput
+  upsert?: Prisma.UserUpsertWithoutSupportTicketsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSupportTicketsInput, Prisma.UserUpdateWithoutSupportTicketsInput>, Prisma.UserUncheckedUpdateWithoutSupportTicketsInput>
+}
+
+export type UserCreateNestedOneWithoutSentSupportMsgsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSentSupportMsgsInput, Prisma.UserUncheckedCreateWithoutSentSupportMsgsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSentSupportMsgsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutSentSupportMsgsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSentSupportMsgsInput, Prisma.UserUncheckedCreateWithoutSentSupportMsgsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSentSupportMsgsInput
+  upsert?: Prisma.UserUpsertWithoutSentSupportMsgsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSentSupportMsgsInput, Prisma.UserUpdateWithoutSentSupportMsgsInput>, Prisma.UserUncheckedUpdateWithoutSentSupportMsgsInput>
+}
+
+export type UserCreateNestedOneWithoutSentInvitesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSentInvitesInput, Prisma.UserUncheckedCreateWithoutSentInvitesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSentInvitesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutSentInvitesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSentInvitesInput, Prisma.UserUncheckedCreateWithoutSentInvitesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSentInvitesInput
+  upsert?: Prisma.UserUpsertWithoutSentInvitesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSentInvitesInput, Prisma.UserUpdateWithoutSentInvitesInput>, Prisma.UserUncheckedUpdateWithoutSentInvitesInput>
+}
+
 export type UserCreateWithoutSessionsInput = {
   id: string
   name: string
@@ -617,6 +682,9 @@ export type UserCreateWithoutSessionsInput = {
   bookings?: Prisma.BookingCreateNestedManyWithoutUserInput
   ownedBarbershops?: Prisma.BarbershopCreateNestedManyWithoutOwnerInput
   professional?: Prisma.ProfessionalCreateNestedOneWithoutUserInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
+  sentSupportMsgs?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  sentInvites?: Prisma.SupportInviteCreateNestedManyWithoutAdminInput
 }
 
 export type UserUncheckedCreateWithoutSessionsInput = {
@@ -636,6 +704,9 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutUserInput
   ownedBarbershops?: Prisma.BarbershopUncheckedCreateNestedManyWithoutOwnerInput
   professional?: Prisma.ProfessionalUncheckedCreateNestedOneWithoutUserInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
+  sentSupportMsgs?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  sentInvites?: Prisma.SupportInviteUncheckedCreateNestedManyWithoutAdminInput
 }
 
 export type UserCreateOrConnectWithoutSessionsInput = {
@@ -671,6 +742,9 @@ export type UserUpdateWithoutSessionsInput = {
   bookings?: Prisma.BookingUpdateManyWithoutUserNestedInput
   ownedBarbershops?: Prisma.BarbershopUpdateManyWithoutOwnerNestedInput
   professional?: Prisma.ProfessionalUpdateOneWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
+  sentSupportMsgs?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  sentInvites?: Prisma.SupportInviteUpdateManyWithoutAdminNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -690,6 +764,9 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutUserNestedInput
   ownedBarbershops?: Prisma.BarbershopUncheckedUpdateManyWithoutOwnerNestedInput
   professional?: Prisma.ProfessionalUncheckedUpdateOneWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
+  sentSupportMsgs?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  sentInvites?: Prisma.SupportInviteUncheckedUpdateManyWithoutAdminNestedInput
 }
 
 export type UserCreateWithoutAccountsInput = {
@@ -709,6 +786,9 @@ export type UserCreateWithoutAccountsInput = {
   bookings?: Prisma.BookingCreateNestedManyWithoutUserInput
   ownedBarbershops?: Prisma.BarbershopCreateNestedManyWithoutOwnerInput
   professional?: Prisma.ProfessionalCreateNestedOneWithoutUserInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
+  sentSupportMsgs?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  sentInvites?: Prisma.SupportInviteCreateNestedManyWithoutAdminInput
 }
 
 export type UserUncheckedCreateWithoutAccountsInput = {
@@ -728,6 +808,9 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutUserInput
   ownedBarbershops?: Prisma.BarbershopUncheckedCreateNestedManyWithoutOwnerInput
   professional?: Prisma.ProfessionalUncheckedCreateNestedOneWithoutUserInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
+  sentSupportMsgs?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  sentInvites?: Prisma.SupportInviteUncheckedCreateNestedManyWithoutAdminInput
 }
 
 export type UserCreateOrConnectWithoutAccountsInput = {
@@ -763,6 +846,9 @@ export type UserUpdateWithoutAccountsInput = {
   bookings?: Prisma.BookingUpdateManyWithoutUserNestedInput
   ownedBarbershops?: Prisma.BarbershopUpdateManyWithoutOwnerNestedInput
   professional?: Prisma.ProfessionalUpdateOneWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
+  sentSupportMsgs?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  sentInvites?: Prisma.SupportInviteUpdateManyWithoutAdminNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAccountsInput = {
@@ -782,6 +868,9 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutUserNestedInput
   ownedBarbershops?: Prisma.BarbershopUncheckedUpdateManyWithoutOwnerNestedInput
   professional?: Prisma.ProfessionalUncheckedUpdateOneWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
+  sentSupportMsgs?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  sentInvites?: Prisma.SupportInviteUncheckedUpdateManyWithoutAdminNestedInput
 }
 
 export type UserCreateWithoutOwnedBarbershopsInput = {
@@ -801,6 +890,9 @@ export type UserCreateWithoutOwnedBarbershopsInput = {
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   bookings?: Prisma.BookingCreateNestedManyWithoutUserInput
   professional?: Prisma.ProfessionalCreateNestedOneWithoutUserInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
+  sentSupportMsgs?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  sentInvites?: Prisma.SupportInviteCreateNestedManyWithoutAdminInput
 }
 
 export type UserUncheckedCreateWithoutOwnedBarbershopsInput = {
@@ -820,6 +912,9 @@ export type UserUncheckedCreateWithoutOwnedBarbershopsInput = {
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutUserInput
   professional?: Prisma.ProfessionalUncheckedCreateNestedOneWithoutUserInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
+  sentSupportMsgs?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  sentInvites?: Prisma.SupportInviteUncheckedCreateNestedManyWithoutAdminInput
 }
 
 export type UserCreateOrConnectWithoutOwnedBarbershopsInput = {
@@ -855,6 +950,9 @@ export type UserUpdateWithoutOwnedBarbershopsInput = {
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   bookings?: Prisma.BookingUpdateManyWithoutUserNestedInput
   professional?: Prisma.ProfessionalUpdateOneWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
+  sentSupportMsgs?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  sentInvites?: Prisma.SupportInviteUpdateManyWithoutAdminNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOwnedBarbershopsInput = {
@@ -874,6 +972,9 @@ export type UserUncheckedUpdateWithoutOwnedBarbershopsInput = {
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutUserNestedInput
   professional?: Prisma.ProfessionalUncheckedUpdateOneWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
+  sentSupportMsgs?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  sentInvites?: Prisma.SupportInviteUncheckedUpdateManyWithoutAdminNestedInput
 }
 
 export type UserCreateWithoutProfessionalInput = {
@@ -893,6 +994,9 @@ export type UserCreateWithoutProfessionalInput = {
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   bookings?: Prisma.BookingCreateNestedManyWithoutUserInput
   ownedBarbershops?: Prisma.BarbershopCreateNestedManyWithoutOwnerInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
+  sentSupportMsgs?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  sentInvites?: Prisma.SupportInviteCreateNestedManyWithoutAdminInput
 }
 
 export type UserUncheckedCreateWithoutProfessionalInput = {
@@ -912,6 +1016,9 @@ export type UserUncheckedCreateWithoutProfessionalInput = {
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutUserInput
   ownedBarbershops?: Prisma.BarbershopUncheckedCreateNestedManyWithoutOwnerInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
+  sentSupportMsgs?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  sentInvites?: Prisma.SupportInviteUncheckedCreateNestedManyWithoutAdminInput
 }
 
 export type UserCreateOrConnectWithoutProfessionalInput = {
@@ -947,6 +1054,9 @@ export type UserUpdateWithoutProfessionalInput = {
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   bookings?: Prisma.BookingUpdateManyWithoutUserNestedInput
   ownedBarbershops?: Prisma.BarbershopUpdateManyWithoutOwnerNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
+  sentSupportMsgs?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  sentInvites?: Prisma.SupportInviteUpdateManyWithoutAdminNestedInput
 }
 
 export type UserUncheckedUpdateWithoutProfessionalInput = {
@@ -966,6 +1076,9 @@ export type UserUncheckedUpdateWithoutProfessionalInput = {
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutUserNestedInput
   ownedBarbershops?: Prisma.BarbershopUncheckedUpdateManyWithoutOwnerNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
+  sentSupportMsgs?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  sentInvites?: Prisma.SupportInviteUncheckedUpdateManyWithoutAdminNestedInput
 }
 
 export type UserCreateWithoutBookingsInput = {
@@ -985,6 +1098,9 @@ export type UserCreateWithoutBookingsInput = {
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   ownedBarbershops?: Prisma.BarbershopCreateNestedManyWithoutOwnerInput
   professional?: Prisma.ProfessionalCreateNestedOneWithoutUserInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
+  sentSupportMsgs?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  sentInvites?: Prisma.SupportInviteCreateNestedManyWithoutAdminInput
 }
 
 export type UserUncheckedCreateWithoutBookingsInput = {
@@ -1004,6 +1120,9 @@ export type UserUncheckedCreateWithoutBookingsInput = {
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   ownedBarbershops?: Prisma.BarbershopUncheckedCreateNestedManyWithoutOwnerInput
   professional?: Prisma.ProfessionalUncheckedCreateNestedOneWithoutUserInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
+  sentSupportMsgs?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  sentInvites?: Prisma.SupportInviteUncheckedCreateNestedManyWithoutAdminInput
 }
 
 export type UserCreateOrConnectWithoutBookingsInput = {
@@ -1039,6 +1158,9 @@ export type UserUpdateWithoutBookingsInput = {
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   ownedBarbershops?: Prisma.BarbershopUpdateManyWithoutOwnerNestedInput
   professional?: Prisma.ProfessionalUpdateOneWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
+  sentSupportMsgs?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  sentInvites?: Prisma.SupportInviteUpdateManyWithoutAdminNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBookingsInput = {
@@ -1058,6 +1180,321 @@ export type UserUncheckedUpdateWithoutBookingsInput = {
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   ownedBarbershops?: Prisma.BarbershopUncheckedUpdateManyWithoutOwnerNestedInput
   professional?: Prisma.ProfessionalUncheckedUpdateOneWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
+  sentSupportMsgs?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  sentInvites?: Prisma.SupportInviteUncheckedUpdateManyWithoutAdminNestedInput
+}
+
+export type UserCreateWithoutSupportTicketsInput = {
+  id: string
+  name: string
+  email: string
+  emailVerified?: boolean
+  image?: string | null
+  role?: $Enums.UserRole
+  banned?: boolean
+  banReason?: string | null
+  banExpires?: Date | string | null
+  stripeCustomerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  bookings?: Prisma.BookingCreateNestedManyWithoutUserInput
+  ownedBarbershops?: Prisma.BarbershopCreateNestedManyWithoutOwnerInput
+  professional?: Prisma.ProfessionalCreateNestedOneWithoutUserInput
+  sentSupportMsgs?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  sentInvites?: Prisma.SupportInviteCreateNestedManyWithoutAdminInput
+}
+
+export type UserUncheckedCreateWithoutSupportTicketsInput = {
+  id: string
+  name: string
+  email: string
+  emailVerified?: boolean
+  image?: string | null
+  role?: $Enums.UserRole
+  banned?: boolean
+  banReason?: string | null
+  banExpires?: Date | string | null
+  stripeCustomerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutUserInput
+  ownedBarbershops?: Prisma.BarbershopUncheckedCreateNestedManyWithoutOwnerInput
+  professional?: Prisma.ProfessionalUncheckedCreateNestedOneWithoutUserInput
+  sentSupportMsgs?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  sentInvites?: Prisma.SupportInviteUncheckedCreateNestedManyWithoutAdminInput
+}
+
+export type UserCreateOrConnectWithoutSupportTicketsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutSupportTicketsInput, Prisma.UserUncheckedCreateWithoutSupportTicketsInput>
+}
+
+export type UserUpsertWithoutSupportTicketsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutSupportTicketsInput, Prisma.UserUncheckedUpdateWithoutSupportTicketsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutSupportTicketsInput, Prisma.UserUncheckedCreateWithoutSupportTicketsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutSupportTicketsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutSupportTicketsInput, Prisma.UserUncheckedUpdateWithoutSupportTicketsInput>
+}
+
+export type UserUpdateWithoutSupportTicketsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  bookings?: Prisma.BookingUpdateManyWithoutUserNestedInput
+  ownedBarbershops?: Prisma.BarbershopUpdateManyWithoutOwnerNestedInput
+  professional?: Prisma.ProfessionalUpdateOneWithoutUserNestedInput
+  sentSupportMsgs?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  sentInvites?: Prisma.SupportInviteUpdateManyWithoutAdminNestedInput
+}
+
+export type UserUncheckedUpdateWithoutSupportTicketsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  bookings?: Prisma.BookingUncheckedUpdateManyWithoutUserNestedInput
+  ownedBarbershops?: Prisma.BarbershopUncheckedUpdateManyWithoutOwnerNestedInput
+  professional?: Prisma.ProfessionalUncheckedUpdateOneWithoutUserNestedInput
+  sentSupportMsgs?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  sentInvites?: Prisma.SupportInviteUncheckedUpdateManyWithoutAdminNestedInput
+}
+
+export type UserCreateWithoutSentSupportMsgsInput = {
+  id: string
+  name: string
+  email: string
+  emailVerified?: boolean
+  image?: string | null
+  role?: $Enums.UserRole
+  banned?: boolean
+  banReason?: string | null
+  banExpires?: Date | string | null
+  stripeCustomerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  bookings?: Prisma.BookingCreateNestedManyWithoutUserInput
+  ownedBarbershops?: Prisma.BarbershopCreateNestedManyWithoutOwnerInput
+  professional?: Prisma.ProfessionalCreateNestedOneWithoutUserInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
+  sentInvites?: Prisma.SupportInviteCreateNestedManyWithoutAdminInput
+}
+
+export type UserUncheckedCreateWithoutSentSupportMsgsInput = {
+  id: string
+  name: string
+  email: string
+  emailVerified?: boolean
+  image?: string | null
+  role?: $Enums.UserRole
+  banned?: boolean
+  banReason?: string | null
+  banExpires?: Date | string | null
+  stripeCustomerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutUserInput
+  ownedBarbershops?: Prisma.BarbershopUncheckedCreateNestedManyWithoutOwnerInput
+  professional?: Prisma.ProfessionalUncheckedCreateNestedOneWithoutUserInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
+  sentInvites?: Prisma.SupportInviteUncheckedCreateNestedManyWithoutAdminInput
+}
+
+export type UserCreateOrConnectWithoutSentSupportMsgsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutSentSupportMsgsInput, Prisma.UserUncheckedCreateWithoutSentSupportMsgsInput>
+}
+
+export type UserUpsertWithoutSentSupportMsgsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutSentSupportMsgsInput, Prisma.UserUncheckedUpdateWithoutSentSupportMsgsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutSentSupportMsgsInput, Prisma.UserUncheckedCreateWithoutSentSupportMsgsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutSentSupportMsgsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutSentSupportMsgsInput, Prisma.UserUncheckedUpdateWithoutSentSupportMsgsInput>
+}
+
+export type UserUpdateWithoutSentSupportMsgsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  bookings?: Prisma.BookingUpdateManyWithoutUserNestedInput
+  ownedBarbershops?: Prisma.BarbershopUpdateManyWithoutOwnerNestedInput
+  professional?: Prisma.ProfessionalUpdateOneWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
+  sentInvites?: Prisma.SupportInviteUpdateManyWithoutAdminNestedInput
+}
+
+export type UserUncheckedUpdateWithoutSentSupportMsgsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  bookings?: Prisma.BookingUncheckedUpdateManyWithoutUserNestedInput
+  ownedBarbershops?: Prisma.BarbershopUncheckedUpdateManyWithoutOwnerNestedInput
+  professional?: Prisma.ProfessionalUncheckedUpdateOneWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
+  sentInvites?: Prisma.SupportInviteUncheckedUpdateManyWithoutAdminNestedInput
+}
+
+export type UserCreateWithoutSentInvitesInput = {
+  id: string
+  name: string
+  email: string
+  emailVerified?: boolean
+  image?: string | null
+  role?: $Enums.UserRole
+  banned?: boolean
+  banReason?: string | null
+  banExpires?: Date | string | null
+  stripeCustomerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  bookings?: Prisma.BookingCreateNestedManyWithoutUserInput
+  ownedBarbershops?: Prisma.BarbershopCreateNestedManyWithoutOwnerInput
+  professional?: Prisma.ProfessionalCreateNestedOneWithoutUserInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
+  sentSupportMsgs?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+}
+
+export type UserUncheckedCreateWithoutSentInvitesInput = {
+  id: string
+  name: string
+  email: string
+  emailVerified?: boolean
+  image?: string | null
+  role?: $Enums.UserRole
+  banned?: boolean
+  banReason?: string | null
+  banExpires?: Date | string | null
+  stripeCustomerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutUserInput
+  ownedBarbershops?: Prisma.BarbershopUncheckedCreateNestedManyWithoutOwnerInput
+  professional?: Prisma.ProfessionalUncheckedCreateNestedOneWithoutUserInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
+  sentSupportMsgs?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+}
+
+export type UserCreateOrConnectWithoutSentInvitesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutSentInvitesInput, Prisma.UserUncheckedCreateWithoutSentInvitesInput>
+}
+
+export type UserUpsertWithoutSentInvitesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutSentInvitesInput, Prisma.UserUncheckedUpdateWithoutSentInvitesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutSentInvitesInput, Prisma.UserUncheckedCreateWithoutSentInvitesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutSentInvitesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutSentInvitesInput, Prisma.UserUncheckedUpdateWithoutSentInvitesInput>
+}
+
+export type UserUpdateWithoutSentInvitesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  bookings?: Prisma.BookingUpdateManyWithoutUserNestedInput
+  ownedBarbershops?: Prisma.BarbershopUpdateManyWithoutOwnerNestedInput
+  professional?: Prisma.ProfessionalUpdateOneWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
+  sentSupportMsgs?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+}
+
+export type UserUncheckedUpdateWithoutSentInvitesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  bookings?: Prisma.BookingUncheckedUpdateManyWithoutUserNestedInput
+  ownedBarbershops?: Prisma.BarbershopUncheckedUpdateManyWithoutOwnerNestedInput
+  professional?: Prisma.ProfessionalUncheckedUpdateOneWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
+  sentSupportMsgs?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
 }
 
 
@@ -1070,6 +1507,9 @@ export type UserCountOutputType = {
   accounts: number
   bookings: number
   ownedBarbershops: number
+  supportTickets: number
+  sentSupportMsgs: number
+  sentInvites: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1077,6 +1517,9 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   accounts?: boolean | UserCountOutputTypeCountAccountsArgs
   bookings?: boolean | UserCountOutputTypeCountBookingsArgs
   ownedBarbershops?: boolean | UserCountOutputTypeCountOwnedBarbershopsArgs
+  supportTickets?: boolean | UserCountOutputTypeCountSupportTicketsArgs
+  sentSupportMsgs?: boolean | UserCountOutputTypeCountSentSupportMsgsArgs
+  sentInvites?: boolean | UserCountOutputTypeCountSentInvitesArgs
 }
 
 /**
@@ -1117,6 +1560,27 @@ export type UserCountOutputTypeCountOwnedBarbershopsArgs<ExtArgs extends runtime
   where?: Prisma.BarbershopWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountSupportTicketsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SupportTicketWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountSentSupportMsgsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SupportMessageWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountSentInvitesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SupportInviteWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1136,6 +1600,9 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   bookings?: boolean | Prisma.User$bookingsArgs<ExtArgs>
   ownedBarbershops?: boolean | Prisma.User$ownedBarbershopsArgs<ExtArgs>
   professional?: boolean | Prisma.User$professionalArgs<ExtArgs>
+  supportTickets?: boolean | Prisma.User$supportTicketsArgs<ExtArgs>
+  sentSupportMsgs?: boolean | Prisma.User$sentSupportMsgsArgs<ExtArgs>
+  sentInvites?: boolean | Prisma.User$sentInvitesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1191,6 +1658,9 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   bookings?: boolean | Prisma.User$bookingsArgs<ExtArgs>
   ownedBarbershops?: boolean | Prisma.User$ownedBarbershopsArgs<ExtArgs>
   professional?: boolean | Prisma.User$professionalArgs<ExtArgs>
+  supportTickets?: boolean | Prisma.User$supportTicketsArgs<ExtArgs>
+  sentSupportMsgs?: boolean | Prisma.User$sentSupportMsgsArgs<ExtArgs>
+  sentInvites?: boolean | Prisma.User$sentInvitesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1204,6 +1674,9 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     bookings: Prisma.$BookingPayload<ExtArgs>[]
     ownedBarbershops: Prisma.$BarbershopPayload<ExtArgs>[]
     professional: Prisma.$ProfessionalPayload<ExtArgs> | null
+    supportTickets: Prisma.$SupportTicketPayload<ExtArgs>[]
+    sentSupportMsgs: Prisma.$SupportMessagePayload<ExtArgs>[]
+    sentInvites: Prisma.$SupportInvitePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1617,6 +2090,9 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   bookings<T extends Prisma.User$bookingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$bookingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BookingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   ownedBarbershops<T extends Prisma.User$ownedBarbershopsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$ownedBarbershopsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BarbershopPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   professional<T extends Prisma.User$professionalArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$professionalArgs<ExtArgs>>): Prisma.Prisma__ProfessionalClient<runtime.Types.Result.GetResult<Prisma.$ProfessionalPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  supportTickets<T extends Prisma.User$supportTicketsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$supportTicketsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupportTicketPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  sentSupportMsgs<T extends Prisma.User$sentSupportMsgsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sentSupportMsgsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupportMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  sentInvites<T extends Prisma.User$sentInvitesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sentInvitesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupportInvitePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2158,6 +2634,78 @@ export type User$professionalArgs<ExtArgs extends runtime.Types.Extensions.Inter
    */
   include?: Prisma.ProfessionalInclude<ExtArgs> | null
   where?: Prisma.ProfessionalWhereInput
+}
+
+/**
+ * User.supportTickets
+ */
+export type User$supportTicketsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SupportTicket
+   */
+  select?: Prisma.SupportTicketSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SupportTicket
+   */
+  omit?: Prisma.SupportTicketOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SupportTicketInclude<ExtArgs> | null
+  where?: Prisma.SupportTicketWhereInput
+  orderBy?: Prisma.SupportTicketOrderByWithRelationInput | Prisma.SupportTicketOrderByWithRelationInput[]
+  cursor?: Prisma.SupportTicketWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SupportTicketScalarFieldEnum | Prisma.SupportTicketScalarFieldEnum[]
+}
+
+/**
+ * User.sentSupportMsgs
+ */
+export type User$sentSupportMsgsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SupportMessage
+   */
+  select?: Prisma.SupportMessageSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SupportMessage
+   */
+  omit?: Prisma.SupportMessageOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SupportMessageInclude<ExtArgs> | null
+  where?: Prisma.SupportMessageWhereInput
+  orderBy?: Prisma.SupportMessageOrderByWithRelationInput | Prisma.SupportMessageOrderByWithRelationInput[]
+  cursor?: Prisma.SupportMessageWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SupportMessageScalarFieldEnum | Prisma.SupportMessageScalarFieldEnum[]
+}
+
+/**
+ * User.sentInvites
+ */
+export type User$sentInvitesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SupportInvite
+   */
+  select?: Prisma.SupportInviteSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SupportInvite
+   */
+  omit?: Prisma.SupportInviteOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SupportInviteInclude<ExtArgs> | null
+  where?: Prisma.SupportInviteWhereInput
+  orderBy?: Prisma.SupportInviteOrderByWithRelationInput | Prisma.SupportInviteOrderByWithRelationInput[]
+  cursor?: Prisma.SupportInviteWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SupportInviteScalarFieldEnum | Prisma.SupportInviteScalarFieldEnum[]
 }
 
 /**

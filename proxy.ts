@@ -12,6 +12,7 @@ const publicRoutes = [
 
 const ownerRoutes = ["/dashboard/owner"];
 const professionalRoutes = ["/dashboard/professional"];
+const supportRoutes = ["/dashboard/support"];
 
 const PROTECTED_ROUTES = ["/dashboard", "/bookings", "/api/whatsapp"];
 
@@ -27,6 +28,10 @@ function isOwnerRoute(pathname: string): boolean {
 
 function isProfessionalRoute(pathname: string): boolean {
   return professionalRoutes.some((route) => pathname.startsWith(route));
+}
+
+function isSupportRoute(pathname: string): boolean {
+  return supportRoutes.some((route) => pathname.startsWith(route));
 }
 
 function isProtectedRoute(pathname: string): boolean {
@@ -130,6 +135,12 @@ export async function proxy(request: NextRequest) {
 
   if (isProfessionalRoute(pathname)) {
     if (userRole !== "professional" && userRole !== "owner") {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+  }
+
+  if (isSupportRoute(pathname)) {
+    if (userRole !== "support" && userRole !== "admin") {
       return NextResponse.redirect(new URL("/", request.url));
     }
   }

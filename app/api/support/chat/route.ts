@@ -18,7 +18,63 @@ const messageSchema = z.object({
     }),
   ),
   userPlan: z.string().optional(),
+  imageUrl: z.string().optional(),
 });
+
+async function getOrCreateTicket(userId: string) {
+  const existing = await prisma.supportTicket.findFirst({
+    where: {
+      userId,
+      status: { in: ["OPEN", "WAITING_ADMIN"] },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  if (existing) return existing;
+
+  return prisma.supportTicket.create({
+    data: { userId },
+  });
+}
+
+async function saveMessage(
+  ticketId: string,
+  content: string,
+  opts: { isFromAdmin?: boolean; isFromAI?: boolean; senderId?: string; imageUrl?: string },
+) {
+  return prisma.supportMessage.create({
+    data: {
+      ticketId,
+      content,
+      imageUrl: opts.imageUrl,
+      isFromAdmin: opts.isFromAdmin ?? false,
+      isFromAI: opts.isFromAI ?? false,
+      senderId: opts.senderId,
+    },
+  });
+}
+
+async function getUnreadAdminMessages(ticketId: string) {
+  const messages = await prisma.supportMessage.findMany({
+    where: {
+      ticketId,
+      isFromAdmin: true,
+      readByUser: false,
+    },
+    orderBy: { createdAt: "asc" },
+  });
+
+  if (messages.length > 0) {
+    await prisma.supportMessage.updateMany({
+      where: {
+        id: { in: messages.map((m) => m.id) },
+      },
+      data: { readByUser: true },
+    });
+  }
+
+  return messages;
+}
 
 export const POST = async (request: Request) => {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -37,7 +93,7 @@ export const POST = async (request: Request) => {
     );
   }
 
-  const { messages, userPlan } = parsed.data;
+  const { messages, userPlan, imageUrl } = parsed.data;
   const lastMessage = messages[messages.length - 1];
 
   if (!lastMessage || lastMessage.role !== "user") {
@@ -70,6 +126,24 @@ export const POST = async (request: Request) => {
     });
   }
 
+  const ticket = await getOrCreateTicket(session.user.id);
+  await saveMessage(ticket.id, lastMessage.content, {
+    senderId: session.user.id,
+    imageUrl,
+  });
+
+  const unreadAdminMessages = await getUnreadAdminMessages(ticket.id);
+  if (unreadAdminMessages.length > 0) {
+    const combined = unreadAdminMessages
+      .map((m) => m.content)
+      .join("\n\n");
+    return NextResponse.json({
+      type: "admin_response",
+      message: combined,
+      ticketId: ticket.id,
+    });
+  }
+
   try {
     const userBarbershop = await prisma.barbershop.findFirst({
       where: { ownerId: session.user.id },
@@ -91,12 +165,20 @@ export const POST = async (request: Request) => {
 
     const text = await responder(sanitizedMessages, systemPrompt, 800);
 
+    await saveMessage(ticket.id, text, { isFromAI: true });
+
     return NextResponse.json({
       type: "ai_response",
       message: text,
+      ticketId: ticket.id,
     });
   } catch (error) {
     console.error("AI support error:", error);
+
+    await prisma.supportTicket.update({
+      where: { id: ticket.id },
+      data: { status: "WAITING_ADMIN" },
+    });
 
     if (isPremiumPlan) {
       return NextResponse.json({
@@ -109,9 +191,13 @@ export const POST = async (request: Request) => {
     }
 
     return NextResponse.json({
-      type: "ai_response",
+      type: "waiting_admin",
       message:
-        "Desculpe, houve um problema ao processar sua mensagem. Por favor, tente novamente em alguns instantes.",
+        "Nosso assistente automático está temporariamente indisponível. " +
+        "Sua mensagem foi encaminhada para nossa equipe de suporte humano. " +
+        "Fique tranquilo, um atendente vai responder em breve! " +
+        "Você pode continuar enviando mensagens aqui mesmo.",
+      ticketId: ticket.id,
     });
   }
 };

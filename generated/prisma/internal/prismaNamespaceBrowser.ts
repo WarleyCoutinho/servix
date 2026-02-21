@@ -64,7 +64,10 @@ export const ModelName = {
   Booking: 'Booking',
   Payment: 'Payment',
   PlanHistory: 'PlanHistory',
-  StripeEvent: 'StripeEvent'
+  StripeEvent: 'StripeEvent',
+  SupportTicket: 'SupportTicket',
+  SupportMessage: 'SupportMessage',
+  SupportInvite: 'SupportInvite'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -316,6 +319,44 @@ export const StripeEventScalarFieldEnum = {
 } as const
 
 export type StripeEventScalarFieldEnum = (typeof StripeEventScalarFieldEnum)[keyof typeof StripeEventScalarFieldEnum]
+
+
+export const SupportTicketScalarFieldEnum = {
+  id: 'id',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  closedAt: 'closedAt',
+  userId: 'userId'
+} as const
+
+export type SupportTicketScalarFieldEnum = (typeof SupportTicketScalarFieldEnum)[keyof typeof SupportTicketScalarFieldEnum]
+
+
+export const SupportMessageScalarFieldEnum = {
+  id: 'id',
+  content: 'content',
+  imageUrl: 'imageUrl',
+  isFromAdmin: 'isFromAdmin',
+  isFromAI: 'isFromAI',
+  readByUser: 'readByUser',
+  createdAt: 'createdAt',
+  ticketId: 'ticketId',
+  senderId: 'senderId'
+} as const
+
+export type SupportMessageScalarFieldEnum = (typeof SupportMessageScalarFieldEnum)[keyof typeof SupportMessageScalarFieldEnum]
+
+
+export const SupportInviteScalarFieldEnum = {
+  id: 'id',
+  email: 'email',
+  invitedBy: 'invitedBy',
+  accepted: 'accepted',
+  createdAt: 'createdAt'
+} as const
+
+export type SupportInviteScalarFieldEnum = (typeof SupportInviteScalarFieldEnum)[keyof typeof SupportInviteScalarFieldEnum]
 
 
 export const SortOrder = {

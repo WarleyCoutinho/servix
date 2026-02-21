@@ -4,7 +4,7 @@ import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { BotMessageSquare, Send, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Streamdown } from "streamdown";
 
 import { Button } from "@/components/ui/button";
@@ -24,12 +24,23 @@ interface ChatSheetProps {
 const ChatSheet = ({ triggerClassName, iconOnly = false }: ChatSheetProps) => {
   const [open, setOpen] = useState(false);
   const router = useRouter();
-  const { messages, sendMessage, status } = useChat({
+  const { messages, sendMessage, status, error } = useChat({
     transport: new DefaultChatTransport({
       api: "/api/chat",
     }),
   });
   const [input, setInput] = useState("");
+  const [chatError, setChatError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (error) {
+      setChatError(
+        "Nosso assistente está temporariamente indisponível. " +
+        "Mas você pode agendar normalmente: acesse **Barbearias e salões** no menu, " +
+        "escolha o estabelecimento, selecione o profissional e horário desejado. É rápido e fácil! 😊",
+      );
+    }
+  }, [error]);
 
   const handleLinkClick = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
@@ -157,6 +168,28 @@ const ChatSheet = ({ triggerClassName, iconOnly = false }: ChatSheetProps) => {
                 <BotMessageSquare className="text-primary size-3.5" />
               </div>
               <div className="text-muted-foreground text-sm">Digitando...</div>
+            </div>
+          )}
+
+          {chatError && (
+            <div className="flex items-start gap-2 pt-6 pr-8">
+              <div className="flex size-8 shrink-0 items-center justify-center rounded-full border border-amber-500/30 bg-amber-500/12">
+                <BotMessageSquare className="size-3.5 text-amber-500" />
+              </div>
+              <div className="text-sm leading-relaxed">
+                <p>{chatError}</p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="mt-3"
+                  onClick={() => {
+                    setOpen(false);
+                    router.push("/barbershops");
+                  }}
+                >
+                  Ver barbearias e salões
+                </Button>
+              </div>
             </div>
           )}
         </div>
