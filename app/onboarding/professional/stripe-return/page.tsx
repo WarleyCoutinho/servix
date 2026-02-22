@@ -25,7 +25,11 @@ export default async function StripeReturnPage() {
   }
 
   if (professional.stripeAccountId) {
-    await updateProfessionalStripeStatus(professional.stripeAccountId);
+    try {
+      await updateProfessionalStripeStatus(professional.stripeAccountId);
+    } catch (error) {
+      console.error("[Stripe Return] Erro ao atualizar status:", error);
+    }
   }
 
   const updatedProfessional = await prisma.professional.findUnique({

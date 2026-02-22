@@ -4,8 +4,12 @@ import z from "zod";
 import { prisma, safeQuery } from "@/lib/prisma";
 import { getAvailableSlots } from "@/actions/schedules/get-available-slots";
 import { createBooking } from "@/actions/create-booking";
-import { createBookingCheckoutSession } from "@/actions/create-booking-checkout-session";
-import { formatBrt } from "@/lib/timezone";
+import { formatBrt, startOfDayBrt, endOfDayBrt } from "@/lib/timezone";
+import { stripe, calculatePlatformFee } from "@/lib/stripe";
+import { isAccountReadyForPayments } from "@/lib/stripe-connect";
+import { isPast, addMinutes } from "date-fns";
+import { DEFAULT_INTERVAL_MINUTES } from "@/lib/schedule-utils";
+import type Stripe from "stripe";
 
 function levenshtein(a: string, b: string): number {
   const m = a.length;
@@ -48,6 +52,8 @@ export const POST = async (request: Request) => {
       headers: { "Content-Type": "application/json" },
     });
   }
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL;
 
   const { messages } = await request.json();
 
@@ -315,30 +321,188 @@ export const POST = async (request: Request) => {
         execute: async ({ serviceId, professionalId, date, paymentMethod }) => {
           console.log("createBooking", serviceId, professionalId, date, paymentMethod);
           try {
+            const bookingDate = new Date(date);
+
             if (paymentMethod === "pay_after_service") {
-              await createBooking({
+              const result = await createBooking({
                 serviceId,
                 professionalId,
-                date: new Date(date),
+                date: bookingDate,
                 payAfterService: true,
               });
+
+              if (!result) {
+                return { success: false, error: "Erro ao criar agendamento. Por favor, tente novamente." };
+              }
+              if (result.validationErrors) {
+                const errors = result.validationErrors;
+                const firstError =
+                  errors._errors?.[0] ||
+                  Object.values(errors).find(
+                    (v): v is { _errors: string[] } =>
+                      v != null && typeof v === "object" && "_errors" in v && Array.isArray((v as { _errors?: unknown })._errors),
+                  )?._errors?.[0];
+                return { success: false, error: firstError || "Erro de validação no agendamento." };
+              }
+              if (result.serverError) {
+                return { success: false, error: result.serverError };
+              }
+
               return {
                 success: true,
                 paymentMethod: "pay_after_service",
               };
             }
 
-            const result = await createBookingCheckoutSession({
-              serviceId,
-              professionalId,
-              date: new Date(date),
+            // Pagamento online — criar sessão Stripe com URL de produção
+            const service = await prisma.barbershopService.findUnique({
+              where: { id: serviceId },
+              include: { barbershop: true },
+            });
+            if (!service) {
+              return { success: false, error: "Serviço não encontrado." };
+            }
+
+            if (isPast(bookingDate)) {
+              return { success: false, error: "Data e hora selecionadas já passaram." };
+            }
+
+            const professional = await prisma.professional.findUnique({
+              where: { id: professionalId },
+            });
+            if (!professional || !professional.isActive) {
+              return { success: false, error: "Profissional não encontrado ou indisponível." };
+            }
+            if (professional.barbershopId !== service.barbershopId) {
+              return { success: false, error: "Profissional não pertence a esta barbearia." };
+            }
+            if (!professional.stripeAccountId || !isAccountReadyForPayments(professional.stripeAccountStatus)) {
+              return { success: false, error: "Este profissional ainda não configurou o recebimento de pagamentos. Por favor, escolha outro profissional." };
+            }
+
+            const dayStart = startOfDayBrt(bookingDate);
+            const dayEnd = endOfDayBrt(bookingDate);
+            const existingBookings = await prisma.booking.findMany({
+              where: {
+                professionalId,
+                date: { gte: dayStart, lte: dayEnd },
+                cancelledAt: null,
+              },
+              include: { service: { select: { durationMinutes: true } } },
             });
 
-            if (result?.data?.url) {
+            const newDuration = service.durationMinutes;
+            const newSlotsNeeded = Math.ceil(newDuration / DEFAULT_INTERVAL_MINUTES);
+            const newStart = bookingDate.getTime();
+            const newEnd = addMinutes(bookingDate, newSlotsNeeded * DEFAULT_INTERVAL_MINUTES).getTime();
+
+            for (const existing of existingBookings) {
+              const existingDuration = existing.service.durationMinutes;
+              const existingSlotsNeeded = Math.ceil(existingDuration / DEFAULT_INTERVAL_MINUTES);
+              const existingStart = existing.date.getTime();
+              const existingEnd = addMinutes(existing.date, existingSlotsNeeded * DEFAULT_INTERVAL_MINUTES).getTime();
+
+              if (newStart < existingEnd && newEnd > existingStart) {
+                return { success: false, error: "Este profissional já possui agendamento neste horário." };
+              }
+            }
+
+            const applicationFeeAmount = calculatePlatformFee(
+              service.priceInCents,
+              service.barbershop.platformFeePercentage,
+            );
+
+            const paymentMethods: Stripe.Checkout.SessionCreateParams.PaymentMethodType[] = [];
+            if (professional.acceptsPix) paymentMethods.push("pix");
+            if (professional.acceptsCard) paymentMethods.push("card");
+
+            if (paymentMethods.length === 0) {
+              return { success: false, error: "Nenhuma forma de pagamento online disponível para este profissional." };
+            }
+
+            const buildSessionParams = (
+              methods: Stripe.Checkout.SessionCreateParams.PaymentMethodType[]
+            ): Stripe.Checkout.SessionCreateParams => {
+              const params: Stripe.Checkout.SessionCreateParams = {
+                payment_method_types: methods,
+                mode: "payment",
+                success_url: `${appUrl}/bookings?success=true`,
+                cancel_url: `${appUrl}`,
+                metadata: {
+                  serviceId: service.id,
+                  barbershopId: service.barbershopId,
+                  userId: session.user.id,
+                  date: bookingDate.toISOString(),
+                  professionalId: professional.id,
+                  priceInCents: service.priceInCents.toString(),
+                  applicationFeeInCents: applicationFeeAmount.toString(),
+                },
+                line_items: [
+                  {
+                    price_data: {
+                      currency: "brl",
+                      unit_amount: service.priceInCents,
+                      product_data: {
+                        name: `${service.barbershop.name} - ${service.name}`,
+                        description: service.description,
+                        images: [service.imageUrl],
+                      },
+                    },
+                    quantity: 1,
+                  },
+                ],
+                payment_intent_data: {},
+              };
+
+              if (methods.includes("pix")) {
+                params.payment_method_options = {
+                  pix: { expires_after_seconds: 1800 },
+                };
+              }
+
+              if (professional.stripeAccountId) {
+                params.payment_intent_data = {
+                  application_fee_amount: applicationFeeAmount,
+                  transfer_data: {
+                    destination: professional.stripeAccountId,
+                  },
+                };
+              }
+
+              return params;
+            };
+
+            let checkoutSession;
+            let pixFallback = false;
+            try {
+              checkoutSession = await stripe.checkout.sessions.create(
+                buildSessionParams(paymentMethods)
+              );
+            } catch (stripeError) {
+              console.error("Stripe checkout error:", stripeError);
+              const errorMessage = stripeError instanceof Error ? stripeError.message.toLowerCase() : "";
+              const isPixError =
+                errorMessage.includes("pix") ||
+                errorMessage.includes("payment_method") ||
+                errorMessage.includes("payment method");
+
+              if (isPixError && paymentMethods.includes("pix")) {
+                console.warn("PIX unavailable, falling back to card-only");
+                pixFallback = true;
+                checkoutSession = await stripe.checkout.sessions.create(
+                  buildSessionParams(["card"])
+                );
+              } else {
+                return { success: false, error: "Não foi possível gerar o link de pagamento." };
+              }
+            }
+
+            if (checkoutSession?.url) {
               return {
                 success: true,
                 paymentMethod: "online",
-                checkoutUrl: result.data.url,
+                checkoutUrl: checkoutSession.url,
+                pixFallback,
               };
             }
 
@@ -348,8 +512,10 @@ export const POST = async (request: Request) => {
             };
           } catch (error) {
             console.error("createBooking error", error);
+            const message = error instanceof Error ? error.message : "Erro inesperado ao criar agendamento.";
             return {
               success: false,
+              error: message,
             };
           }
         },

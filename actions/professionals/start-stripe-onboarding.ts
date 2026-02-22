@@ -2,7 +2,11 @@
 
 import { StripeAccountStatus } from "@/generated/prisma/enums";
 import { professionalActionClient } from "@/lib/action-client";
-import { createAccountLink, createExpressAccount } from "@/lib/stripe-connect";
+import {
+  createAccountLink,
+  createExpressAccount,
+  isStripeAccountValid,
+} from "@/lib/stripe-connect";
 
 export const startStripeOnboarding = professionalActionClient.action(
   async ({ ctx: { professional, user } }) => {
@@ -16,13 +20,19 @@ export const startStripeOnboarding = professionalActionClient.action(
 
     let accountId = professional.stripeAccountId;
 
-    if (!accountId) {
+    if (accountId) {
+      if (professional.stripeAccountStatus === StripeAccountStatus.ACTIVE) {
+        throw new Error("Sua conta já está configurada e ativa.");
+      }
+
+      const accountValid = await isStripeAccountValid(accountId);
+      if (!accountValid) {
+        const account = await createExpressAccount(professional.id, user.email);
+        accountId = account.id;
+      }
+    } else {
       const account = await createExpressAccount(professional.id, user.email);
       accountId = account.id;
-    } else if (
-      professional.stripeAccountStatus === StripeAccountStatus.ACTIVE
-    ) {
-      throw new Error("Sua conta  já está configurada e ativa.");
     }
 
     const accountLink = await createAccountLink(

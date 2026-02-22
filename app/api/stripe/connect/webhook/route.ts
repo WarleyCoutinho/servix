@@ -6,9 +6,19 @@ import { StripeAccountStatus } from "@/generated/prisma/enums";
 import { verifyStripeWebhook } from "@/lib/stripe-webhook";
 
 export const POST = async (request: Request) => {
+  const connectSecret = process.env.STRIPE_CONNECT_WEBHOOK_SECRET;
+
+  if (!connectSecret) {
+    console.error("[Stripe Connect Webhook] STRIPE_CONNECT_WEBHOOK_SECRET não está configurado. Configure esta variável no servidor.");
+    return NextResponse.json(
+      { error: "Webhook secret not configured" },
+      { status: 500 }
+    );
+  }
+
   const verification = await verifyStripeWebhook(
     request,
-    process.env.STRIPE_CONNECT_WEBHOOK_SECRET,
+    connectSecret,
     "STRIPE_SECRET_KEY",
     "STRIPE_CONNECT_WEBHOOK_SECRET"
   );

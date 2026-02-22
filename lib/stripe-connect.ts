@@ -7,36 +7,41 @@ export async function createExpressAccount(
   professionalId: string,
   email: string,
 ): Promise<Stripe.Account> {
-  const account = await stripe.accounts.create({
-    type: "express",
-    country: "BR",
-    email,
-    capabilities: {
-      card_payments: { requested: true },
-      transfers: { requested: true },
-    },
-    business_type: "individual",
-    settings: {
-      payouts: {
-        schedule: {
-          interval: "daily",
+  try {
+    const account = await stripe.accounts.create({
+      type: "express",
+      country: "BR",
+      email,
+      capabilities: {
+        card_payments: { requested: true },
+        transfers: { requested: true },
+      },
+      business_type: "individual",
+      settings: {
+        payouts: {
+          schedule: {
+            interval: "daily",
+          },
         },
       },
-    },
-    metadata: {
-      professionalId,
-    },
-  });
+      metadata: {
+        professionalId,
+      },
+    });
 
-  await prisma.professional.update({
-    where: { id: professionalId },
-    data: {
-      stripeAccountId: account.id,
-      stripeAccountStatus: StripeAccountStatus.ONBOARDING,
-    },
-  });
+    await prisma.professional.update({
+      where: { id: professionalId },
+      data: {
+        stripeAccountId: account.id,
+        stripeAccountStatus: StripeAccountStatus.ONBOARDING,
+      },
+    });
 
-  return account;
+    return account;
+  } catch (error) {
+    console.error("[Stripe Connect] Erro ao criar conta Express:", error);
+    throw new Error("Não foi possível criar sua conta de pagamentos. Por favor, tente novamente.");
+  }
 }
 
 export async function createAccountLink(
@@ -44,60 +49,90 @@ export async function createAccountLink(
   refreshUrl: string,
   returnUrl: string,
 ): Promise<Stripe.AccountLink> {
-  return stripe.accountLinks.create({
-    account: accountId,
-    refresh_url: refreshUrl,
-    return_url: returnUrl,
-    type: "account_onboarding",
-  });
+  try {
+    return await stripe.accountLinks.create({
+      account: accountId,
+      refresh_url: refreshUrl,
+      return_url: returnUrl,
+      type: "account_onboarding",
+    });
+  } catch (error) {
+    console.error("[Stripe Connect] Erro ao criar link de onboarding:", error);
+    throw new Error("Não foi possível gerar o link de configuração. Por favor, tente novamente.");
+  }
 }
 
 export async function createLoginLink(
   accountId: string,
 ): Promise<Stripe.LoginLink> {
-  return stripe.accounts.createLoginLink(accountId);
+  try {
+    return await stripe.accounts.createLoginLink(accountId);
+  } catch (error) {
+    console.error("[Stripe Connect] Erro ao criar link do dashboard:", error);
+    throw new Error("Não foi possível acessar o dashboard de pagamentos. Por favor, tente novamente.");
+  }
+}
+
+export async function isStripeAccountValid(
+  accountId: string,
+): Promise<boolean> {
+  try {
+    await stripe.accounts.retrieve(accountId);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export async function getAccountStatus(
   accountId: string,
 ): Promise<StripeAccountStatus> {
-  const account = await stripe.accounts.retrieve(accountId);
+  try {
+    const account = await stripe.accounts.retrieve(accountId);
 
-  if (account.details_submitted && account.charges_enabled) {
-    return StripeAccountStatus.ACTIVE;
-  }
-
-  if (account.requirements?.disabled_reason) {
-    if (
-      account.requirements.disabled_reason.includes("rejected") ||
-      account.requirements.disabled_reason.includes("fraud")
-    ) {
-      return StripeAccountStatus.DISABLED;
+    if (account.details_submitted && account.charges_enabled) {
+      return StripeAccountStatus.ACTIVE;
     }
-    return StripeAccountStatus.RESTRICTED;
-  }
 
-  if (account.details_submitted) {
-    return StripeAccountStatus.RESTRICTED;
-  }
+    if (account.requirements?.disabled_reason) {
+      if (
+        account.requirements.disabled_reason.includes("rejected") ||
+        account.requirements.disabled_reason.includes("fraud")
+      ) {
+        return StripeAccountStatus.DISABLED;
+      }
+      return StripeAccountStatus.RESTRICTED;
+    }
 
-  return StripeAccountStatus.ONBOARDING;
+    if (account.details_submitted) {
+      return StripeAccountStatus.RESTRICTED;
+    }
+
+    return StripeAccountStatus.ONBOARDING;
+  } catch (error) {
+    console.error("[Stripe Connect] Erro ao buscar status da conta:", error);
+    return StripeAccountStatus.DISABLED;
+  }
 }
 
 export async function updateProfessionalStripeStatus(
   stripeAccountId: string,
 ): Promise<void> {
-  const status = await getAccountStatus(stripeAccountId);
-  const account = await stripe.accounts.retrieve(stripeAccountId);
+  try {
+    const account = await stripe.accounts.retrieve(stripeAccountId);
+    const status = await getAccountStatus(stripeAccountId);
 
-  await prisma.professional.update({
-    where: { stripeAccountId },
-    data: {
-      stripeAccountStatus: status,
-      stripeOnboardingComplete:
-        account.details_submitted && account.charges_enabled,
-    },
-  });
+    await prisma.professional.update({
+      where: { stripeAccountId },
+      data: {
+        stripeAccountStatus: status,
+        stripeOnboardingComplete:
+          account.details_submitted && account.charges_enabled,
+      },
+    });
+  } catch (error) {
+    console.error("[Stripe Connect] Erro ao atualizar status do profissional:", error);
+  }
 }
 
 export function isAccountReadyForPayments(
