@@ -16,7 +16,7 @@ function getStripeStatusInfo(status: StripeAccountStatus) {
     case StripeAccountStatus.ONBOARDING:
       return { label: "Configurando", variant: "secondary" as const };
     case StripeAccountStatus.PENDING:
-      return { label: "Pendente", variant: "outline" as const };
+      return { label: "Em verificação", variant: "secondary" as const };
     case StripeAccountStatus.RESTRICTED:
       return { label: "Restrito", variant: "destructive" as const };
     case StripeAccountStatus.DISABLED:
@@ -160,9 +160,11 @@ export default async function ProfessionalDashboardPage() {
           <CardContent>
             <Badge variant={stripeStatus.variant}>{stripeStatus.label}</Badge>
             <p className="mt-1 text-xs text-muted-foreground">
-              {professional.stripeOnboardingComplete
+              {professional.stripeAccountStatus === StripeAccountStatus.ACTIVE
                 ? "Pronto para receber"
-                : "Configure sua conta"}
+                : professional.stripeOnboardingComplete
+                  ? "Verificação em andamento"
+                  : "Configure sua conta"}
             </p>
           </CardContent>
         </Card>

@@ -2,7 +2,8 @@ import { Button } from "@/components/ui/button";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { updateProfessionalStripeStatus } from "@/lib/stripe-connect";
-import { AlertCircle, CheckCircle } from "lucide-react";
+import { StripeAccountStatus } from "@/generated/prisma/enums";
+import { AlertCircle, CheckCircle, Clock } from "lucide-react";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -37,11 +38,13 @@ export default async function StripeReturnPage() {
   });
 
   const isComplete = updatedProfessional?.stripeOnboardingComplete;
+  const isActive =
+    updatedProfessional?.stripeAccountStatus === StripeAccountStatus.ACTIVE;
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6 text-center">
-        {isComplete ? (
+        {isActive ? (
           <>
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
               <CheckCircle className="h-8 w-8 text-green-600" />
@@ -52,6 +55,18 @@ export default async function StripeReturnPage() {
               pagamentos pelos seus serviços.
             </p>
           </>
+        ) : isComplete ? (
+          <>
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
+              <Clock className="h-8 w-8 text-blue-600" />
+            </div>
+            <h1 className="text-2xl font-bold">Verificação em andamento</h1>
+            <p className="text-muted-foreground">
+              Seus dados foram enviados com sucesso! O Stripe está verificando
+              suas informações. Isso pode levar alguns minutos. Você será
+              notificado quando sua conta estiver ativa.
+            </p>
+          </>
         ) : (
           <>
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-yellow-100">
@@ -59,9 +74,8 @@ export default async function StripeReturnPage() {
             </div>
             <h1 className="text-2xl font-bold">Configuração pendente</h1>
             <p className="text-muted-foreground">
-              Sua conta Stripe ainda não está completamente configurada. Pode
-              levar alguns minutos para a verificação ser concluída, ou você
-              pode precisar fornecer informações adicionais.
+              Sua conta Stripe ainda não está completamente configurada. Você
+              precisa fornecer informações adicionais para concluir o cadastro.
             </p>
           </>
         )}

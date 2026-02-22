@@ -105,7 +105,14 @@ export async function getAccountStatus(
     }
 
     if (account.details_submitted) {
-      return StripeAccountStatus.RESTRICTED;
+      const hasPendingRequirements =
+        (account.requirements?.currently_due?.length ?? 0) > 0;
+
+      if (hasPendingRequirements) {
+        return StripeAccountStatus.RESTRICTED;
+      }
+
+      return StripeAccountStatus.PENDING;
     }
 
     return StripeAccountStatus.ONBOARDING;
@@ -126,8 +133,7 @@ export async function updateProfessionalStripeStatus(
       where: { stripeAccountId },
       data: {
         stripeAccountStatus: status,
-        stripeOnboardingComplete:
-          account.details_submitted && account.charges_enabled,
+        stripeOnboardingComplete: account.details_submitted === true,
       },
     });
   } catch (error) {

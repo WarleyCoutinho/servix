@@ -100,6 +100,18 @@ export default async function ProfessionalDashboardLayout({
             </Button>
           </div>
         )}
+        {professional.stripeOnboardingComplete &&
+          professional.stripeAccountStatus !== "ACTIVE" && (
+            <div className="m-4 rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-950">
+              <p className="mb-1 text-sm font-medium text-blue-800 dark:text-blue-200">
+                Verificação em andamento
+              </p>
+              <p className="text-xs text-blue-600 dark:text-blue-400">
+                O Stripe está verificando seus dados. Sua conta será ativada
+                automaticamente quando a verificação for concluída.
+              </p>
+            </div>
+          )}
       </DashboardSidebar>
       <main className="flex-1 overflow-auto">
         <div className="mx-auto max-w-6xl p-4 pt-16 sm:p-6 md:pt-6">
