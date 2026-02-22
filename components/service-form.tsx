@@ -226,6 +226,7 @@ export const ServiceForm = forwardRef<ServiceFormRef, ServiceFormProps>(
                             setImageUrl(null);
                           }}
                           disabled={isPending}
+                          folder="services"
                         />
                       </FormControl>
                       <FormMessage />

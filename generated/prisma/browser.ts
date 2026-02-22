@@ -102,3 +102,8 @@ export type SupportMessage = Prisma.SupportMessageModel
  * 
  */
 export type SupportInvite = Prisma.SupportInviteModel
+/**
+ * Model Upload
+ * 
+ */
+export type Upload = Prisma.UploadModel

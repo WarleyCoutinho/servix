@@ -8,7 +8,7 @@ import { revalidatePath } from "next/cache";
 const inputSchema = z.object({
   displayName: z.string().min(2, "Nome deve ter pelo menos 2 caracteres").optional(),
   bio: z.string().optional(),
-  imageUrl: z.string().url("URL inválida").optional().nullable(),
+  imageUrl: z.string().min(1, "URL inválida").optional().nullable(),
   acceptsPix: z.boolean().optional(),
   acceptsCard: z.boolean().optional(),
   acceptsPayAfterService: z.boolean().optional(),

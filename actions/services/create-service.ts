@@ -11,7 +11,7 @@ const inputSchema = z.object({
   description: z.string().min(10, "Descrição deve ter pelo menos 10 caracteres"),
   priceInCents: z.number().min(100, "Preço mínimo é R$ 1,00"),
   durationMinutes: z.number().min(5, "Duração mínima é 5 minutos"),
-  imageUrl: z.string().url("URL da imagem inválida").optional(),
+  imageUrl: z.string().min(1, "URL da imagem inválida").optional(),
 });
 
 export const createService = subscribedOwnerActionClient

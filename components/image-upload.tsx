@@ -12,6 +12,7 @@ interface ImageUploadProps {
   onRemove: () => void;
   disabled?: boolean;
   className?: string;
+  folder?: string;
 }
 
 export function ImageUpload({
@@ -20,6 +21,7 @@ export function ImageUpload({
   onRemove,
   disabled = false,
   className,
+  folder,
 }: ImageUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [localPreview, setLocalPreview] = useState<string | null>(null);
@@ -43,6 +45,7 @@ export function ImageUpload({
     try {
       const formData = new FormData();
       formData.append("file", file);
+      if (folder) formData.append("folder", folder);
 
       const response = await fetch("/api/upload", {
         method: "POST",
@@ -54,7 +57,7 @@ export function ImageUpload({
         throw new Error(data.error || "Erro ao fazer upload");
       }
 
-      onChange(data.imageUrl);
+      onChange(`/api/uploads/${data.id}`);
       setLocalPreview(null);
     } catch (error) {
       toast.error(

@@ -205,6 +205,7 @@ export function NewEstablishmentForm({ showCpfField }: NewEstablishmentFormProps
                 setFormData((prev) => ({ ...prev, imageUrl: "" }))
               }
               disabled={isPending}
+              folder="barbershop"
             />
           </div>
 

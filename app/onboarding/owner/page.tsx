@@ -306,6 +306,7 @@ export default function OwnerOnboardingPage() {
                           setImageUrl(null);
                         }}
                         disabled={isPending}
+                        folder="barbershop"
                       />
                     </FormControl>
                     <FormMessage />

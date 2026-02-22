@@ -48,7 +48,6 @@ prisma/migrations/**/migration_lock.toml
 
 # Uploads
 public/uploads/
-uploads/
 
 # Backups
 backups/

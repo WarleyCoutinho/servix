@@ -67,7 +67,8 @@ export const ModelName = {
   StripeEvent: 'StripeEvent',
   SupportTicket: 'SupportTicket',
   SupportMessage: 'SupportMessage',
-  SupportInvite: 'SupportInvite'
+  SupportInvite: 'SupportInvite',
+  Upload: 'Upload'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -357,6 +358,19 @@ export const SupportInviteScalarFieldEnum = {
 } as const
 
 export type SupportInviteScalarFieldEnum = (typeof SupportInviteScalarFieldEnum)[keyof typeof SupportInviteScalarFieldEnum]
+
+
+export const UploadScalarFieldEnum = {
+  id: 'id',
+  nomeArquivo: 'nomeArquivo',
+  tipoArquivo: 'tipoArquivo',
+  tamanho: 'tamanho',
+  dados: 'dados',
+  permanente: 'permanente',
+  createdAt: 'createdAt'
+} as const
+
+export type UploadScalarFieldEnum = (typeof UploadScalarFieldEnum)[keyof typeof UploadScalarFieldEnum]
 
 
 export const SortOrder = {

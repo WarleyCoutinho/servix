@@ -435,3 +435,19 @@ model SupportInvite {
 
   @@map("support_invite")
 }
+
+// =====================
+// UPLOADS
+// =====================
+
+model Upload {
+  id          String   @id @default(uuid())
+  nomeArquivo String
+  tipoArquivo String
+  tamanho     Int
+  dados       Bytes
+  permanente  Boolean  @default(false)
+  createdAt   DateTime @default(now()) @db.Timestamptz()
+
+  @@map("upload")
+}

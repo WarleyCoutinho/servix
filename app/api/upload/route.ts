@@ -1,8 +1,7 @@
 import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
-import { mkdir, writeFile } from "node:fs/promises";
-import { join } from "node:path";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ALLOWED_TYPES = [
@@ -12,6 +11,10 @@ const ALLOWED_TYPES = [
   "image/gif",
   "image/avif",
 ];
+
+const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+
+const PERMANENT_FOLDERS = new Set(["services", "barbershop", "professional"]);
 
 export const POST = async (request: Request) => {
   try {
@@ -23,6 +26,7 @@ export const POST = async (request: Request) => {
 
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
+    const folder = formData.get("folder") as string | null;
 
     if (!file) {
       return NextResponse.json(
@@ -45,22 +49,29 @@ export const POST = async (request: Request) => {
       );
     }
 
-    const extension = file.name.split(".").pop() || "jpg";
-    const fileName = `${crypto.randomUUID()}.${extension}`;
     const buffer = Buffer.from(await file.arrayBuffer());
+    const permanente = PERMANENT_FOLDERS.has(folder ?? "");
 
-    const folder = formData.get("folder") as string | null;
-    const subDir = folder === "support" ? "support" : "services";
-    const uploadDir = join(process.cwd(), "public", "uploads", subDir);
+    await prisma.upload.deleteMany({
+      where: {
+        permanente: false,
+        createdAt: {
+          lt: new Date(Date.now() - THIRTY_DAYS_MS),
+        },
+      },
+    });
 
-    await mkdir(uploadDir, { recursive: true });
+    const upload = await prisma.upload.create({
+      data: {
+        nomeArquivo: file.name,
+        tipoArquivo: file.type,
+        tamanho: file.size,
+        dados: buffer,
+        permanente,
+      },
+    });
 
-    const filePath = join(uploadDir, fileName);
-    await writeFile(filePath, buffer);
-
-    const imageUrl = `/uploads/${subDir}/${fileName}`;
-
-    return NextResponse.json({ imageUrl });
+    return NextResponse.json({ id: upload.id });
   } catch (error) {
     console.error("Upload error:", error);
     return NextResponse.json(

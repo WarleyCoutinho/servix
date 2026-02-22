@@ -119,7 +119,7 @@ export function SupportTicketChat({ ticket }: { ticket: Ticket }) {
         body: formData,
       });
       const data = await res.json();
-      return data.imageUrl ?? null;
+      return data.id ? `/api/uploads/${data.id}` : null;
     } catch {
       return null;
     }
