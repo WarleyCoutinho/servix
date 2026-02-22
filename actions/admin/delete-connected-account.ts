@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { adminActionClient } from "@/lib/action-client";
-import { stripe } from "@/lib/stripe";
+import { getStripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 import { StripeAccountStatus } from "@/generated/prisma/enums";
 
@@ -13,7 +13,22 @@ const schema = z.object({
 export const deleteConnectedAccount = adminActionClient
   .schema(schema)
   .action(async ({ parsedInput: { accountId } }) => {
-    await stripe.accounts.del(accountId);
+    const stripeClient = getStripe();
+
+    try {
+      await stripeClient.accounts.del(accountId);
+    } catch (error: unknown) {
+      const isV2Account =
+        error instanceof Error &&
+        error.message.includes("v2/core/accounts") &&
+        error.message.includes("close");
+
+      if (isV2Account) {
+        await stripeClient.rawRequest("POST", `/v2/core/accounts/${accountId}/close`, {});
+      } else {
+        throw error;
+      }
+    }
 
     const professional = await prisma.professional.findUnique({
       where: { stripeAccountId: accountId },
