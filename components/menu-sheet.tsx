@@ -219,9 +219,8 @@ const MenuSheet = ({ categories = [], onLoginClick }: MenuSheetProps) => {
                     <CalendarDays className="size-4 shrink-0" />
                     Meus Agendamentos
                   </button>
-                  <ChatSheet
-                    triggerClassName="hover:bg-accent flex items-center gap-3 px-4 py-3 text-left text-sm font-medium transition-colors sm:px-6"
-                  />
+                  {/* Ativar quando tiver cliente e pagar um IA profissional */}
+                  {/* <ChatSheet /> */}
                 </>
               )}
             </nav>

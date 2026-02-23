@@ -5,6 +5,7 @@ import { getOwnerSubscription } from "@/lib/get-owner-subscription";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { SubscriptionPlans } from "./_components/subscription-plans";
+import { FeeNotificationBanner } from "./_components/fee-notification-banner";
 
 export default async function SubscriptionPage() {
   const session = await auth.api.getSession({
@@ -15,10 +16,20 @@ export default async function SubscriptionPage() {
     redirect("/");
   }
 
-  const ownerSubscription = await getOwnerSubscription(session.user.id);
-  const currentPlan = ownerSubscription?.plan ?? null;
+  const [ownerSubscription, plans, notifications] = await Promise.all([
+    getOwnerSubscription(session.user.id),
+    getAllPlans(),
+    prisma.notification.findMany({
+      where: {
+        userId: session.user.id,
+        read: false,
+      },
+      orderBy: { createdAt: "desc" },
+      take: 5,
+    }),
+  ]);
 
-  const plans = await getAllPlans();
+  const currentPlan = ownerSubscription?.plan ?? null;
 
   const plansData = plans.map((plan: PlanConfig) => ({
     plan: plan.plan,
@@ -31,5 +42,10 @@ export default async function SubscriptionPage() {
     features: plan.features,
   }));
 
-  return <SubscriptionPlans plans={plansData} currentPlan={currentPlan} />;
+  return (
+    <div className="space-y-6">
+      <FeeNotificationBanner notifications={notifications} />
+      <SubscriptionPlans plans={plansData} currentPlan={currentPlan} />
+    </div>
+  );
 }

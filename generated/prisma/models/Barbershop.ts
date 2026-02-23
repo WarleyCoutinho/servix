@@ -45,6 +45,7 @@ export type BarbershopMinAggregateOutputType = {
   imageUrl: string | null
   isActive: boolean | null
   platformFeePercentage: number | null
+  feeOverride: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
   ownerId: string | null
@@ -61,6 +62,7 @@ export type BarbershopMaxAggregateOutputType = {
   imageUrl: string | null
   isActive: boolean | null
   platformFeePercentage: number | null
+  feeOverride: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
   ownerId: string | null
@@ -78,6 +80,7 @@ export type BarbershopCountAggregateOutputType = {
   phones: number
   isActive: number
   platformFeePercentage: number
+  feeOverride: number
   createdAt: number
   updatedAt: number
   ownerId: number
@@ -104,6 +107,7 @@ export type BarbershopMinAggregateInputType = {
   imageUrl?: true
   isActive?: true
   platformFeePercentage?: true
+  feeOverride?: true
   createdAt?: true
   updatedAt?: true
   ownerId?: true
@@ -120,6 +124,7 @@ export type BarbershopMaxAggregateInputType = {
   imageUrl?: true
   isActive?: true
   platformFeePercentage?: true
+  feeOverride?: true
   createdAt?: true
   updatedAt?: true
   ownerId?: true
@@ -137,6 +142,7 @@ export type BarbershopCountAggregateInputType = {
   phones?: true
   isActive?: true
   platformFeePercentage?: true
+  feeOverride?: true
   createdAt?: true
   updatedAt?: true
   ownerId?: true
@@ -241,6 +247,7 @@ export type BarbershopGroupByOutputType = {
   phones: string[]
   isActive: boolean
   platformFeePercentage: number | null
+  feeOverride: boolean
   createdAt: Date
   updatedAt: Date
   ownerId: string | null
@@ -281,6 +288,7 @@ export type BarbershopWhereInput = {
   phones?: Prisma.StringNullableListFilter<"Barbershop">
   isActive?: Prisma.BoolFilter<"Barbershop"> | boolean
   platformFeePercentage?: Prisma.IntNullableFilter<"Barbershop"> | number | null
+  feeOverride?: Prisma.BoolFilter<"Barbershop"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Barbershop"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Barbershop"> | Date | string
   ownerId?: Prisma.StringNullableFilter<"Barbershop"> | string | null
@@ -290,6 +298,7 @@ export type BarbershopWhereInput = {
   professionals?: Prisma.ProfessionalListRelationFilter
   subscription?: Prisma.XOR<Prisma.SubscriptionNullableScalarRelationFilter, Prisma.SubscriptionWhereInput> | null
   planHistory?: Prisma.PlanHistoryListRelationFilter
+  feeHistory?: Prisma.PlatformFeeHistoryListRelationFilter
 }
 
 export type BarbershopOrderByWithRelationInput = {
@@ -304,6 +313,7 @@ export type BarbershopOrderByWithRelationInput = {
   phones?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   platformFeePercentage?: Prisma.SortOrderInput | Prisma.SortOrder
+  feeOverride?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   ownerId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -313,6 +323,7 @@ export type BarbershopOrderByWithRelationInput = {
   professionals?: Prisma.ProfessionalOrderByRelationAggregateInput
   subscription?: Prisma.SubscriptionOrderByWithRelationInput
   planHistory?: Prisma.PlanHistoryOrderByRelationAggregateInput
+  feeHistory?: Prisma.PlatformFeeHistoryOrderByRelationAggregateInput
 }
 
 export type BarbershopWhereUniqueInput = Prisma.AtLeast<{
@@ -330,6 +341,7 @@ export type BarbershopWhereUniqueInput = Prisma.AtLeast<{
   phones?: Prisma.StringNullableListFilter<"Barbershop">
   isActive?: Prisma.BoolFilter<"Barbershop"> | boolean
   platformFeePercentage?: Prisma.IntNullableFilter<"Barbershop"> | number | null
+  feeOverride?: Prisma.BoolFilter<"Barbershop"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Barbershop"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Barbershop"> | Date | string
   ownerId?: Prisma.StringNullableFilter<"Barbershop"> | string | null
@@ -339,6 +351,7 @@ export type BarbershopWhereUniqueInput = Prisma.AtLeast<{
   professionals?: Prisma.ProfessionalListRelationFilter
   subscription?: Prisma.XOR<Prisma.SubscriptionNullableScalarRelationFilter, Prisma.SubscriptionWhereInput> | null
   planHistory?: Prisma.PlanHistoryListRelationFilter
+  feeHistory?: Prisma.PlatformFeeHistoryListRelationFilter
 }, "id" | "slug">
 
 export type BarbershopOrderByWithAggregationInput = {
@@ -353,6 +366,7 @@ export type BarbershopOrderByWithAggregationInput = {
   phones?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   platformFeePercentage?: Prisma.SortOrderInput | Prisma.SortOrder
+  feeOverride?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   ownerId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -378,6 +392,7 @@ export type BarbershopScalarWhereWithAggregatesInput = {
   phones?: Prisma.StringNullableListFilter<"Barbershop">
   isActive?: Prisma.BoolWithAggregatesFilter<"Barbershop"> | boolean
   platformFeePercentage?: Prisma.IntNullableWithAggregatesFilter<"Barbershop"> | number | null
+  feeOverride?: Prisma.BoolWithAggregatesFilter<"Barbershop"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Barbershop"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Barbershop"> | Date | string
   ownerId?: Prisma.StringNullableWithAggregatesFilter<"Barbershop"> | string | null
@@ -395,6 +410,7 @@ export type BarbershopCreateInput = {
   phones?: Prisma.BarbershopCreatephonesInput | string[]
   isActive?: boolean
   platformFeePercentage?: number | null
+  feeOverride?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   owner?: Prisma.UserCreateNestedOneWithoutOwnedBarbershopsInput
@@ -403,6 +419,7 @@ export type BarbershopCreateInput = {
   professionals?: Prisma.ProfessionalCreateNestedManyWithoutBarbershopInput
   subscription?: Prisma.SubscriptionCreateNestedOneWithoutBarbershopInput
   planHistory?: Prisma.PlanHistoryCreateNestedManyWithoutBarbershopInput
+  feeHistory?: Prisma.PlatformFeeHistoryCreateNestedManyWithoutBarbershopInput
 }
 
 export type BarbershopUncheckedCreateInput = {
@@ -417,6 +434,7 @@ export type BarbershopUncheckedCreateInput = {
   phones?: Prisma.BarbershopCreatephonesInput | string[]
   isActive?: boolean
   platformFeePercentage?: number | null
+  feeOverride?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   ownerId?: string | null
@@ -425,6 +443,7 @@ export type BarbershopUncheckedCreateInput = {
   professionals?: Prisma.ProfessionalUncheckedCreateNestedManyWithoutBarbershopInput
   subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutBarbershopInput
   planHistory?: Prisma.PlanHistoryUncheckedCreateNestedManyWithoutBarbershopInput
+  feeHistory?: Prisma.PlatformFeeHistoryUncheckedCreateNestedManyWithoutBarbershopInput
 }
 
 export type BarbershopUpdateInput = {
@@ -439,6 +458,7 @@ export type BarbershopUpdateInput = {
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   platformFeePercentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  feeOverride?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneWithoutOwnedBarbershopsNestedInput
@@ -447,6 +467,7 @@ export type BarbershopUpdateInput = {
   professionals?: Prisma.ProfessionalUpdateManyWithoutBarbershopNestedInput
   subscription?: Prisma.SubscriptionUpdateOneWithoutBarbershopNestedInput
   planHistory?: Prisma.PlanHistoryUpdateManyWithoutBarbershopNestedInput
+  feeHistory?: Prisma.PlatformFeeHistoryUpdateManyWithoutBarbershopNestedInput
 }
 
 export type BarbershopUncheckedUpdateInput = {
@@ -461,6 +482,7 @@ export type BarbershopUncheckedUpdateInput = {
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   platformFeePercentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  feeOverride?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -469,6 +491,7 @@ export type BarbershopUncheckedUpdateInput = {
   professionals?: Prisma.ProfessionalUncheckedUpdateManyWithoutBarbershopNestedInput
   subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutBarbershopNestedInput
   planHistory?: Prisma.PlanHistoryUncheckedUpdateManyWithoutBarbershopNestedInput
+  feeHistory?: Prisma.PlatformFeeHistoryUncheckedUpdateManyWithoutBarbershopNestedInput
 }
 
 export type BarbershopCreateManyInput = {
@@ -483,6 +506,7 @@ export type BarbershopCreateManyInput = {
   phones?: Prisma.BarbershopCreatephonesInput | string[]
   isActive?: boolean
   platformFeePercentage?: number | null
+  feeOverride?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   ownerId?: string | null
@@ -500,6 +524,7 @@ export type BarbershopUpdateManyMutationInput = {
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   platformFeePercentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  feeOverride?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -516,6 +541,7 @@ export type BarbershopUncheckedUpdateManyInput = {
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   platformFeePercentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  feeOverride?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -551,6 +577,7 @@ export type BarbershopCountOrderByAggregateInput = {
   phones?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   platformFeePercentage?: Prisma.SortOrder
+  feeOverride?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
@@ -571,6 +598,7 @@ export type BarbershopMaxOrderByAggregateInput = {
   imageUrl?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   platformFeePercentage?: Prisma.SortOrder
+  feeOverride?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
@@ -587,6 +615,7 @@ export type BarbershopMinOrderByAggregateInput = {
   imageUrl?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   platformFeePercentage?: Prisma.SortOrder
+  feeOverride?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
@@ -730,6 +759,20 @@ export type BarbershopUpdateOneRequiredWithoutPlanHistoryNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.BarbershopUpdateToOneWithWhereWithoutPlanHistoryInput, Prisma.BarbershopUpdateWithoutPlanHistoryInput>, Prisma.BarbershopUncheckedUpdateWithoutPlanHistoryInput>
 }
 
+export type BarbershopCreateNestedOneWithoutFeeHistoryInput = {
+  create?: Prisma.XOR<Prisma.BarbershopCreateWithoutFeeHistoryInput, Prisma.BarbershopUncheckedCreateWithoutFeeHistoryInput>
+  connectOrCreate?: Prisma.BarbershopCreateOrConnectWithoutFeeHistoryInput
+  connect?: Prisma.BarbershopWhereUniqueInput
+}
+
+export type BarbershopUpdateOneRequiredWithoutFeeHistoryNestedInput = {
+  create?: Prisma.XOR<Prisma.BarbershopCreateWithoutFeeHistoryInput, Prisma.BarbershopUncheckedCreateWithoutFeeHistoryInput>
+  connectOrCreate?: Prisma.BarbershopCreateOrConnectWithoutFeeHistoryInput
+  upsert?: Prisma.BarbershopUpsertWithoutFeeHistoryInput
+  connect?: Prisma.BarbershopWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.BarbershopUpdateToOneWithWhereWithoutFeeHistoryInput, Prisma.BarbershopUpdateWithoutFeeHistoryInput>, Prisma.BarbershopUncheckedUpdateWithoutFeeHistoryInput>
+}
+
 export type BarbershopCreateWithoutOwnerInput = {
   id?: string
   name: string
@@ -742,6 +785,7 @@ export type BarbershopCreateWithoutOwnerInput = {
   phones?: Prisma.BarbershopCreatephonesInput | string[]
   isActive?: boolean
   platformFeePercentage?: number | null
+  feeOverride?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   services?: Prisma.BarbershopServiceCreateNestedManyWithoutBarbershopInput
@@ -749,6 +793,7 @@ export type BarbershopCreateWithoutOwnerInput = {
   professionals?: Prisma.ProfessionalCreateNestedManyWithoutBarbershopInput
   subscription?: Prisma.SubscriptionCreateNestedOneWithoutBarbershopInput
   planHistory?: Prisma.PlanHistoryCreateNestedManyWithoutBarbershopInput
+  feeHistory?: Prisma.PlatformFeeHistoryCreateNestedManyWithoutBarbershopInput
 }
 
 export type BarbershopUncheckedCreateWithoutOwnerInput = {
@@ -763,6 +808,7 @@ export type BarbershopUncheckedCreateWithoutOwnerInput = {
   phones?: Prisma.BarbershopCreatephonesInput | string[]
   isActive?: boolean
   platformFeePercentage?: number | null
+  feeOverride?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   services?: Prisma.BarbershopServiceUncheckedCreateNestedManyWithoutBarbershopInput
@@ -770,6 +816,7 @@ export type BarbershopUncheckedCreateWithoutOwnerInput = {
   professionals?: Prisma.ProfessionalUncheckedCreateNestedManyWithoutBarbershopInput
   subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutBarbershopInput
   planHistory?: Prisma.PlanHistoryUncheckedCreateNestedManyWithoutBarbershopInput
+  feeHistory?: Prisma.PlatformFeeHistoryUncheckedCreateNestedManyWithoutBarbershopInput
 }
 
 export type BarbershopCreateOrConnectWithoutOwnerInput = {
@@ -813,6 +860,7 @@ export type BarbershopScalarWhereInput = {
   phones?: Prisma.StringNullableListFilter<"Barbershop">
   isActive?: Prisma.BoolFilter<"Barbershop"> | boolean
   platformFeePercentage?: Prisma.IntNullableFilter<"Barbershop"> | number | null
+  feeOverride?: Prisma.BoolFilter<"Barbershop"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Barbershop"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Barbershop"> | Date | string
   ownerId?: Prisma.StringNullableFilter<"Barbershop"> | string | null
@@ -830,6 +878,7 @@ export type BarbershopCreateWithoutProfessionalsInput = {
   phones?: Prisma.BarbershopCreatephonesInput | string[]
   isActive?: boolean
   platformFeePercentage?: number | null
+  feeOverride?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   owner?: Prisma.UserCreateNestedOneWithoutOwnedBarbershopsInput
@@ -837,6 +886,7 @@ export type BarbershopCreateWithoutProfessionalsInput = {
   bookings?: Prisma.BookingCreateNestedManyWithoutBarbershopInput
   subscription?: Prisma.SubscriptionCreateNestedOneWithoutBarbershopInput
   planHistory?: Prisma.PlanHistoryCreateNestedManyWithoutBarbershopInput
+  feeHistory?: Prisma.PlatformFeeHistoryCreateNestedManyWithoutBarbershopInput
 }
 
 export type BarbershopUncheckedCreateWithoutProfessionalsInput = {
@@ -851,6 +901,7 @@ export type BarbershopUncheckedCreateWithoutProfessionalsInput = {
   phones?: Prisma.BarbershopCreatephonesInput | string[]
   isActive?: boolean
   platformFeePercentage?: number | null
+  feeOverride?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   ownerId?: string | null
@@ -858,6 +909,7 @@ export type BarbershopUncheckedCreateWithoutProfessionalsInput = {
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutBarbershopInput
   subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutBarbershopInput
   planHistory?: Prisma.PlanHistoryUncheckedCreateNestedManyWithoutBarbershopInput
+  feeHistory?: Prisma.PlatformFeeHistoryUncheckedCreateNestedManyWithoutBarbershopInput
 }
 
 export type BarbershopCreateOrConnectWithoutProfessionalsInput = {
@@ -888,6 +940,7 @@ export type BarbershopUpdateWithoutProfessionalsInput = {
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   platformFeePercentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  feeOverride?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneWithoutOwnedBarbershopsNestedInput
@@ -895,6 +948,7 @@ export type BarbershopUpdateWithoutProfessionalsInput = {
   bookings?: Prisma.BookingUpdateManyWithoutBarbershopNestedInput
   subscription?: Prisma.SubscriptionUpdateOneWithoutBarbershopNestedInput
   planHistory?: Prisma.PlanHistoryUpdateManyWithoutBarbershopNestedInput
+  feeHistory?: Prisma.PlatformFeeHistoryUpdateManyWithoutBarbershopNestedInput
 }
 
 export type BarbershopUncheckedUpdateWithoutProfessionalsInput = {
@@ -909,6 +963,7 @@ export type BarbershopUncheckedUpdateWithoutProfessionalsInput = {
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   platformFeePercentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  feeOverride?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -916,6 +971,7 @@ export type BarbershopUncheckedUpdateWithoutProfessionalsInput = {
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutBarbershopNestedInput
   subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutBarbershopNestedInput
   planHistory?: Prisma.PlanHistoryUncheckedUpdateManyWithoutBarbershopNestedInput
+  feeHistory?: Prisma.PlatformFeeHistoryUncheckedUpdateManyWithoutBarbershopNestedInput
 }
 
 export type BarbershopCreateWithoutSubscriptionInput = {
@@ -930,6 +986,7 @@ export type BarbershopCreateWithoutSubscriptionInput = {
   phones?: Prisma.BarbershopCreatephonesInput | string[]
   isActive?: boolean
   platformFeePercentage?: number | null
+  feeOverride?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   owner?: Prisma.UserCreateNestedOneWithoutOwnedBarbershopsInput
@@ -937,6 +994,7 @@ export type BarbershopCreateWithoutSubscriptionInput = {
   bookings?: Prisma.BookingCreateNestedManyWithoutBarbershopInput
   professionals?: Prisma.ProfessionalCreateNestedManyWithoutBarbershopInput
   planHistory?: Prisma.PlanHistoryCreateNestedManyWithoutBarbershopInput
+  feeHistory?: Prisma.PlatformFeeHistoryCreateNestedManyWithoutBarbershopInput
 }
 
 export type BarbershopUncheckedCreateWithoutSubscriptionInput = {
@@ -951,6 +1009,7 @@ export type BarbershopUncheckedCreateWithoutSubscriptionInput = {
   phones?: Prisma.BarbershopCreatephonesInput | string[]
   isActive?: boolean
   platformFeePercentage?: number | null
+  feeOverride?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   ownerId?: string | null
@@ -958,6 +1017,7 @@ export type BarbershopUncheckedCreateWithoutSubscriptionInput = {
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutBarbershopInput
   professionals?: Prisma.ProfessionalUncheckedCreateNestedManyWithoutBarbershopInput
   planHistory?: Prisma.PlanHistoryUncheckedCreateNestedManyWithoutBarbershopInput
+  feeHistory?: Prisma.PlatformFeeHistoryUncheckedCreateNestedManyWithoutBarbershopInput
 }
 
 export type BarbershopCreateOrConnectWithoutSubscriptionInput = {
@@ -988,6 +1048,7 @@ export type BarbershopUpdateWithoutSubscriptionInput = {
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   platformFeePercentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  feeOverride?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneWithoutOwnedBarbershopsNestedInput
@@ -995,6 +1056,7 @@ export type BarbershopUpdateWithoutSubscriptionInput = {
   bookings?: Prisma.BookingUpdateManyWithoutBarbershopNestedInput
   professionals?: Prisma.ProfessionalUpdateManyWithoutBarbershopNestedInput
   planHistory?: Prisma.PlanHistoryUpdateManyWithoutBarbershopNestedInput
+  feeHistory?: Prisma.PlatformFeeHistoryUpdateManyWithoutBarbershopNestedInput
 }
 
 export type BarbershopUncheckedUpdateWithoutSubscriptionInput = {
@@ -1009,6 +1071,7 @@ export type BarbershopUncheckedUpdateWithoutSubscriptionInput = {
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   platformFeePercentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  feeOverride?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1016,6 +1079,7 @@ export type BarbershopUncheckedUpdateWithoutSubscriptionInput = {
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutBarbershopNestedInput
   professionals?: Prisma.ProfessionalUncheckedUpdateManyWithoutBarbershopNestedInput
   planHistory?: Prisma.PlanHistoryUncheckedUpdateManyWithoutBarbershopNestedInput
+  feeHistory?: Prisma.PlatformFeeHistoryUncheckedUpdateManyWithoutBarbershopNestedInput
 }
 
 export type BarbershopCreateWithoutServicesInput = {
@@ -1030,6 +1094,7 @@ export type BarbershopCreateWithoutServicesInput = {
   phones?: Prisma.BarbershopCreatephonesInput | string[]
   isActive?: boolean
   platformFeePercentage?: number | null
+  feeOverride?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   owner?: Prisma.UserCreateNestedOneWithoutOwnedBarbershopsInput
@@ -1037,6 +1102,7 @@ export type BarbershopCreateWithoutServicesInput = {
   professionals?: Prisma.ProfessionalCreateNestedManyWithoutBarbershopInput
   subscription?: Prisma.SubscriptionCreateNestedOneWithoutBarbershopInput
   planHistory?: Prisma.PlanHistoryCreateNestedManyWithoutBarbershopInput
+  feeHistory?: Prisma.PlatformFeeHistoryCreateNestedManyWithoutBarbershopInput
 }
 
 export type BarbershopUncheckedCreateWithoutServicesInput = {
@@ -1051,6 +1117,7 @@ export type BarbershopUncheckedCreateWithoutServicesInput = {
   phones?: Prisma.BarbershopCreatephonesInput | string[]
   isActive?: boolean
   platformFeePercentage?: number | null
+  feeOverride?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   ownerId?: string | null
@@ -1058,6 +1125,7 @@ export type BarbershopUncheckedCreateWithoutServicesInput = {
   professionals?: Prisma.ProfessionalUncheckedCreateNestedManyWithoutBarbershopInput
   subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutBarbershopInput
   planHistory?: Prisma.PlanHistoryUncheckedCreateNestedManyWithoutBarbershopInput
+  feeHistory?: Prisma.PlatformFeeHistoryUncheckedCreateNestedManyWithoutBarbershopInput
 }
 
 export type BarbershopCreateOrConnectWithoutServicesInput = {
@@ -1088,6 +1156,7 @@ export type BarbershopUpdateWithoutServicesInput = {
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   platformFeePercentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  feeOverride?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneWithoutOwnedBarbershopsNestedInput
@@ -1095,6 +1164,7 @@ export type BarbershopUpdateWithoutServicesInput = {
   professionals?: Prisma.ProfessionalUpdateManyWithoutBarbershopNestedInput
   subscription?: Prisma.SubscriptionUpdateOneWithoutBarbershopNestedInput
   planHistory?: Prisma.PlanHistoryUpdateManyWithoutBarbershopNestedInput
+  feeHistory?: Prisma.PlatformFeeHistoryUpdateManyWithoutBarbershopNestedInput
 }
 
 export type BarbershopUncheckedUpdateWithoutServicesInput = {
@@ -1109,6 +1179,7 @@ export type BarbershopUncheckedUpdateWithoutServicesInput = {
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   platformFeePercentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  feeOverride?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1116,6 +1187,7 @@ export type BarbershopUncheckedUpdateWithoutServicesInput = {
   professionals?: Prisma.ProfessionalUncheckedUpdateManyWithoutBarbershopNestedInput
   subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutBarbershopNestedInput
   planHistory?: Prisma.PlanHistoryUncheckedUpdateManyWithoutBarbershopNestedInput
+  feeHistory?: Prisma.PlatformFeeHistoryUncheckedUpdateManyWithoutBarbershopNestedInput
 }
 
 export type BarbershopCreateWithoutBookingsInput = {
@@ -1130,6 +1202,7 @@ export type BarbershopCreateWithoutBookingsInput = {
   phones?: Prisma.BarbershopCreatephonesInput | string[]
   isActive?: boolean
   platformFeePercentage?: number | null
+  feeOverride?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   owner?: Prisma.UserCreateNestedOneWithoutOwnedBarbershopsInput
@@ -1137,6 +1210,7 @@ export type BarbershopCreateWithoutBookingsInput = {
   professionals?: Prisma.ProfessionalCreateNestedManyWithoutBarbershopInput
   subscription?: Prisma.SubscriptionCreateNestedOneWithoutBarbershopInput
   planHistory?: Prisma.PlanHistoryCreateNestedManyWithoutBarbershopInput
+  feeHistory?: Prisma.PlatformFeeHistoryCreateNestedManyWithoutBarbershopInput
 }
 
 export type BarbershopUncheckedCreateWithoutBookingsInput = {
@@ -1151,6 +1225,7 @@ export type BarbershopUncheckedCreateWithoutBookingsInput = {
   phones?: Prisma.BarbershopCreatephonesInput | string[]
   isActive?: boolean
   platformFeePercentage?: number | null
+  feeOverride?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   ownerId?: string | null
@@ -1158,6 +1233,7 @@ export type BarbershopUncheckedCreateWithoutBookingsInput = {
   professionals?: Prisma.ProfessionalUncheckedCreateNestedManyWithoutBarbershopInput
   subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutBarbershopInput
   planHistory?: Prisma.PlanHistoryUncheckedCreateNestedManyWithoutBarbershopInput
+  feeHistory?: Prisma.PlatformFeeHistoryUncheckedCreateNestedManyWithoutBarbershopInput
 }
 
 export type BarbershopCreateOrConnectWithoutBookingsInput = {
@@ -1188,6 +1264,7 @@ export type BarbershopUpdateWithoutBookingsInput = {
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   platformFeePercentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  feeOverride?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneWithoutOwnedBarbershopsNestedInput
@@ -1195,6 +1272,7 @@ export type BarbershopUpdateWithoutBookingsInput = {
   professionals?: Prisma.ProfessionalUpdateManyWithoutBarbershopNestedInput
   subscription?: Prisma.SubscriptionUpdateOneWithoutBarbershopNestedInput
   planHistory?: Prisma.PlanHistoryUpdateManyWithoutBarbershopNestedInput
+  feeHistory?: Prisma.PlatformFeeHistoryUpdateManyWithoutBarbershopNestedInput
 }
 
 export type BarbershopUncheckedUpdateWithoutBookingsInput = {
@@ -1209,6 +1287,7 @@ export type BarbershopUncheckedUpdateWithoutBookingsInput = {
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   platformFeePercentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  feeOverride?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1216,6 +1295,7 @@ export type BarbershopUncheckedUpdateWithoutBookingsInput = {
   professionals?: Prisma.ProfessionalUncheckedUpdateManyWithoutBarbershopNestedInput
   subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutBarbershopNestedInput
   planHistory?: Prisma.PlanHistoryUncheckedUpdateManyWithoutBarbershopNestedInput
+  feeHistory?: Prisma.PlatformFeeHistoryUncheckedUpdateManyWithoutBarbershopNestedInput
 }
 
 export type BarbershopCreateWithoutPlanHistoryInput = {
@@ -1230,6 +1310,7 @@ export type BarbershopCreateWithoutPlanHistoryInput = {
   phones?: Prisma.BarbershopCreatephonesInput | string[]
   isActive?: boolean
   platformFeePercentage?: number | null
+  feeOverride?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   owner?: Prisma.UserCreateNestedOneWithoutOwnedBarbershopsInput
@@ -1237,6 +1318,7 @@ export type BarbershopCreateWithoutPlanHistoryInput = {
   bookings?: Prisma.BookingCreateNestedManyWithoutBarbershopInput
   professionals?: Prisma.ProfessionalCreateNestedManyWithoutBarbershopInput
   subscription?: Prisma.SubscriptionCreateNestedOneWithoutBarbershopInput
+  feeHistory?: Prisma.PlatformFeeHistoryCreateNestedManyWithoutBarbershopInput
 }
 
 export type BarbershopUncheckedCreateWithoutPlanHistoryInput = {
@@ -1251,6 +1333,7 @@ export type BarbershopUncheckedCreateWithoutPlanHistoryInput = {
   phones?: Prisma.BarbershopCreatephonesInput | string[]
   isActive?: boolean
   platformFeePercentage?: number | null
+  feeOverride?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   ownerId?: string | null
@@ -1258,6 +1341,7 @@ export type BarbershopUncheckedCreateWithoutPlanHistoryInput = {
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutBarbershopInput
   professionals?: Prisma.ProfessionalUncheckedCreateNestedManyWithoutBarbershopInput
   subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutBarbershopInput
+  feeHistory?: Prisma.PlatformFeeHistoryUncheckedCreateNestedManyWithoutBarbershopInput
 }
 
 export type BarbershopCreateOrConnectWithoutPlanHistoryInput = {
@@ -1288,6 +1372,7 @@ export type BarbershopUpdateWithoutPlanHistoryInput = {
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   platformFeePercentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  feeOverride?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneWithoutOwnedBarbershopsNestedInput
@@ -1295,6 +1380,7 @@ export type BarbershopUpdateWithoutPlanHistoryInput = {
   bookings?: Prisma.BookingUpdateManyWithoutBarbershopNestedInput
   professionals?: Prisma.ProfessionalUpdateManyWithoutBarbershopNestedInput
   subscription?: Prisma.SubscriptionUpdateOneWithoutBarbershopNestedInput
+  feeHistory?: Prisma.PlatformFeeHistoryUpdateManyWithoutBarbershopNestedInput
 }
 
 export type BarbershopUncheckedUpdateWithoutPlanHistoryInput = {
@@ -1309,6 +1395,7 @@ export type BarbershopUncheckedUpdateWithoutPlanHistoryInput = {
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   platformFeePercentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  feeOverride?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1316,6 +1403,115 @@ export type BarbershopUncheckedUpdateWithoutPlanHistoryInput = {
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutBarbershopNestedInput
   professionals?: Prisma.ProfessionalUncheckedUpdateManyWithoutBarbershopNestedInput
   subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutBarbershopNestedInput
+  feeHistory?: Prisma.PlatformFeeHistoryUncheckedUpdateManyWithoutBarbershopNestedInput
+}
+
+export type BarbershopCreateWithoutFeeHistoryInput = {
+  id?: string
+  name: string
+  slug?: string | null
+  address: string
+  city?: string
+  state?: string
+  description: string
+  imageUrl: string
+  phones?: Prisma.BarbershopCreatephonesInput | string[]
+  isActive?: boolean
+  platformFeePercentage?: number | null
+  feeOverride?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  owner?: Prisma.UserCreateNestedOneWithoutOwnedBarbershopsInput
+  services?: Prisma.BarbershopServiceCreateNestedManyWithoutBarbershopInput
+  bookings?: Prisma.BookingCreateNestedManyWithoutBarbershopInput
+  professionals?: Prisma.ProfessionalCreateNestedManyWithoutBarbershopInput
+  subscription?: Prisma.SubscriptionCreateNestedOneWithoutBarbershopInput
+  planHistory?: Prisma.PlanHistoryCreateNestedManyWithoutBarbershopInput
+}
+
+export type BarbershopUncheckedCreateWithoutFeeHistoryInput = {
+  id?: string
+  name: string
+  slug?: string | null
+  address: string
+  city?: string
+  state?: string
+  description: string
+  imageUrl: string
+  phones?: Prisma.BarbershopCreatephonesInput | string[]
+  isActive?: boolean
+  platformFeePercentage?: number | null
+  feeOverride?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ownerId?: string | null
+  services?: Prisma.BarbershopServiceUncheckedCreateNestedManyWithoutBarbershopInput
+  bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutBarbershopInput
+  professionals?: Prisma.ProfessionalUncheckedCreateNestedManyWithoutBarbershopInput
+  subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutBarbershopInput
+  planHistory?: Prisma.PlanHistoryUncheckedCreateNestedManyWithoutBarbershopInput
+}
+
+export type BarbershopCreateOrConnectWithoutFeeHistoryInput = {
+  where: Prisma.BarbershopWhereUniqueInput
+  create: Prisma.XOR<Prisma.BarbershopCreateWithoutFeeHistoryInput, Prisma.BarbershopUncheckedCreateWithoutFeeHistoryInput>
+}
+
+export type BarbershopUpsertWithoutFeeHistoryInput = {
+  update: Prisma.XOR<Prisma.BarbershopUpdateWithoutFeeHistoryInput, Prisma.BarbershopUncheckedUpdateWithoutFeeHistoryInput>
+  create: Prisma.XOR<Prisma.BarbershopCreateWithoutFeeHistoryInput, Prisma.BarbershopUncheckedCreateWithoutFeeHistoryInput>
+  where?: Prisma.BarbershopWhereInput
+}
+
+export type BarbershopUpdateToOneWithWhereWithoutFeeHistoryInput = {
+  where?: Prisma.BarbershopWhereInput
+  data: Prisma.XOR<Prisma.BarbershopUpdateWithoutFeeHistoryInput, Prisma.BarbershopUncheckedUpdateWithoutFeeHistoryInput>
+}
+
+export type BarbershopUpdateWithoutFeeHistoryInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  phones?: Prisma.BarbershopUpdatephonesInput | string[]
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  platformFeePercentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  feeOverride?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  owner?: Prisma.UserUpdateOneWithoutOwnedBarbershopsNestedInput
+  services?: Prisma.BarbershopServiceUpdateManyWithoutBarbershopNestedInput
+  bookings?: Prisma.BookingUpdateManyWithoutBarbershopNestedInput
+  professionals?: Prisma.ProfessionalUpdateManyWithoutBarbershopNestedInput
+  subscription?: Prisma.SubscriptionUpdateOneWithoutBarbershopNestedInput
+  planHistory?: Prisma.PlanHistoryUpdateManyWithoutBarbershopNestedInput
+}
+
+export type BarbershopUncheckedUpdateWithoutFeeHistoryInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  phones?: Prisma.BarbershopUpdatephonesInput | string[]
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  platformFeePercentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  feeOverride?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  services?: Prisma.BarbershopServiceUncheckedUpdateManyWithoutBarbershopNestedInput
+  bookings?: Prisma.BookingUncheckedUpdateManyWithoutBarbershopNestedInput
+  professionals?: Prisma.ProfessionalUncheckedUpdateManyWithoutBarbershopNestedInput
+  subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutBarbershopNestedInput
+  planHistory?: Prisma.PlanHistoryUncheckedUpdateManyWithoutBarbershopNestedInput
 }
 
 export type BarbershopCreateManyOwnerInput = {
@@ -1330,6 +1526,7 @@ export type BarbershopCreateManyOwnerInput = {
   phones?: Prisma.BarbershopCreatephonesInput | string[]
   isActive?: boolean
   platformFeePercentage?: number | null
+  feeOverride?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1346,6 +1543,7 @@ export type BarbershopUpdateWithoutOwnerInput = {
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   platformFeePercentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  feeOverride?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   services?: Prisma.BarbershopServiceUpdateManyWithoutBarbershopNestedInput
@@ -1353,6 +1551,7 @@ export type BarbershopUpdateWithoutOwnerInput = {
   professionals?: Prisma.ProfessionalUpdateManyWithoutBarbershopNestedInput
   subscription?: Prisma.SubscriptionUpdateOneWithoutBarbershopNestedInput
   planHistory?: Prisma.PlanHistoryUpdateManyWithoutBarbershopNestedInput
+  feeHistory?: Prisma.PlatformFeeHistoryUpdateManyWithoutBarbershopNestedInput
 }
 
 export type BarbershopUncheckedUpdateWithoutOwnerInput = {
@@ -1367,6 +1566,7 @@ export type BarbershopUncheckedUpdateWithoutOwnerInput = {
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   platformFeePercentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  feeOverride?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   services?: Prisma.BarbershopServiceUncheckedUpdateManyWithoutBarbershopNestedInput
@@ -1374,6 +1574,7 @@ export type BarbershopUncheckedUpdateWithoutOwnerInput = {
   professionals?: Prisma.ProfessionalUncheckedUpdateManyWithoutBarbershopNestedInput
   subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutBarbershopNestedInput
   planHistory?: Prisma.PlanHistoryUncheckedUpdateManyWithoutBarbershopNestedInput
+  feeHistory?: Prisma.PlatformFeeHistoryUncheckedUpdateManyWithoutBarbershopNestedInput
 }
 
 export type BarbershopUncheckedUpdateManyWithoutOwnerInput = {
@@ -1388,6 +1589,7 @@ export type BarbershopUncheckedUpdateManyWithoutOwnerInput = {
   phones?: Prisma.BarbershopUpdatephonesInput | string[]
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   platformFeePercentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  feeOverride?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1402,6 +1604,7 @@ export type BarbershopCountOutputType = {
   bookings: number
   professionals: number
   planHistory: number
+  feeHistory: number
 }
 
 export type BarbershopCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1409,6 +1612,7 @@ export type BarbershopCountOutputTypeSelect<ExtArgs extends runtime.Types.Extens
   bookings?: boolean | BarbershopCountOutputTypeCountBookingsArgs
   professionals?: boolean | BarbershopCountOutputTypeCountProfessionalsArgs
   planHistory?: boolean | BarbershopCountOutputTypeCountPlanHistoryArgs
+  feeHistory?: boolean | BarbershopCountOutputTypeCountFeeHistoryArgs
 }
 
 /**
@@ -1449,6 +1653,13 @@ export type BarbershopCountOutputTypeCountPlanHistoryArgs<ExtArgs extends runtim
   where?: Prisma.PlanHistoryWhereInput
 }
 
+/**
+ * BarbershopCountOutputType without action
+ */
+export type BarbershopCountOutputTypeCountFeeHistoryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PlatformFeeHistoryWhereInput
+}
+
 
 export type BarbershopSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1462,6 +1673,7 @@ export type BarbershopSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   phones?: boolean
   isActive?: boolean
   platformFeePercentage?: boolean
+  feeOverride?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   ownerId?: boolean
@@ -1471,6 +1683,7 @@ export type BarbershopSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   professionals?: boolean | Prisma.Barbershop$professionalsArgs<ExtArgs>
   subscription?: boolean | Prisma.Barbershop$subscriptionArgs<ExtArgs>
   planHistory?: boolean | Prisma.Barbershop$planHistoryArgs<ExtArgs>
+  feeHistory?: boolean | Prisma.Barbershop$feeHistoryArgs<ExtArgs>
   _count?: boolean | Prisma.BarbershopCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["barbershop"]>
 
@@ -1486,6 +1699,7 @@ export type BarbershopSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   phones?: boolean
   isActive?: boolean
   platformFeePercentage?: boolean
+  feeOverride?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   ownerId?: boolean
@@ -1504,6 +1718,7 @@ export type BarbershopSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   phones?: boolean
   isActive?: boolean
   platformFeePercentage?: boolean
+  feeOverride?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   ownerId?: boolean
@@ -1522,12 +1737,13 @@ export type BarbershopSelectScalar = {
   phones?: boolean
   isActive?: boolean
   platformFeePercentage?: boolean
+  feeOverride?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   ownerId?: boolean
 }
 
-export type BarbershopOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "address" | "city" | "state" | "description" | "imageUrl" | "phones" | "isActive" | "platformFeePercentage" | "createdAt" | "updatedAt" | "ownerId", ExtArgs["result"]["barbershop"]>
+export type BarbershopOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "address" | "city" | "state" | "description" | "imageUrl" | "phones" | "isActive" | "platformFeePercentage" | "feeOverride" | "createdAt" | "updatedAt" | "ownerId", ExtArgs["result"]["barbershop"]>
 export type BarbershopInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   owner?: boolean | Prisma.Barbershop$ownerArgs<ExtArgs>
   services?: boolean | Prisma.Barbershop$servicesArgs<ExtArgs>
@@ -1535,6 +1751,7 @@ export type BarbershopInclude<ExtArgs extends runtime.Types.Extensions.InternalA
   professionals?: boolean | Prisma.Barbershop$professionalsArgs<ExtArgs>
   subscription?: boolean | Prisma.Barbershop$subscriptionArgs<ExtArgs>
   planHistory?: boolean | Prisma.Barbershop$planHistoryArgs<ExtArgs>
+  feeHistory?: boolean | Prisma.Barbershop$feeHistoryArgs<ExtArgs>
   _count?: boolean | Prisma.BarbershopCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type BarbershopIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1553,6 +1770,7 @@ export type $BarbershopPayload<ExtArgs extends runtime.Types.Extensions.Internal
     professionals: Prisma.$ProfessionalPayload<ExtArgs>[]
     subscription: Prisma.$SubscriptionPayload<ExtArgs> | null
     planHistory: Prisma.$PlanHistoryPayload<ExtArgs>[]
+    feeHistory: Prisma.$PlatformFeeHistoryPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1566,6 +1784,7 @@ export type $BarbershopPayload<ExtArgs extends runtime.Types.Extensions.Internal
     phones: string[]
     isActive: boolean
     platformFeePercentage: number | null
+    feeOverride: boolean
     createdAt: Date
     updatedAt: Date
     ownerId: string | null
@@ -1969,6 +2188,7 @@ export interface Prisma__BarbershopClient<T, Null = never, ExtArgs extends runti
   professionals<T extends Prisma.Barbershop$professionalsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Barbershop$professionalsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProfessionalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   subscription<T extends Prisma.Barbershop$subscriptionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Barbershop$subscriptionArgs<ExtArgs>>): Prisma.Prisma__SubscriptionClient<runtime.Types.Result.GetResult<Prisma.$SubscriptionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   planHistory<T extends Prisma.Barbershop$planHistoryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Barbershop$planHistoryArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PlanHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  feeHistory<T extends Prisma.Barbershop$feeHistoryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Barbershop$feeHistoryArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PlatformFeeHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2009,6 +2229,7 @@ export interface BarbershopFieldRefs {
   readonly phones: Prisma.FieldRef<"Barbershop", 'String[]'>
   readonly isActive: Prisma.FieldRef<"Barbershop", 'Boolean'>
   readonly platformFeePercentage: Prisma.FieldRef<"Barbershop", 'Int'>
+  readonly feeOverride: Prisma.FieldRef<"Barbershop", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Barbershop", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Barbershop", 'DateTime'>
   readonly ownerId: Prisma.FieldRef<"Barbershop", 'String'>
@@ -2539,6 +2760,30 @@ export type Barbershop$planHistoryArgs<ExtArgs extends runtime.Types.Extensions.
   take?: number
   skip?: number
   distinct?: Prisma.PlanHistoryScalarFieldEnum | Prisma.PlanHistoryScalarFieldEnum[]
+}
+
+/**
+ * Barbershop.feeHistory
+ */
+export type Barbershop$feeHistoryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PlatformFeeHistory
+   */
+  select?: Prisma.PlatformFeeHistorySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PlatformFeeHistory
+   */
+  omit?: Prisma.PlatformFeeHistoryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PlatformFeeHistoryInclude<ExtArgs> | null
+  where?: Prisma.PlatformFeeHistoryWhereInput
+  orderBy?: Prisma.PlatformFeeHistoryOrderByWithRelationInput | Prisma.PlatformFeeHistoryOrderByWithRelationInput[]
+  cursor?: Prisma.PlatformFeeHistoryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PlatformFeeHistoryScalarFieldEnum | Prisma.PlatformFeeHistoryScalarFieldEnum[]
 }
 
 /**

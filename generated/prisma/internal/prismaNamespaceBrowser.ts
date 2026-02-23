@@ -68,6 +68,8 @@ export const ModelName = {
   SupportTicket: 'SupportTicket',
   SupportMessage: 'SupportMessage',
   SupportInvite: 'SupportInvite',
+  PlatformFeeHistory: 'PlatformFeeHistory',
+  Notification: 'Notification',
   Upload: 'Upload'
 } as const
 
@@ -162,6 +164,7 @@ export const BarbershopScalarFieldEnum = {
   phones: 'phones',
   isActive: 'isActive',
   platformFeePercentage: 'platformFeePercentage',
+  feeOverride: 'feeOverride',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   ownerId: 'ownerId'
@@ -358,6 +361,33 @@ export const SupportInviteScalarFieldEnum = {
 } as const
 
 export type SupportInviteScalarFieldEnum = (typeof SupportInviteScalarFieldEnum)[keyof typeof SupportInviteScalarFieldEnum]
+
+
+export const PlatformFeeHistoryScalarFieldEnum = {
+  id: 'id',
+  fromFeePercentage: 'fromFeePercentage',
+  toFeePercentage: 'toFeePercentage',
+  fromFeeOverride: 'fromFeeOverride',
+  toFeeOverride: 'toFeeOverride',
+  reason: 'reason',
+  changedBy: 'changedBy',
+  changedAt: 'changedAt',
+  barbershopId: 'barbershopId'
+} as const
+
+export type PlatformFeeHistoryScalarFieldEnum = (typeof PlatformFeeHistoryScalarFieldEnum)[keyof typeof PlatformFeeHistoryScalarFieldEnum]
+
+
+export const NotificationScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  message: 'message',
+  read: 'read',
+  createdAt: 'createdAt',
+  userId: 'userId'
+} as const
+
+export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
 
 
 export const UploadScalarFieldEnum = {

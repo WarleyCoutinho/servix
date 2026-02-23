@@ -401,6 +401,8 @@ export const ModelName = {
   SupportTicket: 'SupportTicket',
   SupportMessage: 'SupportMessage',
   SupportInvite: 'SupportInvite',
+  PlatformFeeHistory: 'PlatformFeeHistory',
+  Notification: 'Notification',
   Upload: 'Upload'
 } as const
 
@@ -417,7 +419,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "account" | "verification" | "barbershop" | "professional" | "planConfig" | "subscription" | "professionalSchedule" | "barbershopService" | "booking" | "payment" | "planHistory" | "stripeEvent" | "supportTicket" | "supportMessage" | "supportInvite" | "upload"
+    modelProps: "user" | "session" | "account" | "verification" | "barbershop" | "professional" | "planConfig" | "subscription" | "professionalSchedule" | "barbershopService" | "booking" | "payment" | "planHistory" | "stripeEvent" | "supportTicket" | "supportMessage" | "supportInvite" | "platformFeeHistory" | "notification" | "upload"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1679,6 +1681,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    PlatformFeeHistory: {
+      payload: Prisma.$PlatformFeeHistoryPayload<ExtArgs>
+      fields: Prisma.PlatformFeeHistoryFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PlatformFeeHistoryFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformFeeHistoryPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PlatformFeeHistoryFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformFeeHistoryPayload>
+        }
+        findFirst: {
+          args: Prisma.PlatformFeeHistoryFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformFeeHistoryPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PlatformFeeHistoryFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformFeeHistoryPayload>
+        }
+        findMany: {
+          args: Prisma.PlatformFeeHistoryFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformFeeHistoryPayload>[]
+        }
+        create: {
+          args: Prisma.PlatformFeeHistoryCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformFeeHistoryPayload>
+        }
+        createMany: {
+          args: Prisma.PlatformFeeHistoryCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PlatformFeeHistoryCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformFeeHistoryPayload>[]
+        }
+        delete: {
+          args: Prisma.PlatformFeeHistoryDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformFeeHistoryPayload>
+        }
+        update: {
+          args: Prisma.PlatformFeeHistoryUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformFeeHistoryPayload>
+        }
+        deleteMany: {
+          args: Prisma.PlatformFeeHistoryDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PlatformFeeHistoryUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PlatformFeeHistoryUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformFeeHistoryPayload>[]
+        }
+        upsert: {
+          args: Prisma.PlatformFeeHistoryUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformFeeHistoryPayload>
+        }
+        aggregate: {
+          args: Prisma.PlatformFeeHistoryAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePlatformFeeHistory>
+        }
+        groupBy: {
+          args: Prisma.PlatformFeeHistoryGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PlatformFeeHistoryGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PlatformFeeHistoryCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PlatformFeeHistoryCountAggregateOutputType> | number
+        }
+      }
+    }
+    Notification: {
+      payload: Prisma.$NotificationPayload<ExtArgs>
+      fields: Prisma.NotificationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.NotificationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.NotificationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationPayload>
+        }
+        findFirst: {
+          args: Prisma.NotificationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.NotificationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationPayload>
+        }
+        findMany: {
+          args: Prisma.NotificationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationPayload>[]
+        }
+        create: {
+          args: Prisma.NotificationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationPayload>
+        }
+        createMany: {
+          args: Prisma.NotificationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.NotificationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationPayload>[]
+        }
+        delete: {
+          args: Prisma.NotificationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationPayload>
+        }
+        update: {
+          args: Prisma.NotificationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationPayload>
+        }
+        deleteMany: {
+          args: Prisma.NotificationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.NotificationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.NotificationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationPayload>[]
+        }
+        upsert: {
+          args: Prisma.NotificationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationPayload>
+        }
+        aggregate: {
+          args: Prisma.NotificationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateNotification>
+        }
+        groupBy: {
+          args: Prisma.NotificationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.NotificationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.NotificationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.NotificationCountAggregateOutputType> | number
+        }
+      }
+    }
     Upload: {
       payload: Prisma.$UploadPayload<ExtArgs>
       fields: Prisma.UploadFieldRefs
@@ -1867,6 +2017,7 @@ export const BarbershopScalarFieldEnum = {
   phones: 'phones',
   isActive: 'isActive',
   platformFeePercentage: 'platformFeePercentage',
+  feeOverride: 'feeOverride',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   ownerId: 'ownerId'
@@ -2063,6 +2214,33 @@ export const SupportInviteScalarFieldEnum = {
 } as const
 
 export type SupportInviteScalarFieldEnum = (typeof SupportInviteScalarFieldEnum)[keyof typeof SupportInviteScalarFieldEnum]
+
+
+export const PlatformFeeHistoryScalarFieldEnum = {
+  id: 'id',
+  fromFeePercentage: 'fromFeePercentage',
+  toFeePercentage: 'toFeePercentage',
+  fromFeeOverride: 'fromFeeOverride',
+  toFeeOverride: 'toFeeOverride',
+  reason: 'reason',
+  changedBy: 'changedBy',
+  changedAt: 'changedAt',
+  barbershopId: 'barbershopId'
+} as const
+
+export type PlatformFeeHistoryScalarFieldEnum = (typeof PlatformFeeHistoryScalarFieldEnum)[keyof typeof PlatformFeeHistoryScalarFieldEnum]
+
+
+export const NotificationScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  message: 'message',
+  read: 'read',
+  createdAt: 'createdAt',
+  userId: 'userId'
+} as const
+
+export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
 
 
 export const UploadScalarFieldEnum = {
@@ -2394,6 +2572,8 @@ export type GlobalOmitConfig = {
   supportTicket?: Prisma.SupportTicketOmit
   supportMessage?: Prisma.SupportMessageOmit
   supportInvite?: Prisma.SupportInviteOmit
+  platformFeeHistory?: Prisma.PlatformFeeHistoryOmit
+  notification?: Prisma.NotificationOmit
   upload?: Prisma.UploadOmit
 }
 

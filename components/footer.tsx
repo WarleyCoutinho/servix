@@ -30,7 +30,7 @@ const Footer = () => {
                   href="/barbershops"
                   className="transition-colors hover:text-foreground"
                 >
-                  Barbearias
+                  Barbearias/Salões
                 </Link>
               </li>
               <li>
@@ -41,14 +41,14 @@ const Footer = () => {
                   Agendamentos
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link
                   href="/"
                   className="transition-colors hover:text-foreground"
                 >
                   Conheça o Servix
                 </Link>
-              </li>
+              </li> */}
             </ul>
           </div>
 
@@ -65,10 +65,21 @@ const Footer = () => {
 
         <div className="mt-8 flex flex-col items-center justify-between gap-2 border-t pt-6 sm:flex-row">
           <p className="text-xs text-muted-foreground">
-            &copy; 2026 Servix. Todos os direitos reservados.
+            &copy; {new Date().getFullYear()} Servix. Todos os direitos
+            reservados.
           </p>
+
           <p className="text-xs text-muted-foreground">
-            Feito com cuidado para barbearias e salões de beleza.
+            Feito com cuidado para barbearias e salões de beleza pela{" "}
+            <Link
+              href="https://adapticode.com.br"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-bold uppercase tracking-wider hover:text-foreground hover:scale-105 inline-block transition-all duration-200"
+            >
+              Adapti Code
+            </Link>
+            .
           </p>
         </div>
       </div>

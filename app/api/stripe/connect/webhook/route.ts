@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { updateProfessionalStripeStatus } from "@/lib/stripe-connect";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@/generated/prisma/client";
 import { StripeAccountStatus } from "@/generated/prisma/enums";
 import { verifyStripeWebhook } from "@/lib/stripe-webhook";
 
@@ -29,21 +30,24 @@ export const POST = async (request: Request) => {
 
   const { event } = verification;
 
-  // Idempotência: verificar se evento já foi processado
-  const existingEvent = await prisma.stripeEvent.findUnique({
-    where: { stripeEventId: event.id },
-  });
-
-  if (existingEvent) {
-    return NextResponse.json({ received: true, skipped: true });
+  // Idempotência: registrar evento com proteção contra race condition
+  try {
+    await prisma.stripeEvent.create({
+      data: {
+        stripeEventId: event.id,
+        eventType: event.type,
+      },
+    });
+  } catch (error) {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2002"
+    ) {
+      console.log(`Event ${event.id} already processed, skipping`);
+      return NextResponse.json({ received: true, skipped: true });
+    }
+    throw error;
   }
-
-  await prisma.stripeEvent.create({
-    data: {
-      stripeEventId: event.id,
-      eventType: event.type,
-    },
-  });
 
   try {
     switch (event.type) {

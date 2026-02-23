@@ -103,6 +103,16 @@ export type SupportMessage = Prisma.SupportMessageModel
  */
 export type SupportInvite = Prisma.SupportInviteModel
 /**
+ * Model PlatformFeeHistory
+ * 
+ */
+export type PlatformFeeHistory = Prisma.PlatformFeeHistoryModel
+/**
+ * Model Notification
+ * 
+ */
+export type Notification = Prisma.NotificationModel
+/**
  * Model Upload
  * 
  */

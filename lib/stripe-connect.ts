@@ -120,7 +120,7 @@ export async function getAccountStatus(
   try {
     const account = await stripe.accounts.retrieve(accountId);
 
-    if (account.details_submitted && account.charges_enabled) {
+    if (account.details_submitted && account.charges_enabled && account.payouts_enabled) {
       return StripeAccountStatus.ACTIVE;
     }
 

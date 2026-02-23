@@ -5,7 +5,8 @@ import { prisma, safeQuery } from "@/lib/prisma";
 import { getAvailableSlots } from "@/actions/schedules/get-available-slots";
 import { createBooking } from "@/actions/create-booking";
 import { formatBrt, startOfDayBrt, endOfDayBrt } from "@/lib/timezone";
-import { stripe, calculatePlatformFee } from "@/lib/stripe";
+import { stripe } from "@/lib/stripe";
+import { getEffectiveFee, calculatePlatformFeeAmount } from "@/lib/platform-fee";
 import { isAccountReadyForPayments } from "@/lib/stripe-connect";
 import { isPast, addMinutes } from "date-fns";
 import { DEFAULT_INTERVAL_MINUTES } from "@/lib/schedule-utils";
@@ -357,7 +358,7 @@ export const POST = async (request: Request) => {
             // Pagamento online — criar sessão Stripe com URL de produção
             const service = await prisma.barbershopService.findUnique({
               where: { id: serviceId },
-              include: { barbershop: true },
+              include: { barbershop: { select: { id: true, name: true, createdAt: true, platformFeePercentage: true, feeOverride: true } } },
             });
             if (!service) {
               return { success: false, error: "Serviço não encontrado." };
@@ -407,9 +408,10 @@ export const POST = async (request: Request) => {
               }
             }
 
-            const applicationFeeAmount = calculatePlatformFee(
+            const feeResult = getEffectiveFee(service.barbershop);
+            const applicationFeeAmount = calculatePlatformFeeAmount(
               service.priceInCents,
-              service.barbershop.platformFeePercentage,
+              feeResult.feePercentage,
             );
 
             const paymentMethods: Stripe.Checkout.SessionCreateParams.PaymentMethodType[] = [];

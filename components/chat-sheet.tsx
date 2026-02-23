@@ -2,9 +2,9 @@
 
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
-import { BotMessageSquare, Send, Sparkles } from "lucide-react";
+import { BotMessageSquare, Send } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { Streamdown } from "streamdown";
 
 import { Button } from "@/components/ui/button";
@@ -16,12 +16,17 @@ import {
   SheetTrigger,
 } from "./ui/sheet";
 
-interface ChatSheetProps {
-  triggerClassName?: string;
-  iconOnly?: boolean;
-}
+// Linhas 02
 
-const ChatSheet = ({ triggerClassName, iconOnly = false }: ChatSheetProps) => {
+// interface ChatSheetProps {
+//   triggerClassName?: string;
+//   iconOnly?: boolean;
+// }
+
+//  Linha 02
+
+// const ChatSheet = ({ triggerClassName, iconOnly = false }: ChatSheetProps) => {
+const ChatSheet = () => {
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const { messages, sendMessage, status, error } = useChat({
@@ -30,17 +35,23 @@ const ChatSheet = ({ triggerClassName, iconOnly = false }: ChatSheetProps) => {
     }),
   });
   const [input, setInput] = useState("");
-  const [chatError, setChatError] = useState<string | null>(null);
+  // const [chatError, setChatError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (error) {
-      setChatError(
-        "Nosso assistente está temporariamente indisponível. " +
-        "Mas você pode agendar normalmente: acesse **Barbearias e salões** no menu, " +
-        "escolha o estabelecimento, selecione o profissional e horário desejado. É rápido e fácil! 😊",
-      );
-    }
-  }, [error]);
+  // useEffect(() => {
+  //   if (error) {
+  //     setChatError(
+  //       "Nosso assistente está temporariamente indisponível. " +
+  //         "Mas você pode agendar normalmente: acesse **Barbearias e salões** no menu, " +
+  //         "escolha o estabelecimento, selecione o profissional e horário desejado. É rápido e fácil! 😊",
+  //     );
+  //   }
+  // }, [error]);
+
+  const chatError = error
+    ? "Nosso assistente está temporariamente indisponível. " +
+      "Mas você pode agendar normalmente: acesse **Barbearias e salões** no menu, " +
+      "escolha o estabelecimento, selecione o profissional e horário desejado. É rápido e fácil! 😊"
+    : null;
 
   const handleLinkClick = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
@@ -51,8 +62,7 @@ const ChatSheet = ({ triggerClassName, iconOnly = false }: ChatSheetProps) => {
       if (!href) return;
 
       const isInternal =
-        href.startsWith("/") ||
-        href.startsWith(window.location.origin);
+        href.startsWith("/") || href.startsWith(window.location.origin);
 
       if (isInternal) {
         e.preventDefault();
@@ -81,19 +91,19 @@ const ChatSheet = ({ triggerClassName, iconOnly = false }: ChatSheetProps) => {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        {iconOnly ? (
+        {/* Linha 03 */}
+
+        {/* Para usar aqui descomentar aqui e as sequintes linha vou numera-las para facilitar a ativação quando tiver cliente e pagar um IA profissional */}
+        {/* {iconOnly ? (
           <Button variant="ghost" size="icon" className={triggerClassName}>
             <BotMessageSquare className="size-5" />
           </Button>
         ) : (
-          <button
-            type="button"
-            className={triggerClassName}
-          >
+          <button type="button" className={triggerClassName}>
             <Sparkles className="size-4 shrink-0" />
             Assistente IA
           </button>
-        )}
+        )} */}
       </SheetTrigger>
       <SheetContent
         side="left"
@@ -102,7 +112,7 @@ const ChatSheet = ({ triggerClassName, iconOnly = false }: ChatSheetProps) => {
         <SheetHeader className="border-border shrink-0 border-b px-4 py-4 text-left sm:px-6">
           <SheetTitle className="flex items-center gap-2 text-lg">
             <BotMessageSquare className="size-5" />
-            <span className="font-[family-name:var(--font-merriweather)] tracking-tight italic">
+            <span className="font-(family-name:--font-merriweather) tracking-tight italic">
               Agenda.ai
             </span>
           </SheetTitle>
@@ -114,20 +124,24 @@ const ChatSheet = ({ triggerClassName, iconOnly = false }: ChatSheetProps) => {
           </p>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-4 pb-4 sm:px-6" onClick={handleLinkClick}>
+        <div
+          className="flex-1 overflow-y-auto px-4 pb-4 sm:px-6"
+          onClick={handleLinkClick}
+        >
           <div className="flex gap-2 pt-6 pr-8">
             <div className="bg-primary/12 flex size-8 shrink-0 items-center justify-center rounded-full border">
               <BotMessageSquare className="text-primary size-3.5" />
             </div>
             <p className="text-sm leading-relaxed whitespace-pre-line">
               Olá! Sou o{" "}
-              <span className="font-[family-name:var(--font-merriweather)] tracking-tight italic">
+              <span className="font-(family-name:--font-merriweather) tracking-tight italic">
                 Agenda.ai
               </span>
               , seu assistente pessoal.
               {"\n\n"}
-              Estou aqui para te auxiliar a agendar seu corte ou barba, encontrar
-              as barbearias disponíveis perto de você e responder às suas dúvidas.
+              Estou aqui para te auxiliar a agendar seu corte ou barba,
+              encontrar as barbearias disponíveis perto de você e responder às
+              suas dúvidas.
             </p>
           </div>
 
@@ -207,7 +221,7 @@ const ChatSheet = ({ triggerClassName, iconOnly = false }: ChatSheetProps) => {
             <Button
               type="submit"
               disabled={isLoading || !input.trim()}
-              className="size-[42px] shrink-0 rounded-full"
+              className="size-10.5 shrink-0 rounded-full"
             >
               <Send className="size-5" />
             </Button>

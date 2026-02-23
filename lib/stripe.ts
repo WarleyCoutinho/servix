@@ -41,13 +41,3 @@ export const stripe = {
     return getStripe().webhooks;
   },
 };
-
-export function calculatePlatformFee(
-  amountInCents: number,
-  ownerFeePercentage?: number | null,
-): number {
-  const feePercentage =
-    ownerFeePercentage ??
-    parseInt(process.env.PLATFORM_FEE_PERCENTAGE ?? "10", 10);
-  return Math.round((amountInCents * feePercentage) / 100);
-}

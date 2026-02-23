@@ -6,7 +6,7 @@ import { returnValidationErrors } from "next-safe-action";
 import { prisma } from "@/lib/prisma";
 import { isFuture } from "date-fns";
 import { revalidatePath } from "next/cache";
-import Stripe from "stripe";
+import { stripe } from "@/lib/stripe";
 import { PaymentStatus } from "@/generated/prisma/enums";
 import { sendDailyScheduleToGroup } from "@/lib/whatsapp-schedule";
 
@@ -58,26 +58,10 @@ export const cancelBooking = protectedActionClient
       booking.payment?.stripeChargeId &&
       booking.payment.status === PaymentStatus.SUCCEEDED
     ) {
-      if (!process.env.STRIPE_SECRET_KEY) {
-        returnValidationErrors(inputSchema, {
-          _errors: ["Chave de API do Stripe não encontrada."],
-        });
-      }
       try {
-        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-          apiVersion: "2025-07-30.basil",
-        });
         await stripe.refunds.create({
           charge: booking.payment.stripeChargeId,
           reason: "requested_by_customer",
-        });
-
-        await prisma.payment.update({
-          where: { id: booking.payment.id },
-          data: {
-            status: PaymentStatus.REFUNDED,
-            refundedAt: new Date(),
-          },
         });
       } catch (error) {
         console.error("Erro ao processar o reembolso do agendamento", error);

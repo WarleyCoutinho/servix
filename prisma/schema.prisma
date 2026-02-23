@@ -89,6 +89,7 @@ model User {
   bookings         Booking[]
   ownedBarbershops Barbershop[]     @relation("BarbershopOwner")
   professional     Professional?
+  notifications    Notification[]
   supportTickets   SupportTicket[]
   sentSupportMsgs  SupportMessage[] @relation("SupportMessageSender")
   sentInvites      SupportInvite[]  @relation("SupportInvites")
@@ -161,6 +162,7 @@ model Barbershop {
   phones      String[]
   isActive                 Boolean  @default(true)
   platformFeePercentage    Int?
+  feeOverride              Boolean  @default(false)
   createdAt                DateTime @default(now())
   updatedAt                DateTime @updatedAt
 
@@ -172,6 +174,7 @@ model Barbershop {
   professionals Professional[]
   subscription  Subscription?
   planHistory   PlanHistory[]
+  feeHistory    PlatformFeeHistory[]
 
   @@index([ownerId])
 }
@@ -434,6 +437,45 @@ model SupportInvite {
   createdAt DateTime @default(now()) @db.Timestamptz()
 
   @@map("support_invite")
+}
+
+// =====================
+// PLATFORM FEE HISTORY
+// =====================
+
+model PlatformFeeHistory {
+  id                String   @id @default(uuid())
+  fromFeePercentage Int?
+  toFeePercentage   Int?
+  fromFeeOverride   Boolean  @default(false)
+  toFeeOverride     Boolean  @default(false)
+  reason            String?
+  changedBy         String?
+  changedAt         DateTime @default(now()) @db.Timestamptz()
+
+  barbershopId String
+  barbershop   Barbershop @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
+
+  @@index([barbershopId])
+  @@map("platform_fee_history")
+}
+
+// =====================
+// NOTIFICATIONS
+// =====================
+
+model Notification {
+  id        String   @id @default(uuid())
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now()) @db.Timestamptz()
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, read])
+  @@map("notification")
 }
 
 // =====================

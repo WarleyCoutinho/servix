@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@/generated/prisma/client";
 import { NextResponse } from "next/server";
 import z from "zod";
 import { PaymentStatus, SubscriptionPlan } from "@/generated/prisma/enums";
@@ -51,23 +52,24 @@ export const POST = async (request: Request) => {
 
   const { event, stripe } = verification;
 
-  // Idempotência: verificar se evento já foi processado
-  const existingEvent = await prisma.stripeEvent.findUnique({
-    where: { stripeEventId: event.id },
-  });
-
-  if (existingEvent) {
-    console.log(`Event ${event.id} already processed, skipping`);
-    return NextResponse.json({ received: true, skipped: true });
+  // Idempotência: registrar evento com proteção contra race condition
+  try {
+    await prisma.stripeEvent.create({
+      data: {
+        stripeEventId: event.id,
+        eventType: event.type,
+      },
+    });
+  } catch (error) {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2002"
+    ) {
+      console.log(`Event ${event.id} already processed, skipping`);
+      return NextResponse.json({ received: true, skipped: true });
+    }
+    throw error;
   }
-
-  // Marcar evento como processado ANTES de processar
-  await prisma.stripeEvent.create({
-    data: {
-      stripeEventId: event.id,
-      eventType: event.type,
-    },
-  });
 
   try {
     switch (event.type) {
@@ -395,7 +397,7 @@ export const POST = async (request: Request) => {
             where: { id: payment.bookingId },
           });
 
-          if (booking) {
+          if (booking && !booking.cancelledAt) {
             await prisma.booking.update({
               where: { id: booking.id },
               data: { cancelledAt: new Date() },
@@ -407,6 +409,61 @@ export const POST = async (request: Request) => {
           }
 
           console.log(`Payment ${payment.id} refunded, booking cancelled`);
+        }
+        break;
+      }
+
+      case "charge.dispute.created": {
+        const dispute = event.data.object as Stripe.Dispute;
+        const chargeId = typeof dispute.charge === "string" ? dispute.charge : dispute.charge.id;
+
+        const payment = await prisma.payment.findUnique({
+          where: { stripeChargeId: chargeId },
+        });
+
+        if (payment) {
+          await prisma.payment.update({
+            where: { id: payment.id },
+            data: { status: PaymentStatus.FAILED },
+          });
+
+          const booking = await prisma.booking.findUnique({
+            where: { id: payment.bookingId },
+          });
+
+          if (booking && !booking.cancelledAt) {
+            await prisma.booking.update({
+              where: { id: booking.id },
+              data: { cancelledAt: new Date() },
+            });
+
+            sendDailyScheduleToGroup(booking.professionalId, booking.date).catch(
+              (err) => console.error("[WhatsApp] Erro ao enviar agenda após disputa:", err),
+            );
+          }
+
+          console.log(
+            `Dispute ${dispute.id} created for charge ${chargeId} - Reason: ${dispute.reason}, Amount: ${dispute.amount / 100} ${dispute.currency}`,
+          );
+        }
+        break;
+      }
+
+      case "transfer.created": {
+        const transfer = event.data.object as Stripe.Transfer;
+
+        const transferPayment = await prisma.payment.findFirst({
+          where: { stripeTransferId: transfer.id },
+        });
+
+        if (transferPayment) {
+          console.log(
+            `Transfer ${transfer.id} created for payment ${transferPayment.id} - Amount: ${transfer.amount / 100} ${transfer.currency}`,
+          );
+        } else {
+          console.warn(
+            `Transfer ${transfer.id} created but no matching payment found`,
+          );
         }
         break;
       }

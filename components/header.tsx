@@ -19,7 +19,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
-import ChatSheet from "./chat-sheet";
 import LoginModal from "./login-modal";
 import MenuSheet from "./menu-sheet";
 import { ThemeToggle } from "./theme-toggle";
@@ -59,9 +58,6 @@ const Header = ({ categories = [] }: HeaderProps) => {
     <header className="bg-background border-border sticky top-0 z-40 border-b">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-6">
-          {/* <Link href="/" className="shrink-0">
-            <Image src="/logo.svg" alt="Servix" width={91} height={24} />
-          </Link> */}
           <Link href={isLoggedIn ? "/home" : "/"} className="shrink-0">
             <Image
               src={logo}
@@ -170,9 +166,10 @@ const Header = ({ categories = [] }: HeaderProps) => {
 
         <div className="flex items-center gap-2">
           <ThemeToggle />
-          {session?.user?.role === "client" && (
+          {/* Ativar quando tiver cliente e pagar um IA profissional
+          {/* {session?.user?.role === "client" && (
             <ChatSheet triggerClassName="hidden sm:flex" iconOnly />
-          )}
+          )} */}
 
           <div className="hidden md:block">
             {isLoggedIn ? (
@@ -280,7 +277,8 @@ const Header = ({ categories = [] }: HeaderProps) => {
           </div>
 
           <div className="flex items-center gap-2 md:hidden">
-            {session?.user?.role === "client" && <ChatSheet iconOnly />}
+            {/* Ativar quando tiver cliente e pagar um IA profissional */}
+            {/* {session?.user?.role === "client" && <ChatSheet iconOnly />} */}
             <MenuSheet
               categories={categories}
               onLoginClick={() => setLoginModalOpen(true)}

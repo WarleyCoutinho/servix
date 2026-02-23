@@ -5,7 +5,7 @@ export default async function AdminUsersPage() {
   const users = await prisma.user.findMany({
     include: {
       ownedBarbershops: {
-        select: { id: true, name: true, platformFeePercentage: true },
+        select: { id: true, name: true, platformFeePercentage: true, feeOverride: true, createdAt: true },
         take: 1,
       },
       professional: {

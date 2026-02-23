@@ -5,7 +5,8 @@ import z from "zod";
 import { prisma } from "@/lib/prisma";
 import { returnValidationErrors } from "next-safe-action";
 import { isPast, addMinutes } from "date-fns";
-import { stripe, calculatePlatformFee } from "@/lib/stripe";
+import { stripe } from "@/lib/stripe";
+import { getEffectiveFee, calculatePlatformFeeAmount } from "@/lib/platform-fee";
 import { isAccountReadyForPayments } from "@/lib/stripe-connect";
 import { DEFAULT_INTERVAL_MINUTES } from "@/lib/schedule-utils";
 import { startOfDayBrt, endOfDayBrt } from "@/lib/timezone";
@@ -26,7 +27,15 @@ export const createBookingCheckoutSession = protectedActionClient
           id: serviceId,
         },
         include: {
-          barbershop: true,
+          barbershop: {
+            select: {
+              id: true,
+              name: true,
+              createdAt: true,
+              platformFeePercentage: true,
+              feeOverride: true,
+            },
+          },
         },
       });
 
@@ -113,9 +122,10 @@ export const createBookingCheckoutSession = protectedActionClient
         }
       }
 
-      const applicationFeeAmount = calculatePlatformFee(
+      const feeResult = getEffectiveFee(service.barbershop);
+      const applicationFeeAmount = calculatePlatformFeeAmount(
         service.priceInCents,
-        service.barbershop.platformFeePercentage,
+        feeResult.feePercentage,
       );
 
       const paymentMethods: Stripe.Checkout.SessionCreateParams.PaymentMethodType[] = [];

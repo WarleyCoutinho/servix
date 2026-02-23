@@ -149,7 +149,7 @@ export default async function ProfessionalPaymentsPage({ searchParams }: PagePro
               -{formatCurrency(totalFees)}
             </div>
             <p className="text-muted-foreground text-xs">
-              {process.env.PLATFORM_FEE_PERCENTAGE || 10}% sobre cada venda
+              Taxa de plataforma sobre cada venda
             </p>
           </CardContent>
         </Card>
