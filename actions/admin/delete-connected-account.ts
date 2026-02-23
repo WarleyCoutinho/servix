@@ -14,24 +14,31 @@ export const deleteConnectedAccount = adminActionClient
   .schema(schema)
   .action(async ({ parsedInput: { accountId } }) => {
     const stripeClient = getStripe();
+    const account = await stripeClient.accounts.retrieve(accountId);
 
-    try {
-      await stripeClient.accounts.del(accountId);
-    } catch (error: unknown) {
-      const isV2Account =
-        error instanceof Error &&
-        error.message.includes("v2/core/accounts") &&
-        error.message.includes("close");
+    if (account.type === "standard") {
+      await stripeClient.accounts.reject(accountId, {
+        reason: "other",
+      });
+    } else {
+      try {
+        await stripeClient.accounts.del(accountId);
+      } catch (error: unknown) {
+        const isV2Account =
+          error instanceof Error &&
+          error.message.includes("v2/core/accounts") &&
+          error.message.includes("close");
 
-      if (isV2Account) {
-        await stripeClient.rawRequest(
-          "POST",
-          `/v2/core/accounts/${accountId}/close`,
-          {},
-          { apiVersion: "2025-03-31.preview" },
-        );
-      } else {
-        throw error;
+        if (isV2Account) {
+          await stripeClient.rawRequest(
+            "POST",
+            `/v2/core/accounts/${accountId}/close`,
+            {},
+            { apiVersion: "2025-03-31.preview" },
+          );
+        } else {
+          throw error;
+        }
       }
     }
 
