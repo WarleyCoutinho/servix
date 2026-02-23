@@ -27,11 +27,8 @@ export const deleteConnectedAccount = adminActionClient
         await stripeClient.rawRequest(
           "POST",
           `/v2/core/accounts/${accountId}/close`,
-          {
-            additionalHeaders: {
-              "Stripe-Version": "2025-07-30.basil;accounts_v2=v2",
-            },
-          },
+          {},
+          { apiVersion: "2025-03-31.preview" },
         );
       } else {
         throw error;
