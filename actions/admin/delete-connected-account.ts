@@ -24,7 +24,15 @@ export const deleteConnectedAccount = adminActionClient
         error.message.includes("close");
 
       if (isV2Account) {
-        await stripeClient.rawRequest("POST", `/v2/core/accounts/${accountId}/close`, {});
+        await stripeClient.rawRequest(
+          "POST",
+          `/v2/core/accounts/${accountId}/close`,
+          {
+            additionalHeaders: {
+              "Stripe-Version": "2025-07-30.basil;accounts_v2=v2",
+            },
+          },
+        );
       } else {
         throw error;
       }
