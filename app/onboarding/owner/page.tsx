@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { authClient } from "@/lib/auth-client";
+import { formatCPF, formatPhone } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Building2, Loader2 } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
@@ -243,7 +244,12 @@ export default function OwnerOnboardingPage() {
                   <FormItem>
                     <FormLabel>Telefone</FormLabel>
                     <FormControl>
-                      <Input placeholder="(11) 99999-9999" {...field} />
+                      <Input
+                        placeholder="(62) 99999-9999"
+                        value={field.value}
+                        onChange={(e) => field.onChange(formatPhone(e.target.value))}
+                        maxLength={15}
+                      />
                     </FormControl>
                     <FormDescription>
                       Telefone para contato dos clientes
@@ -260,7 +266,12 @@ export default function OwnerOnboardingPage() {
                   <FormItem>
                     <FormLabel>Seu CPF</FormLabel>
                     <FormControl>
-                      <Input placeholder="000.000.000-00" {...field} />
+                      <Input
+                        placeholder="000.000.000-00"
+                        value={field.value}
+                        onChange={(e) => field.onChange(formatCPF(e.target.value))}
+                        maxLength={14}
+                      />
                     </FormControl>
                     <FormDescription>
                       Necessário para seu cadastro como profissional

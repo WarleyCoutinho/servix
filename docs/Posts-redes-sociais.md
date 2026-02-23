@@ -34,7 +34,7 @@ O Servix é um sistema de agendamento online feito pra barbearias e salões:
 👉 A partir de _R$ 39,90/mês_
 ⚡ Sua loja no ar em menos de 10 minutos
 
-🔗 _[COLOQUE SEU LINK AQUI]_
+🔗 https://www.servix.app.br/
 
 ---
 
@@ -54,7 +54,7 @@ Sem ligar. Sem aguardar. Sem perder cliente.
 3 planos a partir de _R$ 39,90/mês_
 Teste agora 👇
 
-🔗 _[COLOQUE SEU LINK AQUI]_
+🔗 https://www.servix.app.br
 
 ---
 
@@ -76,7 +76,7 @@ Começa hoje, sem complicação.
 Login com Google → configure em 10 min → já receba agendamentos.
 
 👇 Assine o plano ideal pro seu negócio
-🔗 _[COLOQUE SEU LINK AQUI]_
+🔗 https://www.servix.app.br
 
 ---
 
@@ -96,7 +96,7 @@ O Servix resolve isso por _R$ 39,90/mês._
 
 Faz as contas. 🧮
 
-🔗 _[COLOQUE SEU LINK AQUI]_
+🔗 https://www.servix.app.br
 
 ---
 
@@ -231,7 +231,7 @@ _Para de perder cliente_ por não atender o telefone. 📵
 O Servix agenda por você. 🤝
 
 👇 Desliza pra cima e começa agora
-[COLOQUE SEU LINK]
+https://www.servix.app.br
 
 ---
 

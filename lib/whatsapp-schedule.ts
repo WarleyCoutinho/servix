@@ -116,11 +116,23 @@ function buildScheduleMessage(
   return lines.join("\n");
 }
 
+function isFutureDateBrt(date: Date): boolean {
+  const nowBrt = toZonedTime(new Date(), TIMEZONE);
+  const dateBrt = toZonedTime(date, TIMEZONE);
+  const nowDateOnly = new Date(nowBrt.getFullYear(), nowBrt.getMonth(), nowBrt.getDate());
+  const targetDateOnly = new Date(dateBrt.getFullYear(), dateBrt.getMonth(), dateBrt.getDate());
+  return targetDateOnly > nowDateOnly;
+}
+
 export async function sendDailyScheduleToGroup(
   professionalId: string,
   bookingDate: Date | string,
 ): Promise<void> {
   const date = new Date(bookingDate);
+
+  if (isFutureDateBrt(date)) {
+    return;
+  }
 
   const professional = await prisma.professional.findUnique({
     where: { id: professionalId },

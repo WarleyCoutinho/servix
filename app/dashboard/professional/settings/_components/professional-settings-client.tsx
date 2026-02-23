@@ -258,36 +258,29 @@ export default function ProfessionalSettingsClient({
               }
             />
           </div>
-          <div className="flex items-center justify-between rounded-lg border p-4">
+          <div className="flex items-center justify-between rounded-lg border p-4 opacity-60">
             <div className="flex items-center gap-3">
               <Banknote className="text-muted-foreground h-5 w-5" />
               <div>
                 <p className="font-medium">PIX</p>
                 <p className="text-muted-foreground text-sm">
-                  Pagamentos via PIX
+                  Pagamentos via PIX (em breve)
                 </p>
               </div>
             </div>
             <Switch
-              checked={formData.acceptsPix}
-              onCheckedChange={(checked) =>
-                setFormData({ ...formData, acceptsPix: checked })
-              }
-              disabled={
-                isLoading ||
-                (!formData.acceptsCard &&
-                  !formData.acceptsPayAfterService &&
-                  formData.acceptsPix)
-              }
+              checked={false}
+              disabled
             />
           </div>
           <div className="flex items-center justify-between rounded-lg border p-4">
             <div className="flex items-center gap-3">
               <HandCoins className="text-muted-foreground h-5 w-5" />
               <div>
-                <p className="font-medium">Pagar após o serviço</p>
+                <p className="font-medium">Pagar após o serviço (Presencial)</p>
                 <p className="text-muted-foreground text-sm">
-                  Permite agendar e pagar presencialmente após a conclusão
+                  O cliente agenda sem pagar online e realiza o pagamento
+                  presencialmente após a conclusão do serviço
                 </p>
               </div>
             </div>

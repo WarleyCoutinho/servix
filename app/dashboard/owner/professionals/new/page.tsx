@@ -13,6 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { formatCPF } from "@/lib/utils";
 import { toast } from "sonner";
 import { Loader2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
@@ -47,14 +48,6 @@ export default function NewProfessionalPage() {
       toast.error(errorMessage);
     },
   });
-
-  function formatCPF(value: string) {
-    const numbers = value.replace(/\D/g, "").slice(0, 11);
-    return numbers
-      .replace(/(\d{3})(\d)/, "$1.$2")
-      .replace(/(\d{3})(\d)/, "$1.$2")
-      .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -115,6 +108,7 @@ export default function NewProfessionalPage() {
                     setFormData({ ...formData, cpf: formatCPF(e.target.value) })
                   }
                   required
+                  maxLength={14}
                 />
               </div>
             </div>

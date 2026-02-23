@@ -26,20 +26,12 @@ const BRAZILIAN_STATES = [
   "RS", "RO", "RR", "SC", "SP", "SE", "TO",
 ];
 import { ImageUpload } from "@/components/image-upload";
+import { formatCPF, formatPhone } from "@/lib/utils";
 import { Loader2, Store } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-
-function formatCPF(value: string) {
-  const digits = value.replace(/\D/g, "").slice(0, 11);
-  if (digits.length <= 3) return digits;
-  if (digits.length <= 6) return `${digits.slice(0, 3)}.${digits.slice(3)}`;
-  if (digits.length <= 9)
-    return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6)}`;
-  return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9)}`;
-}
 
 interface NewEstablishmentFormProps {
   showCpfField: boolean;
@@ -174,11 +166,16 @@ export function NewEstablishmentForm({ showCpfField }: NewEstablishmentFormProps
             <Input
               id="phone"
               name="phone"
-              placeholder="Ex: (11) 99999-9999"
+              placeholder="(62) 99999-9999"
               value={formData.phone}
-              onChange={handleChange}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  phone: formatPhone(e.target.value),
+                }))
+              }
               required
-              minLength={10}
+              maxLength={15}
             />
           </div>
 
