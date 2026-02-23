@@ -57,18 +57,31 @@ export const POST = async (request: Request) => {
         if (professional) {
           await updateProfessionalStripeStatus(account.id);
 
+          const currentlyDue = account.requirements?.currently_due ?? [];
+          const disabledReason = account.requirements?.disabled_reason;
+
           if (
             account.charges_enabled &&
             account.payouts_enabled &&
             account.details_submitted
           ) {
             console.log(
-              `Professional ${professional.id} Stripe account ACTIVE - charges_enabled: ${account.charges_enabled}, payouts_enabled: ${account.payouts_enabled}, details_submitted: ${account.details_submitted}`,
+              `[Stripe Connect] Professional ${professional.id} account ACTIVE`,
             );
           } else {
             console.log(
-              `Professional ${professional.id} Stripe account PENDING - charges_enabled: ${account.charges_enabled}, payouts_enabled: ${account.payouts_enabled}, details_submitted: ${account.details_submitted}`,
+              `[Stripe Connect] Professional ${professional.id} account UPDATE - charges_enabled: ${account.charges_enabled}, payouts_enabled: ${account.payouts_enabled}, details_submitted: ${account.details_submitted}`,
             );
+            if (currentlyDue.length > 0) {
+              console.log(
+                `[Stripe Connect] Professional ${professional.id} currently_due: ${currentlyDue.join(", ")}`,
+              );
+            }
+            if (disabledReason) {
+              console.log(
+                `[Stripe Connect] Professional ${professional.id} disabled_reason: ${disabledReason}`,
+              );
+            }
           }
         }
         break;

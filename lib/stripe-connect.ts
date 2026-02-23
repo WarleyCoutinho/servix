@@ -3,11 +3,34 @@ import { prisma } from "./prisma";
 import { StripeAccountStatus } from "@/generated/prisma/enums";
 import type Stripe from "stripe";
 
+interface PrefillData {
+  firstName?: string;
+  lastName?: string;
+  cpf?: string;
+  phone?: string;
+}
+
 export async function createExpressAccount(
   professionalId: string,
   email: string,
+  prefillData?: PrefillData,
 ): Promise<Stripe.Account> {
   try {
+    const individual: Stripe.AccountCreateParams.Individual = {};
+
+    if (prefillData?.firstName) {
+      individual.first_name = prefillData.firstName;
+    }
+    if (prefillData?.lastName) {
+      individual.last_name = prefillData.lastName;
+    }
+    if (prefillData?.cpf) {
+      individual.id_number = prefillData.cpf.replace(/\D/g, "");
+    }
+    if (prefillData?.phone) {
+      individual.phone = prefillData.phone;
+    }
+
     const account = await stripe.accounts.create({
       type: "express",
       country: "BR",
@@ -17,6 +40,13 @@ export async function createExpressAccount(
         transfers: { requested: true },
       },
       business_type: "individual",
+      individual: Object.keys(individual).length > 0 ? individual : undefined,
+      business_profile: {
+        mcc: "7230",
+        name: prefillData?.firstName && prefillData?.lastName
+          ? `${prefillData.firstName} ${prefillData.lastName}`
+          : undefined,
+      },
       settings: {
         payouts: {
           schedule: {

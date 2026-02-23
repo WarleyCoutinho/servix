@@ -4,6 +4,7 @@ import { UserRole } from "@/generated/prisma/enums";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import {
+  AlertTriangle,
   Calendar,
   Clock,
   CreditCard,
@@ -101,7 +102,28 @@ export default async function ProfessionalDashboardLayout({
           </div>
         )}
         {professional.stripeOnboardingComplete &&
-          professional.stripeAccountStatus !== "ACTIVE" && (
+          professional.stripeAccountStatus === "RESTRICTED" && (
+            <div className="m-4 rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-950">
+              <div className="mb-2 flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
+                <p className="text-sm font-medium text-red-800 dark:text-red-200">
+                  Conta restrita
+                </p>
+              </div>
+              <p className="mb-3 text-xs text-red-600 dark:text-red-400">
+                O Stripe precisa de informações adicionais para ativar sua
+                conta. Complete a verificação para receber pagamentos.
+              </p>
+              <Button size="sm" asChild className="w-full" variant="destructive">
+                <Link href="/onboarding/professional">
+                  <CreditCard className="mr-2 h-4 w-4" />
+                  Completar verificação
+                </Link>
+              </Button>
+            </div>
+          )}
+        {professional.stripeOnboardingComplete &&
+          professional.stripeAccountStatus === "PENDING" && (
             <div className="m-4 rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-950">
               <p className="mb-1 text-sm font-medium text-blue-800 dark:text-blue-200">
                 Verificação em andamento

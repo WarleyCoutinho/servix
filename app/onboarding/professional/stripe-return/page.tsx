@@ -40,6 +40,8 @@ export default async function StripeReturnPage() {
   const isComplete = updatedProfessional?.stripeOnboardingComplete;
   const isActive =
     updatedProfessional?.stripeAccountStatus === StripeAccountStatus.ACTIVE;
+  const isRestricted =
+    updatedProfessional?.stripeAccountStatus === StripeAccountStatus.RESTRICTED;
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-4">
@@ -84,10 +86,12 @@ export default async function StripeReturnPage() {
           <Button asChild>
             <Link href="/dashboard/professional">Ir para o Dashboard</Link>
           </Button>
-          {!isComplete && (
+          {(!isComplete || isRestricted) && (
             <Button variant="outline" asChild>
               <Link href="/onboarding/professional">
-                Continuar configuração
+                {isRestricted
+                  ? "Completar informações pendentes"
+                  : "Continuar configuração"}
               </Link>
             </Button>
           )}
