@@ -176,3 +176,54 @@ export function isAccountReadyForPayments(
 ): boolean {
   return status === StripeAccountStatus.ACTIVE;
 }
+
+const DISABLED_REASON_MESSAGES: Record<string, string> = {
+  "requirements.past_due":
+    "Existem informações obrigatórias pendentes. Complete a verificação para ativar sua conta.",
+  "requirements.pending_verification":
+    "Seus documentos estão sendo analisados pelo Stripe. Isso pode levar alguns minutos.",
+  "listed": "Sua conta foi sinalizada para revisão.",
+  "platform_paused": "A plataforma pausou sua conta temporariamente.",
+  "rejected.fraud": "Sua conta foi rejeitada por suspeita de fraude.",
+  "rejected.listed": "Sua conta foi rejeitada por estar em lista restrita.",
+  "rejected.terms_of_service": "Sua conta foi rejeitada por violação dos termos de uso.",
+  "rejected.other": "Sua conta foi rejeitada. Entre em contato com o suporte.",
+  "under_review": "Sua conta está em análise pelo Stripe.",
+};
+
+export interface AccountRestrictionInfo {
+  reason: string;
+  message: string;
+  currentlyDue: string[];
+  isPendingVerification: boolean;
+}
+
+export async function getAccountRestrictionInfo(
+  accountId: string,
+): Promise<AccountRestrictionInfo | null> {
+  try {
+    const account = await stripe.accounts.retrieve(accountId);
+
+    if (account.charges_enabled) {
+      return null;
+    }
+
+    const disabledReason = account.requirements?.disabled_reason ?? "";
+    const currentlyDue = account.requirements?.currently_due ?? [];
+    const isPendingVerification =
+      disabledReason === "requirements.pending_verification";
+
+    const message =
+      DISABLED_REASON_MESSAGES[disabledReason] ??
+      "Sua conta possui restrições. Complete a verificação para ativar.";
+
+    return {
+      reason: disabledReason,
+      message,
+      currentlyDue,
+      isPendingVerification,
+    };
+  } catch {
+    return null;
+  }
+}

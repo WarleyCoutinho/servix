@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { UserRole } from "@/generated/prisma/enums";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getAccountRestrictionInfo } from "@/lib/stripe-connect";
 import {
   AlertTriangle,
   Calendar,
@@ -76,6 +77,12 @@ export default async function ProfessionalDashboardLayout({
 
   const professional = user.professional;
 
+  const restrictionInfo =
+    professional.stripeAccountId &&
+    professional.stripeAccountStatus === "RESTRICTED"
+      ? await getAccountRestrictionInfo(professional.stripeAccountId)
+      : null;
+
   return (
     <div className="flex min-h-screen">
       <DashboardSidebar
@@ -102,25 +109,39 @@ export default async function ProfessionalDashboardLayout({
           </div>
         )}
         {professional.stripeOnboardingComplete &&
-          professional.stripeAccountStatus === "RESTRICTED" && (
-            <div className="m-4 rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-950">
-              <div className="mb-2 flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
-                <p className="text-sm font-medium text-red-800 dark:text-red-200">
-                  Conta restrita
+          professional.stripeAccountStatus === "RESTRICTED" &&
+          restrictionInfo && (
+            restrictionInfo.isPendingVerification ? (
+              <div className="m-4 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950">
+                <div className="mb-2 flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                  <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                    Documentos em analise
+                  </p>
+                </div>
+                <p className="text-xs text-amber-600 dark:text-amber-400">
+                  {restrictionInfo.message}
                 </p>
               </div>
-              <p className="mb-3 text-xs text-red-600 dark:text-red-400">
-                O Stripe precisa de informações adicionais para ativar sua
-                conta. Complete a verificação para receber pagamentos.
-              </p>
-              <Button size="sm" asChild className="w-full" variant="destructive">
-                <Link href="/onboarding/professional">
-                  <CreditCard className="mr-2 h-4 w-4" />
-                  Completar verificação
-                </Link>
-              </Button>
-            </div>
+            ) : (
+              <div className="m-4 rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-950">
+                <div className="mb-2 flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
+                  <p className="text-sm font-medium text-red-800 dark:text-red-200">
+                    Conta restrita
+                  </p>
+                </div>
+                <p className="mb-3 text-xs text-red-600 dark:text-red-400">
+                  {restrictionInfo.message}
+                </p>
+                <Button size="sm" asChild className="w-full" variant="destructive">
+                  <Link href="/onboarding/professional">
+                    <CreditCard className="mr-2 h-4 w-4" />
+                    Completar verificação
+                  </Link>
+                </Button>
+              </div>
+            )
           )}
         {professional.stripeOnboardingComplete &&
           professional.stripeAccountStatus === "PENDING" && (
