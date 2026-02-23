@@ -16,11 +16,7 @@ export const deleteConnectedAccount = adminActionClient
     const stripeClient = getStripe();
     const account = await stripeClient.accounts.retrieve(accountId);
 
-    if (account.type === "standard") {
-      await stripeClient.accounts.reject(accountId, {
-        reason: "other",
-      });
-    } else {
+    if (account.type !== "standard") {
       try {
         await stripeClient.accounts.del(accountId);
       } catch (error: unknown) {
