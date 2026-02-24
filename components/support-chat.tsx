@@ -1,10 +1,20 @@
 "use client";
 
-import { MessageCircle, Phone, Mail, X, Loader2, Send, Headset, ImagePlus } from "lucide-react";
-import { useRef, useEffect, useState, useCallback } from "react";
+import {
+  Headset,
+  ImagePlus,
+  Loader2,
+  Mail,
+  MessageCircle,
+  Phone,
+  Send,
+  X,
+} from "lucide-react";
+import Image from "next/image";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "./ui/button";
 
-const SUPPORT_WHATSAPP = "5562999687179";
+const SUPPORT_WHATSAPP = "5516989118349";
 const SUPPORT_EMAIL = "contatoadapticode@gmail.com";
 
 interface ChatMessage {
@@ -21,7 +31,12 @@ interface SupportChatProps {
 }
 
 interface ApiResponse {
-  type: "ai_response" | "escalate" | "redirect_human" | "waiting_admin" | "admin_response";
+  type:
+    | "ai_response"
+    | "escalate"
+    | "redirect_human"
+    | "waiting_admin"
+    | "admin_response";
   message: string;
   whatsapp?: string;
   email?: string;
@@ -45,7 +60,7 @@ function ContactButtons() {
         className="flex items-center gap-2 rounded-md border border-green-500/30 bg-green-500/10 px-3 py-2 text-xs font-medium text-green-400 transition-colors hover:bg-green-500/20"
       >
         <Phone className="size-3.5" />
-        WhatsApp: +55 62 99968-7179
+        WhatsApp: +55 16 98911-8349
       </a>
       <a
         href={`mailto:${SUPPORT_EMAIL}`}
@@ -63,7 +78,7 @@ function ChatImage({ src }: { src: string }) {
 
   return (
     <>
-      <img
+      <Image
         src={src}
         alt="Imagem anexada"
         className="mt-1.5 max-h-40 cursor-pointer rounded-lg border border-border object-cover"
@@ -71,10 +86,10 @@ function ChatImage({ src }: { src: string }) {
       />
       {expanded && (
         <div
-          className="fixed inset-0 z-[300] flex items-center justify-center bg-black/80 p-4"
+          className="fixed inset-0 z-300 flex items-center justify-center bg-black/80 p-4"
           onClick={() => setExpanded(false)}
         >
-          <img
+          <Image
             src={src}
             alt="Imagem expandida"
             className="max-h-[90vh] max-w-[90vw] rounded-lg object-contain"
@@ -99,7 +114,8 @@ export function SupportChat({ userPlan, userName }: SupportChatProps) {
     },
   ]);
   const endRef = useRef<HTMLDivElement | null>(null);
-  const isPremiumPlan = userPlan === "PROFESSIONAL" || userPlan === "ENTERPRISE";
+  const isPremiumPlan =
+    userPlan === "PROFESSIONAL" || userPlan === "ENTERPRISE";
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -110,9 +126,7 @@ export function SupportChat({ userPlan, userName }: SupportChatProps) {
 
     const interval = setInterval(async () => {
       try {
-        const res = await fetch(
-          `/api/support/messages?ticketId=${ticketId}`,
-        );
+        const res = await fetch(`/api/support/messages?ticketId=${ticketId}`);
         const data = await res.json();
 
         if (data.messages && data.messages.length > 0) {
@@ -138,22 +152,25 @@ export function SupportChat({ userPlan, userName }: SupportChatProps) {
     return () => clearInterval(interval);
   }, [status, ticketId]);
 
-  const uploadImage = useCallback(async (file: File): Promise<string | null> => {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("folder", "support");
+  const uploadImage = useCallback(
+    async (file: File): Promise<string | null> => {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("folder", "support");
 
-    try {
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-      const data = await res.json();
-      return data.id ? `/api/uploads/${data.id}` : null;
-    } catch {
-      return null;
-    }
-  }, []);
+      try {
+        const res = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+        return data.id ? `/api/uploads/${data.id}` : null;
+      } catch {
+        return null;
+      }
+    },
+    [],
+  );
 
   const sendMessage = useCallback(
     async (text: string, imageUrl?: string) => {
@@ -167,7 +184,9 @@ export function SupportChat({ userPlan, userName }: SupportChatProps) {
 
       try {
         const messagesForApi = updatedMessages
-          .filter((_, i) => !(i === 0 && updatedMessages[0].role === "assistant"))
+          .filter(
+            (_, i) => !(i === 0 && updatedMessages[0].role === "assistant"),
+          )
           .map((m) => ({ role: m.role, content: m.content }));
 
         const res = await fetch("/api/support/chat", {
@@ -255,7 +274,7 @@ export function SupportChat({ userPlan, userName }: SupportChatProps) {
   return (
     <>
       <div
-        className={`fixed bottom-18 right-6 z-[199] flex w-85 max-h-130 flex-col overflow-hidden rounded-xl border border-border bg-card shadow-2xl transition-all duration-250 ${
+        className={`fixed bottom-18 right-6 z-199 flex w-85 max-h-130 flex-col overflow-hidden rounded-xl border border-border bg-card shadow-2xl transition-all duration-250 ${
           open
             ? "pointer-events-auto translate-y-0 scale-100 opacity-100"
             : "pointer-events-none translate-y-3 scale-[0.97] opacity-0"
@@ -272,9 +291,7 @@ export function SupportChat({ userPlan, userName }: SupportChatProps) {
             </div>
             <div>
               <p className="text-sm font-bold text-foreground">
-                {status === "waiting_admin"
-                  ? "Suporte Humano"
-                  : "Ajuda Servix"}
+                {status === "waiting_admin" ? "Suporte Humano" : "Ajuda Servix"}
               </p>
               <div className="flex items-center gap-1.5">
                 <span className={`size-1.5 rounded-full ${statusColor}`} />
@@ -304,7 +321,9 @@ export function SupportChat({ userPlan, userName }: SupportChatProps) {
                 Suporte Premium
               </p>
               <p className="mt-1 text-xs text-muted-foreground">
-                Como assinante do plano {userPlan === "ENTERPRISE" ? "Rede" : "Profissional"}, você tem acesso ao suporte direto:
+                Como assinante do plano{" "}
+                {userPlan === "ENTERPRISE" ? "Rede" : "Profissional"}, você tem
+                acesso ao suporte direto:
               </p>
             </div>
             <ContactButtons />
@@ -325,7 +344,8 @@ export function SupportChat({ userPlan, userName }: SupportChatProps) {
                   {m.imageUrl && <ChatImage src={m.imageUrl} />}
                   {m.role === "assistant" &&
                     isPremiumPlan &&
-                    (m.content.includes("suporte") || m.content.includes("encaminhar")) &&
+                    (m.content.includes("suporte") ||
+                      m.content.includes("encaminhar")) &&
                     i > 0 && <ContactButtons />}
                 </div>
               ))}
@@ -394,7 +414,7 @@ export function SupportChat({ userPlan, userName }: SupportChatProps) {
 
       <Button
         size="icon"
-        className="fixed bottom-6 right-6 z-[200] size-13 rounded-full shadow-lg"
+        className="fixed bottom-6 right-6 z-200 size-13 rounded-full shadow-lg"
         onClick={() => setOpen((o) => !o)}
         title="Suporte"
       >

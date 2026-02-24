@@ -230,7 +230,7 @@ PLANOS COM EQUIPE (Equipe e Profissional):
 - Proprietário acompanha agenda, desempenho e status do Stripe de cada um
 
 CONTATO SUPORTE HUMANO:
-- WhatsApp: +55 62 99968-7179
+- WhatsApp: +55 16 98911-8349
 - E-mail: contatoadapticode@gmail.com`;
 
 export const SERVIX_WHATSAPP_PROMPT = `Você é o assistente de suporte do Servix via WhatsApp, uma plataforma SaaS de agendamento para barbearias, salões de beleza e estética.
@@ -269,7 +269,7 @@ STRIPE: Acessar Painel Profissional → aviso amarelo → Configurar conta Strip
 WHATSAPP: Nome do grupo no sistema deve ser IDÊNTICO ao do WhatsApp. Opção QR Code ou número de telefone para conectar.
 
 CONTATO SUPORTE HUMANO:
-- WhatsApp: +55 62 99968-7179
+- WhatsApp: +55 16 98911-8349
 - E-mail: contatoadapticode@gmail.com
 
 Se não souber a resposta, oriente o usuário a entrar em contato com o suporte humano.`;

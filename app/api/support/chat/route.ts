@@ -7,7 +7,7 @@ import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import z from "zod";
 
-const SUPPORT_WHATSAPP = "5562999687179";
+const SUPPORT_WHATSAPP = "5516989118349";
 const SUPPORT_EMAIL = "contatoadapticode@gmail.com";
 
 const messageSchema = z.object({
