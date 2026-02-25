@@ -80,7 +80,6 @@ const plans = [
       "0% de taxa nos primeiros 90 dias",
       "Após 90 dias, taxa aumenta 1% ao mês até o máximo de 10%",
       "Comissão automática por profissional",
-      "Relatórios avançados por unidade",
       "Ranking de desempenho por profissional",
       "Histórico completo de clientes",
       "Suporte prioritário",
