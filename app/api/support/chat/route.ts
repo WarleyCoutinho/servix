@@ -1,14 +1,11 @@
 "use server";
 
 import { auth } from "@/lib/auth";
-import { responder, SERVIX_SUPPORT_PROMPT, shouldEscalate } from "@/lib/ai";
+import { responder, SERVIX_SUPPORT_PROMPT } from "@/lib/ai";
 import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import z from "zod";
-
-const SUPPORT_WHATSAPP = "5516989118349";
-const SUPPORT_EMAIL = "contatoadapticode@gmail.com";
 
 const messageSchema = z.object({
   messages: z.array(
@@ -25,7 +22,7 @@ async function getOrCreateTicket(userId: string) {
   const existing = await prisma.supportTicket.findFirst({
     where: {
       userId,
-      status: { in: ["OPEN", "WAITING_ADMIN"] },
+      status: { in: ["OPEN", "WAITING_ADMIN", "IN_PROGRESS"] },
     },
     orderBy: { createdAt: "desc" },
   });
@@ -103,34 +100,19 @@ export const POST = async (request: Request) => {
     );
   }
 
-  const plan = userPlan ?? "BASIC";
-  const isPremiumPlan = plan === "PROFESSIONAL" || plan === "ENTERPRISE";
-
-  if (isPremiumPlan) {
-    return NextResponse.json({
-      type: "redirect_human",
-      message:
-        "Como assinante do plano premium, você tem acesso ao suporte direto. Entre em contato pelos canais abaixo:",
-      whatsapp: SUPPORT_WHATSAPP,
-      email: SUPPORT_EMAIL,
-    });
-  }
-
-  if (shouldEscalate(lastMessage.content) && isPremiumPlan) {
-    return NextResponse.json({
-      type: "escalate",
-      message:
-        "Entendi que você precisa de atendimento especializado. Vou te encaminhar para nossa equipe de suporte:",
-      whatsapp: SUPPORT_WHATSAPP,
-      email: SUPPORT_EMAIL,
-    });
-  }
-
   const ticket = await getOrCreateTicket(session.user.id);
   await saveMessage(ticket.id, lastMessage.content, {
     senderId: session.user.id,
     imageUrl,
   });
+
+  if (ticket.status === "IN_PROGRESS") {
+    return NextResponse.json({
+      type: "in_progress",
+      message: "",
+      ticketId: ticket.id,
+    });
+  }
 
   const unreadAdminMessages = await getUnreadAdminMessages(ticket.id);
   if (unreadAdminMessages.length > 0) {
@@ -179,16 +161,6 @@ export const POST = async (request: Request) => {
       where: { id: ticket.id },
       data: { status: "WAITING_ADMIN" },
     });
-
-    if (isPremiumPlan) {
-      return NextResponse.json({
-        type: "escalate",
-        message:
-          "Desculpe, houve um problema ao processar sua mensagem. Entre em contato com nosso suporte:",
-        whatsapp: SUPPORT_WHATSAPP,
-        email: SUPPORT_EMAIL,
-      });
-    }
 
     return NextResponse.json({
       type: "waiting_admin",

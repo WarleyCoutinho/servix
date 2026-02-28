@@ -63,6 +63,7 @@ enum StripeAccountStatus {
 enum SupportTicketStatus {
   OPEN
   WAITING_ADMIN
+  IN_PROGRESS
   RESOLVED
 }
 
@@ -91,6 +92,7 @@ model User {
   professional          Professional?
   notifications         Notification[]
   supportTickets        SupportTicket[]
+  assignedTickets       SupportTicket[]       @relation("SupportTicketAgent")
   sentSupportMsgs       SupportMessage[]      @relation("SupportMessageSender")
   sentInvites           SupportInvite[]       @relation("SupportInvites")
   manualActivationLogs  ManualActivationLog[] @relation("ManualActivationPerformer")
@@ -400,10 +402,14 @@ model SupportTicket {
   userId String
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  assignedToId String?
+  assignedTo   User?  @relation("SupportTicketAgent", fields: [assignedToId], references: [id], onDelete: SetNull)
+
   messages SupportMessage[]
 
   @@index([userId])
   @@index([status])
+  @@index([assignedToId])
   @@map("support_ticket")
 }
 

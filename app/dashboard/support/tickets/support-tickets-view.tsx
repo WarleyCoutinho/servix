@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Headset, MessageSquare } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -31,11 +33,59 @@ interface Ticket {
       subscription: { plan: string; status: string } | null;
     }[];
   };
+  assignedTo?: { name: string } | null;
   messages: { content: string; createdAt: string | Date }[];
   _count: { messages: number };
 }
 
-export function SupportTicketsView({ tickets }: { tickets: Ticket[] }) {
+export function SupportTicketsView({ tickets: initialTickets }: { tickets: Ticket[] }) {
+  const [tickets] = useState(initialTickets);
+  const [assigning, setAssigning] = useState<string | null>(null);
+  const router = useRouter();
+
+  const handleAssign = async (ticketId: string) => {
+    setAssigning(ticketId);
+    try {
+      const res = await fetch(`/api/admin/support/${ticketId}/assign`, {
+        method: "POST",
+      });
+      if (res.ok) {
+        router.push(`/dashboard/support/tickets/${ticketId}`);
+      }
+    } catch {
+      setAssigning(null);
+    }
+  };
+
+  const getStatusBadge = (ticket: Ticket) => {
+    if (ticket.status === "IN_PROGRESS") {
+      return (
+        <div className="flex flex-col gap-1">
+          <Badge variant="default" className="bg-green-600 text-xs">
+            Em Atendimento
+          </Badge>
+          {ticket.assignedTo?.name && (
+            <span className="text-[0.65rem] text-muted-foreground">
+              {ticket.assignedTo.name}
+            </span>
+          )}
+        </div>
+      );
+    }
+    if (ticket.status === "WAITING_ADMIN") {
+      return (
+        <Badge variant="destructive" className="text-xs">
+          Aguardando
+        </Badge>
+      );
+    }
+    return (
+      <Badge variant="secondary" className="text-xs">
+        Aberto
+      </Badge>
+    );
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -113,18 +163,7 @@ export function SupportTicketsView({ tickets }: { tickets: Ticket[] }) {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <Badge
-                          variant={
-                            ticket.status === "WAITING_ADMIN"
-                              ? "destructive"
-                              : "secondary"
-                          }
-                          className="text-xs"
-                        >
-                          {ticket.status === "WAITING_ADMIN"
-                            ? "Aguardando"
-                            : "Aberto"}
-                        </Badge>
+                        {getStatusBadge(ticket)}
                       </TableCell>
                       <TableCell className="text-sm">
                         {ticket._count.messages}
@@ -133,13 +172,22 @@ export function SupportTicketsView({ tickets }: { tickets: Ticket[] }) {
                         {preview}
                       </TableCell>
                       <TableCell>
-                        <Button asChild size="sm" variant="outline">
-                          <Link
-                            href={`/dashboard/support/tickets/${ticket.id}`}
+                        {ticket.status === "IN_PROGRESS" ? (
+                          <Button asChild size="sm" variant="outline">
+                            <Link href={`/dashboard/support/tickets/${ticket.id}`}>
+                              Continuar
+                            </Link>
+                          </Button>
+                        ) : (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={assigning === ticket.id}
+                            onClick={() => handleAssign(ticket.id)}
                           >
-                            Atender
-                          </Link>
-                        </Button>
+                            {assigning === ticket.id ? "Atribuindo..." : "Atender"}
+                          </Button>
+                        )}
                       </TableCell>
                     </TableRow>
                   );

@@ -4,7 +4,6 @@ import {
   Headset,
   ImagePlus,
   Loader2,
-  Mail,
   MessageCircle,
   Phone,
   Send,
@@ -15,7 +14,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "./ui/button";
 
 const SUPPORT_WHATSAPP = "5516989118349";
-const SUPPORT_EMAIL = "contatoadapticode@gmail.com";
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -23,7 +21,7 @@ interface ChatMessage {
   imageUrl?: string;
 }
 
-type ChatStatus = "idle" | "loading" | "error" | "waiting_admin";
+type ChatStatus = "idle" | "loading" | "error" | "waiting_admin" | "in_progress";
 
 interface SupportChatProps {
   userPlan: string;
@@ -36,7 +34,8 @@ interface ApiResponse {
     | "escalate"
     | "redirect_human"
     | "waiting_admin"
-    | "admin_response";
+    | "admin_response"
+    | "in_progress";
   message: string;
   whatsapp?: string;
   email?: string;
@@ -48,29 +47,6 @@ interface PollMessage {
   content: string;
   imageUrl?: string;
   createdAt: string;
-}
-
-function ContactButtons() {
-  return (
-    <div className="mt-3 flex flex-col gap-2">
-      <a
-        href={`https://wa.me/${SUPPORT_WHATSAPP}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex items-center gap-2 rounded-md border border-green-500/30 bg-green-500/10 px-3 py-2 text-xs font-medium text-green-400 transition-colors hover:bg-green-500/20"
-      >
-        <Phone className="size-3.5" />
-        WhatsApp: +55 16 98911-8349
-      </a>
-      <a
-        href={`mailto:${SUPPORT_EMAIL}`}
-        className="flex items-center gap-2 rounded-md border border-blue-500/30 bg-blue-500/10 px-3 py-2 text-xs font-medium text-blue-400 transition-colors hover:bg-blue-500/20"
-      >
-        <Mail className="size-3.5" />
-        {SUPPORT_EMAIL}
-      </a>
-    </div>
-  );
 }
 
 function ChatImage({ src }: { src: string }) {
@@ -105,6 +81,7 @@ export function SupportChat({ userPlan, userName }: SupportChatProps) {
   const [input, setInput] = useState("");
   const [status, setStatus] = useState<ChatStatus>("idle");
   const [ticketId, setTicketId] = useState<string | null>(null);
+  const [agentName, setAgentName] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -114,8 +91,7 @@ export function SupportChat({ userPlan, userName }: SupportChatProps) {
     },
   ]);
   const endRef = useRef<HTMLDivElement | null>(null);
-  const isPremiumPlan =
-    userPlan === "PROFESSIONAL" || userPlan === "ENTERPRISE";
+  const isPremiumPlan = userPlan === "PROFESSIONAL" || userPlan === "ENTERPRISE";
 
   useEffect(() => {
     const handleOpenChat = () => setOpen(true);
@@ -127,13 +103,23 @@ export function SupportChat({ userPlan, userName }: SupportChatProps) {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  const shouldPoll = status === "waiting_admin" || status === "in_progress";
+
   useEffect(() => {
-    if (status !== "waiting_admin" || !ticketId) return;
+    if (!shouldPoll || !ticketId) return;
 
     const interval = setInterval(async () => {
       try {
         const res = await fetch(`/api/support/messages?ticketId=${ticketId}`);
         const data = await res.json();
+
+        if (data.assignedToName) {
+          setAgentName(data.assignedToName);
+        }
+
+        if (data.ticketStatus === "IN_PROGRESS" && status !== "in_progress") {
+          setStatus("in_progress");
+        }
 
         if (data.messages && data.messages.length > 0) {
           const adminMessages: PollMessage[] = data.messages;
@@ -145,18 +131,28 @@ export function SupportChat({ userPlan, userName }: SupportChatProps) {
               imageUrl: m.imageUrl,
             })),
           ]);
-          setStatus("idle");
+          if (status === "waiting_admin") {
+            setStatus("in_progress");
+          }
         }
 
         if (data.ticketStatus === "RESOLVED") {
           setStatus("idle");
           setTicketId(null);
+          setAgentName(null);
+          setMessages((prev) => [
+            ...prev,
+            {
+              role: "assistant",
+              content: "Este atendimento foi encerrado. Se precisar de mais ajuda, envie uma nova mensagem!",
+            },
+          ]);
         }
       } catch {}
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [status, ticketId]);
+  }, [shouldPoll, ticketId, status]);
 
   const uploadImage = useCallback(
     async (file: File): Promise<string | null> => {
@@ -186,6 +182,25 @@ export function SupportChat({ userPlan, userName }: SupportChatProps) {
       const updatedMessages = [...messages, userMsg];
       setMessages(updatedMessages);
       setInput("");
+
+      if (status === "in_progress") {
+        try {
+          const messagesForApi = [{ role: "user" as const, content: text }];
+          const res = await fetch("/api/support/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              messages: messagesForApi,
+              userPlan,
+              imageUrl,
+            }),
+          });
+          const data: ApiResponse = await res.json();
+          if (data.ticketId) setTicketId(data.ticketId);
+        } catch {}
+        return;
+      }
+
       setStatus("loading");
 
       try {
@@ -211,16 +226,27 @@ export function SupportChat({ userPlan, userName }: SupportChatProps) {
           setTicketId(data.ticketId);
         }
 
-        setMessages((prev) => [
-          ...prev,
-          { role: "assistant", content: data.message },
-        ]);
-
-        if (data.type === "waiting_admin") {
+        if (data.type === "in_progress") {
+          setStatus("in_progress");
+        } else if (data.type === "waiting_admin") {
+          setMessages((prev) => [
+            ...prev,
+            { role: "assistant", content: data.message },
+          ]);
           setStatus("waiting_admin");
         } else if (data.type === "escalate" || data.type === "redirect_human") {
+          setMessages((prev) => [
+            ...prev,
+            { role: "assistant", content: data.message },
+          ]);
           setStatus("error");
         } else {
+          if (data.message) {
+            setMessages((prev) => [
+              ...prev,
+              { role: "assistant", content: data.message },
+            ]);
+          }
           setStatus("idle");
         }
       } catch {
@@ -266,7 +292,9 @@ export function SupportChat({ userPlan, userName }: SupportChatProps) {
         ? "bg-red-400"
         : status === "waiting_admin"
           ? "bg-amber-400"
-          : "bg-green-400";
+          : status === "in_progress"
+            ? "bg-green-400"
+            : "bg-green-400";
 
   const statusText =
     status === "loading"
@@ -275,7 +303,9 @@ export function SupportChat({ userPlan, userName }: SupportChatProps) {
         ? "Encaminhando ao suporte"
         : status === "waiting_admin"
           ? "Aguardando atendente..."
-          : "Online agora";
+          : status === "in_progress"
+            ? `Em atendimento${agentName ? ` com ${agentName}` : ""}`
+            : "Online agora";
 
   return (
     <>
@@ -289,7 +319,7 @@ export function SupportChat({ userPlan, userName }: SupportChatProps) {
         <div className="flex items-center justify-between border-b border-border bg-card px-4 py-3">
           <div className="flex items-center gap-3">
             <div className="flex size-8 items-center justify-center rounded-full bg-primary/10 text-base">
-              {status === "waiting_admin" ? (
+              {status === "waiting_admin" || status === "in_progress" ? (
                 <Headset className="size-4 text-amber-500" />
               ) : (
                 "✂️"
@@ -297,7 +327,11 @@ export function SupportChat({ userPlan, userName }: SupportChatProps) {
             </div>
             <div>
               <p className="text-sm font-bold text-foreground">
-                {status === "waiting_admin" ? "Suporte Humano" : "Ajuda Servix"}
+                {status === "in_progress" && agentName
+                  ? agentName
+                  : status === "waiting_admin"
+                    ? "Suporte Humano"
+                    : "Ajuda Servix"}
               </p>
               <div className="flex items-center gap-1.5">
                 <span className={`size-1.5 rounded-full ${statusColor}`} />
@@ -317,105 +351,95 @@ export function SupportChat({ userPlan, userName }: SupportChatProps) {
           </Button>
         </div>
 
-        {isPremiumPlan ? (
-          <div className="flex flex-1 flex-col items-center justify-center gap-4 p-6 text-center">
-            <div className="flex size-12 items-center justify-center rounded-full bg-primary/10 text-2xl">
-              🌟
+        <div className="flex flex-1 flex-col gap-2.5 overflow-y-auto p-4">
+          {messages.map((m, i) => (
+            <div
+              key={i}
+              className={`max-w-[88%] rounded-xl px-3.5 py-2.5 text-sm leading-relaxed ${
+                m.role === "assistant"
+                  ? "self-start rounded-bl-sm border border-border bg-muted text-foreground"
+                  : "self-end rounded-br-sm bg-primary text-primary-foreground"
+              }`}
+            >
+              {m.content && <span>{m.content}</span>}
+              {m.imageUrl && <ChatImage src={m.imageUrl} />}
             </div>
-            <div>
-              <p className="text-sm font-semibold text-foreground">
-                Suporte Premium
-              </p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Como assinante do plano{" "}
-                {userPlan === "ENTERPRISE" ? "Rede" : "Profissional"}, você tem
-                acesso ao suporte direto:
-              </p>
+          ))}
+
+          {status === "loading" && (
+            <div className="flex items-center gap-2 self-start text-muted-foreground">
+              <Loader2 className="size-3.5 animate-spin" />
+              <span className="text-xs">Digitando...</span>
             </div>
-            <ContactButtons />
-          </div>
-        ) : (
-          <>
-            <div className="flex flex-1 flex-col gap-2.5 overflow-y-auto p-4">
-              {messages.map((m, i) => (
-                <div
-                  key={i}
-                  className={`max-w-[88%] rounded-xl px-3.5 py-2.5 text-sm leading-relaxed ${
-                    m.role === "assistant"
-                      ? "self-start rounded-bl-sm border border-border bg-muted text-foreground"
-                      : "self-end rounded-br-sm bg-primary text-primary-foreground"
-                  }`}
-                >
-                  {m.content && <span>{m.content}</span>}
-                  {m.imageUrl && <ChatImage src={m.imageUrl} />}
-                  {m.role === "assistant" &&
-                    isPremiumPlan &&
-                    (m.content.includes("suporte") ||
-                      m.content.includes("encaminhar")) &&
-                    i > 0 && <ContactButtons />}
-                </div>
-              ))}
+          )}
 
-              {status === "loading" && (
-                <div className="flex items-center gap-2 self-start text-muted-foreground">
-                  <Loader2 className="size-3.5 animate-spin" />
-                  <span className="text-xs">Digitando...</span>
-                </div>
-              )}
-
-              {uploading && (
-                <div className="flex items-center gap-2 self-end text-muted-foreground">
-                  <Loader2 className="size-3.5 animate-spin" />
-                  <span className="text-xs">Enviando imagem...</span>
-                </div>
-              )}
-
-              {status === "waiting_admin" && (
-                <div className="flex items-center gap-2 self-start rounded-lg border border-amber-500/20 bg-amber-500/5 px-3 py-2 text-amber-500">
-                  <Loader2 className="size-3.5 animate-spin" />
-                  <span className="text-xs">Aguardando atendente...</span>
-                </div>
-              )}
-
-              <div ref={endRef} />
+          {uploading && (
+            <div className="flex items-center gap-2 self-end text-muted-foreground">
+              <Loader2 className="size-3.5 animate-spin" />
+              <span className="text-xs">Enviando imagem...</span>
             </div>
+          )}
 
-            <div className="flex gap-2 border-t border-border p-3">
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                className="hidden"
-                onChange={handleFileSelect}
-              />
-              <Button
-                variant="ghost"
-                size="icon"
-                className="size-9 shrink-0"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={status === "loading" || uploading}
-                title="Enviar imagem"
-              >
-                <ImagePlus className="size-4" />
-              </Button>
-              <input
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && sendMessage(input)}
-                placeholder="Digite sua dúvida..."
-                className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground outline-none placeholder:text-muted-foreground focus:border-ring"
-              />
-              <Button
-                size="icon"
-                className="size-9 shrink-0"
-                onClick={() => sendMessage(input)}
-                disabled={status === "loading" || uploading || !input.trim()}
-              >
-                <Send className="size-4" />
-              </Button>
+          {status === "waiting_admin" && (
+            <div className="flex items-center gap-2 self-start rounded-lg border border-amber-500/20 bg-amber-500/5 px-3 py-2 text-amber-500">
+              <Loader2 className="size-3.5 animate-spin" />
+              <span className="text-xs">Aguardando atendente...</span>
             </div>
-          </>
+          )}
+
+          <div ref={endRef} />
+        </div>
+
+        {isPremiumPlan && status !== "in_progress" && (
+          <a
+            href={`https://wa.me/${SUPPORT_WHATSAPP}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mx-3 mb-1 flex items-center gap-2 rounded-lg border border-green-500/20 bg-green-500/5 px-3 py-2 text-xs text-green-600 transition-colors hover:bg-green-500/10 dark:text-green-400"
+          >
+            <Phone className="size-3.5" />
+            <span>Prefere WhatsApp? Fale conosco direto</span>
+          </a>
         )}
+
+        <div className="flex gap-2 border-t border-border p-3">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            className="hidden"
+            onChange={handleFileSelect}
+          />
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-9 shrink-0"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={status === "loading" || uploading}
+            title="Enviar imagem"
+          >
+            <ImagePlus className="size-4" />
+          </Button>
+          <input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && sendMessage(input)}
+            placeholder={
+              status === "in_progress"
+                ? "Envie sua mensagem..."
+                : "Digite sua dúvida..."
+            }
+            className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground outline-none placeholder:text-muted-foreground focus:border-ring"
+          />
+          <Button
+            size="icon"
+            className="size-9 shrink-0"
+            onClick={() => sendMessage(input)}
+            disabled={status === "loading" || uploading || !input.trim()}
+          >
+            <Send className="size-4" />
+          </Button>
+        </div>
       </div>
 
       <Button

@@ -22,6 +22,11 @@ export const GET = async (request: Request) => {
       id: ticketId,
       userId: session.user.id,
     },
+    include: {
+      assignedTo: {
+        select: { name: true },
+      },
+    },
   });
 
   if (!ticket) {
@@ -54,5 +59,6 @@ export const GET = async (request: Request) => {
       createdAt: m.createdAt,
     })),
     ticketStatus: ticket.status,
+    assignedToName: ticket.assignedTo?.name ?? null,
   });
 };

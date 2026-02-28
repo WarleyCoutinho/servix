@@ -91,9 +91,16 @@ export const POST = async (
     },
   });
 
+  const ticket = await prisma.supportTicket.findUnique({
+    where: { id: ticketId },
+  });
+
   await prisma.supportTicket.update({
     where: { id: ticketId },
-    data: { status: "OPEN" },
+    data: {
+      status: ticket?.assignedToId ? "IN_PROGRESS" : "OPEN",
+      assignedToId: ticket?.assignedToId ?? session.user.id,
+    },
   });
 
   return NextResponse.json({ message });

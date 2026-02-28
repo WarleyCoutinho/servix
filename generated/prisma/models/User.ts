@@ -245,6 +245,7 @@ export type UserWhereInput = {
   professional?: Prisma.XOR<Prisma.ProfessionalNullableScalarRelationFilter, Prisma.ProfessionalWhereInput> | null
   notifications?: Prisma.NotificationListRelationFilter
   supportTickets?: Prisma.SupportTicketListRelationFilter
+  assignedTickets?: Prisma.SupportTicketListRelationFilter
   sentSupportMsgs?: Prisma.SupportMessageListRelationFilter
   sentInvites?: Prisma.SupportInviteListRelationFilter
   manualActivationLogs?: Prisma.ManualActivationLogListRelationFilter
@@ -270,6 +271,7 @@ export type UserOrderByWithRelationInput = {
   professional?: Prisma.ProfessionalOrderByWithRelationInput
   notifications?: Prisma.NotificationOrderByRelationAggregateInput
   supportTickets?: Prisma.SupportTicketOrderByRelationAggregateInput
+  assignedTickets?: Prisma.SupportTicketOrderByRelationAggregateInput
   sentSupportMsgs?: Prisma.SupportMessageOrderByRelationAggregateInput
   sentInvites?: Prisma.SupportInviteOrderByRelationAggregateInput
   manualActivationLogs?: Prisma.ManualActivationLogOrderByRelationAggregateInput
@@ -298,6 +300,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   professional?: Prisma.XOR<Prisma.ProfessionalNullableScalarRelationFilter, Prisma.ProfessionalWhereInput> | null
   notifications?: Prisma.NotificationListRelationFilter
   supportTickets?: Prisma.SupportTicketListRelationFilter
+  assignedTickets?: Prisma.SupportTicketListRelationFilter
   sentSupportMsgs?: Prisma.SupportMessageListRelationFilter
   sentInvites?: Prisma.SupportInviteListRelationFilter
   manualActivationLogs?: Prisma.ManualActivationLogListRelationFilter
@@ -359,6 +362,7 @@ export type UserCreateInput = {
   professional?: Prisma.ProfessionalCreateNestedOneWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
+  assignedTickets?: Prisma.SupportTicketCreateNestedManyWithoutAssignedToInput
   sentSupportMsgs?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
   sentInvites?: Prisma.SupportInviteCreateNestedManyWithoutAdminInput
   manualActivationLogs?: Prisma.ManualActivationLogCreateNestedManyWithoutPerformedByInput
@@ -384,6 +388,7 @@ export type UserUncheckedCreateInput = {
   professional?: Prisma.ProfessionalUncheckedCreateNestedOneWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
+  assignedTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutAssignedToInput
   sentSupportMsgs?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
   sentInvites?: Prisma.SupportInviteUncheckedCreateNestedManyWithoutAdminInput
   manualActivationLogs?: Prisma.ManualActivationLogUncheckedCreateNestedManyWithoutPerformedByInput
@@ -409,6 +414,7 @@ export type UserUpdateInput = {
   professional?: Prisma.ProfessionalUpdateOneWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
+  assignedTickets?: Prisma.SupportTicketUpdateManyWithoutAssignedToNestedInput
   sentSupportMsgs?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
   sentInvites?: Prisma.SupportInviteUpdateManyWithoutAdminNestedInput
   manualActivationLogs?: Prisma.ManualActivationLogUpdateManyWithoutPerformedByNestedInput
@@ -434,6 +440,7 @@ export type UserUncheckedUpdateInput = {
   professional?: Prisma.ProfessionalUncheckedUpdateOneWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
+  assignedTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutAssignedToNestedInput
   sentSupportMsgs?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
   sentInvites?: Prisma.SupportInviteUncheckedUpdateManyWithoutAdminNestedInput
   manualActivationLogs?: Prisma.ManualActivationLogUncheckedUpdateManyWithoutPerformedByNestedInput
@@ -641,12 +648,28 @@ export type UserCreateNestedOneWithoutSupportTicketsInput = {
   connect?: Prisma.UserWhereUniqueInput
 }
 
+export type UserCreateNestedOneWithoutAssignedTicketsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAssignedTicketsInput, Prisma.UserUncheckedCreateWithoutAssignedTicketsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAssignedTicketsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
 export type UserUpdateOneRequiredWithoutSupportTicketsNestedInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutSupportTicketsInput, Prisma.UserUncheckedCreateWithoutSupportTicketsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutSupportTicketsInput
   upsert?: Prisma.UserUpsertWithoutSupportTicketsInput
   connect?: Prisma.UserWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSupportTicketsInput, Prisma.UserUpdateWithoutSupportTicketsInput>, Prisma.UserUncheckedUpdateWithoutSupportTicketsInput>
+}
+
+export type UserUpdateOneWithoutAssignedTicketsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAssignedTicketsInput, Prisma.UserUncheckedCreateWithoutAssignedTicketsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAssignedTicketsInput
+  upsert?: Prisma.UserUpsertWithoutAssignedTicketsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAssignedTicketsInput, Prisma.UserUpdateWithoutAssignedTicketsInput>, Prisma.UserUncheckedUpdateWithoutAssignedTicketsInput>
 }
 
 export type UserCreateNestedOneWithoutSentSupportMsgsInput = {
@@ -726,6 +749,7 @@ export type UserCreateWithoutSessionsInput = {
   professional?: Prisma.ProfessionalCreateNestedOneWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
+  assignedTickets?: Prisma.SupportTicketCreateNestedManyWithoutAssignedToInput
   sentSupportMsgs?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
   sentInvites?: Prisma.SupportInviteCreateNestedManyWithoutAdminInput
   manualActivationLogs?: Prisma.ManualActivationLogCreateNestedManyWithoutPerformedByInput
@@ -750,6 +774,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   professional?: Prisma.ProfessionalUncheckedCreateNestedOneWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
+  assignedTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutAssignedToInput
   sentSupportMsgs?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
   sentInvites?: Prisma.SupportInviteUncheckedCreateNestedManyWithoutAdminInput
   manualActivationLogs?: Prisma.ManualActivationLogUncheckedCreateNestedManyWithoutPerformedByInput
@@ -790,6 +815,7 @@ export type UserUpdateWithoutSessionsInput = {
   professional?: Prisma.ProfessionalUpdateOneWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
+  assignedTickets?: Prisma.SupportTicketUpdateManyWithoutAssignedToNestedInput
   sentSupportMsgs?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
   sentInvites?: Prisma.SupportInviteUpdateManyWithoutAdminNestedInput
   manualActivationLogs?: Prisma.ManualActivationLogUpdateManyWithoutPerformedByNestedInput
@@ -814,6 +840,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   professional?: Prisma.ProfessionalUncheckedUpdateOneWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
+  assignedTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutAssignedToNestedInput
   sentSupportMsgs?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
   sentInvites?: Prisma.SupportInviteUncheckedUpdateManyWithoutAdminNestedInput
   manualActivationLogs?: Prisma.ManualActivationLogUncheckedUpdateManyWithoutPerformedByNestedInput
@@ -838,6 +865,7 @@ export type UserCreateWithoutAccountsInput = {
   professional?: Prisma.ProfessionalCreateNestedOneWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
+  assignedTickets?: Prisma.SupportTicketCreateNestedManyWithoutAssignedToInput
   sentSupportMsgs?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
   sentInvites?: Prisma.SupportInviteCreateNestedManyWithoutAdminInput
   manualActivationLogs?: Prisma.ManualActivationLogCreateNestedManyWithoutPerformedByInput
@@ -862,6 +890,7 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   professional?: Prisma.ProfessionalUncheckedCreateNestedOneWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
+  assignedTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutAssignedToInput
   sentSupportMsgs?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
   sentInvites?: Prisma.SupportInviteUncheckedCreateNestedManyWithoutAdminInput
   manualActivationLogs?: Prisma.ManualActivationLogUncheckedCreateNestedManyWithoutPerformedByInput
@@ -902,6 +931,7 @@ export type UserUpdateWithoutAccountsInput = {
   professional?: Prisma.ProfessionalUpdateOneWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
+  assignedTickets?: Prisma.SupportTicketUpdateManyWithoutAssignedToNestedInput
   sentSupportMsgs?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
   sentInvites?: Prisma.SupportInviteUpdateManyWithoutAdminNestedInput
   manualActivationLogs?: Prisma.ManualActivationLogUpdateManyWithoutPerformedByNestedInput
@@ -926,6 +956,7 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   professional?: Prisma.ProfessionalUncheckedUpdateOneWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
+  assignedTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutAssignedToNestedInput
   sentSupportMsgs?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
   sentInvites?: Prisma.SupportInviteUncheckedUpdateManyWithoutAdminNestedInput
   manualActivationLogs?: Prisma.ManualActivationLogUncheckedUpdateManyWithoutPerformedByNestedInput
@@ -950,6 +981,7 @@ export type UserCreateWithoutOwnedBarbershopsInput = {
   professional?: Prisma.ProfessionalCreateNestedOneWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
+  assignedTickets?: Prisma.SupportTicketCreateNestedManyWithoutAssignedToInput
   sentSupportMsgs?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
   sentInvites?: Prisma.SupportInviteCreateNestedManyWithoutAdminInput
   manualActivationLogs?: Prisma.ManualActivationLogCreateNestedManyWithoutPerformedByInput
@@ -974,6 +1006,7 @@ export type UserUncheckedCreateWithoutOwnedBarbershopsInput = {
   professional?: Prisma.ProfessionalUncheckedCreateNestedOneWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
+  assignedTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutAssignedToInput
   sentSupportMsgs?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
   sentInvites?: Prisma.SupportInviteUncheckedCreateNestedManyWithoutAdminInput
   manualActivationLogs?: Prisma.ManualActivationLogUncheckedCreateNestedManyWithoutPerformedByInput
@@ -1014,6 +1047,7 @@ export type UserUpdateWithoutOwnedBarbershopsInput = {
   professional?: Prisma.ProfessionalUpdateOneWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
+  assignedTickets?: Prisma.SupportTicketUpdateManyWithoutAssignedToNestedInput
   sentSupportMsgs?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
   sentInvites?: Prisma.SupportInviteUpdateManyWithoutAdminNestedInput
   manualActivationLogs?: Prisma.ManualActivationLogUpdateManyWithoutPerformedByNestedInput
@@ -1038,6 +1072,7 @@ export type UserUncheckedUpdateWithoutOwnedBarbershopsInput = {
   professional?: Prisma.ProfessionalUncheckedUpdateOneWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
+  assignedTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutAssignedToNestedInput
   sentSupportMsgs?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
   sentInvites?: Prisma.SupportInviteUncheckedUpdateManyWithoutAdminNestedInput
   manualActivationLogs?: Prisma.ManualActivationLogUncheckedUpdateManyWithoutPerformedByNestedInput
@@ -1062,6 +1097,7 @@ export type UserCreateWithoutProfessionalInput = {
   ownedBarbershops?: Prisma.BarbershopCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
+  assignedTickets?: Prisma.SupportTicketCreateNestedManyWithoutAssignedToInput
   sentSupportMsgs?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
   sentInvites?: Prisma.SupportInviteCreateNestedManyWithoutAdminInput
   manualActivationLogs?: Prisma.ManualActivationLogCreateNestedManyWithoutPerformedByInput
@@ -1086,6 +1122,7 @@ export type UserUncheckedCreateWithoutProfessionalInput = {
   ownedBarbershops?: Prisma.BarbershopUncheckedCreateNestedManyWithoutOwnerInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
+  assignedTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutAssignedToInput
   sentSupportMsgs?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
   sentInvites?: Prisma.SupportInviteUncheckedCreateNestedManyWithoutAdminInput
   manualActivationLogs?: Prisma.ManualActivationLogUncheckedCreateNestedManyWithoutPerformedByInput
@@ -1126,6 +1163,7 @@ export type UserUpdateWithoutProfessionalInput = {
   ownedBarbershops?: Prisma.BarbershopUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
+  assignedTickets?: Prisma.SupportTicketUpdateManyWithoutAssignedToNestedInput
   sentSupportMsgs?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
   sentInvites?: Prisma.SupportInviteUpdateManyWithoutAdminNestedInput
   manualActivationLogs?: Prisma.ManualActivationLogUpdateManyWithoutPerformedByNestedInput
@@ -1150,6 +1188,7 @@ export type UserUncheckedUpdateWithoutProfessionalInput = {
   ownedBarbershops?: Prisma.BarbershopUncheckedUpdateManyWithoutOwnerNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
+  assignedTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutAssignedToNestedInput
   sentSupportMsgs?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
   sentInvites?: Prisma.SupportInviteUncheckedUpdateManyWithoutAdminNestedInput
   manualActivationLogs?: Prisma.ManualActivationLogUncheckedUpdateManyWithoutPerformedByNestedInput
@@ -1174,6 +1213,7 @@ export type UserCreateWithoutBookingsInput = {
   professional?: Prisma.ProfessionalCreateNestedOneWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
+  assignedTickets?: Prisma.SupportTicketCreateNestedManyWithoutAssignedToInput
   sentSupportMsgs?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
   sentInvites?: Prisma.SupportInviteCreateNestedManyWithoutAdminInput
   manualActivationLogs?: Prisma.ManualActivationLogCreateNestedManyWithoutPerformedByInput
@@ -1198,6 +1238,7 @@ export type UserUncheckedCreateWithoutBookingsInput = {
   professional?: Prisma.ProfessionalUncheckedCreateNestedOneWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
+  assignedTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutAssignedToInput
   sentSupportMsgs?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
   sentInvites?: Prisma.SupportInviteUncheckedCreateNestedManyWithoutAdminInput
   manualActivationLogs?: Prisma.ManualActivationLogUncheckedCreateNestedManyWithoutPerformedByInput
@@ -1238,6 +1279,7 @@ export type UserUpdateWithoutBookingsInput = {
   professional?: Prisma.ProfessionalUpdateOneWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
+  assignedTickets?: Prisma.SupportTicketUpdateManyWithoutAssignedToNestedInput
   sentSupportMsgs?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
   sentInvites?: Prisma.SupportInviteUpdateManyWithoutAdminNestedInput
   manualActivationLogs?: Prisma.ManualActivationLogUpdateManyWithoutPerformedByNestedInput
@@ -1262,6 +1304,7 @@ export type UserUncheckedUpdateWithoutBookingsInput = {
   professional?: Prisma.ProfessionalUncheckedUpdateOneWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
+  assignedTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutAssignedToNestedInput
   sentSupportMsgs?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
   sentInvites?: Prisma.SupportInviteUncheckedUpdateManyWithoutAdminNestedInput
   manualActivationLogs?: Prisma.ManualActivationLogUncheckedUpdateManyWithoutPerformedByNestedInput
@@ -1286,6 +1329,7 @@ export type UserCreateWithoutSupportTicketsInput = {
   ownedBarbershops?: Prisma.BarbershopCreateNestedManyWithoutOwnerInput
   professional?: Prisma.ProfessionalCreateNestedOneWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  assignedTickets?: Prisma.SupportTicketCreateNestedManyWithoutAssignedToInput
   sentSupportMsgs?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
   sentInvites?: Prisma.SupportInviteCreateNestedManyWithoutAdminInput
   manualActivationLogs?: Prisma.ManualActivationLogCreateNestedManyWithoutPerformedByInput
@@ -1310,6 +1354,7 @@ export type UserUncheckedCreateWithoutSupportTicketsInput = {
   ownedBarbershops?: Prisma.BarbershopUncheckedCreateNestedManyWithoutOwnerInput
   professional?: Prisma.ProfessionalUncheckedCreateNestedOneWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  assignedTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutAssignedToInput
   sentSupportMsgs?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
   sentInvites?: Prisma.SupportInviteUncheckedCreateNestedManyWithoutAdminInput
   manualActivationLogs?: Prisma.ManualActivationLogUncheckedCreateNestedManyWithoutPerformedByInput
@@ -1318,6 +1363,61 @@ export type UserUncheckedCreateWithoutSupportTicketsInput = {
 export type UserCreateOrConnectWithoutSupportTicketsInput = {
   where: Prisma.UserWhereUniqueInput
   create: Prisma.XOR<Prisma.UserCreateWithoutSupportTicketsInput, Prisma.UserUncheckedCreateWithoutSupportTicketsInput>
+}
+
+export type UserCreateWithoutAssignedTicketsInput = {
+  id: string
+  name: string
+  email: string
+  emailVerified?: boolean
+  image?: string | null
+  role?: $Enums.UserRole
+  banned?: boolean
+  banReason?: string | null
+  banExpires?: Date | string | null
+  stripeCustomerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  bookings?: Prisma.BookingCreateNestedManyWithoutUserInput
+  ownedBarbershops?: Prisma.BarbershopCreateNestedManyWithoutOwnerInput
+  professional?: Prisma.ProfessionalCreateNestedOneWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
+  sentSupportMsgs?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  sentInvites?: Prisma.SupportInviteCreateNestedManyWithoutAdminInput
+  manualActivationLogs?: Prisma.ManualActivationLogCreateNestedManyWithoutPerformedByInput
+}
+
+export type UserUncheckedCreateWithoutAssignedTicketsInput = {
+  id: string
+  name: string
+  email: string
+  emailVerified?: boolean
+  image?: string | null
+  role?: $Enums.UserRole
+  banned?: boolean
+  banReason?: string | null
+  banExpires?: Date | string | null
+  stripeCustomerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutUserInput
+  ownedBarbershops?: Prisma.BarbershopUncheckedCreateNestedManyWithoutOwnerInput
+  professional?: Prisma.ProfessionalUncheckedCreateNestedOneWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
+  sentSupportMsgs?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  sentInvites?: Prisma.SupportInviteUncheckedCreateNestedManyWithoutAdminInput
+  manualActivationLogs?: Prisma.ManualActivationLogUncheckedCreateNestedManyWithoutPerformedByInput
+}
+
+export type UserCreateOrConnectWithoutAssignedTicketsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutAssignedTicketsInput, Prisma.UserUncheckedCreateWithoutAssignedTicketsInput>
 }
 
 export type UserUpsertWithoutSupportTicketsInput = {
@@ -1350,6 +1450,7 @@ export type UserUpdateWithoutSupportTicketsInput = {
   ownedBarbershops?: Prisma.BarbershopUpdateManyWithoutOwnerNestedInput
   professional?: Prisma.ProfessionalUpdateOneWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  assignedTickets?: Prisma.SupportTicketUpdateManyWithoutAssignedToNestedInput
   sentSupportMsgs?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
   sentInvites?: Prisma.SupportInviteUpdateManyWithoutAdminNestedInput
   manualActivationLogs?: Prisma.ManualActivationLogUpdateManyWithoutPerformedByNestedInput
@@ -1374,6 +1475,68 @@ export type UserUncheckedUpdateWithoutSupportTicketsInput = {
   ownedBarbershops?: Prisma.BarbershopUncheckedUpdateManyWithoutOwnerNestedInput
   professional?: Prisma.ProfessionalUncheckedUpdateOneWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  assignedTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutAssignedToNestedInput
+  sentSupportMsgs?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  sentInvites?: Prisma.SupportInviteUncheckedUpdateManyWithoutAdminNestedInput
+  manualActivationLogs?: Prisma.ManualActivationLogUncheckedUpdateManyWithoutPerformedByNestedInput
+}
+
+export type UserUpsertWithoutAssignedTicketsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutAssignedTicketsInput, Prisma.UserUncheckedUpdateWithoutAssignedTicketsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAssignedTicketsInput, Prisma.UserUncheckedCreateWithoutAssignedTicketsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutAssignedTicketsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutAssignedTicketsInput, Prisma.UserUncheckedUpdateWithoutAssignedTicketsInput>
+}
+
+export type UserUpdateWithoutAssignedTicketsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  bookings?: Prisma.BookingUpdateManyWithoutUserNestedInput
+  ownedBarbershops?: Prisma.BarbershopUpdateManyWithoutOwnerNestedInput
+  professional?: Prisma.ProfessionalUpdateOneWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
+  sentSupportMsgs?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  sentInvites?: Prisma.SupportInviteUpdateManyWithoutAdminNestedInput
+  manualActivationLogs?: Prisma.ManualActivationLogUpdateManyWithoutPerformedByNestedInput
+}
+
+export type UserUncheckedUpdateWithoutAssignedTicketsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  bookings?: Prisma.BookingUncheckedUpdateManyWithoutUserNestedInput
+  ownedBarbershops?: Prisma.BarbershopUncheckedUpdateManyWithoutOwnerNestedInput
+  professional?: Prisma.ProfessionalUncheckedUpdateOneWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
   sentSupportMsgs?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
   sentInvites?: Prisma.SupportInviteUncheckedUpdateManyWithoutAdminNestedInput
   manualActivationLogs?: Prisma.ManualActivationLogUncheckedUpdateManyWithoutPerformedByNestedInput
@@ -1399,6 +1562,7 @@ export type UserCreateWithoutSentSupportMsgsInput = {
   professional?: Prisma.ProfessionalCreateNestedOneWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
+  assignedTickets?: Prisma.SupportTicketCreateNestedManyWithoutAssignedToInput
   sentInvites?: Prisma.SupportInviteCreateNestedManyWithoutAdminInput
   manualActivationLogs?: Prisma.ManualActivationLogCreateNestedManyWithoutPerformedByInput
 }
@@ -1423,6 +1587,7 @@ export type UserUncheckedCreateWithoutSentSupportMsgsInput = {
   professional?: Prisma.ProfessionalUncheckedCreateNestedOneWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
+  assignedTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutAssignedToInput
   sentInvites?: Prisma.SupportInviteUncheckedCreateNestedManyWithoutAdminInput
   manualActivationLogs?: Prisma.ManualActivationLogUncheckedCreateNestedManyWithoutPerformedByInput
 }
@@ -1463,6 +1628,7 @@ export type UserUpdateWithoutSentSupportMsgsInput = {
   professional?: Prisma.ProfessionalUpdateOneWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
+  assignedTickets?: Prisma.SupportTicketUpdateManyWithoutAssignedToNestedInput
   sentInvites?: Prisma.SupportInviteUpdateManyWithoutAdminNestedInput
   manualActivationLogs?: Prisma.ManualActivationLogUpdateManyWithoutPerformedByNestedInput
 }
@@ -1487,6 +1653,7 @@ export type UserUncheckedUpdateWithoutSentSupportMsgsInput = {
   professional?: Prisma.ProfessionalUncheckedUpdateOneWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
+  assignedTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutAssignedToNestedInput
   sentInvites?: Prisma.SupportInviteUncheckedUpdateManyWithoutAdminNestedInput
   manualActivationLogs?: Prisma.ManualActivationLogUncheckedUpdateManyWithoutPerformedByNestedInput
 }
@@ -1511,6 +1678,7 @@ export type UserCreateWithoutSentInvitesInput = {
   professional?: Prisma.ProfessionalCreateNestedOneWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
+  assignedTickets?: Prisma.SupportTicketCreateNestedManyWithoutAssignedToInput
   sentSupportMsgs?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
   manualActivationLogs?: Prisma.ManualActivationLogCreateNestedManyWithoutPerformedByInput
 }
@@ -1535,6 +1703,7 @@ export type UserUncheckedCreateWithoutSentInvitesInput = {
   professional?: Prisma.ProfessionalUncheckedCreateNestedOneWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
+  assignedTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutAssignedToInput
   sentSupportMsgs?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
   manualActivationLogs?: Prisma.ManualActivationLogUncheckedCreateNestedManyWithoutPerformedByInput
 }
@@ -1575,6 +1744,7 @@ export type UserUpdateWithoutSentInvitesInput = {
   professional?: Prisma.ProfessionalUpdateOneWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
+  assignedTickets?: Prisma.SupportTicketUpdateManyWithoutAssignedToNestedInput
   sentSupportMsgs?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
   manualActivationLogs?: Prisma.ManualActivationLogUpdateManyWithoutPerformedByNestedInput
 }
@@ -1599,6 +1769,7 @@ export type UserUncheckedUpdateWithoutSentInvitesInput = {
   professional?: Prisma.ProfessionalUncheckedUpdateOneWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
+  assignedTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutAssignedToNestedInput
   sentSupportMsgs?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
   manualActivationLogs?: Prisma.ManualActivationLogUncheckedUpdateManyWithoutPerformedByNestedInput
 }
@@ -1622,6 +1793,7 @@ export type UserCreateWithoutNotificationsInput = {
   ownedBarbershops?: Prisma.BarbershopCreateNestedManyWithoutOwnerInput
   professional?: Prisma.ProfessionalCreateNestedOneWithoutUserInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
+  assignedTickets?: Prisma.SupportTicketCreateNestedManyWithoutAssignedToInput
   sentSupportMsgs?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
   sentInvites?: Prisma.SupportInviteCreateNestedManyWithoutAdminInput
   manualActivationLogs?: Prisma.ManualActivationLogCreateNestedManyWithoutPerformedByInput
@@ -1646,6 +1818,7 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   ownedBarbershops?: Prisma.BarbershopUncheckedCreateNestedManyWithoutOwnerInput
   professional?: Prisma.ProfessionalUncheckedCreateNestedOneWithoutUserInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
+  assignedTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutAssignedToInput
   sentSupportMsgs?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
   sentInvites?: Prisma.SupportInviteUncheckedCreateNestedManyWithoutAdminInput
   manualActivationLogs?: Prisma.ManualActivationLogUncheckedCreateNestedManyWithoutPerformedByInput
@@ -1686,6 +1859,7 @@ export type UserUpdateWithoutNotificationsInput = {
   ownedBarbershops?: Prisma.BarbershopUpdateManyWithoutOwnerNestedInput
   professional?: Prisma.ProfessionalUpdateOneWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
+  assignedTickets?: Prisma.SupportTicketUpdateManyWithoutAssignedToNestedInput
   sentSupportMsgs?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
   sentInvites?: Prisma.SupportInviteUpdateManyWithoutAdminNestedInput
   manualActivationLogs?: Prisma.ManualActivationLogUpdateManyWithoutPerformedByNestedInput
@@ -1710,6 +1884,7 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   ownedBarbershops?: Prisma.BarbershopUncheckedUpdateManyWithoutOwnerNestedInput
   professional?: Prisma.ProfessionalUncheckedUpdateOneWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
+  assignedTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutAssignedToNestedInput
   sentSupportMsgs?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
   sentInvites?: Prisma.SupportInviteUncheckedUpdateManyWithoutAdminNestedInput
   manualActivationLogs?: Prisma.ManualActivationLogUncheckedUpdateManyWithoutPerformedByNestedInput
@@ -1735,6 +1910,7 @@ export type UserCreateWithoutManualActivationLogsInput = {
   professional?: Prisma.ProfessionalCreateNestedOneWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
+  assignedTickets?: Prisma.SupportTicketCreateNestedManyWithoutAssignedToInput
   sentSupportMsgs?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
   sentInvites?: Prisma.SupportInviteCreateNestedManyWithoutAdminInput
 }
@@ -1759,6 +1935,7 @@ export type UserUncheckedCreateWithoutManualActivationLogsInput = {
   professional?: Prisma.ProfessionalUncheckedCreateNestedOneWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
+  assignedTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutAssignedToInput
   sentSupportMsgs?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
   sentInvites?: Prisma.SupportInviteUncheckedCreateNestedManyWithoutAdminInput
 }
@@ -1799,6 +1976,7 @@ export type UserUpdateWithoutManualActivationLogsInput = {
   professional?: Prisma.ProfessionalUpdateOneWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
+  assignedTickets?: Prisma.SupportTicketUpdateManyWithoutAssignedToNestedInput
   sentSupportMsgs?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
   sentInvites?: Prisma.SupportInviteUpdateManyWithoutAdminNestedInput
 }
@@ -1823,6 +2001,7 @@ export type UserUncheckedUpdateWithoutManualActivationLogsInput = {
   professional?: Prisma.ProfessionalUncheckedUpdateOneWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
+  assignedTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutAssignedToNestedInput
   sentSupportMsgs?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
   sentInvites?: Prisma.SupportInviteUncheckedUpdateManyWithoutAdminNestedInput
 }
@@ -1839,6 +2018,7 @@ export type UserCountOutputType = {
   ownedBarbershops: number
   notifications: number
   supportTickets: number
+  assignedTickets: number
   sentSupportMsgs: number
   sentInvites: number
   manualActivationLogs: number
@@ -1851,6 +2031,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   ownedBarbershops?: boolean | UserCountOutputTypeCountOwnedBarbershopsArgs
   notifications?: boolean | UserCountOutputTypeCountNotificationsArgs
   supportTickets?: boolean | UserCountOutputTypeCountSupportTicketsArgs
+  assignedTickets?: boolean | UserCountOutputTypeCountAssignedTicketsArgs
   sentSupportMsgs?: boolean | UserCountOutputTypeCountSentSupportMsgsArgs
   sentInvites?: boolean | UserCountOutputTypeCountSentInvitesArgs
   manualActivationLogs?: boolean | UserCountOutputTypeCountManualActivationLogsArgs
@@ -1911,6 +2092,13 @@ export type UserCountOutputTypeCountSupportTicketsArgs<ExtArgs extends runtime.T
 /**
  * UserCountOutputType without action
  */
+export type UserCountOutputTypeCountAssignedTicketsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SupportTicketWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
 export type UserCountOutputTypeCountSentSupportMsgsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.SupportMessageWhereInput
 }
@@ -1950,6 +2138,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   professional?: boolean | Prisma.User$professionalArgs<ExtArgs>
   notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
   supportTickets?: boolean | Prisma.User$supportTicketsArgs<ExtArgs>
+  assignedTickets?: boolean | Prisma.User$assignedTicketsArgs<ExtArgs>
   sentSupportMsgs?: boolean | Prisma.User$sentSupportMsgsArgs<ExtArgs>
   sentInvites?: boolean | Prisma.User$sentInvitesArgs<ExtArgs>
   manualActivationLogs?: boolean | Prisma.User$manualActivationLogsArgs<ExtArgs>
@@ -2010,6 +2199,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   professional?: boolean | Prisma.User$professionalArgs<ExtArgs>
   notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
   supportTickets?: boolean | Prisma.User$supportTicketsArgs<ExtArgs>
+  assignedTickets?: boolean | Prisma.User$assignedTicketsArgs<ExtArgs>
   sentSupportMsgs?: boolean | Prisma.User$sentSupportMsgsArgs<ExtArgs>
   sentInvites?: boolean | Prisma.User$sentInvitesArgs<ExtArgs>
   manualActivationLogs?: boolean | Prisma.User$manualActivationLogsArgs<ExtArgs>
@@ -2028,6 +2218,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     professional: Prisma.$ProfessionalPayload<ExtArgs> | null
     notifications: Prisma.$NotificationPayload<ExtArgs>[]
     supportTickets: Prisma.$SupportTicketPayload<ExtArgs>[]
+    assignedTickets: Prisma.$SupportTicketPayload<ExtArgs>[]
     sentSupportMsgs: Prisma.$SupportMessagePayload<ExtArgs>[]
     sentInvites: Prisma.$SupportInvitePayload<ExtArgs>[]
     manualActivationLogs: Prisma.$ManualActivationLogPayload<ExtArgs>[]
@@ -2446,6 +2637,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   professional<T extends Prisma.User$professionalArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$professionalArgs<ExtArgs>>): Prisma.Prisma__ProfessionalClient<runtime.Types.Result.GetResult<Prisma.$ProfessionalPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   notifications<T extends Prisma.User$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   supportTickets<T extends Prisma.User$supportTicketsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$supportTicketsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupportTicketPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  assignedTickets<T extends Prisma.User$assignedTicketsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$assignedTicketsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupportTicketPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   sentSupportMsgs<T extends Prisma.User$sentSupportMsgsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sentSupportMsgsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupportMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   sentInvites<T extends Prisma.User$sentInvitesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sentInvitesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupportInvitePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   manualActivationLogs<T extends Prisma.User$manualActivationLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$manualActivationLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ManualActivationLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -3020,6 +3212,30 @@ export type User$notificationsArgs<ExtArgs extends runtime.Types.Extensions.Inte
  * User.supportTickets
  */
 export type User$supportTicketsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SupportTicket
+   */
+  select?: Prisma.SupportTicketSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SupportTicket
+   */
+  omit?: Prisma.SupportTicketOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SupportTicketInclude<ExtArgs> | null
+  where?: Prisma.SupportTicketWhereInput
+  orderBy?: Prisma.SupportTicketOrderByWithRelationInput | Prisma.SupportTicketOrderByWithRelationInput[]
+  cursor?: Prisma.SupportTicketWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SupportTicketScalarFieldEnum | Prisma.SupportTicketScalarFieldEnum[]
+}
+
+/**
+ * User.assignedTickets
+ */
+export type User$assignedTicketsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Select specific fields to fetch from the SupportTicket
    */

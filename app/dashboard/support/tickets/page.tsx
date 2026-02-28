@@ -4,7 +4,7 @@ import { SupportTicketsView } from "./support-tickets-view";
 export default async function SupportTicketsPage() {
   const tickets = await prisma.supportTicket.findMany({
     where: {
-      status: { in: ["OPEN", "WAITING_ADMIN"] },
+      status: { in: ["OPEN", "WAITING_ADMIN", "IN_PROGRESS"] },
     },
     include: {
       user: {
@@ -23,6 +23,9 @@ export default async function SupportTicketsPage() {
             },
           },
         },
+      },
+      assignedTo: {
+        select: { name: true },
       },
       messages: {
         orderBy: { createdAt: "desc" },

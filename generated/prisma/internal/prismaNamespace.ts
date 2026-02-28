@@ -2259,7 +2259,8 @@ export const SupportTicketScalarFieldEnum = {
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   closedAt: 'closedAt',
-  userId: 'userId'
+  userId: 'userId',
+  assignedToId: 'assignedToId'
 } as const
 
 export type SupportTicketScalarFieldEnum = (typeof SupportTicketScalarFieldEnum)[keyof typeof SupportTicketScalarFieldEnum]

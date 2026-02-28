@@ -79,6 +79,7 @@ export type StripeAccountStatus = (typeof StripeAccountStatus)[keyof typeof Stri
 export const SupportTicketStatus = {
   OPEN: 'OPEN',
   WAITING_ADMIN: 'WAITING_ADMIN',
+  IN_PROGRESS: 'IN_PROGRESS',
   RESOLVED: 'RESOLVED'
 } as const
 

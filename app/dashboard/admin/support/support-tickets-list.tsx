@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Headset, Clock, CheckCircle, AlertTriangle, MessageSquare, Users } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +15,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 interface TicketUser {
   id: string;
@@ -37,6 +38,7 @@ interface Ticket {
   createdAt: string | Date;
   updatedAt: string | Date;
   user: TicketUser;
+  assignedTo?: { name: string } | null;
   messages: { content: string; createdAt: string | Date }[];
   _count: { messages: number };
 }
@@ -44,7 +46,7 @@ interface Ticket {
 interface Stats {
   total: number;
   waitingAdmin: number;
-  open: number;
+  inProgress: number;
   resolvedToday: number;
 }
 
@@ -55,7 +57,9 @@ export function SupportTicketsList({
   initialTickets: Ticket[];
   stats: Stats;
 }) {
-  const [tickets] = useState(initialTickets);
+  const [tickets, setTickets] = useState(initialTickets);
+  const [assigning, setAssigning] = useState<string | null>(null);
+  const router = useRouter();
 
   const statCards = [
     {
@@ -74,7 +78,7 @@ export function SupportTicketsList({
     },
     {
       title: "Em Atendimento",
-      value: stats.open,
+      value: stats.inProgress,
       icon: Clock,
       color: "text-green-500",
       bg: "bg-green-500/10",
@@ -87,6 +91,49 @@ export function SupportTicketsList({
       bg: "bg-emerald-500/10",
     },
   ];
+
+  const handleAssign = async (ticketId: string) => {
+    setAssigning(ticketId);
+    try {
+      const res = await fetch(`/api/admin/support/${ticketId}/assign`, {
+        method: "POST",
+      });
+      if (res.ok) {
+        router.push(`/dashboard/admin/support/${ticketId}`);
+      }
+    } catch {
+      setAssigning(null);
+    }
+  };
+
+  const getStatusBadge = (ticket: Ticket) => {
+    if (ticket.status === "IN_PROGRESS") {
+      return (
+        <div className="flex flex-col gap-1">
+          <Badge variant="default" className="bg-green-600 text-xs">
+            Em Atendimento
+          </Badge>
+          {ticket.assignedTo?.name && (
+            <span className="text-[0.65rem] text-muted-foreground">
+              {ticket.assignedTo.name}
+            </span>
+          )}
+        </div>
+      );
+    }
+    if (ticket.status === "WAITING_ADMIN") {
+      return (
+        <Badge variant="destructive" className="text-xs">
+          Aguardando
+        </Badge>
+      );
+    }
+    return (
+      <Badge variant="secondary" className="text-xs">
+        Aberto
+      </Badge>
+    );
+  };
 
   return (
     <div className="space-y-6">
@@ -191,18 +238,7 @@ export function SupportTicketsList({
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <Badge
-                          variant={
-                            ticket.status === "WAITING_ADMIN"
-                              ? "destructive"
-                              : "secondary"
-                          }
-                          className="text-xs"
-                        >
-                          {ticket.status === "WAITING_ADMIN"
-                            ? "Aguardando"
-                            : "Aberto"}
-                        </Badge>
+                        {getStatusBadge(ticket)}
                       </TableCell>
                       <TableCell className="text-sm">
                         {ticket._count.messages}
@@ -211,13 +247,22 @@ export function SupportTicketsList({
                         {preview}
                       </TableCell>
                       <TableCell>
-                        <Button asChild size="sm" variant="outline">
-                          <Link
-                            href={`/dashboard/admin/support/${ticket.id}`}
+                        {ticket.status === "IN_PROGRESS" ? (
+                          <Button asChild size="sm" variant="outline">
+                            <Link href={`/dashboard/admin/support/${ticket.id}`}>
+                              Continuar
+                            </Link>
+                          </Button>
+                        ) : (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={assigning === ticket.id}
+                            onClick={() => handleAssign(ticket.id)}
                           >
-                            Atender
-                          </Link>
-                        </Button>
+                            {assigning === ticket.id ? "Atribuindo..." : "Atender"}
+                          </Button>
+                        )}
                       </TableCell>
                     </TableRow>
                   );
