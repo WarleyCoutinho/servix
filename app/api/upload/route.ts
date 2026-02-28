@@ -12,8 +12,6 @@ const ALLOWED_TYPES = [
   "image/avif",
 ];
 
-const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
-
 const PERMANENT_FOLDERS = new Set(["services", "barbershop", "professional"]);
 
 export const POST = async (request: Request) => {
@@ -51,15 +49,6 @@ export const POST = async (request: Request) => {
 
     const buffer = Buffer.from(await file.arrayBuffer());
     const permanente = PERMANENT_FOLDERS.has(folder ?? "");
-
-    await prisma.upload.deleteMany({
-      where: {
-        permanente: false,
-        createdAt: {
-          lt: new Date(Date.now() - THIRTY_DAYS_MS),
-        },
-      },
-    });
 
     const upload = await prisma.upload.create({
       data: {
