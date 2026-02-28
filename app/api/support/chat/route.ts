@@ -1,13 +1,16 @@
 "use server";
 
 import { auth } from "@/lib/auth";
-import { responder, SERVIX_SUPPORT_PROMPT } from "@/lib/ai";
+import { responder, SERVIX_SUPPORT_PROMPT, moderateContent } from "@/lib/ai";
 import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import z from "zod";
+import { rateLimit } from "@/lib/rate-limit";
+import { logSupportAction } from "@/lib/support-audit";
 
 const MAX_MESSAGE_LENGTH = 5000;
+const chatLimiter = rateLimit({ interval: 60_000, limit: 10 });
 const MAX_MESSAGES_HISTORY = 50;
 
 const messageSchema = z.object({
@@ -102,6 +105,14 @@ export const POST = async (request: Request) => {
     return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
   }
 
+  const { success } = chatLimiter.check(session.user.id);
+  if (!success) {
+    return NextResponse.json(
+      { error: "Muitas requisições. Aguarde um momento." },
+      { status: 429 },
+    );
+  }
+
   let body: unknown;
   try {
     body = await request.json();
@@ -182,6 +193,32 @@ export const POST = async (request: Request) => {
 
     const text = await responder(sanitizedMessages, systemPrompt, 800);
 
+    const moderation = moderateContent(text);
+    if (moderation.flagged) {
+      await prisma.supportTicket.update({
+        where: { id: ticket.id },
+        data: { status: "WAITING_ADMIN" },
+      });
+
+      logSupportAction("STATUS_CHANGE", ticket.id, session.user.id, {
+        from: ticket.status,
+        to: "WAITING_ADMIN",
+        reason: "ai_content_flagged",
+      });
+
+      const fallbackMessage =
+        "Sua pergunta foi encaminhada para nossa equipe de suporte. " +
+        "Um atendente vai responder em breve!";
+
+      await saveMessage(ticket.id, fallbackMessage, { isFromAI: true });
+
+      return NextResponse.json({
+        type: "waiting_admin",
+        message: fallbackMessage,
+        ticketId: ticket.id,
+      });
+    }
+
     await saveMessage(ticket.id, text, { isFromAI: true });
 
     return NextResponse.json({
@@ -195,6 +232,12 @@ export const POST = async (request: Request) => {
     await prisma.supportTicket.update({
       where: { id: ticket.id },
       data: { status: "WAITING_ADMIN" },
+    });
+
+    logSupportAction("STATUS_CHANGE", ticket.id, session.user.id, {
+      from: ticket.status,
+      to: "WAITING_ADMIN",
+      reason: "ai_error",
     });
 
     return NextResponse.json({

@@ -1,10 +1,13 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { rateLimit } from "@/lib/rate-limit";
+import { logSupportAction } from "@/lib/support-audit";
 import { UserRole } from "@/generated/prisma/enums";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 
 const MAX_MESSAGE_LENGTH = 5000;
+const adminMessagesLimiter = rateLimit({ interval: 60_000, limit: 30 });
 
 export const GET = async (
   _request: Request,
@@ -33,7 +36,7 @@ export const GET = async (
           name: true,
           email: true,
           image: true,
-          role: true,
+          createdAt: true,
           ownedBarbershops: {
             select: {
               name: true,
@@ -55,7 +58,7 @@ export const GET = async (
     where: { ticketId },
     include: {
       sender: {
-        select: { name: true, image: true, role: true },
+        select: { name: true, image: true },
       },
     },
     orderBy: { createdAt: "asc" },
@@ -78,6 +81,14 @@ export const POST = async (
   });
   if (user?.role !== UserRole.admin && user?.role !== UserRole.support) {
     return NextResponse.json({ error: "Acesso negado" }, { status: 403 });
+  }
+
+  const { success } = adminMessagesLimiter.check(session.user.id);
+  if (!success) {
+    return NextResponse.json(
+      { error: "Muitas requisições. Aguarde um momento." },
+      { status: 429 },
+    );
   }
 
   const { ticketId } = await params;
@@ -129,6 +140,10 @@ export const POST = async (
       status: "IN_PROGRESS",
       assignedToId: ticket.assignedToId ?? session.user.id,
     },
+  });
+
+  logSupportAction("ADMIN_MESSAGE", ticketId, session.user.id, {
+    messageId: message.id,
   });
 
   return NextResponse.json({ message });

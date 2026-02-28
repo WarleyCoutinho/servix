@@ -98,6 +98,11 @@ export type SupportTicket = Prisma.SupportTicketModel
  */
 export type SupportMessage = Prisma.SupportMessageModel
 /**
+ * Model SupportAuditLog
+ * 
+ */
+export type SupportAuditLog = Prisma.SupportAuditLogModel
+/**
  * Model SupportInvite
  * 
  */

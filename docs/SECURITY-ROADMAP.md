@@ -26,9 +26,9 @@
 
 ---
 
-## Pendentes — Melhorias Futuras
+## Implementados
 
-### 1. Rate Limiting (MEDIUM — Seguranca)
+### 1. Rate Limiting (MEDIUM — Seguranca) — DONE
 
 **Problema:** Nenhuma rota do suporte tem rate limiting. Um usuario pode enviar spam de mensagens ou abusar do polling.
 
@@ -49,7 +49,7 @@
 
 ---
 
-### 2. Polling para WebSocket/SSE (MEDIUM — Performance)
+### 2. Polling para WebSocket/SSE (MEDIUM — Performance) — PENDENTE
 
 **Problema:** O sistema usa polling a cada 5 segundos em ambos os lados (usuario e admin). Isso gera carga desnecessaria no banco e latencia de ate 5s nas respostas.
 
@@ -73,7 +73,7 @@
 
 ---
 
-### 3. Audit Log (LOW — Observabilidade)
+### 3. Audit Log (LOW — Observabilidade) — DONE
 
 **Problema:** Nao ha registro de acoes administrativas no suporte (quem atribuiu, quem resolveu, mudancas de status).
 
@@ -104,7 +104,7 @@
 
 ---
 
-### 4. Filtro de Conteudo na IA (LOW — Seguranca)
+### 4. Filtro de Conteudo na IA (LOW — Seguranca) — DONE
 
 **Problema:** Respostas da IA sao salvas diretamente no banco sem revisao. A IA poderia gerar conteudo inapropriado.
 
@@ -124,7 +124,7 @@
 
 ---
 
-### 5. Deduplicacao de Mensagens no Client (LOW — UX)
+### 5. Deduplicacao de Mensagens no Client (LOW — UX) — DONE
 
 **Problema:** Em condicoes de rede instavel, o polling pode entregar mensagens duplicadas no client-side.
 
@@ -141,7 +141,7 @@
 
 ---
 
-### 6. Reduzir Dados Sensiveis nas Respostas Admin (LOW — Seguranca)
+### 6. Reduzir Dados Sensiveis nas Respostas Admin (LOW — Seguranca) — DONE
 
 **Problema:** As respostas dos endpoints admin incluem email, role e dados de subscription do usuario. Embora necessarios para o painel de suporte, em caso de comprometimento da conta admin, esses dados ficam expostos.
 

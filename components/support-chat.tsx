@@ -91,6 +91,7 @@ export function SupportChat({ userPlan, userName }: SupportChatProps) {
     },
   ]);
   const endRef = useRef<HTMLDivElement | null>(null);
+  const seenIdsRef = useRef(new Set<string>());
   const isPremiumPlan = userPlan === "PROFESSIONAL" || userPlan === "ENTERPRISE";
 
   useEffect(() => {
@@ -123,14 +124,22 @@ export function SupportChat({ userPlan, userName }: SupportChatProps) {
 
         if (data.messages && data.messages.length > 0) {
           const adminMessages: PollMessage[] = data.messages;
-          setMessages((prev) => [
-            ...prev,
-            ...adminMessages.map((m: PollMessage) => ({
-              role: "assistant" as const,
-              content: m.content,
-              imageUrl: m.imageUrl,
-            })),
-          ]);
+          const newMessages = adminMessages.filter(
+            (m) => !seenIdsRef.current.has(m.id),
+          );
+          if (newMessages.length > 0) {
+            for (const m of newMessages) {
+              seenIdsRef.current.add(m.id);
+            }
+            setMessages((prev) => [
+              ...prev,
+              ...newMessages.map((m: PollMessage) => ({
+                role: "assistant" as const,
+                content: m.content,
+                imageUrl: m.imageUrl,
+              })),
+            ]);
+          }
           if (status === "waiting_admin") {
             setStatus("in_progress");
           }

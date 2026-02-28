@@ -84,3 +84,13 @@ export const SupportTicketStatus = {
 } as const
 
 export type SupportTicketStatus = (typeof SupportTicketStatus)[keyof typeof SupportTicketStatus]
+
+
+export const SupportAuditAction = {
+  ASSIGN: 'ASSIGN',
+  RESOLVE: 'RESOLVE',
+  ADMIN_MESSAGE: 'ADMIN_MESSAGE',
+  STATUS_CHANGE: 'STATUS_CHANGE'
+} as const
+
+export type SupportAuditAction = (typeof SupportAuditAction)[keyof typeof SupportAuditAction]

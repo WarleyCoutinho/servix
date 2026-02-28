@@ -28,7 +28,6 @@ interface Message {
   sender: {
     name: string;
     image: string | null;
-    role: string;
   } | null;
 }
 
@@ -37,7 +36,7 @@ interface TicketUser {
   name: string;
   email: string;
   image: string | null;
-  role: string;
+  role?: string;
   createdAt: string | Date;
   ownedBarbershops: {
     name: string;

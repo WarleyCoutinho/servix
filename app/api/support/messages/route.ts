@@ -1,13 +1,24 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { rateLimit } from "@/lib/rate-limit";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
+
+const messagesLimiter = rateLimit({ interval: 60_000, limit: 20 });
 
 export const GET = async (request: Request) => {
   const session = await auth.api.getSession({ headers: await headers() });
 
   if (!session?.user) {
     return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
+  }
+
+  const { success } = messagesLimiter.check(session.user.id);
+  if (!success) {
+    return NextResponse.json(
+      { error: "Muitas requisições. Aguarde um momento." },
+      { status: 429 },
+    );
   }
 
   const { searchParams } = new URL(request.url);

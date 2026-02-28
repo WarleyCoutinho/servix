@@ -67,6 +67,7 @@ export const ModelName = {
   StripeEvent: 'StripeEvent',
   SupportTicket: 'SupportTicket',
   SupportMessage: 'SupportMessage',
+  SupportAuditLog: 'SupportAuditLog',
   SupportInvite: 'SupportInvite',
   PlatformFeeHistory: 'PlatformFeeHistory',
   Notification: 'Notification',
@@ -354,6 +355,18 @@ export const SupportMessageScalarFieldEnum = {
 export type SupportMessageScalarFieldEnum = (typeof SupportMessageScalarFieldEnum)[keyof typeof SupportMessageScalarFieldEnum]
 
 
+export const SupportAuditLogScalarFieldEnum = {
+  id: 'id',
+  action: 'action',
+  ticketId: 'ticketId',
+  userId: 'userId',
+  metadata: 'metadata',
+  createdAt: 'createdAt'
+} as const
+
+export type SupportAuditLogScalarFieldEnum = (typeof SupportAuditLogScalarFieldEnum)[keyof typeof SupportAuditLogScalarFieldEnum]
+
+
 export const SupportInviteScalarFieldEnum = {
   id: 'id',
   email: 'email',
@@ -427,6 +440,14 @@ export const SortOrder = {
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+export const NullableJsonNullValueInput = {
+  DbNull: DbNull,
+  JsonNull: JsonNull
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
 export const QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
@@ -441,4 +462,13 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 

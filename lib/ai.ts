@@ -287,3 +287,22 @@ export function shouldEscalate(message: string): boolean {
   const lower = message.toLowerCase();
   return ESCALATION_KEYWORDS.some((keyword) => lower.includes(keyword));
 }
+
+const BLOCKED_PATTERNS = [
+  /https?:\/\/(?!servix\.|wa\.me\/)\S+\.(ru|cn|tk|ml|ga|cf)\b/i,
+  /\b(senha|password|credit.?card|cart[aã]o.?de.?cr[eé]dito)\b.*\b\d{4,}\b/i,
+  /\b(clique aqui|click here|acesse agora)\b.*https?:\/\//i,
+  /\b(viagra|cialis|casino|lottery|lotter[iy]a)\b/i,
+];
+
+export function moderateContent(text: string): {
+  flagged: boolean;
+  reason?: string;
+} {
+  for (const pattern of BLOCKED_PATTERNS) {
+    if (pattern.test(text)) {
+      return { flagged: true, reason: pattern.source };
+    }
+  }
+  return { flagged: false };
+}

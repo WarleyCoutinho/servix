@@ -248,6 +248,7 @@ export type UserWhereInput = {
   assignedTickets?: Prisma.SupportTicketListRelationFilter
   sentSupportMsgs?: Prisma.SupportMessageListRelationFilter
   sentInvites?: Prisma.SupportInviteListRelationFilter
+  supportAuditLogs?: Prisma.SupportAuditLogListRelationFilter
   manualActivationLogs?: Prisma.ManualActivationLogListRelationFilter
 }
 
@@ -274,6 +275,7 @@ export type UserOrderByWithRelationInput = {
   assignedTickets?: Prisma.SupportTicketOrderByRelationAggregateInput
   sentSupportMsgs?: Prisma.SupportMessageOrderByRelationAggregateInput
   sentInvites?: Prisma.SupportInviteOrderByRelationAggregateInput
+  supportAuditLogs?: Prisma.SupportAuditLogOrderByRelationAggregateInput
   manualActivationLogs?: Prisma.ManualActivationLogOrderByRelationAggregateInput
 }
 
@@ -303,6 +305,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   assignedTickets?: Prisma.SupportTicketListRelationFilter
   sentSupportMsgs?: Prisma.SupportMessageListRelationFilter
   sentInvites?: Prisma.SupportInviteListRelationFilter
+  supportAuditLogs?: Prisma.SupportAuditLogListRelationFilter
   manualActivationLogs?: Prisma.ManualActivationLogListRelationFilter
 }, "id" | "email">
 
@@ -365,6 +368,7 @@ export type UserCreateInput = {
   assignedTickets?: Prisma.SupportTicketCreateNestedManyWithoutAssignedToInput
   sentSupportMsgs?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
   sentInvites?: Prisma.SupportInviteCreateNestedManyWithoutAdminInput
+  supportAuditLogs?: Prisma.SupportAuditLogCreateNestedManyWithoutUserInput
   manualActivationLogs?: Prisma.ManualActivationLogCreateNestedManyWithoutPerformedByInput
 }
 
@@ -391,6 +395,7 @@ export type UserUncheckedCreateInput = {
   assignedTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutAssignedToInput
   sentSupportMsgs?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
   sentInvites?: Prisma.SupportInviteUncheckedCreateNestedManyWithoutAdminInput
+  supportAuditLogs?: Prisma.SupportAuditLogUncheckedCreateNestedManyWithoutUserInput
   manualActivationLogs?: Prisma.ManualActivationLogUncheckedCreateNestedManyWithoutPerformedByInput
 }
 
@@ -417,6 +422,7 @@ export type UserUpdateInput = {
   assignedTickets?: Prisma.SupportTicketUpdateManyWithoutAssignedToNestedInput
   sentSupportMsgs?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
   sentInvites?: Prisma.SupportInviteUpdateManyWithoutAdminNestedInput
+  supportAuditLogs?: Prisma.SupportAuditLogUpdateManyWithoutUserNestedInput
   manualActivationLogs?: Prisma.ManualActivationLogUpdateManyWithoutPerformedByNestedInput
 }
 
@@ -443,6 +449,7 @@ export type UserUncheckedUpdateInput = {
   assignedTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutAssignedToNestedInput
   sentSupportMsgs?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
   sentInvites?: Prisma.SupportInviteUncheckedUpdateManyWithoutAdminNestedInput
+  supportAuditLogs?: Prisma.SupportAuditLogUncheckedUpdateManyWithoutUserNestedInput
   manualActivationLogs?: Prisma.ManualActivationLogUncheckedUpdateManyWithoutPerformedByNestedInput
 }
 
@@ -688,6 +695,20 @@ export type UserUpdateOneWithoutSentSupportMsgsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSentSupportMsgsInput, Prisma.UserUpdateWithoutSentSupportMsgsInput>, Prisma.UserUncheckedUpdateWithoutSentSupportMsgsInput>
 }
 
+export type UserCreateNestedOneWithoutSupportAuditLogsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSupportAuditLogsInput, Prisma.UserUncheckedCreateWithoutSupportAuditLogsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSupportAuditLogsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutSupportAuditLogsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSupportAuditLogsInput, Prisma.UserUncheckedCreateWithoutSupportAuditLogsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSupportAuditLogsInput
+  upsert?: Prisma.UserUpsertWithoutSupportAuditLogsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSupportAuditLogsInput, Prisma.UserUpdateWithoutSupportAuditLogsInput>, Prisma.UserUncheckedUpdateWithoutSupportAuditLogsInput>
+}
+
 export type UserCreateNestedOneWithoutSentInvitesInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutSentInvitesInput, Prisma.UserUncheckedCreateWithoutSentInvitesInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutSentInvitesInput
@@ -752,6 +773,7 @@ export type UserCreateWithoutSessionsInput = {
   assignedTickets?: Prisma.SupportTicketCreateNestedManyWithoutAssignedToInput
   sentSupportMsgs?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
   sentInvites?: Prisma.SupportInviteCreateNestedManyWithoutAdminInput
+  supportAuditLogs?: Prisma.SupportAuditLogCreateNestedManyWithoutUserInput
   manualActivationLogs?: Prisma.ManualActivationLogCreateNestedManyWithoutPerformedByInput
 }
 
@@ -777,6 +799,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   assignedTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutAssignedToInput
   sentSupportMsgs?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
   sentInvites?: Prisma.SupportInviteUncheckedCreateNestedManyWithoutAdminInput
+  supportAuditLogs?: Prisma.SupportAuditLogUncheckedCreateNestedManyWithoutUserInput
   manualActivationLogs?: Prisma.ManualActivationLogUncheckedCreateNestedManyWithoutPerformedByInput
 }
 
@@ -818,6 +841,7 @@ export type UserUpdateWithoutSessionsInput = {
   assignedTickets?: Prisma.SupportTicketUpdateManyWithoutAssignedToNestedInput
   sentSupportMsgs?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
   sentInvites?: Prisma.SupportInviteUpdateManyWithoutAdminNestedInput
+  supportAuditLogs?: Prisma.SupportAuditLogUpdateManyWithoutUserNestedInput
   manualActivationLogs?: Prisma.ManualActivationLogUpdateManyWithoutPerformedByNestedInput
 }
 
@@ -843,6 +867,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   assignedTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutAssignedToNestedInput
   sentSupportMsgs?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
   sentInvites?: Prisma.SupportInviteUncheckedUpdateManyWithoutAdminNestedInput
+  supportAuditLogs?: Prisma.SupportAuditLogUncheckedUpdateManyWithoutUserNestedInput
   manualActivationLogs?: Prisma.ManualActivationLogUncheckedUpdateManyWithoutPerformedByNestedInput
 }
 
@@ -868,6 +893,7 @@ export type UserCreateWithoutAccountsInput = {
   assignedTickets?: Prisma.SupportTicketCreateNestedManyWithoutAssignedToInput
   sentSupportMsgs?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
   sentInvites?: Prisma.SupportInviteCreateNestedManyWithoutAdminInput
+  supportAuditLogs?: Prisma.SupportAuditLogCreateNestedManyWithoutUserInput
   manualActivationLogs?: Prisma.ManualActivationLogCreateNestedManyWithoutPerformedByInput
 }
 
@@ -893,6 +919,7 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   assignedTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutAssignedToInput
   sentSupportMsgs?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
   sentInvites?: Prisma.SupportInviteUncheckedCreateNestedManyWithoutAdminInput
+  supportAuditLogs?: Prisma.SupportAuditLogUncheckedCreateNestedManyWithoutUserInput
   manualActivationLogs?: Prisma.ManualActivationLogUncheckedCreateNestedManyWithoutPerformedByInput
 }
 
@@ -934,6 +961,7 @@ export type UserUpdateWithoutAccountsInput = {
   assignedTickets?: Prisma.SupportTicketUpdateManyWithoutAssignedToNestedInput
   sentSupportMsgs?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
   sentInvites?: Prisma.SupportInviteUpdateManyWithoutAdminNestedInput
+  supportAuditLogs?: Prisma.SupportAuditLogUpdateManyWithoutUserNestedInput
   manualActivationLogs?: Prisma.ManualActivationLogUpdateManyWithoutPerformedByNestedInput
 }
 
@@ -959,6 +987,7 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   assignedTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutAssignedToNestedInput
   sentSupportMsgs?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
   sentInvites?: Prisma.SupportInviteUncheckedUpdateManyWithoutAdminNestedInput
+  supportAuditLogs?: Prisma.SupportAuditLogUncheckedUpdateManyWithoutUserNestedInput
   manualActivationLogs?: Prisma.ManualActivationLogUncheckedUpdateManyWithoutPerformedByNestedInput
 }
 
@@ -984,6 +1013,7 @@ export type UserCreateWithoutOwnedBarbershopsInput = {
   assignedTickets?: Prisma.SupportTicketCreateNestedManyWithoutAssignedToInput
   sentSupportMsgs?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
   sentInvites?: Prisma.SupportInviteCreateNestedManyWithoutAdminInput
+  supportAuditLogs?: Prisma.SupportAuditLogCreateNestedManyWithoutUserInput
   manualActivationLogs?: Prisma.ManualActivationLogCreateNestedManyWithoutPerformedByInput
 }
 
@@ -1009,6 +1039,7 @@ export type UserUncheckedCreateWithoutOwnedBarbershopsInput = {
   assignedTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutAssignedToInput
   sentSupportMsgs?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
   sentInvites?: Prisma.SupportInviteUncheckedCreateNestedManyWithoutAdminInput
+  supportAuditLogs?: Prisma.SupportAuditLogUncheckedCreateNestedManyWithoutUserInput
   manualActivationLogs?: Prisma.ManualActivationLogUncheckedCreateNestedManyWithoutPerformedByInput
 }
 
@@ -1050,6 +1081,7 @@ export type UserUpdateWithoutOwnedBarbershopsInput = {
   assignedTickets?: Prisma.SupportTicketUpdateManyWithoutAssignedToNestedInput
   sentSupportMsgs?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
   sentInvites?: Prisma.SupportInviteUpdateManyWithoutAdminNestedInput
+  supportAuditLogs?: Prisma.SupportAuditLogUpdateManyWithoutUserNestedInput
   manualActivationLogs?: Prisma.ManualActivationLogUpdateManyWithoutPerformedByNestedInput
 }
 
@@ -1075,6 +1107,7 @@ export type UserUncheckedUpdateWithoutOwnedBarbershopsInput = {
   assignedTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutAssignedToNestedInput
   sentSupportMsgs?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
   sentInvites?: Prisma.SupportInviteUncheckedUpdateManyWithoutAdminNestedInput
+  supportAuditLogs?: Prisma.SupportAuditLogUncheckedUpdateManyWithoutUserNestedInput
   manualActivationLogs?: Prisma.ManualActivationLogUncheckedUpdateManyWithoutPerformedByNestedInput
 }
 
@@ -1100,6 +1133,7 @@ export type UserCreateWithoutProfessionalInput = {
   assignedTickets?: Prisma.SupportTicketCreateNestedManyWithoutAssignedToInput
   sentSupportMsgs?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
   sentInvites?: Prisma.SupportInviteCreateNestedManyWithoutAdminInput
+  supportAuditLogs?: Prisma.SupportAuditLogCreateNestedManyWithoutUserInput
   manualActivationLogs?: Prisma.ManualActivationLogCreateNestedManyWithoutPerformedByInput
 }
 
@@ -1125,6 +1159,7 @@ export type UserUncheckedCreateWithoutProfessionalInput = {
   assignedTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutAssignedToInput
   sentSupportMsgs?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
   sentInvites?: Prisma.SupportInviteUncheckedCreateNestedManyWithoutAdminInput
+  supportAuditLogs?: Prisma.SupportAuditLogUncheckedCreateNestedManyWithoutUserInput
   manualActivationLogs?: Prisma.ManualActivationLogUncheckedCreateNestedManyWithoutPerformedByInput
 }
 
@@ -1166,6 +1201,7 @@ export type UserUpdateWithoutProfessionalInput = {
   assignedTickets?: Prisma.SupportTicketUpdateManyWithoutAssignedToNestedInput
   sentSupportMsgs?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
   sentInvites?: Prisma.SupportInviteUpdateManyWithoutAdminNestedInput
+  supportAuditLogs?: Prisma.SupportAuditLogUpdateManyWithoutUserNestedInput
   manualActivationLogs?: Prisma.ManualActivationLogUpdateManyWithoutPerformedByNestedInput
 }
 
@@ -1191,6 +1227,7 @@ export type UserUncheckedUpdateWithoutProfessionalInput = {
   assignedTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutAssignedToNestedInput
   sentSupportMsgs?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
   sentInvites?: Prisma.SupportInviteUncheckedUpdateManyWithoutAdminNestedInput
+  supportAuditLogs?: Prisma.SupportAuditLogUncheckedUpdateManyWithoutUserNestedInput
   manualActivationLogs?: Prisma.ManualActivationLogUncheckedUpdateManyWithoutPerformedByNestedInput
 }
 
@@ -1216,6 +1253,7 @@ export type UserCreateWithoutBookingsInput = {
   assignedTickets?: Prisma.SupportTicketCreateNestedManyWithoutAssignedToInput
   sentSupportMsgs?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
   sentInvites?: Prisma.SupportInviteCreateNestedManyWithoutAdminInput
+  supportAuditLogs?: Prisma.SupportAuditLogCreateNestedManyWithoutUserInput
   manualActivationLogs?: Prisma.ManualActivationLogCreateNestedManyWithoutPerformedByInput
 }
 
@@ -1241,6 +1279,7 @@ export type UserUncheckedCreateWithoutBookingsInput = {
   assignedTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutAssignedToInput
   sentSupportMsgs?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
   sentInvites?: Prisma.SupportInviteUncheckedCreateNestedManyWithoutAdminInput
+  supportAuditLogs?: Prisma.SupportAuditLogUncheckedCreateNestedManyWithoutUserInput
   manualActivationLogs?: Prisma.ManualActivationLogUncheckedCreateNestedManyWithoutPerformedByInput
 }
 
@@ -1282,6 +1321,7 @@ export type UserUpdateWithoutBookingsInput = {
   assignedTickets?: Prisma.SupportTicketUpdateManyWithoutAssignedToNestedInput
   sentSupportMsgs?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
   sentInvites?: Prisma.SupportInviteUpdateManyWithoutAdminNestedInput
+  supportAuditLogs?: Prisma.SupportAuditLogUpdateManyWithoutUserNestedInput
   manualActivationLogs?: Prisma.ManualActivationLogUpdateManyWithoutPerformedByNestedInput
 }
 
@@ -1307,6 +1347,7 @@ export type UserUncheckedUpdateWithoutBookingsInput = {
   assignedTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutAssignedToNestedInput
   sentSupportMsgs?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
   sentInvites?: Prisma.SupportInviteUncheckedUpdateManyWithoutAdminNestedInput
+  supportAuditLogs?: Prisma.SupportAuditLogUncheckedUpdateManyWithoutUserNestedInput
   manualActivationLogs?: Prisma.ManualActivationLogUncheckedUpdateManyWithoutPerformedByNestedInput
 }
 
@@ -1332,6 +1373,7 @@ export type UserCreateWithoutSupportTicketsInput = {
   assignedTickets?: Prisma.SupportTicketCreateNestedManyWithoutAssignedToInput
   sentSupportMsgs?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
   sentInvites?: Prisma.SupportInviteCreateNestedManyWithoutAdminInput
+  supportAuditLogs?: Prisma.SupportAuditLogCreateNestedManyWithoutUserInput
   manualActivationLogs?: Prisma.ManualActivationLogCreateNestedManyWithoutPerformedByInput
 }
 
@@ -1357,6 +1399,7 @@ export type UserUncheckedCreateWithoutSupportTicketsInput = {
   assignedTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutAssignedToInput
   sentSupportMsgs?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
   sentInvites?: Prisma.SupportInviteUncheckedCreateNestedManyWithoutAdminInput
+  supportAuditLogs?: Prisma.SupportAuditLogUncheckedCreateNestedManyWithoutUserInput
   manualActivationLogs?: Prisma.ManualActivationLogUncheckedCreateNestedManyWithoutPerformedByInput
 }
 
@@ -1387,6 +1430,7 @@ export type UserCreateWithoutAssignedTicketsInput = {
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
   sentSupportMsgs?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
   sentInvites?: Prisma.SupportInviteCreateNestedManyWithoutAdminInput
+  supportAuditLogs?: Prisma.SupportAuditLogCreateNestedManyWithoutUserInput
   manualActivationLogs?: Prisma.ManualActivationLogCreateNestedManyWithoutPerformedByInput
 }
 
@@ -1412,6 +1456,7 @@ export type UserUncheckedCreateWithoutAssignedTicketsInput = {
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
   sentSupportMsgs?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
   sentInvites?: Prisma.SupportInviteUncheckedCreateNestedManyWithoutAdminInput
+  supportAuditLogs?: Prisma.SupportAuditLogUncheckedCreateNestedManyWithoutUserInput
   manualActivationLogs?: Prisma.ManualActivationLogUncheckedCreateNestedManyWithoutPerformedByInput
 }
 
@@ -1453,6 +1498,7 @@ export type UserUpdateWithoutSupportTicketsInput = {
   assignedTickets?: Prisma.SupportTicketUpdateManyWithoutAssignedToNestedInput
   sentSupportMsgs?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
   sentInvites?: Prisma.SupportInviteUpdateManyWithoutAdminNestedInput
+  supportAuditLogs?: Prisma.SupportAuditLogUpdateManyWithoutUserNestedInput
   manualActivationLogs?: Prisma.ManualActivationLogUpdateManyWithoutPerformedByNestedInput
 }
 
@@ -1478,6 +1524,7 @@ export type UserUncheckedUpdateWithoutSupportTicketsInput = {
   assignedTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutAssignedToNestedInput
   sentSupportMsgs?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
   sentInvites?: Prisma.SupportInviteUncheckedUpdateManyWithoutAdminNestedInput
+  supportAuditLogs?: Prisma.SupportAuditLogUncheckedUpdateManyWithoutUserNestedInput
   manualActivationLogs?: Prisma.ManualActivationLogUncheckedUpdateManyWithoutPerformedByNestedInput
 }
 
@@ -1514,6 +1561,7 @@ export type UserUpdateWithoutAssignedTicketsInput = {
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
   sentSupportMsgs?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
   sentInvites?: Prisma.SupportInviteUpdateManyWithoutAdminNestedInput
+  supportAuditLogs?: Prisma.SupportAuditLogUpdateManyWithoutUserNestedInput
   manualActivationLogs?: Prisma.ManualActivationLogUpdateManyWithoutPerformedByNestedInput
 }
 
@@ -1539,6 +1587,7 @@ export type UserUncheckedUpdateWithoutAssignedTicketsInput = {
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
   sentSupportMsgs?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
   sentInvites?: Prisma.SupportInviteUncheckedUpdateManyWithoutAdminNestedInput
+  supportAuditLogs?: Prisma.SupportAuditLogUncheckedUpdateManyWithoutUserNestedInput
   manualActivationLogs?: Prisma.ManualActivationLogUncheckedUpdateManyWithoutPerformedByNestedInput
 }
 
@@ -1564,6 +1613,7 @@ export type UserCreateWithoutSentSupportMsgsInput = {
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
   assignedTickets?: Prisma.SupportTicketCreateNestedManyWithoutAssignedToInput
   sentInvites?: Prisma.SupportInviteCreateNestedManyWithoutAdminInput
+  supportAuditLogs?: Prisma.SupportAuditLogCreateNestedManyWithoutUserInput
   manualActivationLogs?: Prisma.ManualActivationLogCreateNestedManyWithoutPerformedByInput
 }
 
@@ -1589,6 +1639,7 @@ export type UserUncheckedCreateWithoutSentSupportMsgsInput = {
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
   assignedTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutAssignedToInput
   sentInvites?: Prisma.SupportInviteUncheckedCreateNestedManyWithoutAdminInput
+  supportAuditLogs?: Prisma.SupportAuditLogUncheckedCreateNestedManyWithoutUserInput
   manualActivationLogs?: Prisma.ManualActivationLogUncheckedCreateNestedManyWithoutPerformedByInput
 }
 
@@ -1630,6 +1681,7 @@ export type UserUpdateWithoutSentSupportMsgsInput = {
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
   assignedTickets?: Prisma.SupportTicketUpdateManyWithoutAssignedToNestedInput
   sentInvites?: Prisma.SupportInviteUpdateManyWithoutAdminNestedInput
+  supportAuditLogs?: Prisma.SupportAuditLogUpdateManyWithoutUserNestedInput
   manualActivationLogs?: Prisma.ManualActivationLogUpdateManyWithoutPerformedByNestedInput
 }
 
@@ -1654,6 +1706,127 @@ export type UserUncheckedUpdateWithoutSentSupportMsgsInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
   assignedTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutAssignedToNestedInput
+  sentInvites?: Prisma.SupportInviteUncheckedUpdateManyWithoutAdminNestedInput
+  supportAuditLogs?: Prisma.SupportAuditLogUncheckedUpdateManyWithoutUserNestedInput
+  manualActivationLogs?: Prisma.ManualActivationLogUncheckedUpdateManyWithoutPerformedByNestedInput
+}
+
+export type UserCreateWithoutSupportAuditLogsInput = {
+  id: string
+  name: string
+  email: string
+  emailVerified?: boolean
+  image?: string | null
+  role?: $Enums.UserRole
+  banned?: boolean
+  banReason?: string | null
+  banExpires?: Date | string | null
+  stripeCustomerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  bookings?: Prisma.BookingCreateNestedManyWithoutUserInput
+  ownedBarbershops?: Prisma.BarbershopCreateNestedManyWithoutOwnerInput
+  professional?: Prisma.ProfessionalCreateNestedOneWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
+  assignedTickets?: Prisma.SupportTicketCreateNestedManyWithoutAssignedToInput
+  sentSupportMsgs?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  sentInvites?: Prisma.SupportInviteCreateNestedManyWithoutAdminInput
+  manualActivationLogs?: Prisma.ManualActivationLogCreateNestedManyWithoutPerformedByInput
+}
+
+export type UserUncheckedCreateWithoutSupportAuditLogsInput = {
+  id: string
+  name: string
+  email: string
+  emailVerified?: boolean
+  image?: string | null
+  role?: $Enums.UserRole
+  banned?: boolean
+  banReason?: string | null
+  banExpires?: Date | string | null
+  stripeCustomerId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutUserInput
+  ownedBarbershops?: Prisma.BarbershopUncheckedCreateNestedManyWithoutOwnerInput
+  professional?: Prisma.ProfessionalUncheckedCreateNestedOneWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
+  assignedTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutAssignedToInput
+  sentSupportMsgs?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  sentInvites?: Prisma.SupportInviteUncheckedCreateNestedManyWithoutAdminInput
+  manualActivationLogs?: Prisma.ManualActivationLogUncheckedCreateNestedManyWithoutPerformedByInput
+}
+
+export type UserCreateOrConnectWithoutSupportAuditLogsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutSupportAuditLogsInput, Prisma.UserUncheckedCreateWithoutSupportAuditLogsInput>
+}
+
+export type UserUpsertWithoutSupportAuditLogsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutSupportAuditLogsInput, Prisma.UserUncheckedUpdateWithoutSupportAuditLogsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutSupportAuditLogsInput, Prisma.UserUncheckedCreateWithoutSupportAuditLogsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutSupportAuditLogsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutSupportAuditLogsInput, Prisma.UserUncheckedUpdateWithoutSupportAuditLogsInput>
+}
+
+export type UserUpdateWithoutSupportAuditLogsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  bookings?: Prisma.BookingUpdateManyWithoutUserNestedInput
+  ownedBarbershops?: Prisma.BarbershopUpdateManyWithoutOwnerNestedInput
+  professional?: Prisma.ProfessionalUpdateOneWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
+  assignedTickets?: Prisma.SupportTicketUpdateManyWithoutAssignedToNestedInput
+  sentSupportMsgs?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  sentInvites?: Prisma.SupportInviteUpdateManyWithoutAdminNestedInput
+  manualActivationLogs?: Prisma.ManualActivationLogUpdateManyWithoutPerformedByNestedInput
+}
+
+export type UserUncheckedUpdateWithoutSupportAuditLogsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  bookings?: Prisma.BookingUncheckedUpdateManyWithoutUserNestedInput
+  ownedBarbershops?: Prisma.BarbershopUncheckedUpdateManyWithoutOwnerNestedInput
+  professional?: Prisma.ProfessionalUncheckedUpdateOneWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
+  assignedTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutAssignedToNestedInput
+  sentSupportMsgs?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
   sentInvites?: Prisma.SupportInviteUncheckedUpdateManyWithoutAdminNestedInput
   manualActivationLogs?: Prisma.ManualActivationLogUncheckedUpdateManyWithoutPerformedByNestedInput
 }
@@ -1680,6 +1853,7 @@ export type UserCreateWithoutSentInvitesInput = {
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
   assignedTickets?: Prisma.SupportTicketCreateNestedManyWithoutAssignedToInput
   sentSupportMsgs?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
+  supportAuditLogs?: Prisma.SupportAuditLogCreateNestedManyWithoutUserInput
   manualActivationLogs?: Prisma.ManualActivationLogCreateNestedManyWithoutPerformedByInput
 }
 
@@ -1705,6 +1879,7 @@ export type UserUncheckedCreateWithoutSentInvitesInput = {
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
   assignedTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutAssignedToInput
   sentSupportMsgs?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
+  supportAuditLogs?: Prisma.SupportAuditLogUncheckedCreateNestedManyWithoutUserInput
   manualActivationLogs?: Prisma.ManualActivationLogUncheckedCreateNestedManyWithoutPerformedByInput
 }
 
@@ -1746,6 +1921,7 @@ export type UserUpdateWithoutSentInvitesInput = {
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
   assignedTickets?: Prisma.SupportTicketUpdateManyWithoutAssignedToNestedInput
   sentSupportMsgs?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
+  supportAuditLogs?: Prisma.SupportAuditLogUpdateManyWithoutUserNestedInput
   manualActivationLogs?: Prisma.ManualActivationLogUpdateManyWithoutPerformedByNestedInput
 }
 
@@ -1771,6 +1947,7 @@ export type UserUncheckedUpdateWithoutSentInvitesInput = {
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
   assignedTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutAssignedToNestedInput
   sentSupportMsgs?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
+  supportAuditLogs?: Prisma.SupportAuditLogUncheckedUpdateManyWithoutUserNestedInput
   manualActivationLogs?: Prisma.ManualActivationLogUncheckedUpdateManyWithoutPerformedByNestedInput
 }
 
@@ -1796,6 +1973,7 @@ export type UserCreateWithoutNotificationsInput = {
   assignedTickets?: Prisma.SupportTicketCreateNestedManyWithoutAssignedToInput
   sentSupportMsgs?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
   sentInvites?: Prisma.SupportInviteCreateNestedManyWithoutAdminInput
+  supportAuditLogs?: Prisma.SupportAuditLogCreateNestedManyWithoutUserInput
   manualActivationLogs?: Prisma.ManualActivationLogCreateNestedManyWithoutPerformedByInput
 }
 
@@ -1821,6 +1999,7 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   assignedTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutAssignedToInput
   sentSupportMsgs?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
   sentInvites?: Prisma.SupportInviteUncheckedCreateNestedManyWithoutAdminInput
+  supportAuditLogs?: Prisma.SupportAuditLogUncheckedCreateNestedManyWithoutUserInput
   manualActivationLogs?: Prisma.ManualActivationLogUncheckedCreateNestedManyWithoutPerformedByInput
 }
 
@@ -1862,6 +2041,7 @@ export type UserUpdateWithoutNotificationsInput = {
   assignedTickets?: Prisma.SupportTicketUpdateManyWithoutAssignedToNestedInput
   sentSupportMsgs?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
   sentInvites?: Prisma.SupportInviteUpdateManyWithoutAdminNestedInput
+  supportAuditLogs?: Prisma.SupportAuditLogUpdateManyWithoutUserNestedInput
   manualActivationLogs?: Prisma.ManualActivationLogUpdateManyWithoutPerformedByNestedInput
 }
 
@@ -1887,6 +2067,7 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   assignedTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutAssignedToNestedInput
   sentSupportMsgs?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
   sentInvites?: Prisma.SupportInviteUncheckedUpdateManyWithoutAdminNestedInput
+  supportAuditLogs?: Prisma.SupportAuditLogUncheckedUpdateManyWithoutUserNestedInput
   manualActivationLogs?: Prisma.ManualActivationLogUncheckedUpdateManyWithoutPerformedByNestedInput
 }
 
@@ -1913,6 +2094,7 @@ export type UserCreateWithoutManualActivationLogsInput = {
   assignedTickets?: Prisma.SupportTicketCreateNestedManyWithoutAssignedToInput
   sentSupportMsgs?: Prisma.SupportMessageCreateNestedManyWithoutSenderInput
   sentInvites?: Prisma.SupportInviteCreateNestedManyWithoutAdminInput
+  supportAuditLogs?: Prisma.SupportAuditLogCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutManualActivationLogsInput = {
@@ -1938,6 +2120,7 @@ export type UserUncheckedCreateWithoutManualActivationLogsInput = {
   assignedTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutAssignedToInput
   sentSupportMsgs?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderInput
   sentInvites?: Prisma.SupportInviteUncheckedCreateNestedManyWithoutAdminInput
+  supportAuditLogs?: Prisma.SupportAuditLogUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutManualActivationLogsInput = {
@@ -1979,6 +2162,7 @@ export type UserUpdateWithoutManualActivationLogsInput = {
   assignedTickets?: Prisma.SupportTicketUpdateManyWithoutAssignedToNestedInput
   sentSupportMsgs?: Prisma.SupportMessageUpdateManyWithoutSenderNestedInput
   sentInvites?: Prisma.SupportInviteUpdateManyWithoutAdminNestedInput
+  supportAuditLogs?: Prisma.SupportAuditLogUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutManualActivationLogsInput = {
@@ -2004,6 +2188,7 @@ export type UserUncheckedUpdateWithoutManualActivationLogsInput = {
   assignedTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutAssignedToNestedInput
   sentSupportMsgs?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderNestedInput
   sentInvites?: Prisma.SupportInviteUncheckedUpdateManyWithoutAdminNestedInput
+  supportAuditLogs?: Prisma.SupportAuditLogUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -2021,6 +2206,7 @@ export type UserCountOutputType = {
   assignedTickets: number
   sentSupportMsgs: number
   sentInvites: number
+  supportAuditLogs: number
   manualActivationLogs: number
 }
 
@@ -2034,6 +2220,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   assignedTickets?: boolean | UserCountOutputTypeCountAssignedTicketsArgs
   sentSupportMsgs?: boolean | UserCountOutputTypeCountSentSupportMsgsArgs
   sentInvites?: boolean | UserCountOutputTypeCountSentInvitesArgs
+  supportAuditLogs?: boolean | UserCountOutputTypeCountSupportAuditLogsArgs
   manualActivationLogs?: boolean | UserCountOutputTypeCountManualActivationLogsArgs
 }
 
@@ -2113,6 +2300,13 @@ export type UserCountOutputTypeCountSentInvitesArgs<ExtArgs extends runtime.Type
 /**
  * UserCountOutputType without action
  */
+export type UserCountOutputTypeCountSupportAuditLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SupportAuditLogWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
 export type UserCountOutputTypeCountManualActivationLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.ManualActivationLogWhereInput
 }
@@ -2141,6 +2335,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   assignedTickets?: boolean | Prisma.User$assignedTicketsArgs<ExtArgs>
   sentSupportMsgs?: boolean | Prisma.User$sentSupportMsgsArgs<ExtArgs>
   sentInvites?: boolean | Prisma.User$sentInvitesArgs<ExtArgs>
+  supportAuditLogs?: boolean | Prisma.User$supportAuditLogsArgs<ExtArgs>
   manualActivationLogs?: boolean | Prisma.User$manualActivationLogsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
@@ -2202,6 +2397,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   assignedTickets?: boolean | Prisma.User$assignedTicketsArgs<ExtArgs>
   sentSupportMsgs?: boolean | Prisma.User$sentSupportMsgsArgs<ExtArgs>
   sentInvites?: boolean | Prisma.User$sentInvitesArgs<ExtArgs>
+  supportAuditLogs?: boolean | Prisma.User$supportAuditLogsArgs<ExtArgs>
   manualActivationLogs?: boolean | Prisma.User$manualActivationLogsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -2221,6 +2417,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     assignedTickets: Prisma.$SupportTicketPayload<ExtArgs>[]
     sentSupportMsgs: Prisma.$SupportMessagePayload<ExtArgs>[]
     sentInvites: Prisma.$SupportInvitePayload<ExtArgs>[]
+    supportAuditLogs: Prisma.$SupportAuditLogPayload<ExtArgs>[]
     manualActivationLogs: Prisma.$ManualActivationLogPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -2640,6 +2837,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   assignedTickets<T extends Prisma.User$assignedTicketsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$assignedTicketsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupportTicketPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   sentSupportMsgs<T extends Prisma.User$sentSupportMsgsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sentSupportMsgsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupportMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   sentInvites<T extends Prisma.User$sentInvitesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sentInvitesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupportInvitePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  supportAuditLogs<T extends Prisma.User$supportAuditLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$supportAuditLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupportAuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   manualActivationLogs<T extends Prisma.User$manualActivationLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$manualActivationLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ManualActivationLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -3302,6 +3500,30 @@ export type User$sentInvitesArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   distinct?: Prisma.SupportInviteScalarFieldEnum | Prisma.SupportInviteScalarFieldEnum[]
+}
+
+/**
+ * User.supportAuditLogs
+ */
+export type User$supportAuditLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SupportAuditLog
+   */
+  select?: Prisma.SupportAuditLogSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SupportAuditLog
+   */
+  omit?: Prisma.SupportAuditLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SupportAuditLogInclude<ExtArgs> | null
+  where?: Prisma.SupportAuditLogWhereInput
+  orderBy?: Prisma.SupportAuditLogOrderByWithRelationInput | Prisma.SupportAuditLogOrderByWithRelationInput[]
+  cursor?: Prisma.SupportAuditLogWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SupportAuditLogScalarFieldEnum | Prisma.SupportAuditLogScalarFieldEnum[]
 }
 
 /**

@@ -47,7 +47,7 @@ export default async function AdminTicketPage({
       messages: {
         include: {
           sender: {
-            select: { name: true, image: true, role: true },
+            select: { name: true, image: true },
           },
         },
         orderBy: { createdAt: "asc" },

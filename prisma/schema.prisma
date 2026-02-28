@@ -67,6 +67,13 @@ enum SupportTicketStatus {
   RESOLVED
 }
 
+enum SupportAuditAction {
+  ASSIGN
+  RESOLVE
+  ADMIN_MESSAGE
+  STATUS_CHANGE
+}
+
 // =====================
 // USER & AUTH
 // =====================
@@ -95,6 +102,7 @@ model User {
   assignedTickets       SupportTicket[]       @relation("SupportTicketAgent")
   sentSupportMsgs       SupportMessage[]      @relation("SupportMessageSender")
   sentInvites           SupportInvite[]       @relation("SupportInvites")
+  supportAuditLogs      SupportAuditLog[]     @relation("SupportAuditLogs")
   manualActivationLogs  ManualActivationLog[] @relation("ManualActivationPerformer")
 
   @@unique([email])
@@ -405,7 +413,8 @@ model SupportTicket {
   assignedToId String?
   assignedTo   User?  @relation("SupportTicketAgent", fields: [assignedToId], references: [id], onDelete: SetNull)
 
-  messages SupportMessage[]
+  messages  SupportMessage[]
+  auditLogs SupportAuditLog[]
 
   @@index([userId])
   @@index([status])
@@ -432,6 +441,26 @@ model SupportMessage {
   @@index([ticketId])
   @@index([ticketId, isFromAdmin, readByUser])
   @@map("support_message")
+}
+
+// =====================
+// SUPPORT AUDIT LOG
+// =====================
+
+model SupportAuditLog {
+  id        String             @id @default(uuid())
+  action    SupportAuditAction
+  ticketId  String
+  userId    String
+  metadata  Json?
+  createdAt DateTime           @default(now()) @db.Timestamptz()
+
+  ticket SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  user   User          @relation("SupportAuditLogs", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId])
+  @@index([userId])
+  @@map("support_audit_log")
 }
 
 // =====================
