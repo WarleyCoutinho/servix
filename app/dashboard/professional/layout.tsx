@@ -1,4 +1,5 @@
 import { DashboardSidebar, type NavItem } from "@/components/dashboard-sidebar";
+import { StripeWarningBanner } from "@/components/stripe-warning-banner";
 import { Button } from "@/components/ui/button";
 import { UserRole } from "@/generated/prisma/enums";
 import { auth } from "@/lib/auth";
@@ -154,6 +155,10 @@ export default async function ProfessionalDashboardLayout({
                 automaticamente quando a verificação for concluída.
               </p>
             </div>
+          )}
+        {professional.acceptsPayAfterService &&
+          professional.stripeAccountStatus !== "ACTIVE" && (
+            <StripeWarningBanner />
           )}
       </DashboardSidebar>
       <main className="flex-1 overflow-auto">

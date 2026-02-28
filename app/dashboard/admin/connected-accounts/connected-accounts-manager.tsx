@@ -31,6 +31,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ManualActivationDialog } from "@/components/manual-activation-dialog";
 import {
   Link2,
   CheckCircle2,
@@ -41,6 +42,7 @@ import {
   ExternalLink,
   Trash2,
   Users,
+  Zap,
 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -58,6 +60,8 @@ interface ConnectedAccountData {
   professionalName: string | null;
   professionalId: string | null;
   barbershopName: string | null;
+  acceptsPayAfterService: boolean;
+  stripeAccountStatus: string;
   requirements: {
     currentlyDue: string[];
     disabledReason: string | null;
@@ -79,6 +83,27 @@ export function ConnectedAccountsManager({
   const [activeTab, setActiveTab] = useState<FilterTab>("all");
   const [accountToDelete, setAccountToDelete] =
     useState<ConnectedAccountData | null>(null);
+  const [manualActivationAccount, setManualActivationAccount] =
+    useState<ConnectedAccountData | null>(null);
+
+  const handleManualActivationChange = (
+    professionalId: string,
+    acceptsPayAfterService: boolean,
+    stripeAccountStatus: string,
+  ) => {
+    setAccounts((prev) =>
+      prev.map((a) =>
+        a.professionalId === professionalId
+          ? { ...a, acceptsPayAfterService, stripeAccountStatus }
+          : a,
+      ),
+    );
+    if (manualActivationAccount?.professionalId === professionalId) {
+      setManualActivationAccount((prev) =>
+        prev ? { ...prev, acceptsPayAfterService, stripeAccountStatus } : null,
+      );
+    }
+  };
 
   const { execute: executeDelete, isPending: isDeleting } = useAction(
     deleteConnectedAccount,
@@ -304,6 +329,16 @@ export function ConnectedAccountsManager({
                                 Ver no Stripe
                               </a>
                             </DropdownMenuItem>
+                            {account.professionalId && (
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  setManualActivationAccount(account)
+                                }
+                              >
+                                <Zap className="mr-2 h-4 w-4" />
+                                Acesso Manual
+                              </DropdownMenuItem>
+                            )}
                             <DropdownMenuItem
                               className="text-destructive focus:text-destructive"
                               onClick={() => setAccountToDelete(account)}
@@ -327,6 +362,23 @@ export function ConnectedAccountsManager({
           )}
         </CardContent>
       </Card>
+
+      <ManualActivationDialog
+        open={!!manualActivationAccount}
+        onOpenChange={(open) =>
+          !open && setManualActivationAccount(null)
+        }
+        professionalId={manualActivationAccount?.professionalId ?? null}
+        professionalName={manualActivationAccount?.professionalName ?? null}
+        acceptsPayAfterService={
+          manualActivationAccount?.acceptsPayAfterService ?? false
+        }
+        stripeAccountStatus={
+          manualActivationAccount?.stripeAccountStatus ?? "PENDING"
+        }
+        chargesEnabled={manualActivationAccount?.chargesEnabled ?? false}
+        onStatusChange={handleManualActivationChange}
+      />
 
       <AlertDialog
         open={!!accountToDelete}

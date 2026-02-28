@@ -117,3 +117,8 @@ export type Notification = Prisma.NotificationModel
  * 
  */
 export type Upload = Prisma.UploadModel
+/**
+ * Model ManualActivationLog
+ * 
+ */
+export type ManualActivationLog = Prisma.ManualActivationLogModel

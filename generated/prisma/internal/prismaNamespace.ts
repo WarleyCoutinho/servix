@@ -403,7 +403,8 @@ export const ModelName = {
   SupportInvite: 'SupportInvite',
   PlatformFeeHistory: 'PlatformFeeHistory',
   Notification: 'Notification',
-  Upload: 'Upload'
+  Upload: 'Upload',
+  ManualActivationLog: 'ManualActivationLog'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -419,7 +420,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "account" | "verification" | "barbershop" | "professional" | "planConfig" | "subscription" | "professionalSchedule" | "barbershopService" | "booking" | "payment" | "planHistory" | "stripeEvent" | "supportTicket" | "supportMessage" | "supportInvite" | "platformFeeHistory" | "notification" | "upload"
+    modelProps: "user" | "session" | "account" | "verification" | "barbershop" | "professional" | "planConfig" | "subscription" | "professionalSchedule" | "barbershopService" | "booking" | "payment" | "planHistory" | "stripeEvent" | "supportTicket" | "supportMessage" | "supportInvite" | "platformFeeHistory" | "notification" | "upload" | "manualActivationLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1903,6 +1904,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ManualActivationLog: {
+      payload: Prisma.$ManualActivationLogPayload<ExtArgs>
+      fields: Prisma.ManualActivationLogFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ManualActivationLogFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ManualActivationLogPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ManualActivationLogFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ManualActivationLogPayload>
+        }
+        findFirst: {
+          args: Prisma.ManualActivationLogFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ManualActivationLogPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ManualActivationLogFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ManualActivationLogPayload>
+        }
+        findMany: {
+          args: Prisma.ManualActivationLogFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ManualActivationLogPayload>[]
+        }
+        create: {
+          args: Prisma.ManualActivationLogCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ManualActivationLogPayload>
+        }
+        createMany: {
+          args: Prisma.ManualActivationLogCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ManualActivationLogCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ManualActivationLogPayload>[]
+        }
+        delete: {
+          args: Prisma.ManualActivationLogDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ManualActivationLogPayload>
+        }
+        update: {
+          args: Prisma.ManualActivationLogUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ManualActivationLogPayload>
+        }
+        deleteMany: {
+          args: Prisma.ManualActivationLogDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ManualActivationLogUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ManualActivationLogUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ManualActivationLogPayload>[]
+        }
+        upsert: {
+          args: Prisma.ManualActivationLogUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ManualActivationLogPayload>
+        }
+        aggregate: {
+          args: Prisma.ManualActivationLogAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateManualActivationLog>
+        }
+        groupBy: {
+          args: Prisma.ManualActivationLogGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ManualActivationLogGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ManualActivationLogCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ManualActivationLogCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -2256,6 +2331,20 @@ export const UploadScalarFieldEnum = {
 export type UploadScalarFieldEnum = (typeof UploadScalarFieldEnum)[keyof typeof UploadScalarFieldEnum]
 
 
+export const ManualActivationLogScalarFieldEnum = {
+  id: 'id',
+  action: 'action',
+  reason: 'reason',
+  stripeStatusAtMoment: 'stripeStatusAtMoment',
+  performedAt: 'performedAt',
+  performedByRole: 'performedByRole',
+  professionalId: 'professionalId',
+  performedById: 'performedById'
+} as const
+
+export type ManualActivationLogScalarFieldEnum = (typeof ManualActivationLogScalarFieldEnum)[keyof typeof ManualActivationLogScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -2575,6 +2664,7 @@ export type GlobalOmitConfig = {
   platformFeeHistory?: Prisma.PlatformFeeHistoryOmit
   notification?: Prisma.NotificationOmit
   upload?: Prisma.UploadOmit
+  manualActivationLog?: Prisma.ManualActivationLogOmit
 }
 
 /* Types for Logging */

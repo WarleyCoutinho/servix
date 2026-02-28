@@ -15,6 +15,8 @@ interface ConnectedAccountData {
   professionalName: string | null;
   professionalId: string | null;
   barbershopName: string | null;
+  acceptsPayAfterService: boolean;
+  stripeAccountStatus: string;
   requirements: {
     currentlyDue: string[];
     disabledReason: string | null;
@@ -47,6 +49,8 @@ export default async function ConnectedAccountsPage() {
     select: {
       stripeAccountId: true,
       id: true,
+      acceptsPayAfterService: true,
+      stripeAccountStatus: true,
       user: { select: { name: true } },
       barbershop: { select: { name: true } },
     },
@@ -70,6 +74,8 @@ export default async function ConnectedAccountsPage() {
       professionalName: prof?.user.name ?? null,
       professionalId: prof?.id ?? null,
       barbershopName: prof?.barbershop.name ?? null,
+      acceptsPayAfterService: prof?.acceptsPayAfterService ?? false,
+      stripeAccountStatus: prof?.stripeAccountStatus ?? "PENDING",
       requirements: {
         currentlyDue: acc.requirements?.currently_due ?? [],
         disabledReason: acc.requirements?.disabled_reason ?? null,

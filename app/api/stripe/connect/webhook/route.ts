@@ -61,6 +61,42 @@ export const POST = async (request: Request) => {
         if (professional) {
           await updateProfessionalStripeStatus(account.id);
 
+          if (
+            account.charges_enabled &&
+            account.payouts_enabled &&
+            account.details_submitted &&
+            professional.acceptsPayAfterService
+          ) {
+            await prisma.professional.update({
+              where: { id: professional.id },
+              data: { acceptsPayAfterService: false },
+            });
+
+            await prisma.manualActivationLog.create({
+              data: {
+                action: "MANUAL_ACTIVATION_DISABLED",
+                reason: "STRIPE_ISSUE",
+                stripeStatusAtMoment: "ACTIVE",
+                professionalId: professional.id,
+                performedById: professional.userId,
+                performedByRole: "SYSTEM",
+              },
+            });
+
+            await prisma.notification.create({
+              data: {
+                userId: professional.userId,
+                title: "Stripe ativada com sucesso",
+                message:
+                  "Sua conta Stripe foi aprovada! O acesso manual foi desativado automaticamente e você agora tem todos os benefícios da Stripe.",
+              },
+            });
+
+            console.log(
+              `[Stripe Connect] Professional ${professional.id} auto-resolved manual activation`,
+            );
+          }
+
           const currentlyDue = account.requirements?.currently_due ?? [];
           const disabledReason = account.requirements?.disabled_reason;
 

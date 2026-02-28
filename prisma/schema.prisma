@@ -84,15 +84,16 @@ model User {
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 
-  sessions         Session[]
-  accounts         Account[]
-  bookings         Booking[]
-  ownedBarbershops Barbershop[]     @relation("BarbershopOwner")
-  professional     Professional?
-  notifications    Notification[]
-  supportTickets   SupportTicket[]
-  sentSupportMsgs  SupportMessage[] @relation("SupportMessageSender")
-  sentInvites      SupportInvite[]  @relation("SupportInvites")
+  sessions              Session[]
+  accounts              Account[]
+  bookings              Booking[]
+  ownedBarbershops      Barbershop[]          @relation("BarbershopOwner")
+  professional          Professional?
+  notifications         Notification[]
+  supportTickets        SupportTicket[]
+  sentSupportMsgs       SupportMessage[]      @relation("SupportMessageSender")
+  sentInvites           SupportInvite[]       @relation("SupportInvites")
+  manualActivationLogs  ManualActivationLog[] @relation("ManualActivationPerformer")
 
   @@unique([email])
   @@map("user")
@@ -205,9 +206,10 @@ model Professional {
   barbershopId String
   barbershop   Barbershop @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
 
-  schedules ProfessionalSchedule[]
-  bookings  Booking[]
-  payments  Payment[]
+  schedules            ProfessionalSchedule[]
+  bookings             Booking[]
+  payments             Payment[]
+  manualActivationLogs ManualActivationLog[]
 
   @@index([barbershopId])
   @@index([cpf])
@@ -492,4 +494,26 @@ model Upload {
   createdAt   DateTime @default(now()) @db.Timestamptz()
 
   @@map("upload")
+}
+
+// =====================
+// MANUAL ACTIVATION LOG
+// =====================
+
+model ManualActivationLog {
+  id                   String   @id @default(uuid())
+  action               String
+  reason               String?
+  stripeStatusAtMoment String?
+  performedAt          DateTime @default(now()) @db.Timestamptz()
+  performedByRole      String
+
+  professionalId String
+  professional   Professional @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+
+  performedById String
+  performedBy   User @relation("ManualActivationPerformer", fields: [performedById], references: [id], onDelete: Cascade)
+
+  @@index([professionalId])
+  @@map("manual_activation_log")
 }

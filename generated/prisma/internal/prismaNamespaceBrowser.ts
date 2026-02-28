@@ -70,7 +70,8 @@ export const ModelName = {
   SupportInvite: 'SupportInvite',
   PlatformFeeHistory: 'PlatformFeeHistory',
   Notification: 'Notification',
-  Upload: 'Upload'
+  Upload: 'Upload',
+  ManualActivationLog: 'ManualActivationLog'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -401,6 +402,20 @@ export const UploadScalarFieldEnum = {
 } as const
 
 export type UploadScalarFieldEnum = (typeof UploadScalarFieldEnum)[keyof typeof UploadScalarFieldEnum]
+
+
+export const ManualActivationLogScalarFieldEnum = {
+  id: 'id',
+  action: 'action',
+  reason: 'reason',
+  stripeStatusAtMoment: 'stripeStatusAtMoment',
+  performedAt: 'performedAt',
+  performedByRole: 'performedByRole',
+  professionalId: 'professionalId',
+  performedById: 'performedById'
+} as const
+
+export type ManualActivationLogScalarFieldEnum = (typeof ManualActivationLogScalarFieldEnum)[keyof typeof ManualActivationLogScalarFieldEnum]
 
 
 export const SortOrder = {
