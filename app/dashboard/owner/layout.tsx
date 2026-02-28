@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { DashboardSidebar, type NavItem } from "@/components/dashboard-sidebar";
 import { BarbershopSelector } from "@/components/barbershop-selector";
+import { StripeWarningBanner } from "@/components/stripe-warning-banner";
 import { getUserPlanInfo } from "@/lib/plan-limits";
 import { PlanBadge } from "@/components/plan-badge";
 import { SupportChat } from "@/components/support-chat";
@@ -36,6 +37,12 @@ export default async function OwnerDashboardLayout({
     include: {
       ownedBarbershops: {
         orderBy: { createdAt: "asc" },
+      },
+      professional: {
+        select: {
+          acceptsPayAfterService: true,
+          stripeAccountStatus: true,
+        },
       },
     },
   });
@@ -113,6 +120,10 @@ export default async function OwnerDashboardLayout({
             />
           )}
         </div>
+        {user.professional?.acceptsPayAfterService &&
+          user.professional.stripeAccountStatus !== "ACTIVE" && (
+            <StripeWarningBanner />
+          )}
       </DashboardSidebar>
       <main className="flex-1 overflow-auto">
         <div className="mx-auto max-w-6xl p-4 pt-16 sm:p-6 md:pt-6">

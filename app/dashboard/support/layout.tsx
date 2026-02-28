@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { prisma, safeQuery } from "@/lib/prisma";
 import { UserRole } from "@/generated/prisma/enums";
-import { LayoutDashboard, Headset } from "lucide-react";
+import { LayoutDashboard, Headset, Link2 } from "lucide-react";
 import {
   DashboardSidebar,
   type NavItem,
@@ -12,6 +12,7 @@ import {
 const navItems: NavItem[] = [
   { href: "/dashboard/support", label: "Visao Geral", icon: LayoutDashboard },
   { href: "/dashboard/support/tickets", label: "Tickets", icon: Headset },
+  { href: "/dashboard/support/connected-accounts", label: "Contas Conectadas", icon: Link2 },
 ];
 
 export default async function SupportDashboardLayout({
