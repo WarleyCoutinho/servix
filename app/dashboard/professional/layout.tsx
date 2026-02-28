@@ -80,10 +80,12 @@ export default async function ProfessionalDashboardLayout({
 
   const professional = user.professional;
 
-  const planInfo = await getUserPlanInfo(
-    professional.barbershop.ownerId,
-    professional.barbershopId,
-  );
+  const planInfo = professional.barbershop.ownerId
+    ? await getUserPlanInfo(
+        professional.barbershop.ownerId,
+        professional.barbershopId,
+      )
+    : null;
   const userPlan = planInfo?.plan ?? "BASIC";
 
   const restrictionInfo =
