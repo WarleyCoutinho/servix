@@ -4,6 +4,8 @@ import { UserRole } from "@/generated/prisma/enums";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 
+const MAX_MESSAGE_LENGTH = 5000;
+
 export const GET = async (
   _request: Request,
   { params }: { params: Promise<{ ticketId: string }> },
@@ -21,16 +23,6 @@ export const GET = async (
   }
 
   const { ticketId } = await params;
-
-  const messages = await prisma.supportMessage.findMany({
-    where: { ticketId },
-    include: {
-      sender: {
-        select: { name: true, image: true, role: true },
-      },
-    },
-    orderBy: { createdAt: "asc" },
-  });
 
   const ticket = await prisma.supportTicket.findUnique({
     where: { id: ticketId },
@@ -55,6 +47,20 @@ export const GET = async (
     },
   });
 
+  if (!ticket) {
+    return NextResponse.json({ error: "Ticket não encontrado" }, { status: 404 });
+  }
+
+  const messages = await prisma.supportMessage.findMany({
+    where: { ticketId },
+    include: {
+      sender: {
+        select: { name: true, image: true, role: true },
+      },
+    },
+    orderBy: { createdAt: "asc" },
+  });
+
   return NextResponse.json({ messages, ticket });
 };
 
@@ -75,31 +81,53 @@ export const POST = async (
   }
 
   const { ticketId } = await params;
-  const { content, imageUrl } = await request.json();
+
+  const ticket = await prisma.supportTicket.findUnique({
+    where: { id: ticketId },
+  });
+
+  if (!ticket) {
+    return NextResponse.json({ error: "Ticket não encontrado" }, { status: 404 });
+  }
+
+  if (ticket.status === "RESOLVED") {
+    return NextResponse.json({ error: "Ticket já foi resolvido" }, { status: 400 });
+  }
+
+  let body: { content?: string; imageUrl?: string };
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "JSON inválido" }, { status: 400 });
+  }
+
+  const { content, imageUrl } = body;
 
   if (!content?.trim() && !imageUrl) {
     return NextResponse.json({ error: "Mensagem vazia" }, { status: 400 });
   }
 
+  const sanitizedContent = (content?.trim() ?? "").slice(0, MAX_MESSAGE_LENGTH);
+
+  if (imageUrl && !imageUrl.startsWith("/api/uploads/")) {
+    return NextResponse.json({ error: "URL de imagem inválida" }, { status: 400 });
+  }
+
   const message = await prisma.supportMessage.create({
     data: {
       ticketId,
-      content: content?.trim() ?? "",
+      content: sanitizedContent,
       imageUrl: imageUrl || undefined,
       isFromAdmin: true,
       senderId: session.user.id,
     },
   });
 
-  const ticket = await prisma.supportTicket.findUnique({
-    where: { id: ticketId },
-  });
-
   await prisma.supportTicket.update({
     where: { id: ticketId },
     data: {
-      status: ticket?.assignedToId ? "IN_PROGRESS" : "OPEN",
-      assignedToId: ticket?.assignedToId ?? session.user.id,
+      status: "IN_PROGRESS",
+      assignedToId: ticket.assignedToId ?? session.user.id,
     },
   });
 

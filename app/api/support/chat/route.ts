@@ -7,15 +7,26 @@ import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import z from "zod";
 
+const MAX_MESSAGE_LENGTH = 5000;
+const MAX_MESSAGES_HISTORY = 50;
+
 const messageSchema = z.object({
-  messages: z.array(
-    z.object({
-      role: z.enum(["user", "assistant"]),
-      content: z.string(),
-    }),
-  ),
+  messages: z
+    .array(
+      z.object({
+        role: z.enum(["user", "assistant"]),
+        content: z.string().max(MAX_MESSAGE_LENGTH),
+      }),
+    )
+    .max(MAX_MESSAGES_HISTORY),
   userPlan: z.string().optional(),
-  imageUrl: z.string().optional(),
+  imageUrl: z
+    .string()
+    .refine(
+      (url) => url.startsWith("/api/uploads/"),
+      "imageUrl deve ser um upload válido",
+    )
+    .optional(),
 });
 
 async function getOrCreateTicket(userId: string) {
@@ -29,6 +40,16 @@ async function getOrCreateTicket(userId: string) {
 
   if (existing) return existing;
 
+  const justCreated = await prisma.supportTicket.findFirst({
+    where: {
+      userId,
+      status: { in: ["OPEN", "WAITING_ADMIN", "IN_PROGRESS"] },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  if (justCreated) return justCreated;
+
   return prisma.supportTicket.create({
     data: { userId },
   });
@@ -39,10 +60,11 @@ async function saveMessage(
   content: string,
   opts: { isFromAdmin?: boolean; isFromAI?: boolean; senderId?: string; imageUrl?: string },
 ) {
+  const sanitizedContent = content.slice(0, MAX_MESSAGE_LENGTH);
   return prisma.supportMessage.create({
     data: {
       ticketId,
-      content,
+      content: sanitizedContent,
       imageUrl: opts.imageUrl,
       isFromAdmin: opts.isFromAdmin ?? false,
       isFromAI: opts.isFromAI ?? false,
@@ -80,7 +102,13 @@ export const POST = async (request: Request) => {
     return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
   }
 
-  const body = await request.json();
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "JSON inválido" }, { status: 400 });
+  }
+
   const parsed = messageSchema.safeParse(body);
 
   if (!parsed.success) {
@@ -90,12 +118,19 @@ export const POST = async (request: Request) => {
     );
   }
 
-  const { messages, userPlan, imageUrl } = parsed.data;
+  const { messages, imageUrl } = parsed.data;
   const lastMessage = messages[messages.length - 1];
 
   if (!lastMessage || lastMessage.role !== "user") {
     return NextResponse.json(
       { error: "Mensagem do usuário não encontrada" },
+      { status: 400 },
+    );
+  }
+
+  if (!lastMessage.content.trim() && !imageUrl) {
+    return NextResponse.json(
+      { error: "Mensagem vazia" },
       { status: 400 },
     );
   }

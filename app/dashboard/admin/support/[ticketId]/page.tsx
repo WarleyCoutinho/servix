@@ -1,5 +1,8 @@
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { notFound } from "next/navigation";
+import { UserRole } from "@/generated/prisma/enums";
+import { headers } from "next/headers";
+import { notFound, redirect } from "next/navigation";
 import { TicketChat } from "./ticket-chat";
 
 export default async function AdminTicketPage({
@@ -7,6 +10,17 @@ export default async function AdminTicketPage({
 }: {
   params: Promise<{ ticketId: string }>;
 }) {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session?.user) redirect("/");
+
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { role: true },
+  });
+  if (user?.role !== UserRole.admin && user?.role !== UserRole.support) {
+    redirect("/");
+  }
+
   const { ticketId } = await params;
 
   const ticket = await prisma.supportTicket.findUnique({

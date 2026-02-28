@@ -410,6 +410,7 @@ model SupportTicket {
   @@index([userId])
   @@index([status])
   @@index([assignedToId])
+  @@index([userId, status])
   @@map("support_ticket")
 }
 
@@ -429,6 +430,7 @@ model SupportMessage {
   sender   User?   @relation("SupportMessageSender", fields: [senderId], references: [id], onDelete: SetNull)
 
   @@index([ticketId])
+  @@index([ticketId, isFromAdmin, readByUser])
   @@map("support_message")
 }
 

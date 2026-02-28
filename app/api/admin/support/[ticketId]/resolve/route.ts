@@ -22,6 +22,18 @@ export const POST = async (
 
   const { ticketId } = await params;
 
+  const existing = await prisma.supportTicket.findUnique({
+    where: { id: ticketId },
+  });
+
+  if (!existing) {
+    return NextResponse.json({ error: "Ticket não encontrado" }, { status: 404 });
+  }
+
+  if (existing.status === "RESOLVED") {
+    return NextResponse.json({ error: "Ticket já foi resolvido" }, { status: 400 });
+  }
+
   const ticket = await prisma.supportTicket.update({
     where: { id: ticketId },
     data: {
