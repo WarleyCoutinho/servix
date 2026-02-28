@@ -49,7 +49,7 @@
 
 ---
 
-### 2. Polling para WebSocket/SSE (MEDIUM — Performance) — PENDENTE
+### 2. Polling para SSE (MEDIUM — Performance) — DONE
 
 **Problema:** O sistema usa polling a cada 5 segundos em ambos os lados (usuario e admin). Isso gera carga desnecessaria no banco e latencia de ate 5s nas respostas.
 

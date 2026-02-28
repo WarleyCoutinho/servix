@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { rateLimit } from "@/lib/rate-limit";
 import { logSupportAction } from "@/lib/support-audit";
+import { supportEvents } from "@/lib/support-events";
 import { UserRole } from "@/generated/prisma/enums";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
@@ -145,6 +146,8 @@ export const POST = async (
   logSupportAction("ADMIN_MESSAGE", ticketId, session.user.id, {
     messageId: message.id,
   });
+
+  supportEvents.notify(ticketId);
 
   return NextResponse.json({ message });
 };

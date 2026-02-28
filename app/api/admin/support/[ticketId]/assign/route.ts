@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { logSupportAction } from "@/lib/support-audit";
+import { supportEvents } from "@/lib/support-events";
 import { UserRole } from "@/generated/prisma/enums";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
@@ -51,6 +52,8 @@ export const POST = async (
   logSupportAction("ASSIGN", ticketId, session.user.id, {
     assignedToId: session.user.id,
   });
+
+  supportEvents.notify(ticketId);
 
   return NextResponse.json({ ticket });
 };

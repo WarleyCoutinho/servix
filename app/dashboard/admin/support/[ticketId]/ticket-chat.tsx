@@ -97,20 +97,41 @@ export function TicketChat({ ticket }: { ticket: Ticket }) {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  useEffect(() => {
-    const interval = setInterval(async () => {
-      try {
-        const res = await fetch(
-          `/api/admin/support/${ticket.id}/messages`,
-        );
-        const data = await res.json();
-        if (data.messages) {
-          setMessages(data.messages);
-        }
-      } catch {}
-    }, 5000);
-    return () => clearInterval(interval);
+  const fetchMessages = useCallback(async () => {
+    try {
+      const res = await fetch(
+        `/api/admin/support/${ticket.id}/messages`,
+      );
+      const data = await res.json();
+      if (data.messages) {
+        setMessages(data.messages);
+      }
+    } catch {}
   }, [ticket.id]);
+
+  useEffect(() => {
+    let fallbackInterval: ReturnType<typeof setInterval> | null = null;
+
+    const es = new EventSource(
+      `/api/admin/support/${ticket.id}/events`,
+    );
+
+    es.onmessage = (event) => {
+      if (event.data === "update") {
+        fetchMessages();
+      }
+    };
+
+    es.onerror = () => {
+      es.close();
+      fallbackInterval = setInterval(fetchMessages, 5000);
+    };
+
+    return () => {
+      es.close();
+      if (fallbackInterval) clearInterval(fallbackInterval);
+    };
+  }, [ticket.id, fetchMessages]);
 
   const uploadImage = useCallback(async (file: File): Promise<string | null> => {
     const formData = new FormData();

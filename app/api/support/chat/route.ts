@@ -8,6 +8,7 @@ import { NextResponse } from "next/server";
 import z from "zod";
 import { rateLimit } from "@/lib/rate-limit";
 import { logSupportAction } from "@/lib/support-audit";
+import { supportEvents } from "@/lib/support-events";
 
 const MAX_MESSAGE_LENGTH = 5000;
 const chatLimiter = rateLimit({ interval: 60_000, limit: 10 });
@@ -152,6 +153,8 @@ export const POST = async (request: Request) => {
     imageUrl,
   });
 
+  supportEvents.notify(ticket.id);
+
   if (ticket.status === "IN_PROGRESS") {
     return NextResponse.json({
       type: "in_progress",
@@ -211,6 +214,7 @@ export const POST = async (request: Request) => {
         "Um atendente vai responder em breve!";
 
       await saveMessage(ticket.id, fallbackMessage, { isFromAI: true });
+      supportEvents.notify(ticket.id);
 
       return NextResponse.json({
         type: "waiting_admin",
@@ -239,6 +243,8 @@ export const POST = async (request: Request) => {
       to: "WAITING_ADMIN",
       reason: "ai_error",
     });
+
+    supportEvents.notify(ticket.id);
 
     return NextResponse.json({
       type: "waiting_admin",

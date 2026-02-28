@@ -104,64 +104,83 @@ export function SupportChat({ userPlan, userName }: SupportChatProps) {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const shouldPoll = status === "waiting_admin" || status === "in_progress";
+  const shouldListen = status === "waiting_admin" || status === "in_progress";
 
-  useEffect(() => {
-    if (!shouldPoll || !ticketId) return;
+  const fetchMessages = useCallback(async () => {
+    if (!ticketId) return;
+    try {
+      const res = await fetch(`/api/support/messages?ticketId=${ticketId}`);
+      const data = await res.json();
 
-    const interval = setInterval(async () => {
-      try {
-        const res = await fetch(`/api/support/messages?ticketId=${ticketId}`);
-        const data = await res.json();
+      if (data.assignedToName) {
+        setAgentName(data.assignedToName);
+      }
 
-        if (data.assignedToName) {
-          setAgentName(data.assignedToName);
-        }
+      if (data.ticketStatus === "IN_PROGRESS") {
+        setStatus((prev) => (prev !== "in_progress" ? "in_progress" : prev));
+      }
 
-        if (data.ticketStatus === "IN_PROGRESS" && status !== "in_progress") {
-          setStatus("in_progress");
-        }
-
-        if (data.messages && data.messages.length > 0) {
-          const adminMessages: PollMessage[] = data.messages;
-          const newMessages = adminMessages.filter(
-            (m) => !seenIdsRef.current.has(m.id),
-          );
-          if (newMessages.length > 0) {
-            for (const m of newMessages) {
-              seenIdsRef.current.add(m.id);
-            }
-            setMessages((prev) => [
-              ...prev,
-              ...newMessages.map((m: PollMessage) => ({
-                role: "assistant" as const,
-                content: m.content,
-                imageUrl: m.imageUrl,
-              })),
-            ]);
+      if (data.messages && data.messages.length > 0) {
+        const adminMessages: PollMessage[] = data.messages;
+        const newMessages = adminMessages.filter(
+          (m) => !seenIdsRef.current.has(m.id),
+        );
+        if (newMessages.length > 0) {
+          for (const m of newMessages) {
+            seenIdsRef.current.add(m.id);
           }
-          if (status === "waiting_admin") {
-            setStatus("in_progress");
-          }
-        }
-
-        if (data.ticketStatus === "RESOLVED") {
-          setStatus("idle");
-          setTicketId(null);
-          setAgentName(null);
           setMessages((prev) => [
             ...prev,
-            {
-              role: "assistant",
-              content: "Este atendimento foi encerrado. Se precisar de mais ajuda, envie uma nova mensagem!",
-            },
+            ...newMessages.map((m: PollMessage) => ({
+              role: "assistant" as const,
+              content: m.content,
+              imageUrl: m.imageUrl,
+            })),
           ]);
         }
-      } catch {}
-    }, 5000);
+        setStatus((prev) =>
+          prev === "waiting_admin" ? "in_progress" : prev,
+        );
+      }
 
-    return () => clearInterval(interval);
-  }, [shouldPoll, ticketId, status]);
+      if (data.ticketStatus === "RESOLVED") {
+        setStatus("idle");
+        setTicketId(null);
+        setAgentName(null);
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "assistant",
+            content: "Este atendimento foi encerrado. Se precisar de mais ajuda, envie uma nova mensagem!",
+          },
+        ]);
+      }
+    } catch {}
+  }, [ticketId]);
+
+  useEffect(() => {
+    if (!shouldListen || !ticketId) return;
+
+    let fallbackInterval: ReturnType<typeof setInterval> | null = null;
+
+    const es = new EventSource(`/api/support/events?ticketId=${ticketId}`);
+
+    es.onmessage = (event) => {
+      if (event.data === "update") {
+        fetchMessages();
+      }
+    };
+
+    es.onerror = () => {
+      es.close();
+      fallbackInterval = setInterval(fetchMessages, 5000);
+    };
+
+    return () => {
+      es.close();
+      if (fallbackInterval) clearInterval(fallbackInterval);
+    };
+  }, [shouldListen, ticketId, fetchMessages]);
 
   const uploadImage = useCallback(
     async (file: File): Promise<string | null> => {
