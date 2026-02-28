@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import { AlertTriangle, ChevronDown, ChevronUp, MessageCircle, Phone } from "lucide-react";
 
 const MINIMIZED_KEY = "stripe-warning-minimized";
@@ -93,26 +92,23 @@ export function StripeWarningBanner({ userPlan = "BASIC" }: StripeWarningBannerP
       </p>
 
       {isPremiumPlan ? (
-        <Button size="sm" asChild className="w-full" variant="outline">
-          <a
-            href={`https://wa.me/${SUPPORT_WHATSAPP}?text=${encodeURIComponent("Olá, preciso de ajuda para ativar a Stripe na minha conta.")}`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Phone className="mr-2 h-4 w-4" />
-            Falar com suporte via WhatsApp
-          </a>
-        </Button>
-      ) : (
-        <Button
-          size="sm"
-          className="w-full"
-          variant="outline"
-          onClick={() => window.dispatchEvent(new CustomEvent("open-support-chat"))}
+        <a
+          href={`https://wa.me/${SUPPORT_WHATSAPP}?text=${encodeURIComponent("Olá, preciso de ajuda para ativar a Stripe na minha conta.")}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-amber-700 underline underline-offset-2 hover:text-amber-900 dark:text-amber-300 dark:hover:text-amber-100"
         >
-          <MessageCircle className="mr-2 h-4 w-4" />
+          <Phone className="h-3.5 w-3.5" />
+          Falar com suporte
+        </a>
+      ) : (
+        <button
+          onClick={() => window.dispatchEvent(new CustomEvent("open-support-chat"))}
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-amber-700 underline underline-offset-2 hover:text-amber-900 dark:text-amber-300 dark:hover:text-amber-100"
+        >
+          <MessageCircle className="h-3.5 w-3.5" />
           Quero ativar a Stripe
-        </Button>
+        </button>
       )}
     </div>
   );
