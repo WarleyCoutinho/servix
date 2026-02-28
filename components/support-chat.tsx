@@ -118,6 +118,12 @@ export function SupportChat({ userPlan, userName }: SupportChatProps) {
     userPlan === "PROFESSIONAL" || userPlan === "ENTERPRISE";
 
   useEffect(() => {
+    const handleOpenChat = () => setOpen(true);
+    window.addEventListener("open-support-chat", handleOpenChat);
+    return () => window.removeEventListener("open-support-chat", handleOpenChat);
+  }, []);
+
+  useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 

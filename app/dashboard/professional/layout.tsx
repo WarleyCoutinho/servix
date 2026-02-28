@@ -1,8 +1,10 @@
 import { DashboardSidebar, type NavItem } from "@/components/dashboard-sidebar";
 import { StripeWarningBanner } from "@/components/stripe-warning-banner";
+import { SupportChat } from "@/components/support-chat";
 import { Button } from "@/components/ui/button";
 import { UserRole } from "@/generated/prisma/enums";
 import { auth } from "@/lib/auth";
+import { getUserPlanInfo } from "@/lib/plan-limits";
 import { prisma } from "@/lib/prisma";
 import { getAccountRestrictionInfo } from "@/lib/stripe-connect";
 import {
@@ -77,6 +79,12 @@ export default async function ProfessionalDashboardLayout({
   }
 
   const professional = user.professional;
+
+  const planInfo = await getUserPlanInfo(
+    professional.barbershop.ownerId,
+    professional.barbershopId,
+  );
+  const userPlan = planInfo?.plan ?? "BASIC";
 
   const restrictionInfo =
     professional.stripeAccountId &&
@@ -158,7 +166,7 @@ export default async function ProfessionalDashboardLayout({
           )}
         {professional.acceptsPayAfterService &&
           professional.stripeAccountStatus !== "ACTIVE" && (
-            <StripeWarningBanner />
+            <StripeWarningBanner userPlan={userPlan} />
           )}
       </DashboardSidebar>
       <main className="flex-1 overflow-auto">
@@ -166,6 +174,10 @@ export default async function ProfessionalDashboardLayout({
           {children}
         </div>
       </main>
+      <SupportChat
+        userPlan={userPlan}
+        userName={professional.displayName ?? user.name}
+      />
     </div>
   );
 }

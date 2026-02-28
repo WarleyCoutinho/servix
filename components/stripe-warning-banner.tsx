@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, ChevronDown, ChevronUp, MessageCircle } from "lucide-react";
-import Link from "next/link";
+import { AlertTriangle, ChevronDown, ChevronUp, MessageCircle, Phone } from "lucide-react";
 
 const MINIMIZED_KEY = "stripe-warning-minimized";
+const SUPPORT_WHATSAPP = "5516989118349";
 
 const LOST_BENEFITS = [
   "Pagamento online com cartão",
@@ -18,7 +18,12 @@ const LOST_BENEFITS = [
   "Período de 0% de taxa",
 ];
 
-export function StripeWarningBanner() {
+interface StripeWarningBannerProps {
+  userPlan?: string;
+}
+
+export function StripeWarningBanner({ userPlan = "BASIC" }: StripeWarningBannerProps) {
+  const isPremiumPlan = userPlan === "PROFESSIONAL" || userPlan === "ENTERPRISE";
   const [minimized, setMinimized] = useState(false);
 
   useEffect(() => {
@@ -87,12 +92,28 @@ export function StripeWarningBanner() {
         Ative a Stripe para ter esses benefícios.
       </p>
 
-      <Button size="sm" asChild className="w-full" variant="outline">
-        <Link href="/dashboard/professional/support">
+      {isPremiumPlan ? (
+        <Button size="sm" asChild className="w-full" variant="outline">
+          <a
+            href={`https://wa.me/${SUPPORT_WHATSAPP}?text=${encodeURIComponent("Olá, preciso de ajuda para ativar a Stripe na minha conta.")}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Phone className="mr-2 h-4 w-4" />
+            Falar com suporte via WhatsApp
+          </a>
+        </Button>
+      ) : (
+        <Button
+          size="sm"
+          className="w-full"
+          variant="outline"
+          onClick={() => window.dispatchEvent(new CustomEvent("open-support-chat"))}
+        >
           <MessageCircle className="mr-2 h-4 w-4" />
           Quero ativar a Stripe
-        </Link>
-      </Button>
+        </Button>
+      )}
     </div>
   );
 }

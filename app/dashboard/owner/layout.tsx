@@ -122,7 +122,7 @@ export default async function OwnerDashboardLayout({
         </div>
         {user.professional?.acceptsPayAfterService &&
           user.professional.stripeAccountStatus !== "ACTIVE" && (
-            <StripeWarningBanner />
+            <StripeWarningBanner userPlan={planInfo?.plan ?? "BASIC"} />
           )}
       </DashboardSidebar>
       <main className="flex-1 overflow-auto">
