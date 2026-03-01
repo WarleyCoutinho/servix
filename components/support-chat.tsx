@@ -338,7 +338,7 @@ export function SupportChat({ userPlan, userName }: SupportChatProps) {
   return (
     <>
       <div
-        className={`fixed bottom-18 right-6 z-199 flex w-85 max-h-130 flex-col overflow-hidden rounded-xl border border-border bg-card shadow-2xl transition-all duration-250 ${
+        className={`fixed bottom-18 left-4 right-4 z-199 flex max-h-130 flex-col overflow-hidden rounded-xl border border-border bg-card shadow-2xl transition-all duration-250 sm:left-auto sm:right-6 sm:w-85 ${
           open
             ? "pointer-events-auto translate-y-0 scale-100 opacity-100"
             : "pointer-events-none translate-y-3 scale-[0.97] opacity-0"
@@ -374,12 +374,13 @@ export function SupportChat({ userPlan, userName }: SupportChatProps) {
             size="icon"
             className="size-7"
             onClick={() => setOpen(false)}
+            aria-label="Fechar chat"
           >
             <X className="size-4" />
           </Button>
         </div>
 
-        <div className="flex flex-1 flex-col gap-2.5 overflow-y-auto p-4">
+        <div className="flex flex-1 flex-col gap-2.5 overflow-y-auto p-4" role="log" aria-live="polite" aria-label="Mensagens do suporte">
           {messages.map((m, i) => (
             <div
               key={i}
@@ -445,6 +446,7 @@ export function SupportChat({ userPlan, userName }: SupportChatProps) {
             onClick={() => fileInputRef.current?.click()}
             disabled={status === "loading" || uploading}
             title="Enviar imagem"
+            aria-label="Enviar imagem"
           >
             <ImagePlus className="size-4" />
           </Button>
@@ -457,13 +459,14 @@ export function SupportChat({ userPlan, userName }: SupportChatProps) {
                 ? "Envie sua mensagem..."
                 : "Digite sua dúvida..."
             }
-            className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground outline-none placeholder:text-muted-foreground focus:border-ring"
+            className="flex-1 rounded-md border border-input bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/20"
           />
           <Button
             size="icon"
             className="size-9 shrink-0"
             onClick={() => sendMessage(input)}
             disabled={status === "loading" || uploading || !input.trim()}
+            aria-label="Enviar mensagem"
           >
             <Send className="size-4" />
           </Button>
@@ -472,9 +475,11 @@ export function SupportChat({ userPlan, userName }: SupportChatProps) {
 
       <Button
         size="icon"
-        className="fixed bottom-6 right-6 z-200 size-13 rounded-full shadow-lg"
+        className="fixed bottom-6 right-6 z-200 size-13 rounded-full shadow-lg transition-transform hover:scale-105 active:scale-95"
         onClick={() => setOpen((o) => !o)}
         title="Suporte"
+        aria-label={open ? "Fechar chat de suporte" : "Abrir chat de suporte"}
+        aria-expanded={open}
       >
         {open ? <X className="size-5" /> : <MessageCircle className="size-5" />}
       </Button>

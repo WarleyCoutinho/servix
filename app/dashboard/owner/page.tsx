@@ -91,13 +91,13 @@ export default async function OwnerDashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Dashboard</h1>
+        <h1 className="text-2xl font-bold sm:text-3xl">Dashboard</h1>
         <p className="text-muted-foreground">Visão geral da sua barbearia</p>
       </div>
 
       {!isSubscriptionActive && (
         <Card className="alert-warning border">
-          <CardContent className="flex items-center justify-between pt-6">
+          <CardContent className="flex flex-col gap-3 pt-4 sm:flex-row sm:items-center sm:justify-between sm:pt-6">
             <p>
               Sua assinatura nao esta ativa. Ative para desbloquear todos os
               recursos.

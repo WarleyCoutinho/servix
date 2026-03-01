@@ -18,9 +18,10 @@ export function SidebarNavLink({ href, children }: SidebarNavLinkProps) {
     <Button
       variant="ghost"
       className={cn(
-        "w-full justify-start rounded-lg",
-        isActive &&
-          "bg-primary/10 text-primary font-medium border-l-2 border-primary",
+        "w-full justify-start rounded-lg transition-colors",
+        isActive
+          ? "bg-primary/10 text-primary font-medium border-l-2 border-primary"
+          : "hover:bg-muted/50",
       )}
       asChild
     >

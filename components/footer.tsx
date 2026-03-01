@@ -4,7 +4,7 @@ const Footer = () => {
   return (
     <footer className="border-t bg-muted/60">
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3">
           <div className="space-y-3">
             <h4 className="text-sm font-bold">Servix</h4>
             <p className="max-w-xs text-sm text-muted-foreground">

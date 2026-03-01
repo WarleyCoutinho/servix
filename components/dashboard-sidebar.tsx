@@ -67,7 +67,7 @@ export function DashboardSidebar(props: DashboardSidebarProps) {
       </div>
 
       {/* Desktop: sidebar fixa */}
-      <aside className="bg-card hidden w-64 shrink-0 border-r md:block">
+      <aside className="bg-card hidden w-64 shrink-0 border-r md:sticky md:top-0 md:block md:h-screen md:overflow-y-auto">
         <SidebarContent {...props} />
       </aside>
     </>

@@ -44,7 +44,7 @@ export default async function AdminDashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Painel Administrativo</h1>
+        <h1 className="text-2xl font-bold sm:text-3xl">Painel Administrativo</h1>
         <p className="text-muted-foreground">
           Gerencie planos, usuarios e configuracoes do sistema
         </p>

@@ -22,7 +22,7 @@ const BookingItem = ({ booking }: BookingItemProps) => {
   return (
     <Sheet open={sheetIsOpen} onOpenChange={setSheetIsOpen}>
       <SheetTrigger asChild>
-        <Card className="flex h-full w-full min-w-full cursor-pointer flex-row items-center justify-between overflow-hidden p-0 transition-shadow hover:shadow-md snap-start">
+        <Card className="flex h-full w-full min-w-full cursor-pointer flex-row items-center justify-between overflow-hidden p-0 transition-all hover:shadow-md active:scale-[0.98] snap-start">
           <div className="flex flex-1 flex-col gap-3 p-4">
             {status === "cancelled" ? (
               <Badge variant="destructive" className="w-fit">CANCELADO</Badge>

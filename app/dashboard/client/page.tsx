@@ -44,53 +44,62 @@ export default async function ClientDashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Olá, {user.name.split(" ")[0]}!</h1>
+        <h1 className="text-2xl font-bold sm:text-3xl">Olá, {user.name.split(" ")[0]}!</h1>
         <p className="text-muted-foreground">
           Acompanhe suas visitas e agendamentos
         </p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card>
+      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+        <Card className="relative overflow-hidden transition-shadow hover:shadow-md">
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/60 to-transparent" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
               Total de Visitas
             </CardTitle>
-            <CalendarDays className="h-4 w-4 text-muted-foreground" />
+            <div className="rounded-lg bg-primary/10 p-2">
+              <CalendarDays className="h-4 w-4 text-primary" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalBookings}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-2xl font-bold tabular-nums">{stats.totalBookings}</div>
+            <p className="mt-1 text-xs text-muted-foreground">
               agendamentos realizados
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="relative overflow-hidden transition-shadow hover:shadow-md">
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/60 to-transparent" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Gasto</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Total Gasto</CardTitle>
+            <div className="rounded-lg bg-primary/10 p-2">
+              <DollarSign className="h-4 w-4 text-primary" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold tabular-nums">
               {formatCurrency(stats.totalSpentInCents)}
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="mt-1 text-xs text-muted-foreground">
               em serviços de beleza
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="relative overflow-hidden transition-shadow hover:shadow-md">
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/60 to-transparent" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
               Estabelecimentos
             </CardTitle>
-            <Store className="h-4 w-4 text-muted-foreground" />
+            <div className="rounded-lg bg-primary/10 p-2">
+              <Store className="h-4 w-4 text-primary" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.uniqueBarbershops}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-2xl font-bold tabular-nums">{stats.uniqueBarbershops}</div>
+            <p className="mt-1 text-xs text-muted-foreground">
               lugares visitados
             </p>
           </CardContent>

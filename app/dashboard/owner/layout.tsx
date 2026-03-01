@@ -126,7 +126,7 @@ export default async function OwnerDashboardLayout({
           )}
       </DashboardSidebar>
       <main className="flex-1 overflow-auto">
-        <div className="mx-auto max-w-6xl p-4 pt-16 sm:p-6 md:pt-6">
+        <div className="mx-auto max-w-6xl p-4 pb-8 pt-16 sm:p-6 sm:pb-8 md:pt-6">
           {children}
         </div>
       </main>

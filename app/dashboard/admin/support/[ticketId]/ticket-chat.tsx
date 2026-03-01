@@ -225,7 +225,7 @@ export function TicketChat({ ticket }: { ticket: Ticket }) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           <Button asChild variant="ghost" size="icon">
             <Link href="/dashboard/admin/support">
@@ -242,7 +242,7 @@ export function TicketChat({ ticket }: { ticket: Ticket }) {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Badge
             variant={
               ticket.status === "WAITING_ADMIN" ? "destructive" : "secondary"
@@ -274,7 +274,7 @@ export function TicketChat({ ticket }: { ticket: Ticket }) {
 
       <div className="grid gap-4 lg:grid-cols-[1fr_20rem]">
         <Card className="flex flex-col overflow-hidden">
-          <div className="flex max-h-[32rem] flex-1 flex-col gap-3 overflow-y-auto p-4">
+          <div className="flex max-h-[24rem] flex-1 flex-col gap-3 overflow-y-auto p-4 sm:max-h-[32rem]" role="log" aria-live="polite" aria-label="Mensagens do ticket">
             {messages.map((msg) => (
               <div
                 key={msg.id}
@@ -340,6 +340,7 @@ export function TicketChat({ ticket }: { ticket: Ticket }) {
                 onClick={() => fileInputRef.current?.click()}
                 disabled={sending || uploading}
                 title="Enviar imagem"
+                aria-label="Enviar imagem"
               >
                 {uploading ? (
                   <Loader2 className="size-4 animate-spin" />
@@ -352,12 +353,13 @@ export function TicketChat({ ticket }: { ticket: Ticket }) {
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSend()}
                 placeholder="Digite sua resposta..."
-                className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm outline-none placeholder:text-muted-foreground focus:border-ring"
+                className="flex-1 rounded-md border border-input bg-background px-3 py-2.5 text-sm placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/20"
               />
               <Button
                 size="icon"
                 onClick={() => handleSend()}
                 disabled={sending || !input.trim()}
+                aria-label="Enviar resposta"
               >
                 {sending ? (
                   <Loader2 className="size-4 animate-spin" />

@@ -154,9 +154,10 @@ export function SupportTicketsList({
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {statCards.map((stat) => (
-          <Card key={stat.title}>
+          <Card key={stat.title} className="relative overflow-hidden transition-shadow hover:shadow-md">
+            <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/60 to-transparent" />
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
                 {stat.title}
               </CardTitle>
               <div className={`rounded-lg p-2 ${stat.bg}`}>
@@ -164,7 +165,7 @@ export function SupportTicketsList({
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
+              <div className="text-2xl font-bold tabular-nums">{stat.value}</div>
             </CardContent>
           </Card>
         ))}
@@ -187,88 +188,90 @@ export function SupportTicketsList({
               </p>
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Cliente</TableHead>
-                  <TableHead>Barbearia</TableHead>
-                  <TableHead>Plano</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Mensagens</TableHead>
-                  <TableHead>Ultima Mensagem</TableHead>
-                  <TableHead></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {tickets.map((ticket) => {
-                  const barbershop = ticket.user.ownedBarbershops[0];
-                  const lastMsg = ticket.messages[0];
-                  const preview = lastMsg?.content
-                    ? lastMsg.content.length > 60
-                      ? lastMsg.content.slice(0, 60) + "..."
-                      : lastMsg.content
-                    : "Sem mensagens";
+            <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Cliente</TableHead>
+                    <TableHead className="hidden md:table-cell">Barbearia</TableHead>
+                    <TableHead className="hidden lg:table-cell">Plano</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="hidden sm:table-cell">Mensagens</TableHead>
+                    <TableHead className="hidden lg:table-cell">Ultima Mensagem</TableHead>
+                    <TableHead></TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {tickets.map((ticket) => {
+                    const barbershop = ticket.user.ownedBarbershops[0];
+                    const lastMsg = ticket.messages[0];
+                    const preview = lastMsg?.content
+                      ? lastMsg.content.length > 60
+                        ? lastMsg.content.slice(0, 60) + "..."
+                        : lastMsg.content
+                      : "Sem mensagens";
 
-                  return (
-                    <TableRow key={ticket.id}>
-                      <TableCell>
-                        <div className="flex items-center gap-3">
-                          <Avatar className="size-8">
-                            <AvatarImage src={ticket.user.image ?? ""} />
-                            <AvatarFallback>
-                              {ticket.user.name?.charAt(0).toUpperCase()}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="text-sm font-medium">
-                              {ticket.user.name}
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              {ticket.user.email}
-                            </p>
+                    return (
+                      <TableRow key={ticket.id}>
+                        <TableCell>
+                          <div className="flex items-center gap-3">
+                            <Avatar className="size-8">
+                              <AvatarImage src={ticket.user.image ?? ""} />
+                              <AvatarFallback>
+                                {ticket.user.name?.charAt(0).toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="text-sm font-medium">
+                                {ticket.user.name}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {ticket.user.email}
+                              </p>
+                            </div>
                           </div>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-sm">
-                        {barbershop?.name ?? "Sem barbearia"}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className="text-xs">
-                          {barbershop?.subscription?.plan ?? "Sem plano"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        {getStatusBadge(ticket)}
-                      </TableCell>
-                      <TableCell className="text-sm">
-                        {ticket._count.messages}
-                      </TableCell>
-                      <TableCell className="max-w-48 text-xs text-muted-foreground">
-                        {preview}
-                      </TableCell>
-                      <TableCell>
-                        {ticket.status === "IN_PROGRESS" ? (
-                          <Button asChild size="sm" variant="outline">
-                            <Link href={`/dashboard/admin/support/${ticket.id}`}>
-                              Continuar
-                            </Link>
-                          </Button>
-                        ) : (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            disabled={assigning === ticket.id}
-                            onClick={() => handleAssign(ticket.id)}
-                          >
-                            {assigning === ticket.id ? "Atribuindo..." : "Atender"}
-                          </Button>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
+                        </TableCell>
+                        <TableCell className="hidden text-sm md:table-cell">
+                          {barbershop?.name ?? "Sem barbearia"}
+                        </TableCell>
+                        <TableCell className="hidden lg:table-cell">
+                          <Badge variant="outline" className="text-xs">
+                            {barbershop?.subscription?.plan ?? "Sem plano"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {getStatusBadge(ticket)}
+                        </TableCell>
+                        <TableCell className="hidden text-sm sm:table-cell">
+                          {ticket._count.messages}
+                        </TableCell>
+                        <TableCell className="hidden max-w-48 text-xs text-muted-foreground lg:table-cell">
+                          {preview}
+                        </TableCell>
+                        <TableCell>
+                          {ticket.status === "IN_PROGRESS" ? (
+                            <Button asChild size="sm" variant="outline">
+                              <Link href={`/dashboard/admin/support/${ticket.id}`}>
+                                Continuar
+                              </Link>
+                            </Button>
+                          ) : (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              disabled={assigning === ticket.id}
+                              onClick={() => handleAssign(ticket.id)}
+                            >
+                              {assigning === ticket.id ? "Atribuindo..." : "Atender"}
+                            </Button>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
           )}
         </CardContent>
       </Card>
