@@ -4,7 +4,6 @@ import { DAY_OF_WEEK_ORDER } from "@/lib/day-of-week";
 
 export async function updateUserRoleBasedOnPlan(
   barbershopId: string,
-  plan: SubscriptionPlan,
 ): Promise<void> {
   const barbershop = await prisma.barbershop.findUnique({
     where: { id: barbershopId },

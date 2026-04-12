@@ -1,5 +1,5 @@
 const WHATSAPP_SERVICE_URL =
-  process.env.WHATSAPP_SERVICE_URL || "http://localhost:3001";
+  process.env.WHATSAPP_SERVICE_URL || "http://localhost:3320";
 const WHATSAPP_SERVICE_API_KEY = process.env.WHATSAPP_SERVICE_API_KEY || "";
 
 const UUID_REGEX =

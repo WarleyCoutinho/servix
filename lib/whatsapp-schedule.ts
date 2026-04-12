@@ -207,7 +207,7 @@ export async function sendDailyScheduleToGroup(
   const professionalName =
     professional.displayName ?? professional.user.name ?? "Profissional";
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://servixplatform.vercel.app";
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL;
   const bookingPath = professional.barbershop.slug
     ? `/${professional.barbershop.slug}`
     : `/agendar/${professionalId}`;

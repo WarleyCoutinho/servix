@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from 'next/image'
 import {
   ArrowLeft,
   Bot,
@@ -56,7 +57,7 @@ function ChatImage({ src }: { src: string }) {
 
   return (
     <>
-      <img
+      <Image
         src={src}
         alt="Imagem anexada"
         className="mt-1.5 max-h-40 cursor-pointer rounded-lg border border-border object-cover"
@@ -64,10 +65,10 @@ function ChatImage({ src }: { src: string }) {
       />
       {expanded && (
         <div
-          className="fixed inset-0 z-[300] flex items-center justify-center bg-black/80 p-4"
+          className="fixed inset-0 z-300 flex items-center justify-center bg-black/80 p-4"
           onClick={() => setExpanded(false)}
         >
-          <img
+          <Image
             src={src}
             alt="Imagem expandida"
             className="max-h-[90vh] max-w-[90vw] rounded-lg object-contain"
@@ -125,27 +126,24 @@ export function SupportTicketChat({ ticket }: { ticket: Ticket }) {
     }
   }, []);
 
-  const handleSend = async (imageUrl?: string) => {
+  const handleSend = useCallback(async (imageUrl?: string) => {
     if (!input.trim() && !imageUrl) return;
     if (sending) return;
 
     setSending(true);
     try {
-      const res = await fetch(
-        `/api/admin/support/${ticket.id}/messages`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ content: input || "Imagem enviada", imageUrl }),
-        },
-      );
+      const res = await fetch(`/api/admin/support/${ticket.id}/messages`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: input || "Imagem enviada", imageUrl }),
+      });
       const data = await res.json();
       if (data.message) {
         setMessages((prev) => [
           ...prev,
           {
             ...data.message,
-            sender: { name: "Suporte", image: null, role: "support" },
+            sender: { name: "Admin", image: null, role: "admin" },
           },
         ]);
         setInput("");
@@ -154,7 +152,7 @@ export function SupportTicketChat({ ticket }: { ticket: Ticket }) {
     } finally {
       setSending(false);
     }
-  };
+  }, [input, sending, ticket.id]);
 
   const handleFileSelect = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -173,7 +171,7 @@ export function SupportTicketChat({ ticket }: { ticket: Ticket }) {
         fileInputRef.current.value = "";
       }
     },
-    [uploadImage, input],
+    [uploadImage, handleSend], 
   );
 
   const handleResolve = async () => {
@@ -249,7 +247,7 @@ export function SupportTicketChat({ ticket }: { ticket: Ticket }) {
 
       <div className="grid gap-4 lg:grid-cols-[1fr_20rem]">
         <Card className="flex flex-col overflow-hidden">
-          <div className="flex max-h-[32rem] flex-1 flex-col gap-3 overflow-y-auto p-4">
+          <div className="flex max-h-128 flex-1 flex-col gap-3 overflow-y-auto p-4">
             {messages.map((msg) => (
               <div
                 key={msg.id}

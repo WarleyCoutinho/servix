@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from 'next/image'
 import {
   ArrowLeft,
   Bot,
@@ -60,18 +61,18 @@ function ChatImage({ src }: { src: string }) {
 
   return (
     <>
-      <img
-        src={src}
+      <Image
+      src={src}
         alt="Imagem anexada"
         className="mt-1.5 max-h-40 cursor-pointer rounded-lg border border-border object-cover"
         onClick={() => setExpanded(true)}
-      />
+    />
       {expanded && (
         <div
-          className="fixed inset-0 z-[300] flex items-center justify-center bg-black/80 p-4"
+          className="fixed inset-0 z-300 flex items-center justify-center bg-black/80 p-4"
           onClick={() => setExpanded(false)}
         >
-          <img
+          <Image
             src={src}
             alt="Imagem expandida"
             className="max-h-[90vh] max-w-[90vw] rounded-lg object-contain"
@@ -150,20 +151,17 @@ export function TicketChat({ ticket }: { ticket: Ticket }) {
     }
   }, []);
 
-  const handleSend = async (imageUrl?: string) => {
+ const handleSend = useCallback(async (imageUrl?: string) => {
     if (!input.trim() && !imageUrl) return;
     if (sending) return;
 
     setSending(true);
     try {
-      const res = await fetch(
-        `/api/admin/support/${ticket.id}/messages`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ content: input || "Imagem enviada", imageUrl }),
-        },
-      );
+      const res = await fetch(`/api/admin/support/${ticket.id}/messages`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: input || "Imagem enviada", imageUrl }),
+      });
       const data = await res.json();
       if (data.message) {
         setMessages((prev) => [
@@ -179,7 +177,7 @@ export function TicketChat({ ticket }: { ticket: Ticket }) {
     } finally {
       setSending(false);
     }
-  };
+  }, [input, sending, ticket.id]);
 
   const handleFileSelect = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -198,9 +196,8 @@ export function TicketChat({ ticket }: { ticket: Ticket }) {
         fileInputRef.current.value = "";
       }
     },
-    [uploadImage, input],
+    [uploadImage, handleSend],
   );
-
   const handleResolve = async () => {
     setResolving(true);
     try {
@@ -274,7 +271,7 @@ export function TicketChat({ ticket }: { ticket: Ticket }) {
 
       <div className="grid gap-4 lg:grid-cols-[1fr_20rem]">
         <Card className="flex flex-col overflow-hidden">
-          <div className="flex max-h-[24rem] flex-1 flex-col gap-3 overflow-y-auto p-4 sm:max-h-[32rem]" role="log" aria-live="polite" aria-label="Mensagens do ticket">
+          <div className="flex max-h-96 flex-1 flex-col gap-3 overflow-y-auto p-4 sm:max-h-128" role="log" aria-live="polite" aria-label="Mensagens do ticket">
             {messages.map((msg) => (
               <div
                 key={msg.id}

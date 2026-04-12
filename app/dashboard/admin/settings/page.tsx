@@ -12,8 +12,7 @@ import {
   PieChart,
 } from "lucide-react";
 import { subDays } from "date-fns";
-import { ptBR } from "date-fns/locale";
-import { startOfMonthBrt, endOfMonthBrt, formatBrt } from "@/lib/timezone";
+import { startOfMonthBrt, endOfMonthBrt } from "@/lib/timezone";
 
 export default async function AdminSettingsPage() {
   const now = new Date();
@@ -106,7 +105,7 @@ export default async function AdminSettingsPage() {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card className="relative overflow-hidden transition-shadow hover:shadow-md">
-          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/60 to-transparent" />
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-linear-to-r from-primary/60 to-transparent" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">MRR (Receita Mensal)</CardTitle>
             <div className="rounded-lg bg-primary/10 p-2">
@@ -127,7 +126,7 @@ export default async function AdminSettingsPage() {
         </Card>
 
         <Card className="relative overflow-hidden transition-shadow hover:shadow-md">
-          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/60 to-transparent" />
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-linear-to-r from-primary/60 to-transparent" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Novos este mes</CardTitle>
             <div className="rounded-lg bg-primary/10 p-2">
@@ -141,7 +140,7 @@ export default async function AdminSettingsPage() {
         </Card>
 
         <Card className="relative overflow-hidden transition-shadow hover:shadow-md">
-          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/60 to-transparent" />
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-linear-to-r from-primary/60 to-transparent" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Agendamentos (mes)</CardTitle>
             <div className="rounded-lg bg-primary/10 p-2">
@@ -157,7 +156,7 @@ export default async function AdminSettingsPage() {
         </Card>
 
         <Card className="relative overflow-hidden transition-shadow hover:shadow-md">
-          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/60 to-transparent" />
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-linear-to-r from-primary/60 to-transparent" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Crescimento (30d)</CardTitle>
             <div className="rounded-lg bg-primary/10 p-2">

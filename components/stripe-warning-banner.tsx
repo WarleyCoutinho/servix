@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState} from "react";
 import { AlertTriangle, ChevronDown, ChevronUp, MessageCircle, Phone } from "lucide-react";
 
 const MINIMIZED_KEY = "stripe-warning-minimized";
@@ -25,12 +25,7 @@ export function StripeWarningBanner({ userPlan = "BASIC" }: StripeWarningBannerP
   const isPremiumPlan = userPlan === "PROFESSIONAL" || userPlan === "ENTERPRISE";
   const [minimized, setMinimized] = useState(false);
 
-  useEffect(() => {
-    const stored = sessionStorage.getItem(MINIMIZED_KEY);
-    if (stored === "true") {
-      setMinimized(true);
-    }
-  }, []);
+  
 
   const toggleMinimized = () => {
     const next = !minimized;

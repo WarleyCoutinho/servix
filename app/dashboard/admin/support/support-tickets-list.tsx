@@ -57,7 +57,7 @@ export function SupportTicketsList({
   initialTickets: Ticket[];
   stats: Stats;
 }) {
-  const [tickets, setTickets] = useState(initialTickets);
+  const [tickets] = useState(initialTickets);
   const [assigning, setAssigning] = useState<string | null>(null);
   const router = useRouter();
 
@@ -155,7 +155,7 @@ export function SupportTicketsList({
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {statCards.map((stat) => (
           <Card key={stat.title} className="relative overflow-hidden transition-shadow hover:shadow-md">
-            <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/60 to-transparent" />
+            <div className="absolute top-0 left-0 right-0 h-0.5 bg-linear-to-r from-primary/60 to-transparent" />
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 {stat.title}

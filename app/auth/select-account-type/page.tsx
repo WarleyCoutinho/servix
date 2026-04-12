@@ -33,55 +33,40 @@ const ACCOUNT_TYPES = [
 
 type AccountType = (typeof ACCOUNT_TYPES)[number]["id"];
 
+const ROLES_QUE_REDIRECIONAM = ["admin", "owner", "professional"] as const;
+
 export default function SelectAccountTypePage() {
   const router = useRouter();
   const { data: session, isPending: isSessionLoading } = authClient.useSession();
   const [selectedType, setSelectedType] = useState<AccountType | null>(null);
-  const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
     if (isSessionLoading) return;
-
-    if (!session?.user) {
-      router.replace("/");
-      return;
-    }
-
-    if (session.user.role === "admin") {
-      router.replace("/dashboard/admin");
-      return;
-    }
-
-    if (session.user.role === "owner") {
-      router.replace("/dashboard/owner");
-      return;
-    }
-
-    if (session.user.role === "professional") {
-      router.replace("/dashboard/professional");
-      return;
-    }
-
-    setIsChecking(false);
+    if (!session?.user) { router.replace("/"); return; }
+    if (session.user.role === "admin") { router.replace("/dashboard/admin"); return; }
+    if (session.user.role === "owner") { router.replace("/dashboard/owner"); return; }
+    if (session.user.role === "professional") { router.replace("/dashboard/professional"); return; }
   }, [session, isSessionLoading, router]);
+
+  // Estado derivado — sem setState necessário
+  const roleVaiRedirecionar = ROLES_QUE_REDIRECIONAM.includes(
+    session?.user?.role as (typeof ROLES_QUE_REDIRECIONAM)[number]
+  );
+  const isChecking = isSessionLoading || !session?.user || roleVaiRedirecionar;
 
   const handleContinue = () => {
     if (!selectedType) return;
-
     const selected = ACCOUNT_TYPES.find((t) => t.id === selectedType);
-    if (selected) {
-      router.push(selected.href);
-    }
+    if (selected) router.push(selected.href);
   };
 
-  if (isSessionLoading || isChecking) {
+  if (isChecking) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <Loader2 className="size-8 animate-spin text-primary" />
       </div>
     );
   }
-
   return (
     <div className="flex min-h-screen items-center justify-center p-4">
       <Card className="w-full max-w-lg">

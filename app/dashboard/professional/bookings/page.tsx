@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ptBR } from "date-fns/locale";
 import { formatCurrency } from "@/lib/utils";
 import { formatBrt } from "@/lib/timezone";
-import { Calendar, Clock, User } from "lucide-react";
+import { Calendar, Clock} from "lucide-react";
 import { PaymentStatus } from "@/generated/prisma/enums";
 import MarkReceivedButton from "./_components/mark-received-button";
 
