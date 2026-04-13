@@ -68,7 +68,7 @@ export const syncSubscription = ownerActionClient.action(
       targetBarbershopId,
       plan,
     );
-    await updateUserRoleBasedOnPlan(targetBarbershopId, plan);
+    await updateUserRoleBasedOnPlan(targetBarbershopId);
 
     const updatedSubscription = await prisma.subscription.findFirst({
       where: {
