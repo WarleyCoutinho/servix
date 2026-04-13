@@ -25,7 +25,7 @@ const PLAN_ORDER: Record<SubscriptionPlan, number> = {
 
 export const changeSubscriptionPlan = ownerActionClient
   .inputSchema(inputSchema)
-  .action(async ({ parsedInput: { plan }, ctx: { barbershop, user } }) => {
+  .action(async ({ parsedInput: { plan }, ctx: {  user } }) => {
     const subscription = await prisma.subscription.findFirst({
       where: {
         barbershop: {
@@ -129,7 +129,7 @@ export const changeSubscriptionPlan = ownerActionClient
       },
     });
 
-    await updateUserRoleBasedOnPlan(subscriptionBarbershopId, plan);
+    await updateUserRoleBasedOnPlan(subscriptionBarbershopId); // removido segundo argumento
 
     revalidatePath("/dashboard/owner/subscription");
     revalidatePath("/dashboard/owner/establishments");
