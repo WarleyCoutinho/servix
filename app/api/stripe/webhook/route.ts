@@ -96,7 +96,7 @@ export const POST = async (request: Request) => {
             );
 
             const activePlan = plan || SubscriptionPlan.BASIC;
-            await updateUserRoleBasedOnPlan(metadata.data.barbershopId, activePlan);
+            await updateUserRoleBasedOnPlan(metadata.data.barbershopId);
 
             console.log(
               `Subscription ${subscriptionId} created for barbershop ${metadata.data.barbershopId} with plan ${activePlan}`,
@@ -255,13 +255,13 @@ export const POST = async (request: Request) => {
               });
             }
 
-            await updateUserRoleBasedOnPlan(barbershopId, activePlan);
+            await updateUserRoleBasedOnPlan(barbershopId);
           }
 
           await syncSubscriptionFromStripe(subscription, barbershopId, newPlan);
 
           if (event.type === "customer.subscription.created") {
-            await updateUserRoleBasedOnPlan(barbershopId, activePlan);
+            await updateUserRoleBasedOnPlan(barbershopId);
 
             await prisma.planHistory.create({
               data: {
