@@ -7,9 +7,391 @@ datasource db {
   provider = "postgresql"
 }
 
-// =====================
-// ENUMS
-// =====================
+model User {
+  id                   String                @id
+  name                 String
+  email                String                @unique
+  emailVerified        Boolean               @default(false)
+  image                String?
+  role                 UserRole              @default(client)
+  banned               Boolean               @default(false)
+  banReason            String?
+  banExpires           DateTime?
+  stripeCustomerId     String?
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  ownedBarbershops     Barbershop[]          @relation("BarbershopOwner")
+  bookings             Booking[]
+  professional         Professional?
+  accounts             Account[]
+  manualActivationLogs ManualActivationLog[] @relation("ManualActivationPerformer")
+  notifications        Notification[]
+  sessions             Session[]
+  supportAuditLogs     SupportAuditLog[]     @relation("SupportAuditLogs")
+  sentInvites          SupportInvite[]       @relation("SupportInvites")
+  sentSupportMsgs      SupportMessage[]      @relation("SupportMessageSender")
+  assignedTickets      SupportTicket[]       @relation("SupportTicketAgent")
+  supportTickets       SupportTicket[]
+
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+model Barbershop {
+  id                    String               @id @default(uuid())
+  name                  String
+  slug                  String?              @unique
+  address               String
+  city                  String               @default("")
+  state                 String               @default("")
+  description           String
+  imageUrl              String
+  phones                String[]
+  isActive              Boolean              @default(true)
+  platformFeePercentage Int?
+  feeOverride           Boolean              @default(false)
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+  ownerId               String?
+  owner                 User?                @relation("BarbershopOwner", fields: [ownerId], references: [id])
+  services              BarbershopService[]
+  bookings              Booking[]
+  professionals         Professional[]
+  subscription          Subscription?
+  planHistory           PlanHistory[]
+  feeHistory            PlatformFeeHistory[]
+
+  @@index([ownerId])
+}
+
+model Professional {
+  id                       String                 @id @default(uuid())
+  cpf                      String                 @unique
+  displayName              String?
+  bio                      String?
+  imageUrl                 String?
+  isActive                 Boolean                @default(true)
+  acceptsPix               Boolean                @default(false)
+  acceptsCard              Boolean                @default(true)
+  acceptsPayAfterService   Boolean                @default(false)
+  stripeAccountId          String?                @unique
+  stripeAccountStatus      StripeAccountStatus    @default(PENDING)
+  stripeOnboardingComplete Boolean                @default(false)
+  whatsappGroupName        String?
+  createdAt                DateTime               @default(now())
+  updatedAt                DateTime               @updatedAt
+  userId                   String                 @unique
+  barbershopId             String
+  bookings                 Booking[]
+  payments                 Payment[]
+  barbershop               Barbershop             @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
+  user                     User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  schedules                ProfessionalSchedule[]
+  manualActivationLogs     ManualActivationLog[]
+
+  @@index([barbershopId])
+  @@index([cpf])
+}
+
+model PlanConfig {
+  id               String           @id @default(uuid())
+  plan             SubscriptionPlan @unique
+  name             String
+  description      String
+  priceInCents     Int
+  stripePriceId    String           @unique
+  maxBarbershops   Int
+  maxProfessionals Int
+  maxServices      Int?
+  features         String[]
+  isActive         Boolean          @default(true)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  @@map("plan_config")
+}
+
+model Subscription {
+  id                   String             @id @default(uuid())
+  stripeSubscriptionId String             @unique
+  stripePriceId        String
+  stripeProductId      String
+  plan                 SubscriptionPlan   @default(BASIC)
+  status               SubscriptionStatus @default(INCOMPLETE)
+  currentPeriodStart   DateTime           @db.Timestamptz(6)
+  currentPeriodEnd     DateTime           @db.Timestamptz(6)
+  cancelAtPeriodEnd    Boolean            @default(false)
+  canceledAt           DateTime?          @db.Timestamptz(6)
+  createdAt            DateTime           @default(now()) @db.Timestamptz(6)
+  updatedAt            DateTime           @updatedAt @db.Timestamptz(6)
+  barbershopId         String             @unique
+  barbershop           Barbershop         @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
+}
+
+model ProfessionalSchedule {
+  id             String       @id @default(uuid())
+  dayOfWeek      DayOfWeek
+  startTime      String
+  endTime        String
+  isAvailable    Boolean      @default(true)
+  hasLunchBreak  Boolean      @default(false)
+  lunchStartTime String       @default("12:00")
+  lunchEndTime   String       @default("13:00")
+  professionalId String
+  professional   Professional @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+
+  @@unique([professionalId, dayOfWeek])
+}
+
+model BarbershopService {
+  id              String     @id @default(uuid())
+  name            String
+  description     String
+  imageUrl        String
+  priceInCents    Int
+  durationMinutes Int        @default(30)
+  barbershopId    String
+  deletedAt       DateTime?
+  barbershop      Barbershop @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
+  bookings        Booking[]
+}
+
+model Booking {
+  id             String            @id @default(uuid())
+  date           DateTime          @db.Timestamptz(6)
+  cancelledAt    DateTime?         @db.Timestamptz(6)
+  createdAt      DateTime          @default(now()) @db.Timestamptz(6)
+  updatedAt      DateTime          @updatedAt @db.Timestamptz(6)
+  barbershopId   String
+  serviceId      String
+  userId         String
+  professionalId String
+  barbershop     Barbershop        @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
+  professional   Professional      @relation(fields: [professionalId], references: [id])
+  service        BarbershopService @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  user           User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payment        Payment?
+
+  @@index([barbershopId, date])
+  @@index([professionalId, date])
+}
+
+model Payment {
+  id                    String        @id @default(uuid())
+  amountInCents         Int
+  applicationFeeInCents Int
+  status                PaymentStatus @default(PENDING)
+  paymentMethod         String?
+  stripePaymentIntentId String?       @unique
+  stripeChargeId        String?       @unique
+  stripeTransferId      String?
+  refundedAt            DateTime?     @db.Timestamptz(6)
+  createdAt             DateTime      @default(now()) @db.Timestamptz(6)
+  updatedAt             DateTime      @updatedAt @db.Timestamptz(6)
+  bookingId             String        @unique
+  professionalId        String?
+  booking               Booking       @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  professional          Professional? @relation(fields: [professionalId], references: [id])
+
+  @@index([professionalId])
+  @@index([status])
+}
+
+model PlanHistory {
+  id                       String            @id @default(uuid())
+  fromPlan                 SubscriptionPlan?
+  toPlan                   SubscriptionPlan
+  isUpgrade                Boolean
+  professionalsDisabled    Int               @default(0)
+  servicesDisabled         Int               @default(0)
+  barbershopsDisabled      Int               @default(0)
+  professionalsReactivated Int               @default(0)
+  servicesReactivated      Int               @default(0)
+  barbershopsReactivated   Int               @default(0)
+  changedAt                DateTime          @default(now()) @db.Timestamptz(6)
+  barbershopId             String
+  barbershop               Barbershop        @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
+
+  @@index([barbershopId])
+  @@map("plan_history")
+}
+
+model StripeEvent {
+  id            String   @id @default(uuid())
+  stripeEventId String   @unique
+  eventType     String
+  processedAt   DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([stripeEventId])
+  @@map("stripe_event")
+}
+
+model SupportTicket {
+  id           String              @id @default(uuid())
+  status       SupportTicketStatus @default(OPEN)
+  createdAt    DateTime            @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime            @updatedAt @db.Timestamptz(6)
+  closedAt     DateTime?           @db.Timestamptz(6)
+  userId       String
+  assignedToId String?
+  auditLogs    SupportAuditLog[]
+  messages     SupportMessage[]
+  assignedTo   User?               @relation("SupportTicketAgent", fields: [assignedToId], references: [id])
+  user         User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([assignedToId])
+  @@index([userId, status])
+  @@map("support_ticket")
+}
+
+model SupportMessage {
+  id          String        @id @default(uuid())
+  content     String
+  imageUrl    String?
+  isFromAdmin Boolean       @default(false)
+  isFromAI    Boolean       @default(false)
+  readByUser  Boolean       @default(false)
+  createdAt   DateTime      @default(now()) @db.Timestamptz(6)
+  ticketId    String
+  senderId    String?
+  sender      User?         @relation("SupportMessageSender", fields: [senderId], references: [id])
+  ticket      SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId])
+  @@index([ticketId, isFromAdmin, readByUser])
+  @@map("support_message")
+}
+
+model SupportAuditLog {
+  id        String             @id @default(uuid())
+  action    SupportAuditAction
+  ticketId  String
+  userId    String
+  metadata  Json?
+  createdAt DateTime           @default(now()) @db.Timestamptz(6)
+  ticket    SupportTicket      @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  user      User               @relation("SupportAuditLogs", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId])
+  @@index([userId])
+  @@map("support_audit_log")
+}
+
+model SupportInvite {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  invitedBy String
+  accepted  Boolean  @default(false)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  admin     User     @relation("SupportInvites", fields: [invitedBy], references: [id], onDelete: Cascade)
+
+  @@map("support_invite")
+}
+
+model PlatformFeeHistory {
+  id                String     @id @default(uuid())
+  fromFeePercentage Int?
+  toFeePercentage   Int?
+  fromFeeOverride   Boolean    @default(false)
+  toFeeOverride     Boolean    @default(false)
+  reason            String?
+  changedBy         String?
+  changedAt         DateTime   @default(now()) @db.Timestamptz(6)
+  barbershopId      String
+  barbershop        Barbershop @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
+
+  @@index([barbershopId])
+  @@map("platform_fee_history")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, read])
+  @@map("notification")
+}
+
+model Upload {
+  id          String   @id @default(uuid())
+  nomeArquivo String
+  tipoArquivo String
+  tamanho     Int
+  dados       Bytes
+  permanente  Boolean  @default(false)
+  createdAt   DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("upload")
+}
+
+model ManualActivationLog {
+  id                   String       @id @default(uuid())
+  action               String
+  reason               String?
+  stripeStatusAtMoment String?
+  performedAt          DateTime     @default(now()) @db.Timestamptz(6)
+  performedByRole      String
+  professionalId       String
+  performedById        String
+  performedBy          User         @relation("ManualActivationPerformer", fields: [performedById], references: [id], onDelete: Cascade)
+  professional         Professional @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+
+  @@index([professionalId])
+  @@map("manual_activation_log")
+}
 
 enum UserRole {
   admin
@@ -63,8 +445,8 @@ enum StripeAccountStatus {
 enum SupportTicketStatus {
   OPEN
   WAITING_ADMIN
-  IN_PROGRESS
   RESOLVED
+  IN_PROGRESS
 }
 
 enum SupportAuditAction {
@@ -72,485 +454,4 @@ enum SupportAuditAction {
   RESOLVE
   ADMIN_MESSAGE
   STATUS_CHANGE
-}
-
-// =====================
-// USER & AUTH
-// =====================
-
-model User {
-  id               String    @id
-  name             String
-  email            String
-  emailVerified    Boolean   @default(false)
-  image            String?
-  role             UserRole  @default(client)
-  banned           Boolean   @default(false)
-  banReason        String?
-  banExpires       DateTime?
-  stripeCustomerId String?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
-
-  sessions              Session[]
-  accounts              Account[]
-  bookings              Booking[]
-  ownedBarbershops      Barbershop[]          @relation("BarbershopOwner")
-  professional          Professional?
-  notifications         Notification[]
-  supportTickets        SupportTicket[]
-  assignedTickets       SupportTicket[]       @relation("SupportTicketAgent")
-  sentSupportMsgs       SupportMessage[]      @relation("SupportMessageSender")
-  sentInvites           SupportInvite[]       @relation("SupportInvites")
-  supportAuditLogs      SupportAuditLog[]     @relation("SupportAuditLogs")
-  manualActivationLogs  ManualActivationLog[] @relation("ManualActivationPerformer")
-
-  @@unique([email])
-  @@map("user")
-}
-
-model Session {
-  id        String   @id
-  expiresAt DateTime
-  token     String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  ipAddress String?
-  userAgent String?
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([token])
-  @@index([userId])
-  @@map("session")
-}
-
-model Account {
-  id                    String    @id
-  accountId             String
-  providerId            String
-  userId                String
-  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  accessToken           String?
-  refreshToken          String?
-  idToken               String?
-  accessTokenExpiresAt  DateTime?
-  refreshTokenExpiresAt DateTime?
-  scope                 String?
-  password              String?
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
-
-  @@index([userId])
-  @@map("account")
-}
-
-model Verification {
-  id         String   @id
-  identifier String
-  value      String
-  expiresAt  DateTime
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  @@index([identifier])
-  @@map("verification")
-}
-
-// =====================
-// BARBERSHOP
-// =====================
-
-model Barbershop {
-  id          String   @id @default(uuid())
-  name        String
-  slug        String?  @unique
-  address     String
-  city        String   @default("")
-  state       String   @default("")
-  description String
-  imageUrl    String
-  phones      String[]
-  isActive                 Boolean  @default(true)
-  platformFeePercentage    Int?
-  feeOverride              Boolean  @default(false)
-  createdAt                DateTime @default(now())
-  updatedAt                DateTime @updatedAt
-
-  ownerId String?
-  owner   User?   @relation("BarbershopOwner", fields: [ownerId], references: [id], onDelete: SetNull)
-
-  services      BarbershopService[]
-  bookings      Booking[]
-  professionals Professional[]
-  subscription  Subscription?
-  planHistory   PlanHistory[]
-  feeHistory    PlatformFeeHistory[]
-
-  @@index([ownerId])
-}
-
-// =====================
-// PROFESSIONAL
-// =====================
-
-model Professional {
-  id                       String              @id @default(uuid())
-  cpf                      String              @unique
-  displayName              String?
-  bio                      String?
-  imageUrl                 String?
-  isActive                 Boolean             @default(true)
-  acceptsPix               Boolean             @default(false)
-  acceptsCard              Boolean             @default(true)
-  acceptsPayAfterService   Boolean             @default(false)
-  stripeAccountId          String?             @unique
-  stripeAccountStatus      StripeAccountStatus @default(PENDING)
-  stripeOnboardingComplete Boolean             @default(false)
-  whatsappGroupName        String?
-  createdAt                DateTime            @default(now())
-  updatedAt                DateTime            @updatedAt
-
-  userId       String     @unique
-  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  barbershopId String
-  barbershop   Barbershop @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
-
-  schedules            ProfessionalSchedule[]
-  bookings             Booking[]
-  payments             Payment[]
-  manualActivationLogs ManualActivationLog[]
-
-  @@index([barbershopId])
-  @@index([cpf])
-}
-
-// =====================
-// PLAN CONFIG
-// =====================
-
-model PlanConfig {
-  id               String           @id @default(uuid())
-  plan             SubscriptionPlan @unique
-  name             String
-  description      String
-  priceInCents     Int
-  stripePriceId    String           @unique
-  maxBarbershops   Int
-  maxProfessionals Int
-  maxServices      Int?
-  features         String[]
-  isActive         Boolean          @default(true)
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
-
-  @@map("plan_config")
-}
-
-// =====================
-// SUBSCRIPTION (Owner)
-// =====================
-
-model Subscription {
-  id                   String             @id @default(uuid())
-  stripeSubscriptionId String             @unique
-  stripePriceId        String
-  stripeProductId      String
-  plan                 SubscriptionPlan   @default(BASIC)
-  status               SubscriptionStatus @default(INCOMPLETE)
-  currentPeriodStart   DateTime           @db.Timestamptz()
-  currentPeriodEnd     DateTime           @db.Timestamptz()
-  cancelAtPeriodEnd    Boolean            @default(false)
-  canceledAt           DateTime?          @db.Timestamptz()
-  createdAt            DateTime           @default(now()) @db.Timestamptz()
-  updatedAt            DateTime           @updatedAt @db.Timestamptz()
-
-  barbershopId String     @unique
-  barbershop   Barbershop @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
-}
-
-// =====================
-// PROFESSIONAL SCHEDULE
-// =====================
-
-model ProfessionalSchedule {
-  id             String    @id @default(uuid())
-  dayOfWeek      DayOfWeek
-  startTime      String
-  endTime        String
-  isAvailable    Boolean   @default(true)
-  hasLunchBreak  Boolean   @default(false)
-  lunchStartTime String    @default("12:00")
-  lunchEndTime   String    @default("13:00")
-
-  professionalId String
-  professional   Professional @relation(fields: [professionalId], references: [id], onDelete: Cascade)
-
-  @@unique([professionalId, dayOfWeek])
-}
-
-// =====================
-// BARBERSHOP SERVICE
-// =====================
-
-model BarbershopService {
-  id              String     @id @default(uuid())
-  name            String
-  description     String
-  imageUrl        String
-  priceInCents    Int
-  durationMinutes Int        @default(30)
-  barbershopId    String
-  barbershop      Barbershop @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
-  bookings        Booking[]
-  deletedAt       DateTime?
-}
-
-// =====================
-// BOOKING
-// =====================
-
-model Booking {
-  id          String    @id @default(uuid())
-  date        DateTime  @db.Timestamptz()
-  cancelledAt DateTime? @db.Timestamptz()
-  createdAt   DateTime  @default(now()) @db.Timestamptz()
-  updatedAt   DateTime  @updatedAt @db.Timestamptz()
-
-  barbershopId   String
-  barbershop     Barbershop        @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
-  serviceId      String
-  service        BarbershopService @relation(fields: [serviceId], references: [id], onDelete: Cascade)
-  userId         String
-  user           User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  professionalId String
-  professional   Professional      @relation(fields: [professionalId], references: [id], onDelete: Restrict)
-
-  payment Payment?
-
-  @@index([barbershopId, date])
-  @@index([professionalId, date])
-}
-
-// =====================
-// PAYMENT
-// =====================
-
-model Payment {
-  id                    String        @id @default(uuid())
-  amountInCents         Int
-  applicationFeeInCents Int
-  status                PaymentStatus @default(PENDING)
-  paymentMethod         String?
-  stripePaymentIntentId String?       @unique
-  stripeChargeId        String?       @unique
-  stripeTransferId      String?
-  refundedAt            DateTime?     @db.Timestamptz()
-  createdAt             DateTime      @default(now()) @db.Timestamptz()
-  updatedAt             DateTime      @updatedAt @db.Timestamptz()
-
-  bookingId      String        @unique
-  booking        Booking       @relation(fields: [bookingId], references: [id], onDelete: Cascade)
-  professionalId String?
-  professional   Professional? @relation(fields: [professionalId], references: [id], onDelete: SetNull)
-
-  @@index([professionalId])
-  @@index([status])
-}
-
-// =====================
-// PLAN HISTORY (Histórico de Planos)
-// =====================
-
-model PlanHistory {
-  id                       String            @id @default(uuid())
-  fromPlan                 SubscriptionPlan?
-  toPlan                   SubscriptionPlan
-  isUpgrade                Boolean
-  professionalsDisabled    Int               @default(0)
-  servicesDisabled         Int               @default(0)
-  barbershopsDisabled      Int               @default(0)
-  professionalsReactivated Int               @default(0)
-  servicesReactivated      Int               @default(0)
-  barbershopsReactivated   Int               @default(0)
-  changedAt                DateTime          @default(now()) @db.Timestamptz()
-
-  barbershopId String
-  barbershop   Barbershop @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
-
-  @@index([barbershopId])
-  @@map("plan_history")
-}
-
-// =====================
-// STRIPE EVENTS (Idempotência)
-// =====================
-
-model StripeEvent {
-  id            String   @id @default(uuid())
-  stripeEventId String   @unique
-  eventType     String
-  processedAt   DateTime @default(now()) @db.Timestamptz()
-
-  @@index([stripeEventId])
-  @@map("stripe_event")
-}
-
-// =====================
-// SUPPORT TICKETS
-// =====================
-
-model SupportTicket {
-  id        String              @id @default(uuid())
-  status    SupportTicketStatus @default(OPEN)
-  createdAt DateTime            @default(now()) @db.Timestamptz()
-  updatedAt DateTime            @updatedAt @db.Timestamptz()
-  closedAt  DateTime?           @db.Timestamptz()
-
-  userId String
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  assignedToId String?
-  assignedTo   User?  @relation("SupportTicketAgent", fields: [assignedToId], references: [id], onDelete: SetNull)
-
-  messages  SupportMessage[]
-  auditLogs SupportAuditLog[]
-
-  @@index([userId])
-  @@index([status])
-  @@index([assignedToId])
-  @@index([userId, status])
-  @@map("support_ticket")
-}
-
-model SupportMessage {
-  id          String   @id @default(uuid())
-  content     String
-  imageUrl    String?
-  isFromAdmin Boolean  @default(false)
-  isFromAI    Boolean  @default(false)
-  readByUser  Boolean  @default(false)
-  createdAt   DateTime @default(now()) @db.Timestamptz()
-
-  ticketId String
-  ticket   SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
-
-  senderId String?
-  sender   User?   @relation("SupportMessageSender", fields: [senderId], references: [id], onDelete: SetNull)
-
-  @@index([ticketId])
-  @@index([ticketId, isFromAdmin, readByUser])
-  @@map("support_message")
-}
-
-// =====================
-// SUPPORT AUDIT LOG
-// =====================
-
-model SupportAuditLog {
-  id        String             @id @default(uuid())
-  action    SupportAuditAction
-  ticketId  String
-  userId    String
-  metadata  Json?
-  createdAt DateTime           @default(now()) @db.Timestamptz()
-
-  ticket SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
-  user   User          @relation("SupportAuditLogs", fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([ticketId])
-  @@index([userId])
-  @@map("support_audit_log")
-}
-
-// =====================
-// SUPPORT INVITES
-// =====================
-
-model SupportInvite {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  invitedBy String
-  admin     User     @relation("SupportInvites", fields: [invitedBy], references: [id], onDelete: Cascade)
-  accepted  Boolean  @default(false)
-  createdAt DateTime @default(now()) @db.Timestamptz()
-
-  @@map("support_invite")
-}
-
-// =====================
-// PLATFORM FEE HISTORY
-// =====================
-
-model PlatformFeeHistory {
-  id                String   @id @default(uuid())
-  fromFeePercentage Int?
-  toFeePercentage   Int?
-  fromFeeOverride   Boolean  @default(false)
-  toFeeOverride     Boolean  @default(false)
-  reason            String?
-  changedBy         String?
-  changedAt         DateTime @default(now()) @db.Timestamptz()
-
-  barbershopId String
-  barbershop   Barbershop @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
-
-  @@index([barbershopId])
-  @@map("platform_fee_history")
-}
-
-// =====================
-// NOTIFICATIONS
-// =====================
-
-model Notification {
-  id        String   @id @default(uuid())
-  title     String
-  message   String
-  read      Boolean  @default(false)
-  createdAt DateTime @default(now()) @db.Timestamptz()
-
-  userId String
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId, read])
-  @@map("notification")
-}
-
-// =====================
-// UPLOADS
-// =====================
-
-model Upload {
-  id          String   @id @default(uuid())
-  nomeArquivo String
-  tipoArquivo String
-  tamanho     Int
-  dados       Bytes
-  permanente  Boolean  @default(false)
-  createdAt   DateTime @default(now()) @db.Timestamptz()
-
-  @@map("upload")
-}
-
-// =====================
-// MANUAL ACTIVATION LOG
-// =====================
-
-model ManualActivationLog {
-  id                   String   @id @default(uuid())
-  action               String
-  reason               String?
-  stripeStatusAtMoment String?
-  performedAt          DateTime @default(now()) @db.Timestamptz()
-  performedByRole      String
-
-  professionalId String
-  professional   Professional @relation(fields: [professionalId], references: [id], onDelete: Cascade)
-
-  performedById String
-  performedBy   User @relation("ManualActivationPerformer", fields: [performedById], references: [id], onDelete: Cascade)
-
-  @@index([professionalId])
-  @@map("manual_activation_log")
 }

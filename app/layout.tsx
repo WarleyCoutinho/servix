@@ -2,7 +2,9 @@ import { Toaster } from "@/components/ui/sonner";
 import { TanstackQueryProvider } from "@/providers/tanstack-query";
 import type { Metadata } from "next";
 import { Merriweather, Plus_Jakarta_Sans } from "next/font/google";
-import "./globals.css";
+import { Barlow, Barlow_Condensed } from "next/font/google";
+import "./styles/globals.css";
+import "./styles/servix.css";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta-sans",
@@ -14,6 +16,17 @@ const merriweather = Merriweather({
   subsets: ["latin"],
   weight: ["400"],
   style: ["italic"],
+});
+const barlow = Barlow({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-barlow",
+});
+
+const barlowCondensed = Barlow_Condensed({
+  subsets: ["latin"],
+  weight: ["400", "600", "700", "800", "900"],
+  variable: "--font-barlow-condensed",
 });
 
 export const metadata: Metadata = {
@@ -29,7 +42,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <body
-        className={`${plusJakartaSans.variable} ${merriweather.variable} font-sans antialiased`}
+        className={`${plusJakartaSans.variable} ${merriweather.variable} font-sans antialiased ${barlow.variable} ${barlowCondensed.variable}`}
       >
         <TanstackQueryProvider>
           {children}
