@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import Link from "next/link";
+import { authClient } from "@/lib/auth-client";
+import { Button } from "./ui/button";
 
 // ─── DADOS ────────────────────────────────────────────────────────────────────
 
@@ -262,6 +263,13 @@ function SectionTitle({
 export default function ServixLanding() {
   const [scrolled, setScrolled] = useState(false);
 
+  const handleCtaClick = () => {
+    authClient.signIn.social({
+      provider: "google",
+      callbackURL: "/auth/callback",
+    });
+  };
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", onScroll);
@@ -279,13 +287,9 @@ export default function ServixLanding() {
           SERVI<span>X</span>
         </div>
         <div className="sx-nav-pill">Barbearias &amp; Salões</div>
-        <Link
-          href="https://www.servix.app.br"
-          rel="noreferrer"
-          className="sx-nav-cta"
-        >
-          Iniciar Agora →
-        </Link>
+        <Button onClick={handleCtaClick} className="sx-nav-cta">
+          Começar agora →
+        </Button>
       </nav>
 
       {/* ─── HERO ─── */}
@@ -314,11 +318,7 @@ export default function ServixLanding() {
         </p>
 
         <div className="sx-hero-actions">
-          <Link
-            href="https://www.servix.app.br"
-            rel="noreferrer"
-            className="sx-btn-primary"
-          >
+          <Button onClick={handleCtaClick} className="sx-btn-primary">
             Testar 90 dias sem taxa
             <svg
               width="18"
@@ -332,7 +332,7 @@ export default function ServixLanding() {
             >
               <path d="M5 12h14M12 5l7 7-7 7" />
             </svg>
-          </Link>
+          </Button>
           <p className="sx-hero-note">
             A partir de <strong>R$39,90/mês</strong> · Cancele quando quiser
           </p>
@@ -711,13 +711,12 @@ export default function ServixLanding() {
                 ))}
                 <p className="sx-price-note">{plan.note}</p>
 
-                <Link
-                  href="https://www.servix.app.br"
-                  rel="noreferrer"
+                <Button
+                  onClick={handleCtaClick}
                   className={`sx-price-cta ${plan.highlight ? "sx-price-cta--featured" : ""}`}
                 >
                   Começar agora
-                </Link>
+                </Button>
               </div>
             ))}
           </div>
@@ -727,13 +726,12 @@ export default function ServixLanding() {
               Todos os planos: <strong>90 dias sem taxa</strong> de transação.
               Cancele quando quiser.
             </p>
-            <Link
-              href="https://www.servix.app.br"
-              rel="noreferrer"
+            <Button
+              onClick={handleCtaClick}
               className="sx-btn-primary sx-btn-primary--sm"
             >
               Acessar servix.app.br →
-            </Link>
+            </Button>
           </div>
         </RevealSection>
       </section>
@@ -750,11 +748,7 @@ export default function ServixLanding() {
             Sua loja no ar em menos de 10 minutos. Sem técnico, sem complicação.
             Cancele quando quiser.
           </p>
-          <Link
-            href="https://www.servix.app.br"
-            rel="noreferrer"
-            className="sx-btn-dark"
-          >
+          <Button onClick={handleCtaClick} className="sx-btn-dark">
             Começar agora
             <svg
               width="20"
@@ -768,7 +762,7 @@ export default function ServixLanding() {
             >
               <path d="M5 12h14M12 5l7 7-7 7" />
             </svg>
-          </Link>
+          </Button>
           <p className="sx-final-note">
             servix.app.br · Barbearia &amp; Salão de Beleza
           </p>
@@ -784,14 +778,9 @@ export default function ServixLanding() {
           Gestão profissional para barbearias e salões de beleza
         </p>
         <p className="sx-footer-text">
-          <a
-            href="https://www.servix.app.br"
-            target="_blank"
-            rel="noreferrer"
-            className="sx-footer-link"
-          >
+          <Button onClick={handleCtaClick} className="sx-footer-link">
             servix.app.br
-          </a>
+          </Button>
         </p>
       </footer>
     </div>
