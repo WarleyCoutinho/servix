@@ -2193,7 +2193,8 @@ export const ProfessionalScalarFieldEnum = {
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   userId: 'userId',
-  barbershopId: 'barbershopId'
+  barbershopId: 'barbershopId',
+  lastScheduleSentAt: 'lastScheduleSentAt'
 } as const
 
 export type ProfessionalScalarFieldEnum = (typeof ProfessionalScalarFieldEnum)[keyof typeof ProfessionalScalarFieldEnum]

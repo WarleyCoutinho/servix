@@ -1,4 +1,4 @@
-/* import { timingSafeEqual } from "crypto";
+import { timingSafeEqual } from "crypto";
 import { prisma } from "@/lib/prisma";
 import { sendDailyScheduleToGroup } from "@/lib/whatsapp-schedule";
 import { toZonedTime } from "date-fns-tz";
@@ -81,4 +81,4 @@ export async function GET(request: Request) {
   const failed = results.filter((r) => r.status === "rejected").length;
 
   return Response.json({ sent, failed, total: professionals.length });
-} */
+}

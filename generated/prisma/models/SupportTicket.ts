@@ -198,10 +198,10 @@ export type SupportTicketWhereInput = {
   closedAt?: Prisma.DateTimeNullableFilter<"SupportTicket"> | Date | string | null
   userId?: Prisma.StringFilter<"SupportTicket"> | string
   assignedToId?: Prisma.StringNullableFilter<"SupportTicket"> | string | null
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-  assignedTo?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
-  messages?: Prisma.SupportMessageListRelationFilter
   auditLogs?: Prisma.SupportAuditLogListRelationFilter
+  messages?: Prisma.SupportMessageListRelationFilter
+  assignedTo?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
 export type SupportTicketOrderByWithRelationInput = {
@@ -212,10 +212,10 @@ export type SupportTicketOrderByWithRelationInput = {
   closedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   userId?: Prisma.SortOrder
   assignedToId?: Prisma.SortOrderInput | Prisma.SortOrder
-  user?: Prisma.UserOrderByWithRelationInput
-  assignedTo?: Prisma.UserOrderByWithRelationInput
-  messages?: Prisma.SupportMessageOrderByRelationAggregateInput
   auditLogs?: Prisma.SupportAuditLogOrderByRelationAggregateInput
+  messages?: Prisma.SupportMessageOrderByRelationAggregateInput
+  assignedTo?: Prisma.UserOrderByWithRelationInput
+  user?: Prisma.UserOrderByWithRelationInput
 }
 
 export type SupportTicketWhereUniqueInput = Prisma.AtLeast<{
@@ -229,10 +229,10 @@ export type SupportTicketWhereUniqueInput = Prisma.AtLeast<{
   closedAt?: Prisma.DateTimeNullableFilter<"SupportTicket"> | Date | string | null
   userId?: Prisma.StringFilter<"SupportTicket"> | string
   assignedToId?: Prisma.StringNullableFilter<"SupportTicket"> | string | null
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-  assignedTo?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
-  messages?: Prisma.SupportMessageListRelationFilter
   auditLogs?: Prisma.SupportAuditLogListRelationFilter
+  messages?: Prisma.SupportMessageListRelationFilter
+  assignedTo?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id">
 
 export type SupportTicketOrderByWithAggregationInput = {
@@ -267,10 +267,10 @@ export type SupportTicketCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   closedAt?: Date | string | null
-  user: Prisma.UserCreateNestedOneWithoutSupportTicketsInput
-  assignedTo?: Prisma.UserCreateNestedOneWithoutAssignedTicketsInput
-  messages?: Prisma.SupportMessageCreateNestedManyWithoutTicketInput
   auditLogs?: Prisma.SupportAuditLogCreateNestedManyWithoutTicketInput
+  messages?: Prisma.SupportMessageCreateNestedManyWithoutTicketInput
+  assignedTo?: Prisma.UserCreateNestedOneWithoutAssignedTicketsInput
+  user: Prisma.UserCreateNestedOneWithoutSupportTicketsInput
 }
 
 export type SupportTicketUncheckedCreateInput = {
@@ -281,8 +281,8 @@ export type SupportTicketUncheckedCreateInput = {
   closedAt?: Date | string | null
   userId: string
   assignedToId?: string | null
-  messages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutTicketInput
   auditLogs?: Prisma.SupportAuditLogUncheckedCreateNestedManyWithoutTicketInput
+  messages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutTicketInput
 }
 
 export type SupportTicketUpdateInput = {
@@ -291,10 +291,10 @@ export type SupportTicketUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  user?: Prisma.UserUpdateOneRequiredWithoutSupportTicketsNestedInput
-  assignedTo?: Prisma.UserUpdateOneWithoutAssignedTicketsNestedInput
-  messages?: Prisma.SupportMessageUpdateManyWithoutTicketNestedInput
   auditLogs?: Prisma.SupportAuditLogUpdateManyWithoutTicketNestedInput
+  messages?: Prisma.SupportMessageUpdateManyWithoutTicketNestedInput
+  assignedTo?: Prisma.UserUpdateOneWithoutAssignedTicketsNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutSupportTicketsNestedInput
 }
 
 export type SupportTicketUncheckedUpdateInput = {
@@ -305,8 +305,8 @@ export type SupportTicketUncheckedUpdateInput = {
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   assignedToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  messages?: Prisma.SupportMessageUncheckedUpdateManyWithoutTicketNestedInput
   auditLogs?: Prisma.SupportAuditLogUncheckedUpdateManyWithoutTicketNestedInput
+  messages?: Prisma.SupportMessageUncheckedUpdateManyWithoutTicketNestedInput
 }
 
 export type SupportTicketCreateManyInput = {
@@ -382,13 +382,6 @@ export type SupportTicketScalarRelationFilter = {
   isNot?: Prisma.SupportTicketWhereInput
 }
 
-export type SupportTicketCreateNestedManyWithoutUserInput = {
-  create?: Prisma.XOR<Prisma.SupportTicketCreateWithoutUserInput, Prisma.SupportTicketUncheckedCreateWithoutUserInput> | Prisma.SupportTicketCreateWithoutUserInput[] | Prisma.SupportTicketUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.SupportTicketCreateOrConnectWithoutUserInput | Prisma.SupportTicketCreateOrConnectWithoutUserInput[]
-  createMany?: Prisma.SupportTicketCreateManyUserInputEnvelope
-  connect?: Prisma.SupportTicketWhereUniqueInput | Prisma.SupportTicketWhereUniqueInput[]
-}
-
 export type SupportTicketCreateNestedManyWithoutAssignedToInput = {
   create?: Prisma.XOR<Prisma.SupportTicketCreateWithoutAssignedToInput, Prisma.SupportTicketUncheckedCreateWithoutAssignedToInput> | Prisma.SupportTicketCreateWithoutAssignedToInput[] | Prisma.SupportTicketUncheckedCreateWithoutAssignedToInput[]
   connectOrCreate?: Prisma.SupportTicketCreateOrConnectWithoutAssignedToInput | Prisma.SupportTicketCreateOrConnectWithoutAssignedToInput[]
@@ -396,7 +389,7 @@ export type SupportTicketCreateNestedManyWithoutAssignedToInput = {
   connect?: Prisma.SupportTicketWhereUniqueInput | Prisma.SupportTicketWhereUniqueInput[]
 }
 
-export type SupportTicketUncheckedCreateNestedManyWithoutUserInput = {
+export type SupportTicketCreateNestedManyWithoutUserInput = {
   create?: Prisma.XOR<Prisma.SupportTicketCreateWithoutUserInput, Prisma.SupportTicketUncheckedCreateWithoutUserInput> | Prisma.SupportTicketCreateWithoutUserInput[] | Prisma.SupportTicketUncheckedCreateWithoutUserInput[]
   connectOrCreate?: Prisma.SupportTicketCreateOrConnectWithoutUserInput | Prisma.SupportTicketCreateOrConnectWithoutUserInput[]
   createMany?: Prisma.SupportTicketCreateManyUserInputEnvelope
@@ -410,18 +403,11 @@ export type SupportTicketUncheckedCreateNestedManyWithoutAssignedToInput = {
   connect?: Prisma.SupportTicketWhereUniqueInput | Prisma.SupportTicketWhereUniqueInput[]
 }
 
-export type SupportTicketUpdateManyWithoutUserNestedInput = {
+export type SupportTicketUncheckedCreateNestedManyWithoutUserInput = {
   create?: Prisma.XOR<Prisma.SupportTicketCreateWithoutUserInput, Prisma.SupportTicketUncheckedCreateWithoutUserInput> | Prisma.SupportTicketCreateWithoutUserInput[] | Prisma.SupportTicketUncheckedCreateWithoutUserInput[]
   connectOrCreate?: Prisma.SupportTicketCreateOrConnectWithoutUserInput | Prisma.SupportTicketCreateOrConnectWithoutUserInput[]
-  upsert?: Prisma.SupportTicketUpsertWithWhereUniqueWithoutUserInput | Prisma.SupportTicketUpsertWithWhereUniqueWithoutUserInput[]
   createMany?: Prisma.SupportTicketCreateManyUserInputEnvelope
-  set?: Prisma.SupportTicketWhereUniqueInput | Prisma.SupportTicketWhereUniqueInput[]
-  disconnect?: Prisma.SupportTicketWhereUniqueInput | Prisma.SupportTicketWhereUniqueInput[]
-  delete?: Prisma.SupportTicketWhereUniqueInput | Prisma.SupportTicketWhereUniqueInput[]
   connect?: Prisma.SupportTicketWhereUniqueInput | Prisma.SupportTicketWhereUniqueInput[]
-  update?: Prisma.SupportTicketUpdateWithWhereUniqueWithoutUserInput | Prisma.SupportTicketUpdateWithWhereUniqueWithoutUserInput[]
-  updateMany?: Prisma.SupportTicketUpdateManyWithWhereWithoutUserInput | Prisma.SupportTicketUpdateManyWithWhereWithoutUserInput[]
-  deleteMany?: Prisma.SupportTicketScalarWhereInput | Prisma.SupportTicketScalarWhereInput[]
 }
 
 export type SupportTicketUpdateManyWithoutAssignedToNestedInput = {
@@ -438,7 +424,7 @@ export type SupportTicketUpdateManyWithoutAssignedToNestedInput = {
   deleteMany?: Prisma.SupportTicketScalarWhereInput | Prisma.SupportTicketScalarWhereInput[]
 }
 
-export type SupportTicketUncheckedUpdateManyWithoutUserNestedInput = {
+export type SupportTicketUpdateManyWithoutUserNestedInput = {
   create?: Prisma.XOR<Prisma.SupportTicketCreateWithoutUserInput, Prisma.SupportTicketUncheckedCreateWithoutUserInput> | Prisma.SupportTicketCreateWithoutUserInput[] | Prisma.SupportTicketUncheckedCreateWithoutUserInput[]
   connectOrCreate?: Prisma.SupportTicketCreateOrConnectWithoutUserInput | Prisma.SupportTicketCreateOrConnectWithoutUserInput[]
   upsert?: Prisma.SupportTicketUpsertWithWhereUniqueWithoutUserInput | Prisma.SupportTicketUpsertWithWhereUniqueWithoutUserInput[]
@@ -463,6 +449,20 @@ export type SupportTicketUncheckedUpdateManyWithoutAssignedToNestedInput = {
   connect?: Prisma.SupportTicketWhereUniqueInput | Prisma.SupportTicketWhereUniqueInput[]
   update?: Prisma.SupportTicketUpdateWithWhereUniqueWithoutAssignedToInput | Prisma.SupportTicketUpdateWithWhereUniqueWithoutAssignedToInput[]
   updateMany?: Prisma.SupportTicketUpdateManyWithWhereWithoutAssignedToInput | Prisma.SupportTicketUpdateManyWithWhereWithoutAssignedToInput[]
+  deleteMany?: Prisma.SupportTicketScalarWhereInput | Prisma.SupportTicketScalarWhereInput[]
+}
+
+export type SupportTicketUncheckedUpdateManyWithoutUserNestedInput = {
+  create?: Prisma.XOR<Prisma.SupportTicketCreateWithoutUserInput, Prisma.SupportTicketUncheckedCreateWithoutUserInput> | Prisma.SupportTicketCreateWithoutUserInput[] | Prisma.SupportTicketUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.SupportTicketCreateOrConnectWithoutUserInput | Prisma.SupportTicketCreateOrConnectWithoutUserInput[]
+  upsert?: Prisma.SupportTicketUpsertWithWhereUniqueWithoutUserInput | Prisma.SupportTicketUpsertWithWhereUniqueWithoutUserInput[]
+  createMany?: Prisma.SupportTicketCreateManyUserInputEnvelope
+  set?: Prisma.SupportTicketWhereUniqueInput | Prisma.SupportTicketWhereUniqueInput[]
+  disconnect?: Prisma.SupportTicketWhereUniqueInput | Prisma.SupportTicketWhereUniqueInput[]
+  delete?: Prisma.SupportTicketWhereUniqueInput | Prisma.SupportTicketWhereUniqueInput[]
+  connect?: Prisma.SupportTicketWhereUniqueInput | Prisma.SupportTicketWhereUniqueInput[]
+  update?: Prisma.SupportTicketUpdateWithWhereUniqueWithoutUserInput | Prisma.SupportTicketUpdateWithWhereUniqueWithoutUserInput[]
+  updateMany?: Prisma.SupportTicketUpdateManyWithWhereWithoutUserInput | Prisma.SupportTicketUpdateManyWithWhereWithoutUserInput[]
   deleteMany?: Prisma.SupportTicketScalarWhereInput | Prisma.SupportTicketScalarWhereInput[]
 }
 
@@ -498,47 +498,15 @@ export type SupportTicketUpdateOneRequiredWithoutAuditLogsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.SupportTicketUpdateToOneWithWhereWithoutAuditLogsInput, Prisma.SupportTicketUpdateWithoutAuditLogsInput>, Prisma.SupportTicketUncheckedUpdateWithoutAuditLogsInput>
 }
 
-export type SupportTicketCreateWithoutUserInput = {
-  id?: string
-  status?: $Enums.SupportTicketStatus
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  closedAt?: Date | string | null
-  assignedTo?: Prisma.UserCreateNestedOneWithoutAssignedTicketsInput
-  messages?: Prisma.SupportMessageCreateNestedManyWithoutTicketInput
-  auditLogs?: Prisma.SupportAuditLogCreateNestedManyWithoutTicketInput
-}
-
-export type SupportTicketUncheckedCreateWithoutUserInput = {
-  id?: string
-  status?: $Enums.SupportTicketStatus
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  closedAt?: Date | string | null
-  assignedToId?: string | null
-  messages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutTicketInput
-  auditLogs?: Prisma.SupportAuditLogUncheckedCreateNestedManyWithoutTicketInput
-}
-
-export type SupportTicketCreateOrConnectWithoutUserInput = {
-  where: Prisma.SupportTicketWhereUniqueInput
-  create: Prisma.XOR<Prisma.SupportTicketCreateWithoutUserInput, Prisma.SupportTicketUncheckedCreateWithoutUserInput>
-}
-
-export type SupportTicketCreateManyUserInputEnvelope = {
-  data: Prisma.SupportTicketCreateManyUserInput | Prisma.SupportTicketCreateManyUserInput[]
-  skipDuplicates?: boolean
-}
-
 export type SupportTicketCreateWithoutAssignedToInput = {
   id?: string
   status?: $Enums.SupportTicketStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   closedAt?: Date | string | null
-  user: Prisma.UserCreateNestedOneWithoutSupportTicketsInput
-  messages?: Prisma.SupportMessageCreateNestedManyWithoutTicketInput
   auditLogs?: Prisma.SupportAuditLogCreateNestedManyWithoutTicketInput
+  messages?: Prisma.SupportMessageCreateNestedManyWithoutTicketInput
+  user: Prisma.UserCreateNestedOneWithoutSupportTicketsInput
 }
 
 export type SupportTicketUncheckedCreateWithoutAssignedToInput = {
@@ -548,8 +516,8 @@ export type SupportTicketUncheckedCreateWithoutAssignedToInput = {
   updatedAt?: Date | string
   closedAt?: Date | string | null
   userId: string
-  messages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutTicketInput
   auditLogs?: Prisma.SupportAuditLogUncheckedCreateNestedManyWithoutTicketInput
+  messages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutTicketInput
 }
 
 export type SupportTicketCreateOrConnectWithoutAssignedToInput = {
@@ -562,33 +530,36 @@ export type SupportTicketCreateManyAssignedToInputEnvelope = {
   skipDuplicates?: boolean
 }
 
-export type SupportTicketUpsertWithWhereUniqueWithoutUserInput = {
+export type SupportTicketCreateWithoutUserInput = {
+  id?: string
+  status?: $Enums.SupportTicketStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  closedAt?: Date | string | null
+  auditLogs?: Prisma.SupportAuditLogCreateNestedManyWithoutTicketInput
+  messages?: Prisma.SupportMessageCreateNestedManyWithoutTicketInput
+  assignedTo?: Prisma.UserCreateNestedOneWithoutAssignedTicketsInput
+}
+
+export type SupportTicketUncheckedCreateWithoutUserInput = {
+  id?: string
+  status?: $Enums.SupportTicketStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  closedAt?: Date | string | null
+  assignedToId?: string | null
+  auditLogs?: Prisma.SupportAuditLogUncheckedCreateNestedManyWithoutTicketInput
+  messages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutTicketInput
+}
+
+export type SupportTicketCreateOrConnectWithoutUserInput = {
   where: Prisma.SupportTicketWhereUniqueInput
-  update: Prisma.XOR<Prisma.SupportTicketUpdateWithoutUserInput, Prisma.SupportTicketUncheckedUpdateWithoutUserInput>
   create: Prisma.XOR<Prisma.SupportTicketCreateWithoutUserInput, Prisma.SupportTicketUncheckedCreateWithoutUserInput>
 }
 
-export type SupportTicketUpdateWithWhereUniqueWithoutUserInput = {
-  where: Prisma.SupportTicketWhereUniqueInput
-  data: Prisma.XOR<Prisma.SupportTicketUpdateWithoutUserInput, Prisma.SupportTicketUncheckedUpdateWithoutUserInput>
-}
-
-export type SupportTicketUpdateManyWithWhereWithoutUserInput = {
-  where: Prisma.SupportTicketScalarWhereInput
-  data: Prisma.XOR<Prisma.SupportTicketUpdateManyMutationInput, Prisma.SupportTicketUncheckedUpdateManyWithoutUserInput>
-}
-
-export type SupportTicketScalarWhereInput = {
-  AND?: Prisma.SupportTicketScalarWhereInput | Prisma.SupportTicketScalarWhereInput[]
-  OR?: Prisma.SupportTicketScalarWhereInput[]
-  NOT?: Prisma.SupportTicketScalarWhereInput | Prisma.SupportTicketScalarWhereInput[]
-  id?: Prisma.StringFilter<"SupportTicket"> | string
-  status?: Prisma.EnumSupportTicketStatusFilter<"SupportTicket"> | $Enums.SupportTicketStatus
-  createdAt?: Prisma.DateTimeFilter<"SupportTicket"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"SupportTicket"> | Date | string
-  closedAt?: Prisma.DateTimeNullableFilter<"SupportTicket"> | Date | string | null
-  userId?: Prisma.StringFilter<"SupportTicket"> | string
-  assignedToId?: Prisma.StringNullableFilter<"SupportTicket"> | string | null
+export type SupportTicketCreateManyUserInputEnvelope = {
+  data: Prisma.SupportTicketCreateManyUserInput | Prisma.SupportTicketCreateManyUserInput[]
+  skipDuplicates?: boolean
 }
 
 export type SupportTicketUpsertWithWhereUniqueWithoutAssignedToInput = {
@@ -607,15 +578,44 @@ export type SupportTicketUpdateManyWithWhereWithoutAssignedToInput = {
   data: Prisma.XOR<Prisma.SupportTicketUpdateManyMutationInput, Prisma.SupportTicketUncheckedUpdateManyWithoutAssignedToInput>
 }
 
+export type SupportTicketScalarWhereInput = {
+  AND?: Prisma.SupportTicketScalarWhereInput | Prisma.SupportTicketScalarWhereInput[]
+  OR?: Prisma.SupportTicketScalarWhereInput[]
+  NOT?: Prisma.SupportTicketScalarWhereInput | Prisma.SupportTicketScalarWhereInput[]
+  id?: Prisma.StringFilter<"SupportTicket"> | string
+  status?: Prisma.EnumSupportTicketStatusFilter<"SupportTicket"> | $Enums.SupportTicketStatus
+  createdAt?: Prisma.DateTimeFilter<"SupportTicket"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"SupportTicket"> | Date | string
+  closedAt?: Prisma.DateTimeNullableFilter<"SupportTicket"> | Date | string | null
+  userId?: Prisma.StringFilter<"SupportTicket"> | string
+  assignedToId?: Prisma.StringNullableFilter<"SupportTicket"> | string | null
+}
+
+export type SupportTicketUpsertWithWhereUniqueWithoutUserInput = {
+  where: Prisma.SupportTicketWhereUniqueInput
+  update: Prisma.XOR<Prisma.SupportTicketUpdateWithoutUserInput, Prisma.SupportTicketUncheckedUpdateWithoutUserInput>
+  create: Prisma.XOR<Prisma.SupportTicketCreateWithoutUserInput, Prisma.SupportTicketUncheckedCreateWithoutUserInput>
+}
+
+export type SupportTicketUpdateWithWhereUniqueWithoutUserInput = {
+  where: Prisma.SupportTicketWhereUniqueInput
+  data: Prisma.XOR<Prisma.SupportTicketUpdateWithoutUserInput, Prisma.SupportTicketUncheckedUpdateWithoutUserInput>
+}
+
+export type SupportTicketUpdateManyWithWhereWithoutUserInput = {
+  where: Prisma.SupportTicketScalarWhereInput
+  data: Prisma.XOR<Prisma.SupportTicketUpdateManyMutationInput, Prisma.SupportTicketUncheckedUpdateManyWithoutUserInput>
+}
+
 export type SupportTicketCreateWithoutMessagesInput = {
   id?: string
   status?: $Enums.SupportTicketStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   closedAt?: Date | string | null
-  user: Prisma.UserCreateNestedOneWithoutSupportTicketsInput
-  assignedTo?: Prisma.UserCreateNestedOneWithoutAssignedTicketsInput
   auditLogs?: Prisma.SupportAuditLogCreateNestedManyWithoutTicketInput
+  assignedTo?: Prisma.UserCreateNestedOneWithoutAssignedTicketsInput
+  user: Prisma.UserCreateNestedOneWithoutSupportTicketsInput
 }
 
 export type SupportTicketUncheckedCreateWithoutMessagesInput = {
@@ -651,9 +651,9 @@ export type SupportTicketUpdateWithoutMessagesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  user?: Prisma.UserUpdateOneRequiredWithoutSupportTicketsNestedInput
-  assignedTo?: Prisma.UserUpdateOneWithoutAssignedTicketsNestedInput
   auditLogs?: Prisma.SupportAuditLogUpdateManyWithoutTicketNestedInput
+  assignedTo?: Prisma.UserUpdateOneWithoutAssignedTicketsNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutSupportTicketsNestedInput
 }
 
 export type SupportTicketUncheckedUpdateWithoutMessagesInput = {
@@ -673,9 +673,9 @@ export type SupportTicketCreateWithoutAuditLogsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   closedAt?: Date | string | null
-  user: Prisma.UserCreateNestedOneWithoutSupportTicketsInput
-  assignedTo?: Prisma.UserCreateNestedOneWithoutAssignedTicketsInput
   messages?: Prisma.SupportMessageCreateNestedManyWithoutTicketInput
+  assignedTo?: Prisma.UserCreateNestedOneWithoutAssignedTicketsInput
+  user: Prisma.UserCreateNestedOneWithoutSupportTicketsInput
 }
 
 export type SupportTicketUncheckedCreateWithoutAuditLogsInput = {
@@ -711,9 +711,9 @@ export type SupportTicketUpdateWithoutAuditLogsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  user?: Prisma.UserUpdateOneRequiredWithoutSupportTicketsNestedInput
-  assignedTo?: Prisma.UserUpdateOneWithoutAssignedTicketsNestedInput
   messages?: Prisma.SupportMessageUpdateManyWithoutTicketNestedInput
+  assignedTo?: Prisma.UserUpdateOneWithoutAssignedTicketsNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutSupportTicketsNestedInput
 }
 
 export type SupportTicketUncheckedUpdateWithoutAuditLogsInput = {
@@ -727,15 +727,6 @@ export type SupportTicketUncheckedUpdateWithoutAuditLogsInput = {
   messages?: Prisma.SupportMessageUncheckedUpdateManyWithoutTicketNestedInput
 }
 
-export type SupportTicketCreateManyUserInput = {
-  id?: string
-  status?: $Enums.SupportTicketStatus
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  closedAt?: Date | string | null
-  assignedToId?: string | null
-}
-
 export type SupportTicketCreateManyAssignedToInput = {
   id?: string
   status?: $Enums.SupportTicketStatus
@@ -745,35 +736,13 @@ export type SupportTicketCreateManyAssignedToInput = {
   userId: string
 }
 
-export type SupportTicketUpdateWithoutUserInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.EnumSupportTicketStatusFieldUpdateOperationsInput | $Enums.SupportTicketStatus
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  assignedTo?: Prisma.UserUpdateOneWithoutAssignedTicketsNestedInput
-  messages?: Prisma.SupportMessageUpdateManyWithoutTicketNestedInput
-  auditLogs?: Prisma.SupportAuditLogUpdateManyWithoutTicketNestedInput
-}
-
-export type SupportTicketUncheckedUpdateWithoutUserInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.EnumSupportTicketStatusFieldUpdateOperationsInput | $Enums.SupportTicketStatus
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  assignedToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  messages?: Prisma.SupportMessageUncheckedUpdateManyWithoutTicketNestedInput
-  auditLogs?: Prisma.SupportAuditLogUncheckedUpdateManyWithoutTicketNestedInput
-}
-
-export type SupportTicketUncheckedUpdateManyWithoutUserInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.EnumSupportTicketStatusFieldUpdateOperationsInput | $Enums.SupportTicketStatus
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  assignedToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+export type SupportTicketCreateManyUserInput = {
+  id?: string
+  status?: $Enums.SupportTicketStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  closedAt?: Date | string | null
+  assignedToId?: string | null
 }
 
 export type SupportTicketUpdateWithoutAssignedToInput = {
@@ -782,9 +751,9 @@ export type SupportTicketUpdateWithoutAssignedToInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  user?: Prisma.UserUpdateOneRequiredWithoutSupportTicketsNestedInput
-  messages?: Prisma.SupportMessageUpdateManyWithoutTicketNestedInput
   auditLogs?: Prisma.SupportAuditLogUpdateManyWithoutTicketNestedInput
+  messages?: Prisma.SupportMessageUpdateManyWithoutTicketNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutSupportTicketsNestedInput
 }
 
 export type SupportTicketUncheckedUpdateWithoutAssignedToInput = {
@@ -794,8 +763,8 @@ export type SupportTicketUncheckedUpdateWithoutAssignedToInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  messages?: Prisma.SupportMessageUncheckedUpdateManyWithoutTicketNestedInput
   auditLogs?: Prisma.SupportAuditLogUncheckedUpdateManyWithoutTicketNestedInput
+  messages?: Prisma.SupportMessageUncheckedUpdateManyWithoutTicketNestedInput
 }
 
 export type SupportTicketUncheckedUpdateManyWithoutAssignedToInput = {
@@ -807,19 +776,50 @@ export type SupportTicketUncheckedUpdateManyWithoutAssignedToInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
+export type SupportTicketUpdateWithoutUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumSupportTicketStatusFieldUpdateOperationsInput | $Enums.SupportTicketStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  auditLogs?: Prisma.SupportAuditLogUpdateManyWithoutTicketNestedInput
+  messages?: Prisma.SupportMessageUpdateManyWithoutTicketNestedInput
+  assignedTo?: Prisma.UserUpdateOneWithoutAssignedTicketsNestedInput
+}
+
+export type SupportTicketUncheckedUpdateWithoutUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumSupportTicketStatusFieldUpdateOperationsInput | $Enums.SupportTicketStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  assignedToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  auditLogs?: Prisma.SupportAuditLogUncheckedUpdateManyWithoutTicketNestedInput
+  messages?: Prisma.SupportMessageUncheckedUpdateManyWithoutTicketNestedInput
+}
+
+export type SupportTicketUncheckedUpdateManyWithoutUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumSupportTicketStatusFieldUpdateOperationsInput | $Enums.SupportTicketStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  assignedToId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
 
 /**
  * Count Type SupportTicketCountOutputType
  */
 
 export type SupportTicketCountOutputType = {
-  messages: number
   auditLogs: number
+  messages: number
 }
 
 export type SupportTicketCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  messages?: boolean | SupportTicketCountOutputTypeCountMessagesArgs
   auditLogs?: boolean | SupportTicketCountOutputTypeCountAuditLogsArgs
+  messages?: boolean | SupportTicketCountOutputTypeCountMessagesArgs
 }
 
 /**
@@ -835,15 +835,15 @@ export type SupportTicketCountOutputTypeDefaultArgs<ExtArgs extends runtime.Type
 /**
  * SupportTicketCountOutputType without action
  */
-export type SupportTicketCountOutputTypeCountMessagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.SupportMessageWhereInput
+export type SupportTicketCountOutputTypeCountAuditLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SupportAuditLogWhereInput
 }
 
 /**
  * SupportTicketCountOutputType without action
  */
-export type SupportTicketCountOutputTypeCountAuditLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.SupportAuditLogWhereInput
+export type SupportTicketCountOutputTypeCountMessagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SupportMessageWhereInput
 }
 
 
@@ -855,10 +855,10 @@ export type SupportTicketSelect<ExtArgs extends runtime.Types.Extensions.Interna
   closedAt?: boolean
   userId?: boolean
   assignedToId?: boolean
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  assignedTo?: boolean | Prisma.SupportTicket$assignedToArgs<ExtArgs>
-  messages?: boolean | Prisma.SupportTicket$messagesArgs<ExtArgs>
   auditLogs?: boolean | Prisma.SupportTicket$auditLogsArgs<ExtArgs>
+  messages?: boolean | Prisma.SupportTicket$messagesArgs<ExtArgs>
+  assignedTo?: boolean | Prisma.SupportTicket$assignedToArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.SupportTicketCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["supportTicket"]>
 
@@ -870,8 +870,8 @@ export type SupportTicketSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   closedAt?: boolean
   userId?: boolean
   assignedToId?: boolean
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   assignedTo?: boolean | Prisma.SupportTicket$assignedToArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["supportTicket"]>
 
 export type SupportTicketSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -882,8 +882,8 @@ export type SupportTicketSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   closedAt?: boolean
   userId?: boolean
   assignedToId?: boolean
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   assignedTo?: boolean | Prisma.SupportTicket$assignedToArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["supportTicket"]>
 
 export type SupportTicketSelectScalar = {
@@ -898,28 +898,28 @@ export type SupportTicketSelectScalar = {
 
 export type SupportTicketOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "status" | "createdAt" | "updatedAt" | "closedAt" | "userId" | "assignedToId", ExtArgs["result"]["supportTicket"]>
 export type SupportTicketInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  assignedTo?: boolean | Prisma.SupportTicket$assignedToArgs<ExtArgs>
-  messages?: boolean | Prisma.SupportTicket$messagesArgs<ExtArgs>
   auditLogs?: boolean | Prisma.SupportTicket$auditLogsArgs<ExtArgs>
+  messages?: boolean | Prisma.SupportTicket$messagesArgs<ExtArgs>
+  assignedTo?: boolean | Prisma.SupportTicket$assignedToArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.SupportTicketCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type SupportTicketIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   assignedTo?: boolean | Prisma.SupportTicket$assignedToArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type SupportTicketIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   assignedTo?: boolean | Prisma.SupportTicket$assignedToArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 
 export type $SupportTicketPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "SupportTicket"
   objects: {
-    user: Prisma.$UserPayload<ExtArgs>
-    assignedTo: Prisma.$UserPayload<ExtArgs> | null
-    messages: Prisma.$SupportMessagePayload<ExtArgs>[]
     auditLogs: Prisma.$SupportAuditLogPayload<ExtArgs>[]
+    messages: Prisma.$SupportMessagePayload<ExtArgs>[]
+    assignedTo: Prisma.$UserPayload<ExtArgs> | null
+    user: Prisma.$UserPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1323,10 +1323,10 @@ readonly fields: SupportTicketFieldRefs;
  */
 export interface Prisma__SupportTicketClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  assignedTo<T extends Prisma.SupportTicket$assignedToArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SupportTicket$assignedToArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-  messages<T extends Prisma.SupportTicket$messagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SupportTicket$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupportMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   auditLogs<T extends Prisma.SupportTicket$auditLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SupportTicket$auditLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupportAuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  messages<T extends Prisma.SupportTicket$messagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SupportTicket$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupportMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  assignedTo<T extends Prisma.SupportTicket$assignedToArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SupportTicket$assignedToArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1759,22 +1759,27 @@ export type SupportTicketDeleteManyArgs<ExtArgs extends runtime.Types.Extensions
 }
 
 /**
- * SupportTicket.assignedTo
+ * SupportTicket.auditLogs
  */
-export type SupportTicket$assignedToArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type SupportTicket$auditLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the User
+   * Select specific fields to fetch from the SupportAuditLog
    */
-  select?: Prisma.UserSelect<ExtArgs> | null
+  select?: Prisma.SupportAuditLogSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the User
+   * Omit specific fields from the SupportAuditLog
    */
-  omit?: Prisma.UserOmit<ExtArgs> | null
+  omit?: Prisma.SupportAuditLogOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.UserInclude<ExtArgs> | null
-  where?: Prisma.UserWhereInput
+  include?: Prisma.SupportAuditLogInclude<ExtArgs> | null
+  where?: Prisma.SupportAuditLogWhereInput
+  orderBy?: Prisma.SupportAuditLogOrderByWithRelationInput | Prisma.SupportAuditLogOrderByWithRelationInput[]
+  cursor?: Prisma.SupportAuditLogWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SupportAuditLogScalarFieldEnum | Prisma.SupportAuditLogScalarFieldEnum[]
 }
 
 /**
@@ -1802,27 +1807,22 @@ export type SupportTicket$messagesArgs<ExtArgs extends runtime.Types.Extensions.
 }
 
 /**
- * SupportTicket.auditLogs
+ * SupportTicket.assignedTo
  */
-export type SupportTicket$auditLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type SupportTicket$assignedToArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the SupportAuditLog
+   * Select specific fields to fetch from the User
    */
-  select?: Prisma.SupportAuditLogSelect<ExtArgs> | null
+  select?: Prisma.UserSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the SupportAuditLog
+   * Omit specific fields from the User
    */
-  omit?: Prisma.SupportAuditLogOmit<ExtArgs> | null
+  omit?: Prisma.UserOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.SupportAuditLogInclude<ExtArgs> | null
-  where?: Prisma.SupportAuditLogWhereInput
-  orderBy?: Prisma.SupportAuditLogOrderByWithRelationInput | Prisma.SupportAuditLogOrderByWithRelationInput[]
-  cursor?: Prisma.SupportAuditLogWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.SupportAuditLogScalarFieldEnum | Prisma.SupportAuditLogScalarFieldEnum[]
+  include?: Prisma.UserInclude<ExtArgs> | null
+  where?: Prisma.UserWhereInput
 }
 
 /**
