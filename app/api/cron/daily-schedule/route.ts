@@ -5,8 +5,8 @@ import { toZonedTime } from "date-fns-tz";
 import { format, startOfDay } from "date-fns";
 
 const TIMEZONE = "America/Sao_Paulo";
-const MIN_HOUR_TO_SEND = "07:00";
-const MAX_HOUR_TO_SEND = "07:10";
+const MIN_HOUR_TO_SEND = "16:27";
+const MAX_HOUR_TO_SEND = "16:30";
 
 function verifyBearerToken(
   authHeader: string | null,
