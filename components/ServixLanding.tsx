@@ -284,7 +284,7 @@ export default function ServixLanding() {
           rel="noreferrer"
           className="sx-nav-cta"
         >
-          Testar 90 dias →
+          Iniciar Agora →
         </Link>
       </nav>
 
