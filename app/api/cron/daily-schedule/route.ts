@@ -5,8 +5,8 @@ import { toZonedTime } from "date-fns-tz";
 import { format, startOfDay } from "date-fns";
 
 const TIMEZONE = "America/Sao_Paulo";
-const MIN_HOUR_TO_SEND = "16:41";
-const MAX_HOUR_TO_SEND = "16:45";
+const MIN_HOUR_TO_SEND = "16:50";
+const MAX_HOUR_TO_SEND = "16:55";
 
 function verifyBearerToken(
   authHeader: string | null,
@@ -25,7 +25,8 @@ export async function GET(request: Request) {
   }
 
   // Converte para horário de Brasília (servidor roda em UTC)
-  const nowBrt = toZonedTime(new Date(), TIMEZONE);
+  const nowUtc = new Date();
+  const nowBrt = toZonedTime(nowUtc, TIMEZONE);
   const currentTime = format(nowBrt, "HH:mm");
 
   // Janela de envio: só executa entre 07:00 e 07:10 BRT
@@ -35,12 +36,22 @@ export async function GET(request: Request) {
       failed: 0,
       total: 0,
       skipped: true,
-      reason: `Fora da janela de envio (${MIN_HOUR_TO_SEND}–${MAX_HOUR_TO_SEND}). Horário atual: ${currentTime}.`,
+      reason: `Fora da janela de envio (${MIN_HOUR_TO_SEND}–${MAX_HOUR_TO_SEND}). Horário atual BRT: ${currentTime}.`,
     });
   }
 
-  // Só busca profissionais que ainda não receberam hoje
-  const startOfToday = startOfDay(nowBrt);
+  // startOfDay em BRT convertido corretamente para UTC para comparar com o banco
+  const startOfTodayBrt = startOfDay(nowBrt);
+  const startOfTodayUtc = new Date(
+    Date.UTC(
+      startOfTodayBrt.getFullYear(),
+      startOfTodayBrt.getMonth(),
+      startOfTodayBrt.getDate(),
+      3, // BRT = UTC-3, então meia-noite BRT = 03:00 UTC
+      0,
+      0,
+    ),
+  );
 
   const professionals = await prisma.professional.findMany({
     where: {
@@ -48,7 +59,7 @@ export async function GET(request: Request) {
       isActive: true,
       OR: [
         { lastScheduleSentAt: null },
-        { lastScheduleSentAt: { lt: startOfToday } },
+        { lastScheduleSentAt: { lt: startOfTodayUtc } },
       ],
     },
     select: { id: true },
@@ -64,15 +75,13 @@ export async function GET(request: Request) {
     });
   }
 
-  const today = new Date();
   const results = await Promise.allSettled(
     professionals.map(async (p) => {
-      await sendDailyScheduleToGroup(p.id, today);
+      await sendDailyScheduleToGroup(p.id, nowUtc);
 
-      // Marca como enviado só se o envio foi bem-sucedido
       await prisma.professional.update({
         where: { id: p.id },
-        data: { lastScheduleSentAt: new Date() },
+        data: { lastScheduleSentAt: nowUtc },
       });
     }),
   );
@@ -80,5 +89,13 @@ export async function GET(request: Request) {
   const sent = results.filter((r) => r.status === "fulfilled").length;
   const failed = results.filter((r) => r.status === "rejected").length;
 
-  return Response.json({ sent, failed, total: professionals.length });
+  return Response.json({
+    sent,
+    failed,
+    total: professionals.length,
+    debug: {
+      currentTimeBrt: currentTime,
+      startOfTodayUtc: startOfTodayUtc.toISOString(),
+    },
+  });
 }
