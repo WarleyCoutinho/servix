@@ -1,12 +1,12 @@
 import { timingSafeEqual } from "crypto";
 import { prisma } from "@/lib/prisma";
 import { sendDailyScheduleToGroup } from "@/lib/whatsapp-schedule";
-import { toZonedTime } from "date-fns-tz";
+import { toZonedTime, fromZonedTime } from "date-fns-tz";
 import { format, startOfDay } from "date-fns";
 
 const TIMEZONE = "America/Sao_Paulo";
-const MIN_HOUR_TO_SEND = "16:50";
-const MAX_HOUR_TO_SEND = "16:55";
+const MIN_HOUR_TO_SEND = "07:00";
+const MAX_HOUR_TO_SEND = "07:10";
 
 function verifyBearerToken(
   authHeader: string | null,
@@ -40,23 +40,16 @@ export async function GET(request: Request) {
     });
   }
 
-  // startOfDay em BRT convertido corretamente para UTC para comparar com o banco
+  // ✅ FIX 🔴: usa fromZonedTime em vez de offset hardcoded (UTC-3)
+  // Isso respeita horário de verão automaticamente (BRST = UTC-2)
   const startOfTodayBrt = startOfDay(nowBrt);
-  const startOfTodayUtc = new Date(
-    Date.UTC(
-      startOfTodayBrt.getFullYear(),
-      startOfTodayBrt.getMonth(),
-      startOfTodayBrt.getDate(),
-      3, // BRT = UTC-3, então meia-noite BRT = 03:00 UTC
-      0,
-      0,
-    ),
-  );
+  const startOfTodayUtc = fromZonedTime(startOfTodayBrt, TIMEZONE);
 
   const professionals = await prisma.professional.findMany({
     where: {
-      whatsappGroupName: { not: null },
       isActive: true,
+      // ✅ FIX 🟢: filtra também string vazia além de null
+      NOT: [{ whatsappGroupName: null }, { whatsappGroupName: "" }],
       OR: [
         { lastScheduleSentAt: null },
         { lastScheduleSentAt: { lt: startOfTodayUtc } },
@@ -77,21 +70,40 @@ export async function GET(request: Request) {
 
   const results = await Promise.allSettled(
     professionals.map(async (p) => {
-      await sendDailyScheduleToGroup(p.id, nowUtc);
-
+      // ✅ FIX 🟡: marca como enviado ANTES de enviar para evitar race condition
+      // em caso de retry simultâneo do cron (Vercel, Railway, etc.)
       await prisma.professional.update({
         where: { id: p.id },
         data: { lastScheduleSentAt: nowUtc },
       });
+
+      // Se o envio falhar, o campo já está marcado — comportamento seguro:
+      // evita spam em caso de falha parcial. Ajuste se preferir reverter em erro.
+      await sendDailyScheduleToGroup(p.id, nowUtc);
     }),
   );
 
   const sent = results.filter((r) => r.status === "fulfilled").length;
-  const failed = results.filter((r) => r.status === "rejected").length;
+
+  // ✅ FIX 🟡: loga detalhes dos erros em vez de engolir silenciosamente
+  const failedResults = results.filter(
+    (r): r is PromiseRejectedResult => r.status === "rejected",
+  );
+
+  if (failedResults.length > 0) {
+    console.error(
+      `[cron/send-schedule] ${failedResults.length} envio(s) falharam:`,
+      failedResults.map((r, i) => ({
+        index: i,
+        professionalId: professionals[i]?.id,
+        reason: r.reason instanceof Error ? r.reason.message : r.reason,
+      })),
+    );
+  }
 
   return Response.json({
     sent,
-    failed,
+    failed: failedResults.length,
     total: professionals.length,
     debug: {
       currentTimeBrt: currentTime,
