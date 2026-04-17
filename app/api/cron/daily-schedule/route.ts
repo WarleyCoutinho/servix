@@ -5,8 +5,8 @@ import { toZonedTime, fromZonedTime } from "date-fns-tz";
 import { format, startOfDay } from "date-fns";
 
 const TIMEZONE = "America/Sao_Paulo";
-/* const MIN_HOUR_TO_SEND = "07:00";
-const MAX_HOUR_TO_SEND = "07:10"; */
+const MIN_HOUR_TO_SEND = "07:00";
+const MAX_HOUR_TO_SEND = "07:10";
 
 function verifyBearerToken(
   authHeader: string | null,
@@ -30,7 +30,7 @@ export async function GET(request: Request) {
   const currentTime = format(nowBrt, "HH:mm");
 
   // Janela de envio: só executa entre 07:00 e 07:10 BRT
-  /*   if (currentTime < MIN_HOUR_TO_SEND || currentTime > MAX_HOUR_TO_SEND) {
+  if (currentTime < MIN_HOUR_TO_SEND || currentTime > MAX_HOUR_TO_SEND) {
     return Response.json({
       sent: 0,
       failed: 0,
@@ -38,7 +38,7 @@ export async function GET(request: Request) {
       skipped: true,
       reason: `Fora da janela de envio (${MIN_HOUR_TO_SEND}–${MAX_HOUR_TO_SEND}). Horário atual BRT: ${currentTime}.`,
     });
-  } */
+  }
 
   // ✅ FIX 🔴: usa fromZonedTime em vez de offset hardcoded (UTC-3)
   // Isso respeita horário de verão automaticamente (BRST = UTC-2)
