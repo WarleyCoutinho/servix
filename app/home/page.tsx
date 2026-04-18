@@ -1,7 +1,7 @@
 import BookingItem from "@/components/booking-item";
 import Header from "@/components/header";
-import bannerDark from "@/public/servix_dark.png";
-import bannerLight from "@/public/servix_light.png";
+import bannerDark from "@/public/servix_dark.svg";
+import bannerLight from "@/public/servix_light.svg";
 import Image from "next/image";
 import { Suspense } from "react";
 
