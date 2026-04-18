@@ -322,17 +322,9 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
                       disabled={{ before: today }}
                       classNames={{
                         cell: "w-full",
-                        day: "w-[36px] h-[36px] mx-auto text-sm bg-transparent rounded-full transition-colors hover:bg-muted data-[selected=true]:bg-primary data-[selected=true]:text-primary-foreground data-[selected=true]:hover:bg-primary",
-                        day_today: [
-                          // fundo: verde lima com 20% opacidade no light, 15% no dark
-                          "bg-primary/20 dark:bg-primary/15",
-                          // texto: verde lima vibrante nos dois modos
-                          "text-primary font-bold",
-                          // hover: aumenta para 40% de opacidade
-                          "hover:bg-primary/40 dark:hover:bg-primary/30",
-                          // ring sutil pra dar mais destaque
-                          "ring-1 ring-primary/50 dark:ring-primary/40",
-                        ].join(" "),
+                        day: "w-[36px] h-[36px] mx-auto text-sm bg-transparent rounded-full transition-colors hover:bg-muted data-[selected=true]:bg-primary data-[selected=true]:text-primary-foreground data-[selected=true]:hover:bg-primary data-[selected=true]:ring-0",
+                        day_today:
+                          "!bg-primary/25 !text-primary !font-bold !ring-1 !ring-primary/60 hover:!bg-primary/40 data-[selected=true]:!bg-primary data-[selected=true]:!text-primary-foreground data-[selected=true]:!ring-0",
                         head_cell:
                           "w-full text-xs font-normal text-muted-foreground capitalize",
                         caption: "capitalize",
