@@ -72,7 +72,7 @@ const Footer = () => {
           <p className="text-xs text-muted-foreground">
             Feito com cuidado para barbearias e salões de beleza pela{" "}
             <Link
-              href="https://adapticode.com.br"
+              href="https://www.adapticode.com.br"
               target="_blank"
               rel="noopener noreferrer"
               className="font-bold uppercase tracking-wider hover:text-foreground hover:scale-105 inline-block transition-all duration-200"
