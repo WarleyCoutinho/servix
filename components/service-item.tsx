@@ -9,7 +9,16 @@ import { authClient } from "@/lib/auth-client";
 import { formatCurrency } from "@/lib/utils";
 import { loadStripe } from "@stripe/stripe-js";
 import { ptBR } from "date-fns/locale";
-import { AlertTriangle, CreditCard, HandCoins, Info, Loader2, LogIn, User,ImagePlus } from "lucide-react";
+import {
+  AlertTriangle,
+  CreditCard,
+  HandCoins,
+  Info,
+  Loader2,
+  LogIn,
+  User,
+  ImagePlus,
+} from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -52,8 +61,10 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
   const [sheetIsOpen, setSheetIsOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const { data: session } = authClient.useSession();
-  const { executeAsync: executeCheckoutBooking, isPending: isCreatingCheckout } =
-    useAction(createBookingCheckoutSession);
+  const {
+    executeAsync: executeCheckoutBooking,
+    isPending: isCreatingCheckout,
+  } = useAction(createBookingCheckoutSession);
   const { executeAsync: executeDirectBooking, isPending: isCreatingDirect } =
     useAction(createBooking);
 
@@ -93,7 +104,8 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
   );
 
   const hasStripePayment =
-    selectedProfessionalData?.acceptsCard || selectedProfessionalData?.acceptsPix;
+    selectedProfessionalData?.acceptsCard ||
+    selectedProfessionalData?.acceptsPix;
   const hasPayAfterService = selectedProfessionalData?.acceptsPayAfterService;
 
   const handleConfirmBooking = async () => {
@@ -101,9 +113,10 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
       return;
     }
 
-    const effectivePaymentMethod = hasPayAfterService && !hasStripePayment
-      ? "pay_after_service"
-      : selectedPaymentMethod;
+    const effectivePaymentMethod =
+      hasPayAfterService && !hasStripePayment
+        ? "pay_after_service"
+        : selectedPaymentMethod;
 
     if (!effectivePaymentMethod && hasPayAfterService && hasStripePayment) {
       return toast.error("Selecione uma forma de pagamento.");
@@ -124,7 +137,9 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
       });
 
       if (!result) {
-        return toast.error("Erro ao criar agendamento. Por favor, tente novamente.");
+        return toast.error(
+          "Erro ao criar agendamento. Por favor, tente novamente.",
+        );
       }
       if (result.validationErrors) {
         const errors = result.validationErrors;
@@ -132,15 +147,25 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
           errors._errors?.[0] ||
           Object.values(errors).find(
             (v): v is { _errors: string[] } =>
-              v != null && typeof v === "object" && "_errors" in v && Array.isArray((v as { _errors?: unknown })._errors),
+              v != null &&
+              typeof v === "object" &&
+              "_errors" in v &&
+              Array.isArray((v as { _errors?: unknown })._errors),
           )?._errors?.[0];
-        return toast.error(firstError || "Erro ao criar agendamento. Por favor, tente novamente.");
+        return toast.error(
+          firstError ||
+            "Erro ao criar agendamento. Por favor, tente novamente.",
+        );
       }
       if (result.serverError) {
-        return toast.error("Erro ao criar agendamento. Por favor, tente novamente.");
+        return toast.error(
+          "Erro ao criar agendamento. Por favor, tente novamente.",
+        );
       }
 
-      toast.success("Agendamento confirmado! O pagamento será feito após o serviço.");
+      toast.success(
+        "Agendamento confirmado! O pagamento será feito após o serviço.",
+      );
       setSheetIsOpen(false);
       setSelectedDate(undefined);
       setSelectedProfessional(undefined);
@@ -166,7 +191,10 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
         errors._errors?.[0] ||
         Object.values(errors).find(
           (v): v is { _errors: string[] } =>
-            v != null && typeof v === "object" && "_errors" in v && Array.isArray((v as { _errors?: unknown })._errors),
+            v != null &&
+            typeof v === "object" &&
+            "_errors" in v &&
+            Array.isArray((v as { _errors?: unknown })._errors),
         )?._errors?.[0];
       return toast.error(
         firstError || "Erro ao criar agendamento. Por favor, tente novamente.",
@@ -184,7 +212,9 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
       );
     }
     if (checkoutSession.pixFallback) {
-      toast.info("PIX indisponível para este profissional. Pagamento será por cartão.");
+      toast.info(
+        "PIX indisponível para este profissional. Pagamento será por cartão.",
+      );
     }
     if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
       return toast.error(
@@ -212,22 +242,22 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
   return (
     <div className="border-border bg-card flex gap-3 rounded-2xl border p-3 transition-shadow hover:shadow-sm">
       {/* Service Image */}
-   {/* Service Image */}
-<div className="relative h-27.5 w-27.5 shrink-0">
-  {service.imageUrl ? (
-    <Image
-      src={service.imageUrl}
-      alt={service.name}
-      fill
-      className="rounded-xl object-cover"
-      unoptimized
-    />
-  ) : (
-    <div className="bg-muted flex h-full w-full items-center justify-center rounded-xl">
-      <ImagePlus className="text-muted-foreground size-8" />
-    </div>
-  )}
-</div>
+      {/* Service Image */}
+      <div className="relative h-27.5 w-27.5 shrink-0">
+        {service.imageUrl ? (
+          <Image
+            src={service.imageUrl}
+            alt={service.name}
+            fill
+            className="rounded-xl object-cover"
+            unoptimized
+          />
+        ) : (
+          <div className="bg-muted flex h-full w-full items-center justify-center rounded-xl">
+            <ImagePlus className="text-muted-foreground size-8" />
+          </div>
+        )}
+      </div>
       {/* Service Info */}
       <div className="flex flex-1 flex-col justify-between">
         <div className="space-y-1">
@@ -290,7 +320,17 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
                       disabled={{ before: new Date() }}
                       classNames={{
                         cell: "w-full",
-                        day: "w-[36px] h-[36px] mx-auto text-sm bg-transparent hover:bg-muted rounded-full data-[selected=true]:bg-primary data-[selected=true]:text-primary-foreground",
+                        day: "w-[36px] h-[36px] mx-auto text-sm bg-transparent rounded-full transition-colors hover:bg-muted data-[selected=true]:bg-primary data-[selected=true]:text-primary-foreground data-[selected=true]:hover:bg-primary",
+                        day_today: [
+                          // fundo: verde lima com 20% opacidade no light, 15% no dark
+                          "bg-primary/20 dark:bg-primary/15",
+                          // texto: verde lima vibrante nos dois modos
+                          "text-primary font-bold",
+                          // hover: aumenta para 40% de opacidade
+                          "hover:bg-primary/40 dark:hover:bg-primary/30",
+                          // ring sutil pra dar mais destaque
+                          "ring-1 ring-primary/50 dark:ring-primary/40",
+                        ].join(" "),
                         head_cell:
                           "w-full text-xs font-normal text-muted-foreground capitalize",
                         caption: "capitalize",
@@ -365,12 +405,16 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
                     selectedProfessional &&
                     selectedProfessional !== refProfessionalId && (
                       <div className="px-5 pt-2">
-                        <Alert variant="destructive" className="border-amber-500/50 bg-amber-500/10 text-amber-700 dark:text-amber-400 [&>svg]:text-amber-600">
+                        <Alert
+                          variant="destructive"
+                          className="border-amber-500/50 bg-amber-500/10 text-amber-700 dark:text-amber-400 [&>svg]:text-amber-600"
+                        >
                           <AlertTriangle className="size-4" />
                           <AlertDescription className="text-xs leading-relaxed">
                             Se você não estiver no grupo desse profissional, não
                             vai poder acompanhar a agenda pelo WhatsApp.
-                            Recomendamos agendar com o profissional do seu grupo.
+                            Recomendamos agendar com o profissional do seu
+                            grupo.
                           </AlertDescription>
                         </Alert>
                       </div>
@@ -412,62 +456,73 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
                   )}
 
                   {/* Payment Method Selection */}
-                  {selectedDate && selectedProfessional && selectedTime && hasPayAfterService && (
-                    <div className="border-border border-b px-5 py-6">
-                      <p className="text-muted-foreground mb-3 text-sm font-medium">
-                        Forma de pagamento
-                      </p>
-                      <div className="space-y-2">
-                        {hasStripePayment && (
+                  {selectedDate &&
+                    selectedProfessional &&
+                    selectedTime &&
+                    hasPayAfterService && (
+                      <div className="border-border border-b px-5 py-6">
+                        <p className="text-muted-foreground mb-3 text-sm font-medium">
+                          Forma de pagamento
+                        </p>
+                        <div className="space-y-2">
+                          {hasStripePayment && (
+                            <button
+                              type="button"
+                              onClick={() => setSelectedPaymentMethod("online")}
+                              className={`flex w-full items-center gap-3 rounded-lg border p-4 transition-colors ${
+                                selectedPaymentMethod === "online"
+                                  ? "border-primary bg-primary/10"
+                                  : "border-border hover:bg-muted"
+                              }`}
+                            >
+                              <CreditCard className="size-5 shrink-0 text-muted-foreground" />
+                              <div className="text-left">
+                                <p className="text-sm font-medium">
+                                  Pagar agora
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  PIX ou cartão via plataforma
+                                </p>
+                              </div>
+                            </button>
+                          )}
                           <button
                             type="button"
-                            onClick={() => setSelectedPaymentMethod("online")}
+                            onClick={() =>
+                              setSelectedPaymentMethod("pay_after_service")
+                            }
                             className={`flex w-full items-center gap-3 rounded-lg border p-4 transition-colors ${
-                              selectedPaymentMethod === "online"
+                              selectedPaymentMethod === "pay_after_service" ||
+                              (!hasStripePayment && hasPayAfterService)
                                 ? "border-primary bg-primary/10"
                                 : "border-border hover:bg-muted"
                             }`}
                           >
-                            <CreditCard className="size-5 shrink-0 text-muted-foreground" />
+                            <HandCoins className="size-5 shrink-0 text-muted-foreground" />
                             <div className="text-left">
-                              <p className="text-sm font-medium">Pagar agora</p>
+                              <p className="text-sm font-medium">
+                                Pagar após o serviço
+                              </p>
                               <p className="text-xs text-muted-foreground">
-                                PIX ou cartão via plataforma
+                                Pagamento presencial após a conclusão
                               </p>
                             </div>
                           </button>
-                        )}
-                        <button
-                          type="button"
-                          onClick={() => setSelectedPaymentMethod("pay_after_service")}
-                          className={`flex w-full items-center gap-3 rounded-lg border p-4 transition-colors ${
-                            selectedPaymentMethod === "pay_after_service" || (!hasStripePayment && hasPayAfterService)
-                              ? "border-primary bg-primary/10"
-                              : "border-border hover:bg-muted"
-                          }`}
-                        >
-                          <HandCoins className="size-5 shrink-0 text-muted-foreground" />
-                          <div className="text-left">
-                            <p className="text-sm font-medium">Pagar após o serviço</p>
-                            <p className="text-xs text-muted-foreground">
-                              Pagamento presencial após a conclusão
-                            </p>
-                          </div>
-                        </button>
-                      </div>
+                        </div>
 
-                      {(selectedPaymentMethod === "pay_after_service" || (!hasStripePayment && hasPayAfterService)) && (
-                        <Alert className="mt-3 border-blue-500/50 bg-blue-500/10 text-blue-700 dark:text-blue-400 [&>svg]:text-blue-600">
-                          <Info className="size-4" />
-                          <AlertDescription className="text-xs leading-relaxed">
-                            O pagamento poderá ser feito via PIX, dinheiro ou
-                            cartão na maquininha do estabelecimento após a
-                            finalização do serviço.
-                          </AlertDescription>
-                        </Alert>
-                      )}
-                    </div>
-                  )}
+                        {(selectedPaymentMethod === "pay_after_service" ||
+                          (!hasStripePayment && hasPayAfterService)) && (
+                          <Alert className="mt-3 border-blue-500/50 bg-blue-500/10 text-blue-700 dark:text-blue-400 [&>svg]:text-blue-600">
+                            <Info className="size-4" />
+                            <AlertDescription className="text-xs leading-relaxed">
+                              O pagamento poderá ser feito via PIX, dinheiro ou
+                              cartão na maquininha do estabelecimento após a
+                              finalização do serviço.
+                            </AlertDescription>
+                          </Alert>
+                        )}
+                      </div>
+                    )}
 
                   {/* Booking Summary */}
                   {selectedDate && selectedProfessional && selectedTime && (
@@ -494,7 +549,9 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
                         !selectedDate ||
                         !selectedProfessional ||
                         !selectedTime ||
-                        (hasPayAfterService && hasStripePayment && !selectedPaymentMethod) ||
+                        (hasPayAfterService &&
+                          hasStripePayment &&
+                          !selectedPaymentMethod) ||
                         isCreatingBooking
                       }
                       onClick={handleConfirmBooking}
