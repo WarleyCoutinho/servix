@@ -323,8 +323,6 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
                       classNames={{
                         cell: "w-full",
                         day: "w-[36px] h-[36px] mx-auto text-sm !bg-transparent rounded-full transition-colors hover:bg-muted data-[selected=true]:!bg-primary data-[selected=true]:text-primary-foreground data-[selected=true]:hover:!bg-primary data-[selected=true]:ring-0",
-                        day_today:
-                          "!bg-primary/25 !text-primary !font-bold !ring-1 !ring-primary/60 hover:!bg-primary/40 data-[selected=true]:!bg-primary data-[selected=true]:!text-primary-foreground data-[selected=true]:!ring-0",
                         head_cell:
                           "w-full text-xs font-normal text-muted-foreground capitalize",
                         caption: "capitalize",
