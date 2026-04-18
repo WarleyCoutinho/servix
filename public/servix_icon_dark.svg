@@ -1,0 +1,46 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e1e1e"/>
+      <stop offset="100%" stop-color="#0a0a0a"/>
+    </linearGradient>
+    <linearGradient id="st" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#D4F56A"/>
+      <stop offset="55%" stop-color="#A8E63D"/>
+      <stop offset="100%" stop-color="#78B820"/>
+    </linearGradient>
+    <linearGradient id="sb" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A8E63D"/>
+      <stop offset="100%" stop-color="#4E8010"/>
+    </linearGradient>
+    <linearGradient id="sm" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#B8E845" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#6FA020" stop-opacity="0.5"/>
+    </linearGradient>
+    <linearGradient id="bv" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.20"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.28"/>
+    </linearGradient>
+    <filter id="sh">
+      <feDropShadow dx="0" dy="12" stdDeviation="18" flood-color="#000000" flood-opacity="0.55"/>
+    </filter>
+  </defs>
+  <rect width="512" height="512" rx="108" fill="url(#bg)"/>
+  <ellipse cx="256" cy="252" rx="148" ry="138" fill="#A8E63D" opacity="0.08"/>
+  <g filter="url(#sh)" transform="translate(0,22)">
+    <!-- top bar -->
+    <path d="M102 128 L348 128 L376 184 L130 184 Z" fill="url(#st)"/>
+    <path d="M102 128 L348 128 L376 184 L130 184 Z" fill="url(#bv)"/>
+    <!-- top-left descender -->
+    <path d="M102 128 L146 128 L176 236 L132 236 Z" fill="url(#st)"/>
+    <path d="M102 128 L146 128 L176 236 L132 236 Z" fill="url(#bv)" opacity="0.6"/>
+    <!-- mid connector -->
+    <path d="M126 226 L362 226 L334 282 L98 282 Z" fill="url(#sm)"/>
+    <!-- bottom-right descender -->
+    <path d="M332 236 L378 236 L408 344 L362 344 Z" fill="url(#sb)"/>
+    <path d="M332 236 L378 236 L408 344 L362 344 Z" fill="url(#bv)" opacity="0.5"/>
+    <!-- bottom bar -->
+    <path d="M138 310 L384 310 L410 366 L164 366 Z" fill="url(#sb)"/>
+    <path d="M138 310 L384 310 L410 366 L164 366 Z" fill="url(#bv)"/>
+  </g>
+</svg>

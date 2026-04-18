@@ -1,6 +1,7 @@
 import BookingItem from "@/components/booking-item";
 import Header from "@/components/header";
-import banner from "@/public/logo-marca-sem-fundo.png";
+import bannerDark from "@/public/servix_dark.svg";
+import bannerLight from "@/public/servix_light.svg";
 import Image from "next/image";
 import { Suspense } from "react";
 
@@ -30,6 +31,31 @@ interface HomeProps {
   searchParams: Promise<{ city?: string; state?: string }>;
 }
 
+const Banner = ({ children }: { children?: React.ReactNode }) => (
+  <div className="relative overflow-hidden rounded-2xl">
+    <Image
+      src={bannerDark}
+      alt="Agende nos melhores com a Servix"
+      sizes="(max-width: 768px) 100vw, 1024px"
+      className="hidden h-auto w-full rounded-2xl dark:block"
+      priority
+    />
+    <Image
+      src={bannerLight}
+      alt="Agende nos melhores com a Servix"
+      sizes="(max-width: 768px) 100vw, 1024px"
+      className="block h-auto w-full rounded-2xl dark:hidden"
+      priority
+    />
+    <div className="absolute inset-0 rounded-2xl bg-linear-to-r from-black/60 via-black/30 to-transparent" />
+    {children && (
+      <div className="absolute bottom-4 left-4 right-4 sm:bottom-8 sm:left-8">
+        {children}
+      </div>
+    )}
+  </div>
+);
+
 export default async function Home({ searchParams }: HomeProps) {
   const params = await searchParams;
   const filters = {
@@ -46,11 +72,12 @@ export default async function Home({ searchParams }: HomeProps) {
   const isRestricted = role === "owner" || role === "professional";
 
   if (isRestricted && userId) {
-    const [myBarbershops, { confirmedBookings }, categories] = await Promise.all([
-      getUserBarbershops(userId, role!),
-      getUserBookings(),
-      getServiceCategories(),
-    ]);
+    const [myBarbershops, { confirmedBookings }, categories] =
+      await Promise.all([
+        getUserBarbershops(userId, role!),
+        getUserBookings(),
+        getServiceCategories(),
+      ]);
 
     return (
       <div className="flex min-h-screen flex-col">
@@ -60,28 +87,18 @@ export default async function Home({ searchParams }: HomeProps) {
             <AuthErrorAlert />
           </Suspense>
 
-          <div className="relative overflow-hidden rounded-2xl">
-            <Image
-              src={banner}
-              alt="Agende nos melhores com a Servix"
-              sizes="(max-width: 768px) 100vw, 1024px"
-              className="h-auto w-full rounded-2xl"
-              priority
-            />
-            <div className="absolute inset-0 rounded-2xl bg-linear-to-r from-black/60 via-black/30 to-transparent" />
-            <div className="absolute bottom-4 left-4 right-4 sm:bottom-8 sm:left-8">
-              <h2 className="text-xl font-bold text-white sm:text-3xl">
-                {role === "owner"
-                  ? "Gerencie seu estabelecimento"
-                  : "Seu local de trabalho"}
-              </h2>
-              <p className="mt-1 text-sm text-white/80 sm:text-base">
-                {role === "owner"
-                  ? "Veja seus estabelecimentos e serviços cadastrados"
-                  : "Veja o estabelecimento onde você trabalha"}
-              </p>
-            </div>
-          </div>
+          <Banner>
+            <h2 className="text-xl font-bold text-white sm:text-3xl">
+              {role === "owner"
+                ? "Gerencie seu estabelecimento"
+                : "Seu local de trabalho"}
+            </h2>
+            <p className="mt-1 text-sm text-white/80 sm:text-base">
+              {role === "owner"
+                ? "Veja seus estabelecimentos e serviços cadastrados"
+                : "Veja o estabelecimento onde você trabalha"}
+            </p>
+          </Banner>
 
           {confirmedBookings.length > 0 && (
             <PageSectionContent>
@@ -96,7 +113,9 @@ export default async function Home({ searchParams }: HomeProps) {
 
           <PageSectionContent>
             <PageSectionTitle>
-              {role === "owner" ? "Meus Estabelecimentos" : "Meu Estabelecimento"}
+              {role === "owner"
+                ? "Meus Estabelecimentos"
+                : "Meu Estabelecimento"}
             </PageSectionTitle>
             {myBarbershops.length > 0 ? (
               <PageSectionScroller>
@@ -118,14 +137,19 @@ export default async function Home({ searchParams }: HomeProps) {
     );
   }
 
-  const [barbershops, popularBarbershops, { confirmedBookings }, categories, locations] =
-    await Promise.all([
-      getBarbershops(filters),
-      getPopularBarbershops(filters),
-      getUserBookings(),
-      getServiceCategories(),
-      getAvailableLocations(),
-    ]);
+  const [
+    barbershops,
+    popularBarbershops,
+    { confirmedBookings },
+    categories,
+    locations,
+  ] = await Promise.all([
+    getBarbershops(filters),
+    getPopularBarbershops(filters),
+    getUserBookings(),
+    getServiceCategories(),
+    getAvailableLocations(),
+  ]);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -136,24 +160,14 @@ export default async function Home({ searchParams }: HomeProps) {
         </Suspense>
         <QuickSearch categories={categories} />
 
-        <div className="relative overflow-hidden rounded-2xl">
-          <Image
-            src={banner}
-            alt="Agende nos melhores com a Servix"
-            sizes="(max-width: 768px) 100vw, 1024px"
-            className="h-auto w-full rounded-2xl"
-            priority
-          />
-          <div className="absolute inset-0 rounded-2xl bg-linear-to-r from-black/60 via-black/30 to-transparent" />
-          <div className="absolute bottom-4 left-4 right-4 sm:bottom-8 sm:left-8">
-            <h2 className="text-xl font-bold text-white sm:text-3xl">
-              Encontre barbearias e salões de beleza perto de você.
-            </h2>
-            <p className="mt-1 text-sm text-white/80 sm:text-base">
-              Agende com os melhores profissionais da sua cidade
-            </p>
-          </div>
-        </div>
+        <Banner>
+          <h2 className="text-xl font-bold text-white sm:text-3xl">
+            Encontre barbearias e salões de beleza perto de você.
+          </h2>
+          <p className="mt-1 text-sm text-white/80 sm:text-base">
+            Agende com os melhores profissionais da sua cidade
+          </p>
+        </Banner>
 
         {locations.length > 0 && (
           <Suspense fallback={null}>
@@ -175,6 +189,7 @@ export default async function Home({ searchParams }: HomeProps) {
             </PageSectionScroller>
           </PageSectionContent>
         )}
+
         <PageSectionContent>
           <PageSectionTitle>Barbearias e Salões</PageSectionTitle>
           {barbershops.length > 0 ? (
@@ -189,6 +204,7 @@ export default async function Home({ searchParams }: HomeProps) {
             </p>
           )}
         </PageSectionContent>
+
         <PageSectionContent>
           <PageSectionTitle>Barbearias e Salões populares</PageSectionTitle>
           {popularBarbershops.length > 0 ? (
@@ -199,7 +215,8 @@ export default async function Home({ searchParams }: HomeProps) {
             </PageSectionScroller>
           ) : (
             <p className="text-sm text-muted-foreground">
-              Nenhum estabelecimento popular encontrado para a localização selecionada.
+              Nenhum estabelecimento popular encontrado para a localização
+              selecionada.
             </p>
           )}
         </PageSectionContent>
