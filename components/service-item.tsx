@@ -238,6 +238,8 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
     setSelectedTime(undefined);
     setSelectedPaymentMethod(undefined);
   };
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
   return (
     <div className="border-border bg-card flex gap-3 rounded-2xl border p-3 transition-shadow hover:shadow-sm">
@@ -317,7 +319,7 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
                       onSelect={handleDateSelect}
                       locale={ptBR}
                       className="w-full p-0"
-                      disabled={{ before: new Date() }}
+                      disabled={{ before: today }}
                       classNames={{
                         cell: "w-full",
                         day: "w-[36px] h-[36px] mx-auto text-sm bg-transparent rounded-full transition-colors hover:bg-muted data-[selected=true]:bg-primary data-[selected=true]:text-primary-foreground data-[selected=true]:hover:bg-primary",
