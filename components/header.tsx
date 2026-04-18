@@ -1,7 +1,8 @@
 "use client";
 
 import { authClient } from "@/lib/auth-client";
-import logo from "@/public/logo-sem-fundo.png";
+import logoDark from "@/public/servix_logo_horizontal.svg";
+import logoLight from "@/public/servix_logo_light.svg";
 import {
   CalendarDays,
   ChevronDown,
@@ -60,11 +61,20 @@ const Header = ({ categories = [] }: HeaderProps) => {
         <div className="flex items-center gap-6">
           <Link href={isLoggedIn ? "/home" : "/"} className="shrink-0">
             <Image
-              src={logo}
-              alt="logo marca para negócios de beleza"
-              width={150}
-              height={28}
+              src={logoLight}
+              alt="Servix"
+              width={200}
+              height={54}
               priority
+              className="block dark:hidden"
+            />
+            <Image
+              src={logoDark}
+              alt="Servix"
+              width={200}
+              height={54}
+              priority
+              className="hidden dark:block"
             />
           </Link>
 

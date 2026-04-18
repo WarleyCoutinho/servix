@@ -1,7 +1,7 @@
 import BookingItem from "@/components/booking-item";
 import Header from "@/components/header";
-import bannerDark from "@/public/servix_dark.svg";
-import bannerLight from "@/public/servix_light.svg";
+import bannerDark from "@/public/servix_dark.png";
+import bannerLight from "@/public/servix_light.png";
 import Image from "next/image";
 import { Suspense } from "react";
 
@@ -49,13 +49,12 @@ const Banner = ({ children }: { children?: React.ReactNode }) => (
     />
     <div className="absolute inset-0 rounded-2xl bg-linear-to-r from-black/60 via-black/30 to-transparent" />
     {children && (
-      <div className="absolute bottom-4 left-4 right-4 sm:bottom-8 sm:left-8">
+      <div className="absolute bottom-[8%] left-4 right-4 sm:bottom-[10%] sm:left-8 md:bottom-[12%]">
         {children}
       </div>
     )}
   </div>
 );
-
 export default async function Home({ searchParams }: HomeProps) {
   const params = await searchParams;
   const filters = {
@@ -160,14 +159,7 @@ export default async function Home({ searchParams }: HomeProps) {
         </Suspense>
         <QuickSearch categories={categories} />
 
-        <Banner>
-          <h2 className="text-xl font-bold text-white sm:text-3xl">
-            Encontre barbearias e salões de beleza perto de você.
-          </h2>
-          <p className="mt-1 text-sm text-white/80 sm:text-base">
-            Agende com os melhores profissionais da sua cidade
-          </p>
-        </Banner>
+        <Banner />
 
         {locations.length > 0 && (
           <Suspense fallback={null}>

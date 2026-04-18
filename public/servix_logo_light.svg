@@ -1,0 +1,59 @@
+<svg width="600" height="160" viewBox="0 0 600 160" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="st2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8AC830"/>
+      <stop offset="55%" stop-color="#6BA820"/>
+      <stop offset="100%" stop-color="#4E7C10"/>
+    </linearGradient>
+    <linearGradient id="sb2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6BA820"/>
+      <stop offset="100%" stop-color="#3A5E0A"/>
+    </linearGradient>
+    <linearGradient id="sm2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7BBF24" stop-opacity="0.42"/>
+      <stop offset="100%" stop-color="#4E7C10" stop-opacity="0.42"/>
+    </linearGradient>
+    <linearGradient id="bv2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.38"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.10"/>
+    </linearGradient>
+  </defs>
+
+  <g transform="translate(10, 28) scale(0.195)">
+    <g transform="translate(0,22)">
+      <path d="M102 128 L348 128 L376 184 L130 184 Z" fill="url(#st2)"/>
+      <path d="M102 128 L348 128 L376 184 L130 184 Z" fill="url(#bv2)"/>
+      <path d="M102 128 L146 128 L176 236 L132 236 Z" fill="url(#st2)"/>
+      <path d="M102 128 L146 128 L176 236 L132 236 Z" fill="url(#bv2)" opacity="0.6"/>
+      <path d="M126 226 L362 226 L334 282 L98 282 Z" fill="url(#sm2)"/>
+      <path d="M332 236 L378 236 L408 344 L362 344 Z" fill="url(#sb2)"/>
+      <path d="M332 236 L378 236 L408 344 L362 344 Z" fill="url(#bv2)" opacity="0.5"/>
+      <path d="M138 310 L384 310 L410 366 L164 366 Z" fill="url(#sb2)"/>
+      <path d="M138 310 L384 310 L410 366 L164 366 Z" fill="url(#bv2)"/>
+    </g>
+  </g>
+
+  <line x1="108" y1="24" x2="108" y2="136" stroke="#ccc" stroke-width="1"/>
+
+  <text
+    x="124"
+    y="104"
+    font-family="'Barlow Condensed', 'Arial Narrow', sans-serif"
+    font-weight="800"
+    font-size="86"
+    letter-spacing="2"
+    fill="#0D0D0D"
+  >SERVIX</text>
+
+  <line x1="124" y1="118" x2="590" y2="118" stroke="#ddd" stroke-width="0.75"/>
+
+  <text
+    x="124"
+    y="140"
+    font-family="'Barlow', Arial, sans-serif"
+    font-weight="400"
+    font-size="12"
+    letter-spacing="3"
+    fill="#999"
+  >GESTÃO PROFISSIONAL · NEGÓCIOS DE BELEZA</text>
+</svg>
