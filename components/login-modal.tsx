@@ -8,7 +8,7 @@ import Image from "next/image";
 import logoDark from "@/public/servix_logo_horizontal.svg";
 import logoLight from "@/public/servix_logo_light.svg";
 import { Button } from "./ui/button";
-import { Dialog, DialogContent } from "./ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "./ui/dialog";
 
 interface LoginModalProps {
   open: boolean;
@@ -42,6 +42,7 @@ const LoginModal = ({ open, onOpenChange }: LoginModalProps) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg p-0 overflow-hidden gap-0">
+        <DialogTitle className="sr-only">Entrar no Servix</DialogTitle>
         <div className="flex flex-col sm:flex-row">
           {/* Lado esquerdo — destaque verde */}
           <div className="relative hidden sm:flex sm:w-2/5 flex-col justify-between bg-primary p-8 overflow-hidden">
