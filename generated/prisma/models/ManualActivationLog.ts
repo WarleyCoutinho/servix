@@ -206,8 +206,8 @@ export type ManualActivationLogWhereInput = {
   performedByRole?: Prisma.StringFilter<"ManualActivationLog"> | string
   professionalId?: Prisma.StringFilter<"ManualActivationLog"> | string
   performedById?: Prisma.StringFilter<"ManualActivationLog"> | string
-  performedBy?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   professional?: Prisma.XOR<Prisma.ProfessionalScalarRelationFilter, Prisma.ProfessionalWhereInput>
+  performedBy?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
 export type ManualActivationLogOrderByWithRelationInput = {
@@ -219,8 +219,8 @@ export type ManualActivationLogOrderByWithRelationInput = {
   performedByRole?: Prisma.SortOrder
   professionalId?: Prisma.SortOrder
   performedById?: Prisma.SortOrder
-  performedBy?: Prisma.UserOrderByWithRelationInput
   professional?: Prisma.ProfessionalOrderByWithRelationInput
+  performedBy?: Prisma.UserOrderByWithRelationInput
 }
 
 export type ManualActivationLogWhereUniqueInput = Prisma.AtLeast<{
@@ -235,8 +235,8 @@ export type ManualActivationLogWhereUniqueInput = Prisma.AtLeast<{
   performedByRole?: Prisma.StringFilter<"ManualActivationLog"> | string
   professionalId?: Prisma.StringFilter<"ManualActivationLog"> | string
   performedById?: Prisma.StringFilter<"ManualActivationLog"> | string
-  performedBy?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   professional?: Prisma.XOR<Prisma.ProfessionalScalarRelationFilter, Prisma.ProfessionalWhereInput>
+  performedBy?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id">
 
 export type ManualActivationLogOrderByWithAggregationInput = {
@@ -274,8 +274,8 @@ export type ManualActivationLogCreateInput = {
   stripeStatusAtMoment?: string | null
   performedAt?: Date | string
   performedByRole: string
-  performedBy: Prisma.UserCreateNestedOneWithoutManualActivationLogsInput
   professional: Prisma.ProfessionalCreateNestedOneWithoutManualActivationLogsInput
+  performedBy: Prisma.UserCreateNestedOneWithoutManualActivationLogsInput
 }
 
 export type ManualActivationLogUncheckedCreateInput = {
@@ -296,8 +296,8 @@ export type ManualActivationLogUpdateInput = {
   stripeStatusAtMoment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   performedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   performedByRole?: Prisma.StringFieldUpdateOperationsInput | string
-  performedBy?: Prisma.UserUpdateOneRequiredWithoutManualActivationLogsNestedInput
   professional?: Prisma.ProfessionalUpdateOneRequiredWithoutManualActivationLogsNestedInput
+  performedBy?: Prisma.UserUpdateOneRequiredWithoutManualActivationLogsNestedInput
 }
 
 export type ManualActivationLogUncheckedUpdateInput = {
@@ -666,8 +666,8 @@ export type ManualActivationLogSelect<ExtArgs extends runtime.Types.Extensions.I
   performedByRole?: boolean
   professionalId?: boolean
   performedById?: boolean
-  performedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   professional?: boolean | Prisma.ProfessionalDefaultArgs<ExtArgs>
+  performedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["manualActivationLog"]>
 
 export type ManualActivationLogSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -679,8 +679,8 @@ export type ManualActivationLogSelectCreateManyAndReturn<ExtArgs extends runtime
   performedByRole?: boolean
   professionalId?: boolean
   performedById?: boolean
-  performedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   professional?: boolean | Prisma.ProfessionalDefaultArgs<ExtArgs>
+  performedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["manualActivationLog"]>
 
 export type ManualActivationLogSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -692,8 +692,8 @@ export type ManualActivationLogSelectUpdateManyAndReturn<ExtArgs extends runtime
   performedByRole?: boolean
   professionalId?: boolean
   performedById?: boolean
-  performedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   professional?: boolean | Prisma.ProfessionalDefaultArgs<ExtArgs>
+  performedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["manualActivationLog"]>
 
 export type ManualActivationLogSelectScalar = {
@@ -709,23 +709,23 @@ export type ManualActivationLogSelectScalar = {
 
 export type ManualActivationLogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "action" | "reason" | "stripeStatusAtMoment" | "performedAt" | "performedByRole" | "professionalId" | "performedById", ExtArgs["result"]["manualActivationLog"]>
 export type ManualActivationLogInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  performedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   professional?: boolean | Prisma.ProfessionalDefaultArgs<ExtArgs>
+  performedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type ManualActivationLogIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  performedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   professional?: boolean | Prisma.ProfessionalDefaultArgs<ExtArgs>
+  performedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type ManualActivationLogIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  performedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   professional?: boolean | Prisma.ProfessionalDefaultArgs<ExtArgs>
+  performedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 
 export type $ManualActivationLogPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "ManualActivationLog"
   objects: {
-    performedBy: Prisma.$UserPayload<ExtArgs>
     professional: Prisma.$ProfessionalPayload<ExtArgs>
+    performedBy: Prisma.$UserPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1130,8 +1130,8 @@ readonly fields: ManualActivationLogFieldRefs;
  */
 export interface Prisma__ManualActivationLogClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  performedBy<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   professional<T extends Prisma.ProfessionalDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProfessionalDefaultArgs<ExtArgs>>): Prisma.Prisma__ProfessionalClient<runtime.Types.Result.GetResult<Prisma.$ProfessionalPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  performedBy<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.

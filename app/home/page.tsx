@@ -86,18 +86,7 @@ export default async function Home({ searchParams }: HomeProps) {
             <AuthErrorAlert />
           </Suspense>
 
-          <Banner>
-            <h2 className="text-xl font-bold text-white sm:text-3xl">
-              {role === "owner"
-                ? "Gerencie seu estabelecimento"
-                : "Seu local de trabalho"}
-            </h2>
-            <p className="mt-1 text-sm text-white/80 sm:text-base">
-              {role === "owner"
-                ? "Veja seus estabelecimentos e serviços cadastrados"
-                : "Veja o estabelecimento onde você trabalha"}
-            </p>
-          </Banner>
+          <Banner />
 
           {confirmedBookings.length > 0 && (
             <PageSectionContent>

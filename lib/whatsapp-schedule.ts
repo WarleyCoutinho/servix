@@ -5,7 +5,13 @@ import {
   generateTimeSlots,
   getDayOfWeekFromDate,
 } from "@/lib/schedule-utils";
-import { endOfDayBrt, formatBrt, isTodayBrt, startOfDayBrt, TIMEZONE } from "@/lib/timezone";
+import {
+  endOfDayBrt,
+  formatBrt,
+  isTodayBrt,
+  startOfDayBrt,
+  TIMEZONE,
+} from "@/lib/timezone";
 import { sendGroupMessage } from "@/lib/whatsapp";
 import { addMinutes, format } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
@@ -40,7 +46,11 @@ function buildScheduleMessage(
   const morningSlots: string[] = [];
   const afternoonSlots: string[] = [];
   const eveningSlots: string[] = [];
-  const stats: ScheduleStats = { finishedCount: 0, bookedCount: 0, freeCount: 0 };
+  const stats: ScheduleStats = {
+    finishedCount: 0,
+    bookedCount: 0,
+    freeCount: 0,
+  };
 
   for (const slot of allSlots) {
     const hour = Number(slot.split(":")[0]);
@@ -94,13 +104,19 @@ function buildScheduleMessage(
 
   const statsParts: string[] = [];
   if (stats.finishedCount > 0) {
-    statsParts.push(`✓ *${stats.finishedCount}* finalizado${stats.finishedCount !== 1 ? "s" : ""}`);
+    statsParts.push(
+      `✓ *${stats.finishedCount}* finalizado${stats.finishedCount !== 1 ? "s" : ""}`,
+    );
   }
   if (stats.bookedCount > 0) {
-    statsParts.push(`*${stats.bookedCount}* agendado${stats.bookedCount !== 1 ? "s" : ""}`);
+    statsParts.push(
+      `*${stats.bookedCount}* agendado${stats.bookedCount !== 1 ? "s" : ""}`,
+    );
   }
   if (stats.freeCount > 0) {
-    statsParts.push(`*${stats.freeCount}* livre${stats.freeCount !== 1 ? "s" : ""}`);
+    statsParts.push(
+      `*${stats.freeCount}* livre${stats.freeCount !== 1 ? "s" : ""}`,
+    );
   }
 
   lines.push(
@@ -119,8 +135,16 @@ function buildScheduleMessage(
 function isFutureDateBrt(date: Date): boolean {
   const nowBrt = toZonedTime(new Date(), TIMEZONE);
   const dateBrt = toZonedTime(date, TIMEZONE);
-  const nowDateOnly = new Date(nowBrt.getFullYear(), nowBrt.getMonth(), nowBrt.getDate());
-  const targetDateOnly = new Date(dateBrt.getFullYear(), dateBrt.getMonth(), dateBrt.getDate());
+  const nowDateOnly = new Date(
+    nowBrt.getFullYear(),
+    nowBrt.getMonth(),
+    nowBrt.getDate(),
+  );
+  const targetDateOnly = new Date(
+    dateBrt.getFullYear(),
+    dateBrt.getMonth(),
+    dateBrt.getDate(),
+  );
   return targetDateOnly > nowDateOnly;
 }
 
@@ -189,8 +213,7 @@ export async function sendDailyScheduleToGroup(
   // Respeitar intervalo de almoço configurado
   if (schedule.hasLunchBreak) {
     allSlots = allSlots.filter(
-      (slot) =>
-        slot < schedule.lunchStartTime || slot >= schedule.lunchEndTime,
+      (slot) => slot < schedule.lunchStartTime || slot >= schedule.lunchEndTime,
     );
   }
 
@@ -240,7 +263,9 @@ function buildBookedTimesMap(
   const map = new Map<string, BookingInfo>();
 
   for (const booking of bookings) {
-    const slotsNeeded = Math.ceil(booking.service.durationMinutes / DEFAULT_INTERVAL_MINUTES);
+    const slotsNeeded = Math.ceil(
+      booking.service.durationMinutes / DEFAULT_INTERVAL_MINUTES,
+    );
     const timeKey = formatBrt(booking.date, "HH:mm");
     map.set(timeKey, {
       serviceName: booking.service.name,
@@ -248,7 +273,10 @@ function buildBookedTimesMap(
     });
 
     for (let i = 1; i < slotsNeeded; i++) {
-      const nextSlotDate = addMinutes(booking.date, i * DEFAULT_INTERVAL_MINUTES);
+      const nextSlotDate = addMinutes(
+        booking.date,
+        i * DEFAULT_INTERVAL_MINUTES,
+      );
       const nextTimeKey = formatBrt(nextSlotDate, "HH:mm");
       map.set(nextTimeKey, {
         serviceName: `${booking.service.name} (cont.)`,

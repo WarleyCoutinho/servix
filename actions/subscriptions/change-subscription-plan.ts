@@ -129,7 +129,7 @@ export const changeSubscriptionPlan = ownerActionClient
       },
     });
 
-    await updateUserRoleBasedOnPlan(subscriptionBarbershopId); // removido segundo argumento
+    await updateUserRoleBasedOnPlan(subscriptionBarbershopId, plan);
 
     revalidatePath("/dashboard/owner/subscription");
     revalidatePath("/dashboard/owner/establishments");

@@ -18,9 +18,7 @@ const dayScheduleSchema = z.object({
   endTime: z.string().regex(timeRegex, "Formato de hora inválido (HH:mm)"),
   isAvailable: z.boolean(),
   hasLunchBreak: z.boolean(),
-  lunchStartTime: z
-    .string()
-    .regex(timeRegex, "Formato de hora inválido (HH:mm)"),
+  lunchStartTime: z.string().regex(timeRegex, "Formato de hora inválido (HH:mm)"),
   lunchEndTime: z.string().regex(timeRegex, "Formato de hora inválido (HH:mm)"),
 });
 
@@ -70,27 +68,19 @@ export const updateProfessionalSchedule = professionalActionClient
         if (bookingDayOfWeek !== schedule.dayOfWeek) continue;
 
         const bookingTime = formatBrt(booking.date, "HH:mm");
-        const slotsNeeded = Math.ceil(
-          booking.service.durationMinutes / DEFAULT_INTERVAL_MINUTES,
-        );
+        const slotsNeeded = Math.ceil(booking.service.durationMinutes / DEFAULT_INTERVAL_MINUTES);
 
         for (let i = 0; i < slotsNeeded; i++) {
-          const slotDate = addMinutes(
-            booking.date,
-            i * DEFAULT_INTERVAL_MINUTES,
-          );
+          const slotDate = addMinutes(booking.date, i * DEFAULT_INTERVAL_MINUTES);
           const slotTime = formatBrt(slotDate, "HH:mm");
 
-          if (
-            slotTime >= schedule.lunchStartTime &&
-            slotTime < schedule.lunchEndTime
-          ) {
+          if (slotTime >= schedule.lunchStartTime && slotTime < schedule.lunchEndTime) {
             const bookingDateFormatted = formatBrt(booking.date, "dd/MM/yyyy");
             const dayLabel = DAY_OF_WEEK_LABELS[schedule.dayOfWeek];
             throw new Error(
               `Não é possível alterar o intervalo de almoço de ${dayLabel}. ` +
-                `Existe um agendamento confirmado em ${bookingDateFormatted} às ${bookingTime} ` +
-                `com o cliente ${booking.user.name} que conflita com o novo horário de almoço.`,
+              `Existe um agendamento confirmado em ${bookingDateFormatted} às ${bookingTime} ` +
+              `com o cliente ${booking.user.name} que conflita com o novo horário de almoço.`
             );
           }
         }

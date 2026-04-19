@@ -116,7 +116,7 @@ export function SupportTicketsView({ tickets: initialTickets }: { tickets: Ticke
               <TableHeader>
                 <TableRow>
                   <TableHead>Cliente</TableHead>
-                  <TableHead>Barbearia/Salão de Beleza</TableHead>
+                  <TableHead>Barbearia</TableHead>
                   <TableHead>Plano</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Mensagens</TableHead>

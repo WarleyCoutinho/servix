@@ -166,6 +166,7 @@ export const createBookingCheckoutSession = protectedActionClient
                 product_data: {
                   name: `${service.barbershop.name} - ${service.name}`,
                   description: service.description,
+                  /* images: [service.imageUrl], */
                 },
               },
               quantity: 1,

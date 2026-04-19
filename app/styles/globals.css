@@ -8,15 +8,7 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* ─────────────────────────────────────────────
-   SERVIX — Light Mode
-   Base: fundo off-white acinzentado (#EBEBEA / oklch ~0.93)
-   Primary: verde lima elétrico (#A8E63D / oklch ~0.85 0.21 130)
-   Accent: verde mais saturado para hover
-   Texto primário: preto quase puro (#0D0D0D)
-   Texto secundário: cinza escuro (#3A3A3A)
-   Card: branco puro com borda sutil
-   ───────────────────────────────────────────── */
+
 :root {
   /* ── Brand ── */
   --lime: oklch(0.85 0.21 130);            /* #A8E63D — verde lima elétrico */
@@ -105,14 +97,7 @@
   --spacing: 0.25rem;
 }
 
-/* ─────────────────────────────────────────────
-   SERVIX — Dark Mode
-   Base: preto grafite profundo (#1A1A1A / oklch ~0.14)
-   Primary: verde lima elétrico (mesmo do light)
-   Cards: grafite ligeiramente elevado (#242424)
-   Borda: cinza escuro translúcido
-   Glow verde no fundo (gradiente sutil radial)
-   ───────────────────────────────────────────── */
+
 .dark {
   /* ── Brand ── */
   --lime: oklch(0.85 0.21 130);

@@ -2190,11 +2190,11 @@ export const ProfessionalScalarFieldEnum = {
   stripeAccountStatus: 'stripeAccountStatus',
   stripeOnboardingComplete: 'stripeOnboardingComplete',
   whatsappGroupName: 'whatsappGroupName',
+  lastScheduleSentAt: 'lastScheduleSentAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   userId: 'userId',
-  barbershopId: 'barbershopId',
-  lastScheduleSentAt: 'lastScheduleSentAt'
+  barbershopId: 'barbershopId'
 } as const
 
 export type ProfessionalScalarFieldEnum = (typeof ProfessionalScalarFieldEnum)[keyof typeof ProfessionalScalarFieldEnum]

@@ -13,12 +13,12 @@ const BarbershopItem = ({ barbershop, className }: BarbershopItemProps) => {
     <Link
       href={`/barbershops/${barbershop.id}`}
       className={cn(
-        "group relative block w-65 shrink-0 snap-start overflow-hidden rounded-2xl border border-border shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg",
+        "group relative block w-[260px] shrink-0 snap-start overflow-hidden rounded-2xl border border-border shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg",
         className,
       )}
     >
-      <div className="relative aspect-4/3">
-        <div className="absolute inset-0 z-10 bg-linear-to-t from-black/75 via-black/20 to-transparent" />
+      <div className="relative aspect-[4/3]">
+        <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
         <Image
           src={barbershop.imageUrl}
           alt={barbershop.name}

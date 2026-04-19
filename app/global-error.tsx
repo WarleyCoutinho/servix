@@ -1,7 +1,6 @@
 "use client";
 
 import { AlertCircle, RefreshCw, Home } from "lucide-react";
-import Link from 'next/link'
 
 interface GlobalErrorProps {
   error: Error & { digest?: string };
@@ -110,7 +109,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
             </div>
 
             <div style={{ display: "flex", gap: "0.75rem" }}>
-              <Link
+              <a
                 href="/"
                 style={{
                   flex: 1,
@@ -131,7 +130,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
               >
                 <Home style={{ width: "1rem", height: "1rem" }} />
                 Início
-              </Link>
+              </a>
               <button
                 onClick={reset}
                 style={{

@@ -17,7 +17,6 @@ import {
   Loader2,
   LogIn,
   User,
-  ImagePlus,
 } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
 import Image from "next/image";
@@ -238,28 +237,22 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
     setSelectedTime(undefined);
     setSelectedPaymentMethod(undefined);
   };
+
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
   return (
     <div className="border-border bg-card flex gap-3 rounded-2xl border p-3 transition-shadow hover:shadow-sm">
       {/* Service Image */}
-      {/* Service Image */}
       <div className="relative h-27.5 w-27.5 shrink-0">
-        {service.imageUrl ? (
-          <Image
-            src={service.imageUrl}
-            alt={service.name}
-            fill
-            className="rounded-xl object-cover"
-            unoptimized
-          />
-        ) : (
-          <div className="bg-muted flex h-full w-full items-center justify-center rounded-xl">
-            <ImagePlus className="text-muted-foreground size-8" />
-          </div>
-        )}
+        <Image
+          src={service.imageUrl}
+          alt={service.name}
+          fill
+          className="rounded-xl object-cover"
+        />
       </div>
+
       {/* Service Info */}
       <div className="flex flex-1 flex-col justify-between">
         <div className="space-y-1">

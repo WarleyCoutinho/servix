@@ -2,7 +2,6 @@ import { Toaster } from "@/components/ui/sonner";
 import { TanstackQueryProvider } from "@/providers/tanstack-query";
 import type { Metadata } from "next";
 import { Merriweather, Plus_Jakarta_Sans } from "next/font/google";
-import { Barlow, Barlow_Condensed } from "next/font/google";
 import "./styles/globals.css";
 import "./styles/servix.css";
 
@@ -17,21 +16,15 @@ const merriweather = Merriweather({
   weight: ["400"],
   style: ["italic"],
 });
-const barlow = Barlow({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-barlow",
-});
-
-const barlowCondensed = Barlow_Condensed({
-  subsets: ["latin"],
-  weight: ["400", "600", "700", "800", "900"],
-  variable: "--font-barlow-condensed",
-});
 
 export const metadata: Metadata = {
   title: "Servix",
-  description: "Servix é uma plataforma SaaS",
+  description: "Servix é uma plataforma SaaS para negócios de beleza",
+  icons: {
+    icon: "/servix_icon_dark.svg",
+    apple: "/servix_icon_dark.svg",
+    shortcut: "/servix_icon_dark.svg",
+  },
 };
 
 export default function RootLayout({
@@ -42,7 +35,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <body
-        className={`${plusJakartaSans.variable} ${merriweather.variable} font-sans antialiased ${barlow.variable} ${barlowCondensed.variable}`}
+        className={`${plusJakartaSans.variable} ${merriweather.variable} font-sans antialiased`}
       >
         <TanstackQueryProvider>
           {children}
