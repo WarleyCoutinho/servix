@@ -54,22 +54,22 @@ function buildScheduleMessage(
     const hour = Number(slot.split(":")[0]);
     const booking = bookedTimesMap.get(slot);
     const isPast = slot < currentTime;
+    const isCont = booking?.serviceName.endsWith("(cont.)");
 
-    if (isPast && !booking) continue;
+    // Slots passados sem agendamento e slots de continuação são invisíveis
+    if ((isPast && !booking) || isCont) continue;
 
     let line: string;
 
     if (isPast && booking) {
-      if (booking.serviceName.endsWith("(cont.)")) continue;
       stats.finishedCount++;
-      line = `~✦ ${slot} — ${booking.serviceName} · ${booking.clientName}~`;
+      line = `~✔ ${slot}  ${booking.serviceName} · ${booking.clientName}~`;
     } else if (booking) {
-      if (booking.serviceName.endsWith("(cont.)")) continue;
       stats.bookedCount++;
-      line = `🔵 *${slot}* — *${booking.clientName}*\n┗ _${booking.serviceName}_`;
+      line = `🔵 *${slot}*\n┗ *${booking.clientName}*  _${booking.serviceName}_`;
     } else {
       stats.freeCount++;
-      line = `○ *${slot}*  _livre_`;
+      line = `◦ ${slot}  _disponível_`;
     }
 
     if (hour < 12) morningSlots.push(line);
@@ -77,9 +77,11 @@ function buildScheduleMessage(
     else eveningSlots.push(line);
   }
 
+  // Cabeçalho impactante
   const lines: string[] = [
-    `✂️ *${professionalName}*`,
-    `📅 ${dayLabel}, ${dateFormatted}`,
+    `💈 *${professionalName.toUpperCase()}*`,
+    `▸ ${dayLabel}, ${dateFormatted}`,
+    ``,
     `━━━━━━━━━━━━━━━━━━━━━━━`,
     ``,
   ];
@@ -99,7 +101,7 @@ function buildScheduleMessage(
   const statsParts: string[] = [];
   if (stats.finishedCount > 0)
     statsParts.push(
-      `✅ ${stats.finishedCount} finalizado${stats.finishedCount !== 1 ? "s" : ""}`,
+      `✔ ${stats.finishedCount} finalizado${stats.finishedCount !== 1 ? "s" : ""}`,
     );
   if (stats.bookedCount > 0)
     statsParts.push(
@@ -107,15 +109,18 @@ function buildScheduleMessage(
     );
   if (stats.freeCount > 0)
     statsParts.push(
-      `○ ${stats.freeCount} livre${stats.freeCount !== 1 ? "s" : ""}`,
+      `◦ ${stats.freeCount} livre${stats.freeCount !== 1 ? "s" : ""}`,
     );
 
   lines.push(
     `━━━━━━━━━━━━━━━━━━━━━━━`,
+    ``,
     `📊 ${statsParts.join("  ·  ")}`,
+    ``,
     `━━━━━━━━━━━━━━━━━━━━━━━`,
     ``,
-    `🔗 *Agendar:* ${bookingUrl}`,
+    `📲 *Agendar:*`,
+    `${bookingUrl}`,
   );
 
   return lines.join("\n");
@@ -143,7 +148,9 @@ export async function sendDailyScheduleToGroup(
 ): Promise<void> {
   const date = new Date(bookingDate);
 
-  if (isFutureDateBrt(date)) return;
+  if (isFutureDateBrt(date)) {
+    return;
+  }
 
   const professional = await prisma.professional.findUnique({
     where: { id: professionalId },
@@ -154,18 +161,24 @@ export async function sendDailyScheduleToGroup(
     },
   });
 
-  if (!professional?.whatsappGroupName) return;
+  if (!professional?.whatsappGroupName) {
+    return;
+  }
 
   const dayOfWeek = getDayOfWeekFromDate(date);
   const schedule = professional.schedules.find(
     (s) => s.dayOfWeek === dayOfWeek,
   );
 
-  if (!schedule?.isAvailable) return;
+  if (!schedule?.isAvailable) {
+    return;
+  }
 
   const currentTime = getCurrentTimeBrt();
 
-  if (isTodayBrt(date) && currentTime >= schedule.endTime) return;
+  if (isTodayBrt(date) && currentTime >= schedule.endTime) {
+    return;
+  }
 
   const bookings = await prisma.booking.findMany({
     where: {
@@ -176,9 +189,7 @@ export async function sendDailyScheduleToGroup(
         lte: endOfDayBrt(date),
       },
     },
-    select: {
-      date: true,
-      clientName: true,
+    include: {
       service: { select: { name: true, durationMinutes: true } },
       user: { select: { name: true } },
     },
@@ -193,6 +204,7 @@ export async function sendDailyScheduleToGroup(
     DEFAULT_INTERVAL_MINUTES,
   );
 
+  // Respeitar intervalo de almoço configurado
   if (schedule.hasLunchBreak) {
     allSlots = allSlots.filter(
       (slot) => slot < schedule.lunchStartTime || slot >= schedule.lunchEndTime,
@@ -203,7 +215,9 @@ export async function sendDailyScheduleToGroup(
     (slot) => slot >= currentTime || bookedTimesMap.has(slot),
   );
 
-  if (!hasVisibleSlots) return;
+  if (!hasVisibleSlots) {
+    return;
+  }
 
   const dayLabel = DAY_OF_WEEK_LABELS[dayOfWeek];
   const dateFormatted = formatBrt(date, "dd/MM/yyyy");
@@ -236,7 +250,6 @@ export async function sendDailyScheduleToGroup(
 function buildBookedTimesMap(
   bookings: Array<{
     date: Date;
-    clientName: string | null;
     service: { name: string; durationMinutes: number };
     user: { name: string };
   }>,
@@ -248,11 +261,9 @@ function buildBookedTimesMap(
       booking.service.durationMinutes / DEFAULT_INTERVAL_MINUTES,
     );
     const timeKey = formatBrt(booking.date, "HH:mm");
-    const clientName = booking.clientName ?? booking.user.name;
-
     map.set(timeKey, {
       serviceName: booking.service.name,
-      clientName,
+      clientName: booking.user.name,
     });
 
     for (let i = 1; i < slotsNeeded; i++) {
@@ -263,7 +274,7 @@ function buildBookedTimesMap(
       const nextTimeKey = formatBrt(nextSlotDate, "HH:mm");
       map.set(nextTimeKey, {
         serviceName: `${booking.service.name} (cont.)`,
-        clientName,
+        clientName: booking.user.name,
       });
     }
   }
