@@ -43,7 +43,7 @@ export const POST = async (request: Request) => {
     request,
     process.env.STRIPE_WEBHOOK_SECRET_KEY,
     "STRIPE_SECRET_KEY",
-    "STRIPE_WEBHOOK_SECRET_KEY"
+    "STRIPE_WEBHOOK_SECRET_KEY",
   );
 
   if (!verification.success) {
@@ -75,10 +75,14 @@ export const POST = async (request: Request) => {
     switch (event.type) {
       case "checkout.session.completed": {
         const session = event.data.object;
-        console.log(`Processing checkout.session.completed: mode=${session.mode}, sessionId=${session.id}`);
+        console.log(
+          `Processing checkout.session.completed: mode=${session.mode}, sessionId=${session.id}`,
+        );
 
         if (session.mode === "subscription") {
-          const metadata = subscriptionMetadataSchema.safeParse(session.metadata);
+          const metadata = subscriptionMetadataSchema.safeParse(
+            session.metadata,
+          );
           if (metadata.success && session.subscription) {
             const subscriptionId =
               typeof session.subscription === "string"
@@ -96,7 +100,10 @@ export const POST = async (request: Request) => {
             );
 
             const activePlan = plan || SubscriptionPlan.BASIC;
-            await updateUserRoleBasedOnPlan(metadata.data.barbershopId, activePlan);
+            await updateUserRoleBasedOnPlan(
+              metadata.data.barbershopId,
+              activePlan,
+            );
 
             console.log(
               `Subscription ${subscriptionId} created for barbershop ${metadata.data.barbershopId} with plan ${activePlan}`,
@@ -106,7 +113,9 @@ export const POST = async (request: Request) => {
           const metadata = bookingMetadataSchema.safeParse(session.metadata);
           if (!metadata.success) {
             console.error("Invalid booking metadata", metadata.error);
-            throw new Error(`Invalid booking metadata: ${metadata.error.message}`);
+            throw new Error(
+              `Invalid booking metadata: ${metadata.error.message}`,
+            );
           }
 
           const expandedSession = await stripe.checkout.sessions.retrieve(
@@ -118,11 +127,15 @@ export const POST = async (request: Request) => {
 
           const paymentIntent =
             expandedSession.payment_intent as import("stripe").Stripe.PaymentIntent;
-          const charge = paymentIntent.latest_charge as import("stripe").Stripe.Charge | null;
+          const charge = paymentIntent.latest_charge as
+            | import("stripe").Stripe.Charge
+            | null;
           const chargeId = charge?.id;
           const transferId = charge?.transfer as string | null;
           const actualPaymentMethod =
-            charge?.payment_method_details?.type ?? paymentIntent.payment_method_types?.[0] ?? "card";
+            charge?.payment_method_details?.type ??
+            paymentIntent.payment_method_types?.[0] ??
+            "card";
 
           const professionalId = metadata.data.professionalId;
 
@@ -145,19 +158,32 @@ export const POST = async (request: Request) => {
               select: { durationMinutes: true },
             });
 
-            const newDuration = service?.durationMinutes ?? DEFAULT_INTERVAL_MINUTES;
-            const newSlotsNeeded = Math.ceil(newDuration / DEFAULT_INTERVAL_MINUTES);
+            const newDuration =
+              service?.durationMinutes ?? DEFAULT_INTERVAL_MINUTES;
+            const newSlotsNeeded = Math.ceil(
+              newDuration / DEFAULT_INTERVAL_MINUTES,
+            );
             const newStart = bookingDate.getTime();
-            const newEnd = addMinutes(bookingDate, newSlotsNeeded * DEFAULT_INTERVAL_MINUTES).getTime();
+            const newEnd = addMinutes(
+              bookingDate,
+              newSlotsNeeded * DEFAULT_INTERVAL_MINUTES,
+            ).getTime();
 
             for (const existing of existingBookings) {
               const existingDuration = existing.service.durationMinutes;
-              const existingSlotsNeeded = Math.ceil(existingDuration / DEFAULT_INTERVAL_MINUTES);
+              const existingSlotsNeeded = Math.ceil(
+                existingDuration / DEFAULT_INTERVAL_MINUTES,
+              );
               const existingStart = existing.date.getTime();
-              const existingEnd = addMinutes(existing.date, existingSlotsNeeded * DEFAULT_INTERVAL_MINUTES).getTime();
+              const existingEnd = addMinutes(
+                existing.date,
+                existingSlotsNeeded * DEFAULT_INTERVAL_MINUTES,
+              ).getTime();
 
               if (newStart < existingEnd && newEnd > existingStart) {
-                throw new Error(`Conflito de horário: profissional ${professionalId} já tem agendamento neste horário`);
+                throw new Error(
+                  `Conflito de horário: profissional ${professionalId} já tem agendamento neste horário`,
+                );
               }
             }
 
@@ -186,7 +212,7 @@ export const POST = async (request: Request) => {
             });
 
             console.log(
-              `Booking ${booking.id} created with payment for user ${metadata.data.userId}${transferId ? ` (transfer: ${transferId})` : ""}`
+              `Booking ${booking.id} created with payment for user ${metadata.data.userId}${transferId ? ` (transfer: ${transferId})` : ""}`,
             );
           });
 
@@ -202,7 +228,9 @@ export const POST = async (request: Request) => {
       case "customer.subscription.updated": {
         const subscription = event.data.object;
         const barbershopId = subscription.metadata?.barbershopId;
-        const newPlan = subscription.metadata?.plan as SubscriptionPlan | undefined;
+        const newPlan = subscription.metadata?.plan as
+          | SubscriptionPlan
+          | undefined;
 
         if (barbershopId) {
           const activePlan = newPlan || SubscriptionPlan.BASIC;
@@ -229,7 +257,8 @@ export const POST = async (request: Request) => {
                   oldPlan,
                   activePlan,
                 );
-                professionalsReactivated = upgradeResult.reactivatedProfessionals;
+                professionalsReactivated =
+                  upgradeResult.reactivatedProfessionals;
                 servicesReactivated = upgradeResult.reactivatedServices;
               } else {
                 const downgradeResult = await handlePlanDowngrade(
@@ -283,7 +312,9 @@ export const POST = async (request: Request) => {
       case "customer.subscription.deleted": {
         const subscription = event.data.object;
         const barbershopId = subscription.metadata?.barbershopId;
-        const plan = subscription.metadata?.plan as SubscriptionPlan | undefined;
+        const plan = subscription.metadata?.plan as
+          | SubscriptionPlan
+          | undefined;
 
         if (barbershopId) {
           await syncSubscriptionFromStripe(subscription, barbershopId, plan);
@@ -308,11 +339,15 @@ export const POST = async (request: Request) => {
           const subscription =
             await stripe.subscriptions.retrieve(subscriptionId);
           const barbershopId = subscription.metadata?.barbershopId;
-          const plan = subscription.metadata?.plan as SubscriptionPlan | undefined;
+          const plan = subscription.metadata?.plan as
+            | SubscriptionPlan
+            | undefined;
 
           if (barbershopId) {
             await syncSubscriptionFromStripe(subscription, barbershopId, plan);
-            console.log(`Invoice ${invoice.id} paid for subscription ${subscriptionId}`);
+            console.log(
+              `Invoice ${invoice.id} paid for subscription ${subscriptionId}`,
+            );
           }
         }
         break;
@@ -332,7 +367,9 @@ export const POST = async (request: Request) => {
           const subscription =
             await stripe.subscriptions.retrieve(subscriptionId);
           const barbershopId = subscription.metadata?.barbershopId;
-          const plan = subscription.metadata?.plan as SubscriptionPlan | undefined;
+          const plan = subscription.metadata?.plan as
+            | SubscriptionPlan
+            | undefined;
 
           if (barbershopId) {
             await syncSubscriptionFromStripe(subscription, barbershopId, plan);
@@ -372,7 +409,9 @@ export const POST = async (request: Request) => {
             where: { id: payment.id },
             data: { status: PaymentStatus.SUCCEEDED },
           });
-          console.log(`Payment ${payment.id} confirmed via payment_intent.succeeded`);
+          console.log(
+            `Payment ${payment.id} confirmed via payment_intent.succeeded`,
+          );
         }
         break;
       }
@@ -403,8 +442,14 @@ export const POST = async (request: Request) => {
               data: { cancelledAt: new Date() },
             });
 
-            sendDailyScheduleToGroup(booking.professionalId, booking.date).catch(
-              (err) => console.error("[WhatsApp] Erro ao enviar agenda após reembolso:", err),
+            sendDailyScheduleToGroup(
+              booking.professionalId,
+              booking.date,
+            ).catch((err) =>
+              console.error(
+                "[WhatsApp] Erro ao enviar agenda após reembolso:",
+                err,
+              ),
             );
           }
 
@@ -415,7 +460,10 @@ export const POST = async (request: Request) => {
 
       case "charge.dispute.created": {
         const dispute = event.data.object as Stripe.Dispute;
-        const chargeId = typeof dispute.charge === "string" ? dispute.charge : dispute.charge.id;
+        const chargeId =
+          typeof dispute.charge === "string"
+            ? dispute.charge
+            : dispute.charge.id;
 
         const payment = await prisma.payment.findUnique({
           where: { stripeChargeId: chargeId },
@@ -437,8 +485,14 @@ export const POST = async (request: Request) => {
               data: { cancelledAt: new Date() },
             });
 
-            sendDailyScheduleToGroup(booking.professionalId, booking.date).catch(
-              (err) => console.error("[WhatsApp] Erro ao enviar agenda após disputa:", err),
+            sendDailyScheduleToGroup(
+              booking.professionalId,
+              booking.date,
+            ).catch((err) =>
+              console.error(
+                "[WhatsApp] Erro ao enviar agenda após disputa:",
+                err,
+              ),
             );
           }
 
@@ -473,14 +527,16 @@ export const POST = async (request: Request) => {
     }
   } catch (processingError) {
     // Se falhar o processamento, remover o evento para permitir retry
-    await prisma.stripeEvent.delete({
-      where: { stripeEventId: event.id },
-    }).catch(() => {});
+    await prisma.stripeEvent
+      .delete({
+        where: { stripeEventId: event.id },
+      })
+      .catch(() => {});
 
     console.error(`Error processing event ${event.id}:`, processingError);
     return NextResponse.json(
       { error: "Error processing event" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 

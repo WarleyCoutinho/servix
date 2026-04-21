@@ -15,105 +15,141 @@ const inputSchema = z.object({
   professionalId: z.uuid(),
   date: z.date(),
   payAfterService: z.boolean().optional(),
+  clientName: z.string().min(2).max(100).optional(),
 });
 
 export const createBooking = protectedActionClient
   .inputSchema(inputSchema)
-  .action(async ({ parsedInput: { serviceId, professionalId, date, payAfterService }, ctx: { user } }) => {
-    if (isPast(date)) {
-      returnValidationErrors(inputSchema, {
-        _errors: ["Data e hora selecionadas já passaram."],
-      });
-    }
-
-    const service = await prisma.barbershopService.findUnique({
-      where: { id: serviceId },
-    });
-    if (!service) {
-      returnValidationErrors(inputSchema, {
-        _errors: ["Serviço não encontrado. Por favor, selecione outro serviço."],
-      });
-    }
-
-    const professional = await prisma.professional.findUnique({
-      where: { id: professionalId },
-    });
-    if (!professional || !professional.isActive) {
-      returnValidationErrors(inputSchema, {
-        _errors: ["Profissional não encontrado ou indisponível."],
-      });
-    }
-    if (professional.barbershopId !== service.barbershopId) {
-      returnValidationErrors(inputSchema, {
-        _errors: ["Profissional não pertence a esta barbearia."],
-      });
-    }
-
-    if (payAfterService && !professional.acceptsPayAfterService) {
-      returnValidationErrors(inputSchema, {
-        _errors: ["Este profissional não aceita pagamento após o serviço."],
-      });
-    }
-
-    const booking = await prisma.$transaction(async (tx) => {
-      const dayStart = startOfDayBrt(date);
-      const dayEnd = endOfDayBrt(date);
-
-      const existingBookings = await tx.booking.findMany({
-        where: {
-          professionalId,
-          date: { gte: dayStart, lte: dayEnd },
-          cancelledAt: null,
-        },
-        include: { service: { select: { durationMinutes: true } } },
-      });
-
-      const newDuration = service.durationMinutes;
-      const newSlotsNeeded = Math.ceil(newDuration / DEFAULT_INTERVAL_MINUTES);
-      const newStart = date.getTime();
-      const newEnd = addMinutes(date, newSlotsNeeded * DEFAULT_INTERVAL_MINUTES).getTime();
-
-      for (const existing of existingBookings) {
-        const existingDuration = existing.service.durationMinutes;
-        const existingSlotsNeeded = Math.ceil(existingDuration / DEFAULT_INTERVAL_MINUTES);
-        const existingStart = existing.date.getTime();
-        const existingEnd = addMinutes(existing.date, existingSlotsNeeded * DEFAULT_INTERVAL_MINUTES).getTime();
-
-        if (newStart < existingEnd && newEnd > existingStart) {
-          throw new Error("Este profissional já possui agendamento neste horário.");
-        }
-      }
-
-      const newBooking = await tx.booking.create({
-        data: {
-          serviceId,
-          professionalId,
-          date: date.toISOString(),
-          userId: user.id,
-          barbershopId: service.barbershopId,
-        },
-      });
-
-      if (payAfterService) {
-        await tx.payment.create({
-          data: {
-            bookingId: newBooking.id,
-            professionalId,
-            amountInCents: service.priceInCents,
-            applicationFeeInCents: 0,
-            status: PaymentStatus.PENDING,
-            paymentMethod: "pay_after_service",
-          },
+  .action(
+    async ({
+      parsedInput: {
+        serviceId,
+        professionalId,
+        date,
+        payAfterService,
+        clientName,
+      },
+      ctx: { user },
+    }) => {
+      if (isPast(date)) {
+        returnValidationErrors(inputSchema, {
+          _errors: ["Data e hora selecionadas já passaram."],
         });
       }
 
-      return newBooking;
-    }, { isolationLevel: "Serializable" });
+      const service = await prisma.barbershopService.findUnique({
+        where: { id: serviceId },
+      });
+      if (!service) {
+        returnValidationErrors(inputSchema, {
+          _errors: [
+            "Serviço não encontrado. Por favor, selecione outro serviço.",
+          ],
+        });
+      }
 
-    // Enviar agenda atualizada ao WhatsApp para qualquer data agendada
-    sendDailyScheduleToGroup(professionalId, date).catch(
-      (err) => console.error("[WhatsApp] Erro ao enviar agenda:", err),
-    );
+      const professional = await prisma.professional.findUnique({
+        where: { id: professionalId },
+        include: {
+          barbershop: { select: { ownerId: true } },
+        },
+      });
+      if (!professional || !professional.isActive) {
+        returnValidationErrors(inputSchema, {
+          _errors: ["Profissional não encontrado ou indisponível."],
+        });
+      }
+      if (professional.barbershopId !== service.barbershopId) {
+        returnValidationErrors(inputSchema, {
+          _errors: ["Profissional não pertence a esta barbearia."],
+        });
+      }
 
-    return booking;
-  });
+      if (payAfterService && !professional.acceptsPayAfterService) {
+        returnValidationErrors(inputSchema, {
+          _errors: ["Este profissional não aceita pagamento após o serviço."],
+        });
+      }
+
+      const isOwner = professional.barbershop.ownerId === user.id;
+      const resolvedClientName =
+        isOwner && clientName ? clientName.trim() : null;
+
+      const booking = await prisma.$transaction(
+        async (tx) => {
+          const dayStart = startOfDayBrt(date);
+          const dayEnd = endOfDayBrt(date);
+
+          const existingBookings = await tx.booking.findMany({
+            where: {
+              professionalId,
+              date: { gte: dayStart, lte: dayEnd },
+              cancelledAt: null,
+            },
+            include: { service: { select: { durationMinutes: true } } },
+          });
+
+          const newDuration = service.durationMinutes;
+          const newSlotsNeeded = Math.ceil(
+            newDuration / DEFAULT_INTERVAL_MINUTES,
+          );
+          const newStart = date.getTime();
+          const newEnd = addMinutes(
+            date,
+            newSlotsNeeded * DEFAULT_INTERVAL_MINUTES,
+          ).getTime();
+
+          for (const existing of existingBookings) {
+            const existingDuration = existing.service.durationMinutes;
+            const existingSlotsNeeded = Math.ceil(
+              existingDuration / DEFAULT_INTERVAL_MINUTES,
+            );
+            const existingStart = existing.date.getTime();
+            const existingEnd = addMinutes(
+              existing.date,
+              existingSlotsNeeded * DEFAULT_INTERVAL_MINUTES,
+            ).getTime();
+
+            if (newStart < existingEnd && newEnd > existingStart) {
+              throw new Error(
+                "Este profissional já possui agendamento neste horário.",
+              );
+            }
+          }
+
+          const newBooking = await tx.booking.create({
+            data: {
+              serviceId,
+              professionalId,
+              date: date.toISOString(),
+              userId: user.id,
+              barbershopId: service.barbershopId,
+              clientName: resolvedClientName,
+            },
+          });
+
+          if (payAfterService) {
+            await tx.payment.create({
+              data: {
+                bookingId: newBooking.id,
+                professionalId,
+                amountInCents: service.priceInCents,
+                applicationFeeInCents: 0,
+                status: PaymentStatus.PENDING,
+                paymentMethod: "pay_after_service",
+              },
+            });
+          }
+
+          return newBooking;
+        },
+        { isolationLevel: "Serializable" },
+      );
+
+      sendDailyScheduleToGroup(professionalId, date).catch((err) =>
+        console.error("[WhatsApp] Erro ao enviar agenda:", err),
+      );
+
+      return booking;
+    },
+  );

@@ -8,8 +8,10 @@ import {
 } from "@/components/ui/page";
 import { getBarbershopById } from "@/data/barbershops";
 import { getServiceCategories } from "@/data/services";
+import { auth } from "@/lib/auth";
 import { MapPin, Phone } from "lucide-react";
 import Image from "next/image";
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 
 interface BarbershopDetailPageProps {
@@ -20,14 +22,20 @@ interface BarbershopDetailPageProps {
 
 const BarbershopDetailPage = async ({ params }: BarbershopDetailPageProps) => {
   const { id } = await params;
-  const [barbershop, categories] = await Promise.all([
+  const [barbershop, categories, session] = await Promise.all([
     getBarbershopById(id),
     getServiceCategories(),
+    auth.api.getSession({ headers: await headers() }),
   ]);
 
   if (!barbershop) {
     notFound();
   }
+
+  const isOwner =
+    !!session?.user && !!barbershop.ownerId
+      ? session.user.id === barbershop.ownerId
+      : false;
 
   return (
     <div>
@@ -79,6 +87,7 @@ const BarbershopDetailPage = async ({ params }: BarbershopDetailPageProps) => {
                   key={service.id}
                   service={service}
                   barbershop={barbershop}
+                  isOwner={isOwner}
                 />
               ))}
             </div>

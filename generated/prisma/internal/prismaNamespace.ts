@@ -2273,6 +2273,7 @@ export const BookingScalarFieldEnum = {
   cancelledAt: 'cancelledAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
+  clientName: 'clientName',
   barbershopId: 'barbershopId',
   serviceId: 'serviceId',
   userId: 'userId',

@@ -312,12 +312,14 @@ model BarbershopService {
 // =====================
 
 model Booking {
-  id          String    @id @default(uuid())
-  date        DateTime  @db.Timestamptz()
-  cancelledAt DateTime? @db.Timestamptz()
-  createdAt   DateTime  @default(now()) @db.Timestamptz()
-  updatedAt   DateTime  @updatedAt @db.Timestamptz()
-
+  id             String            @id @default(uuid())
+  date           DateTime          @db.Timestamptz()
+  cancelledAt    DateTime?         @db.Timestamptz()
+  createdAt      DateTime          @default(now()) @db.Timestamptz()
+  updatedAt      DateTime          @updatedAt @db.Timestamptz()
+  // Nome do cliente digitado pelo owner ao agendar em nome de terceiros.
+  // Null quando o próprio cliente faz o agendamento.
+  clientName     String?
   barbershopId   String
   barbershop     Barbershop        @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
   serviceId      String

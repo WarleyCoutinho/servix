@@ -100,9 +100,14 @@ function Section({
 interface ServiceItemProps {
   service: BarbershopService;
   barbershop: Barbershop;
+  isOwner?: boolean;
 }
 
-const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
+const ServiceItem = ({
+  service,
+  barbershop,
+  isOwner = false,
+}: ServiceItemProps) => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const refProfessionalId = searchParams.get("ref");
@@ -117,12 +122,14 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<
     "online" | "pay_after_service" | undefined
   >(undefined);
+  const [clientName, setClientName] = useState("");
   const [sheetIsOpen, setSheetIsOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
 
   const profSectionRef = useRef<HTMLDivElement | null>(null);
   const timeSectionRef = useRef<HTMLDivElement | null>(null);
   const paySectionRef = useRef<HTMLDivElement | null>(null);
+  const clientNameSectionRef = useRef<HTMLDivElement | null>(null);
 
   const { data: session } = authClient.useSession();
 
@@ -171,6 +178,7 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
     setSelectedProfessional(undefined);
     setSelectedTime(undefined);
     setSelectedPaymentMethod(undefined);
+    setClientName("");
     if (date) scrollTo(profSectionRef);
   };
 
@@ -178,13 +186,26 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
     setSelectedProfessional(professionalId);
     setSelectedTime(undefined);
     setSelectedPaymentMethod(undefined);
+    setClientName("");
     scrollTo(timeSectionRef);
   };
 
   const handleTimeSelect = (time: string) => {
     setSelectedTime(time);
     setSelectedPaymentMethod(undefined);
-    if (hasPayAfterService) scrollTo(paySectionRef);
+    setClientName("");
+    if (isOwner) {
+      // Owner sempre paga no local — pula passo de pagamento
+      scrollTo(clientNameSectionRef);
+    } else if (hasPayAfterService) {
+      scrollTo(paySectionRef);
+    }
+  };
+
+  const handlePaymentMethodSelect = (
+    method: "online" | "pay_after_service",
+  ) => {
+    setSelectedPaymentMethod(method);
   };
 
   const reset = () => {
@@ -192,6 +213,7 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
     setSelectedProfessional(undefined);
     setSelectedTime(undefined);
     setSelectedPaymentMethod(undefined);
+    setClientName("");
   };
 
   const getFirstError = (
@@ -211,6 +233,40 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
   const handleConfirmBooking = async () => {
     if (!selectedDate || !selectedTime || !selectedProfessional) return;
 
+    const splittedTime = selectedTime.split(":");
+    const date = new Date(selectedDate);
+    date.setHours(Number(splittedTime[0]), Number(splittedTime[1]));
+
+    // ── Fluxo owner: sempre pagar no local, com nome do cliente ──
+    if (isOwner) {
+      if (clientName.trim().length < 2) {
+        return toast.error("Digite o nome do cliente.");
+      }
+
+      const result = await executeDirectBooking({
+        date,
+        serviceId: service.id,
+        professionalId: selectedProfessional,
+        payAfterService: true,
+        clientName: clientName.trim(),
+      });
+
+      if (!result || result.serverError)
+        return toast.error("Erro ao criar agendamento. Tente novamente.");
+      if (result.validationErrors)
+        return toast.error(
+          getFirstError(result.validationErrors) ||
+            "Erro ao criar agendamento.",
+        );
+
+      toast.success("Agendamento confirmado! 🎉");
+      setSheetIsOpen(false);
+      reset();
+      router.push("/bookings?success=true");
+      return;
+    }
+
+    // ── Fluxo normal (cliente) ──
     const effectivePaymentMethod =
       hasPayAfterService && !hasStripePayment
         ? "pay_after_service"
@@ -219,12 +275,6 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
     if (!effectivePaymentMethod && hasPayAfterService && hasStripePayment) {
       return toast.error("Selecione uma forma de pagamento.");
     }
-
-    const splittedTime = selectedTime.split(":");
-    const hours = Number(splittedTime[0]);
-    const minutes = Number(splittedTime[1]);
-    const date = new Date(selectedDate);
-    date.setHours(hours, minutes);
 
     if (effectivePaymentMethod === "pay_after_service") {
       const result = await executeDirectBooking({
@@ -288,13 +338,21 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
   const step4Done =
     !hasPayAfterService ||
     !!selectedPaymentMethod ||
-    (!hasStripePayment && hasPayAfterService);
+    (!hasStripePayment && !!hasPayAfterService);
+  const stepOwnerDone = clientName.trim().length >= 2;
 
-  const canConfirm =
-    step1Done &&
-    step2Done &&
-    step3Done &&
-    (!hasPayAfterService || !hasStripePayment || !!selectedPaymentMethod);
+  const canConfirm = isOwner
+    ? step1Done && step2Done && step3Done && stepOwnerDone
+    : step1Done &&
+      step2Done &&
+      step3Done &&
+      (!hasPayAfterService || !hasStripePayment || !!selectedPaymentMethod);
+
+  // Owner: 4 passos (data, prof, horário, nome cliente)
+  // Cliente: 4 passos (data, prof, horário, pagamento — se aplicável)
+  const progressSegments = isOwner
+    ? [step1Done, step2Done, step3Done, stepOwnerDone]
+    : [step1Done, step2Done, step3Done, !hasPayAfterService || step4Done];
 
   const formatDate = (d: Date) =>
     new Intl.DateTimeFormat("pt-BR", {
@@ -334,6 +392,7 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
 
             <SheetContent className="flex flex-col gap-0 overflow-y-auto p-0 sm:max-w-md">
               <SheetTitle className="sr-only">Fazer Reserva</SheetTitle>
+
               {/* ── Cabeçalho sticky ── */}
               <div className="bg-card border-border sticky top-0 z-10 border-b px-5 py-4 shadow-sm">
                 <div className="flex items-start gap-3">
@@ -360,12 +419,7 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
 
                 {/* Barra de progresso */}
                 <div className="mt-4 flex gap-1.5">
-                  {[
-                    step1Done,
-                    step2Done,
-                    step3Done,
-                    !hasPayAfterService || step4Done,
-                  ].map((done, i) => (
+                  {progressSegments.map((done, i) => (
                     <div
                       key={i}
                       className={[
@@ -557,8 +611,8 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
                     </Section>
                   </div>
 
-                  {/* ══ PASSO 4 — Pagamento ══ */}
-                  {hasPayAfterService && (
+                  {/* ══ PASSO 4 — Pagamento (apenas clientes normais) ══ */}
+                  {!isOwner && hasPayAfterService && (
                     <div ref={paySectionRef}>
                       <Section
                         step={4}
@@ -571,7 +625,9 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
                           {hasStripePayment && (
                             <button
                               type="button"
-                              onClick={() => setSelectedPaymentMethod("online")}
+                              onClick={() =>
+                                handlePaymentMethodSelect("online")
+                              }
                               className={[
                                 "flex items-center gap-3 rounded-xl border p-4 text-left transition-all duration-150",
                                 selectedPaymentMethod === "online"
@@ -616,7 +672,7 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
                           <button
                             type="button"
                             onClick={() =>
-                              setSelectedPaymentMethod("pay_after_service")
+                              handlePaymentMethodSelect("pay_after_service")
                             }
                             className={[
                               "flex items-center gap-3 rounded-xl border p-4 text-left transition-all duration-150",
@@ -673,6 +729,40 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
                               </AlertDescription>
                             </Alert>
                           )}
+                        </div>
+                      </Section>
+                    </div>
+                  )}
+
+                  {/* ══ PASSO 4 — Nome do cliente (apenas owner) ══ */}
+                  {isOwner && (
+                    <div ref={clientNameSectionRef}>
+                      <Section
+                        step={4}
+                        label="Nome do cliente"
+                        done={stepOwnerDone}
+                        active={step3Done && !stepOwnerDone}
+                        locked={!step3Done}
+                      >
+                        <div className="flex flex-col gap-2 px-5">
+                          <div className="relative">
+                            <User
+                              size={14}
+                              className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                            />
+                            <input
+                              type="text"
+                              value={clientName}
+                              onChange={(e) => setClientName(e.target.value)}
+                              placeholder="Digite o nome do cliente"
+                              maxLength={100}
+                              className="w-full rounded-xl border border-border bg-background py-2.5 pl-9 pr-3 text-sm placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/40 transition-all"
+                            />
+                          </div>
+                          <p className="text-xs leading-relaxed text-muted-foreground">
+                            O agendamento será registrado com esse nome, não com
+                            o seu usuário.
+                          </p>
                         </div>
                       </Section>
                     </div>

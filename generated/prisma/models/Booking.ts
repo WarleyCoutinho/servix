@@ -30,6 +30,7 @@ export type BookingMinAggregateOutputType = {
   cancelledAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
+  clientName: string | null
   barbershopId: string | null
   serviceId: string | null
   userId: string | null
@@ -42,6 +43,7 @@ export type BookingMaxAggregateOutputType = {
   cancelledAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
+  clientName: string | null
   barbershopId: string | null
   serviceId: string | null
   userId: string | null
@@ -54,6 +56,7 @@ export type BookingCountAggregateOutputType = {
   cancelledAt: number
   createdAt: number
   updatedAt: number
+  clientName: number
   barbershopId: number
   serviceId: number
   userId: number
@@ -68,6 +71,7 @@ export type BookingMinAggregateInputType = {
   cancelledAt?: true
   createdAt?: true
   updatedAt?: true
+  clientName?: true
   barbershopId?: true
   serviceId?: true
   userId?: true
@@ -80,6 +84,7 @@ export type BookingMaxAggregateInputType = {
   cancelledAt?: true
   createdAt?: true
   updatedAt?: true
+  clientName?: true
   barbershopId?: true
   serviceId?: true
   userId?: true
@@ -92,6 +97,7 @@ export type BookingCountAggregateInputType = {
   cancelledAt?: true
   createdAt?: true
   updatedAt?: true
+  clientName?: true
   barbershopId?: true
   serviceId?: true
   userId?: true
@@ -177,6 +183,7 @@ export type BookingGroupByOutputType = {
   cancelledAt: Date | null
   createdAt: Date
   updatedAt: Date
+  clientName: string | null
   barbershopId: string
   serviceId: string
   userId: string
@@ -210,6 +217,7 @@ export type BookingWhereInput = {
   cancelledAt?: Prisma.DateTimeNullableFilter<"Booking"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Booking"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Booking"> | Date | string
+  clientName?: Prisma.StringNullableFilter<"Booking"> | string | null
   barbershopId?: Prisma.StringFilter<"Booking"> | string
   serviceId?: Prisma.StringFilter<"Booking"> | string
   userId?: Prisma.StringFilter<"Booking"> | string
@@ -227,6 +235,7 @@ export type BookingOrderByWithRelationInput = {
   cancelledAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  clientName?: Prisma.SortOrderInput | Prisma.SortOrder
   barbershopId?: Prisma.SortOrder
   serviceId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
@@ -247,6 +256,7 @@ export type BookingWhereUniqueInput = Prisma.AtLeast<{
   cancelledAt?: Prisma.DateTimeNullableFilter<"Booking"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Booking"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Booking"> | Date | string
+  clientName?: Prisma.StringNullableFilter<"Booking"> | string | null
   barbershopId?: Prisma.StringFilter<"Booking"> | string
   serviceId?: Prisma.StringFilter<"Booking"> | string
   userId?: Prisma.StringFilter<"Booking"> | string
@@ -264,6 +274,7 @@ export type BookingOrderByWithAggregationInput = {
   cancelledAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  clientName?: Prisma.SortOrderInput | Prisma.SortOrder
   barbershopId?: Prisma.SortOrder
   serviceId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
@@ -282,6 +293,7 @@ export type BookingScalarWhereWithAggregatesInput = {
   cancelledAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Booking"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Booking"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Booking"> | Date | string
+  clientName?: Prisma.StringNullableWithAggregatesFilter<"Booking"> | string | null
   barbershopId?: Prisma.StringWithAggregatesFilter<"Booking"> | string
   serviceId?: Prisma.StringWithAggregatesFilter<"Booking"> | string
   userId?: Prisma.StringWithAggregatesFilter<"Booking"> | string
@@ -294,6 +306,7 @@ export type BookingCreateInput = {
   cancelledAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  clientName?: string | null
   barbershop: Prisma.BarbershopCreateNestedOneWithoutBookingsInput
   service: Prisma.BarbershopServiceCreateNestedOneWithoutBookingsInput
   user: Prisma.UserCreateNestedOneWithoutBookingsInput
@@ -307,6 +320,7 @@ export type BookingUncheckedCreateInput = {
   cancelledAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  clientName?: string | null
   barbershopId: string
   serviceId: string
   userId: string
@@ -320,6 +334,7 @@ export type BookingUpdateInput = {
   cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  clientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barbershop?: Prisma.BarbershopUpdateOneRequiredWithoutBookingsNestedInput
   service?: Prisma.BarbershopServiceUpdateOneRequiredWithoutBookingsNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutBookingsNestedInput
@@ -333,6 +348,7 @@ export type BookingUncheckedUpdateInput = {
   cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  clientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barbershopId?: Prisma.StringFieldUpdateOperationsInput | string
   serviceId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -346,6 +362,7 @@ export type BookingCreateManyInput = {
   cancelledAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  clientName?: string | null
   barbershopId: string
   serviceId: string
   userId: string
@@ -358,6 +375,7 @@ export type BookingUpdateManyMutationInput = {
   cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  clientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type BookingUncheckedUpdateManyInput = {
@@ -366,6 +384,7 @@ export type BookingUncheckedUpdateManyInput = {
   cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  clientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barbershopId?: Prisma.StringFieldUpdateOperationsInput | string
   serviceId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -388,6 +407,7 @@ export type BookingCountOrderByAggregateInput = {
   cancelledAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  clientName?: Prisma.SortOrder
   barbershopId?: Prisma.SortOrder
   serviceId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
@@ -400,6 +420,7 @@ export type BookingMaxOrderByAggregateInput = {
   cancelledAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  clientName?: Prisma.SortOrder
   barbershopId?: Prisma.SortOrder
   serviceId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
@@ -412,6 +433,7 @@ export type BookingMinOrderByAggregateInput = {
   cancelledAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  clientName?: Prisma.SortOrder
   barbershopId?: Prisma.SortOrder
   serviceId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
@@ -611,6 +633,7 @@ export type BookingCreateWithoutUserInput = {
   cancelledAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  clientName?: string | null
   barbershop: Prisma.BarbershopCreateNestedOneWithoutBookingsInput
   service: Prisma.BarbershopServiceCreateNestedOneWithoutBookingsInput
   professional: Prisma.ProfessionalCreateNestedOneWithoutBookingsInput
@@ -623,6 +646,7 @@ export type BookingUncheckedCreateWithoutUserInput = {
   cancelledAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  clientName?: string | null
   barbershopId: string
   serviceId: string
   professionalId: string
@@ -664,6 +688,7 @@ export type BookingScalarWhereInput = {
   cancelledAt?: Prisma.DateTimeNullableFilter<"Booking"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Booking"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Booking"> | Date | string
+  clientName?: Prisma.StringNullableFilter<"Booking"> | string | null
   barbershopId?: Prisma.StringFilter<"Booking"> | string
   serviceId?: Prisma.StringFilter<"Booking"> | string
   userId?: Prisma.StringFilter<"Booking"> | string
@@ -676,6 +701,7 @@ export type BookingCreateWithoutBarbershopInput = {
   cancelledAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  clientName?: string | null
   service: Prisma.BarbershopServiceCreateNestedOneWithoutBookingsInput
   user: Prisma.UserCreateNestedOneWithoutBookingsInput
   professional: Prisma.ProfessionalCreateNestedOneWithoutBookingsInput
@@ -688,6 +714,7 @@ export type BookingUncheckedCreateWithoutBarbershopInput = {
   cancelledAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  clientName?: string | null
   serviceId: string
   userId: string
   professionalId: string
@@ -726,6 +753,7 @@ export type BookingCreateWithoutProfessionalInput = {
   cancelledAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  clientName?: string | null
   barbershop: Prisma.BarbershopCreateNestedOneWithoutBookingsInput
   service: Prisma.BarbershopServiceCreateNestedOneWithoutBookingsInput
   user: Prisma.UserCreateNestedOneWithoutBookingsInput
@@ -738,6 +766,7 @@ export type BookingUncheckedCreateWithoutProfessionalInput = {
   cancelledAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  clientName?: string | null
   barbershopId: string
   serviceId: string
   userId: string
@@ -776,6 +805,7 @@ export type BookingCreateWithoutServiceInput = {
   cancelledAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  clientName?: string | null
   barbershop: Prisma.BarbershopCreateNestedOneWithoutBookingsInput
   user: Prisma.UserCreateNestedOneWithoutBookingsInput
   professional: Prisma.ProfessionalCreateNestedOneWithoutBookingsInput
@@ -788,6 +818,7 @@ export type BookingUncheckedCreateWithoutServiceInput = {
   cancelledAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  clientName?: string | null
   barbershopId: string
   userId: string
   professionalId: string
@@ -826,6 +857,7 @@ export type BookingCreateWithoutPaymentInput = {
   cancelledAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  clientName?: string | null
   barbershop: Prisma.BarbershopCreateNestedOneWithoutBookingsInput
   service: Prisma.BarbershopServiceCreateNestedOneWithoutBookingsInput
   user: Prisma.UserCreateNestedOneWithoutBookingsInput
@@ -838,6 +870,7 @@ export type BookingUncheckedCreateWithoutPaymentInput = {
   cancelledAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  clientName?: string | null
   barbershopId: string
   serviceId: string
   userId: string
@@ -866,6 +899,7 @@ export type BookingUpdateWithoutPaymentInput = {
   cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  clientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barbershop?: Prisma.BarbershopUpdateOneRequiredWithoutBookingsNestedInput
   service?: Prisma.BarbershopServiceUpdateOneRequiredWithoutBookingsNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutBookingsNestedInput
@@ -878,6 +912,7 @@ export type BookingUncheckedUpdateWithoutPaymentInput = {
   cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  clientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barbershopId?: Prisma.StringFieldUpdateOperationsInput | string
   serviceId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -890,6 +925,7 @@ export type BookingCreateManyUserInput = {
   cancelledAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  clientName?: string | null
   barbershopId: string
   serviceId: string
   professionalId: string
@@ -901,6 +937,7 @@ export type BookingUpdateWithoutUserInput = {
   cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  clientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barbershop?: Prisma.BarbershopUpdateOneRequiredWithoutBookingsNestedInput
   service?: Prisma.BarbershopServiceUpdateOneRequiredWithoutBookingsNestedInput
   professional?: Prisma.ProfessionalUpdateOneRequiredWithoutBookingsNestedInput
@@ -913,6 +950,7 @@ export type BookingUncheckedUpdateWithoutUserInput = {
   cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  clientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barbershopId?: Prisma.StringFieldUpdateOperationsInput | string
   serviceId?: Prisma.StringFieldUpdateOperationsInput | string
   professionalId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -925,6 +963,7 @@ export type BookingUncheckedUpdateManyWithoutUserInput = {
   cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  clientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barbershopId?: Prisma.StringFieldUpdateOperationsInput | string
   serviceId?: Prisma.StringFieldUpdateOperationsInput | string
   professionalId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -936,6 +975,7 @@ export type BookingCreateManyBarbershopInput = {
   cancelledAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  clientName?: string | null
   serviceId: string
   userId: string
   professionalId: string
@@ -947,6 +987,7 @@ export type BookingUpdateWithoutBarbershopInput = {
   cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  clientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   service?: Prisma.BarbershopServiceUpdateOneRequiredWithoutBookingsNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutBookingsNestedInput
   professional?: Prisma.ProfessionalUpdateOneRequiredWithoutBookingsNestedInput
@@ -959,6 +1000,7 @@ export type BookingUncheckedUpdateWithoutBarbershopInput = {
   cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  clientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serviceId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   professionalId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -971,6 +1013,7 @@ export type BookingUncheckedUpdateManyWithoutBarbershopInput = {
   cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  clientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serviceId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   professionalId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -982,6 +1025,7 @@ export type BookingCreateManyProfessionalInput = {
   cancelledAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  clientName?: string | null
   barbershopId: string
   serviceId: string
   userId: string
@@ -993,6 +1037,7 @@ export type BookingUpdateWithoutProfessionalInput = {
   cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  clientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barbershop?: Prisma.BarbershopUpdateOneRequiredWithoutBookingsNestedInput
   service?: Prisma.BarbershopServiceUpdateOneRequiredWithoutBookingsNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutBookingsNestedInput
@@ -1005,6 +1050,7 @@ export type BookingUncheckedUpdateWithoutProfessionalInput = {
   cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  clientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barbershopId?: Prisma.StringFieldUpdateOperationsInput | string
   serviceId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1017,6 +1063,7 @@ export type BookingUncheckedUpdateManyWithoutProfessionalInput = {
   cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  clientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barbershopId?: Prisma.StringFieldUpdateOperationsInput | string
   serviceId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1028,6 +1075,7 @@ export type BookingCreateManyServiceInput = {
   cancelledAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  clientName?: string | null
   barbershopId: string
   userId: string
   professionalId: string
@@ -1039,6 +1087,7 @@ export type BookingUpdateWithoutServiceInput = {
   cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  clientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barbershop?: Prisma.BarbershopUpdateOneRequiredWithoutBookingsNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutBookingsNestedInput
   professional?: Prisma.ProfessionalUpdateOneRequiredWithoutBookingsNestedInput
@@ -1051,6 +1100,7 @@ export type BookingUncheckedUpdateWithoutServiceInput = {
   cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  clientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barbershopId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   professionalId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1063,6 +1113,7 @@ export type BookingUncheckedUpdateManyWithoutServiceInput = {
   cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  clientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barbershopId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   professionalId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1076,6 +1127,7 @@ export type BookingSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   cancelledAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  clientName?: boolean
   barbershopId?: boolean
   serviceId?: boolean
   userId?: boolean
@@ -1093,6 +1145,7 @@ export type BookingSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   cancelledAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  clientName?: boolean
   barbershopId?: boolean
   serviceId?: boolean
   userId?: boolean
@@ -1109,6 +1162,7 @@ export type BookingSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   cancelledAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  clientName?: boolean
   barbershopId?: boolean
   serviceId?: boolean
   userId?: boolean
@@ -1125,13 +1179,14 @@ export type BookingSelectScalar = {
   cancelledAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  clientName?: boolean
   barbershopId?: boolean
   serviceId?: boolean
   userId?: boolean
   professionalId?: boolean
 }
 
-export type BookingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "date" | "cancelledAt" | "createdAt" | "updatedAt" | "barbershopId" | "serviceId" | "userId" | "professionalId", ExtArgs["result"]["booking"]>
+export type BookingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "date" | "cancelledAt" | "createdAt" | "updatedAt" | "clientName" | "barbershopId" | "serviceId" | "userId" | "professionalId", ExtArgs["result"]["booking"]>
 export type BookingInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   barbershop?: boolean | Prisma.BarbershopDefaultArgs<ExtArgs>
   service?: boolean | Prisma.BarbershopServiceDefaultArgs<ExtArgs>
@@ -1167,6 +1222,7 @@ export type $BookingPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     cancelledAt: Date | null
     createdAt: Date
     updatedAt: Date
+    clientName: string | null
     barbershopId: string
     serviceId: string
     userId: string
@@ -1604,6 +1660,7 @@ export interface BookingFieldRefs {
   readonly cancelledAt: Prisma.FieldRef<"Booking", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Booking", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Booking", 'DateTime'>
+  readonly clientName: Prisma.FieldRef<"Booking", 'String'>
   readonly barbershopId: Prisma.FieldRef<"Booking", 'String'>
   readonly serviceId: Prisma.FieldRef<"Booking", 'String'>
   readonly userId: Prisma.FieldRef<"Booking", 'String'>

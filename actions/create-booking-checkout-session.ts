@@ -6,7 +6,10 @@ import { prisma } from "@/lib/prisma";
 import { returnValidationErrors } from "next-safe-action";
 import { isPast, addMinutes } from "date-fns";
 import { stripe } from "@/lib/stripe";
-import { getEffectiveFee, calculatePlatformFeeAmount } from "@/lib/platform-fee";
+import {
+  getEffectiveFee,
+  calculatePlatformFeeAmount,
+} from "@/lib/platform-fee";
 import { isAccountReadyForPayments } from "@/lib/stripe-connect";
 import { DEFAULT_INTERVAL_MINUTES } from "@/lib/schedule-utils";
 import { startOfDayBrt, endOfDayBrt } from "@/lib/timezone";
@@ -16,12 +19,16 @@ const inputSchema = z.object({
   serviceId: z.uuid(),
   date: z.date(),
   professionalId: z.uuid(),
+  clientName: z.string().min(2).max(100).optional(),
 });
 
 export const createBookingCheckoutSession = protectedActionClient
   .inputSchema(inputSchema)
   .action(
-    async ({ parsedInput: { serviceId, date, professionalId }, ctx: { user } }) => {
+    async ({
+      parsedInput: { serviceId, date, professionalId, clientName },
+      ctx: { user },
+    }) => {
       const service = await prisma.barbershopService.findUnique({
         where: {
           id: serviceId,
@@ -31,6 +38,7 @@ export const createBookingCheckoutSession = protectedActionClient
             select: {
               id: true,
               name: true,
+              ownerId: true,
               createdAt: true,
               platformFeePercentage: true,
               feeOverride: true,
@@ -105,18 +113,28 @@ export const createBookingCheckoutSession = protectedActionClient
       const newDuration = service.durationMinutes;
       const newSlotsNeeded = Math.ceil(newDuration / DEFAULT_INTERVAL_MINUTES);
       const newStart = date.getTime();
-      const newEnd = addMinutes(date, newSlotsNeeded * DEFAULT_INTERVAL_MINUTES).getTime();
+      const newEnd = addMinutes(
+        date,
+        newSlotsNeeded * DEFAULT_INTERVAL_MINUTES,
+      ).getTime();
 
       for (const existing of existingBookings) {
         const existingDuration = existing.service.durationMinutes;
-        const existingSlotsNeeded = Math.ceil(existingDuration / DEFAULT_INTERVAL_MINUTES);
+        const existingSlotsNeeded = Math.ceil(
+          existingDuration / DEFAULT_INTERVAL_MINUTES,
+        );
         const existingStart = existing.date.getTime();
-        const existingEnd = addMinutes(existing.date, existingSlotsNeeded * DEFAULT_INTERVAL_MINUTES).getTime();
+        const existingEnd = addMinutes(
+          existing.date,
+          existingSlotsNeeded * DEFAULT_INTERVAL_MINUTES,
+        ).getTime();
 
         if (newStart < existingEnd && newEnd > existingStart) {
           returnValidationErrors(inputSchema, {
             date: {
-              _errors: ["Este profissional já possui agendamento neste horário."],
+              _errors: [
+                "Este profissional já possui agendamento neste horário.",
+              ],
             },
           });
         }
@@ -128,7 +146,8 @@ export const createBookingCheckoutSession = protectedActionClient
         feeResult.feePercentage,
       );
 
-      const paymentMethods: Stripe.Checkout.SessionCreateParams.PaymentMethodType[] = [];
+      const paymentMethods: Stripe.Checkout.SessionCreateParams.PaymentMethodType[] =
+        [];
 
       if (professional.acceptsPix) {
         paymentMethods.push("pix");
@@ -138,26 +157,38 @@ export const createBookingCheckoutSession = protectedActionClient
       }
 
       if (paymentMethods.length === 0) {
-        throw new Error("Nenhuma forma de pagamento disponível para este profissional.");
+        throw new Error(
+          "Nenhuma forma de pagamento disponível para este profissional.",
+        );
       }
 
+      const isOwner = service.barbershop.ownerId === user.id;
+      const resolvedClientName =
+        isOwner && clientName ? clientName.trim() : undefined;
+
       const buildSessionParams = (
-        methods: Stripe.Checkout.SessionCreateParams.PaymentMethodType[]
+        methods: Stripe.Checkout.SessionCreateParams.PaymentMethodType[],
       ): Stripe.Checkout.SessionCreateParams => {
+        const metadata: Record<string, string> = {
+          serviceId: service.id,
+          barbershopId: service.barbershopId,
+          userId: user.id,
+          date: date.toISOString(),
+          professionalId: professional.id,
+          priceInCents: service.priceInCents.toString(),
+          applicationFeeInCents: applicationFeeAmount.toString(),
+        };
+
+        if (resolvedClientName) {
+          metadata.clientName = resolvedClientName;
+        }
+
         const params: Stripe.Checkout.SessionCreateParams = {
           payment_method_types: methods,
           mode: "payment",
           success_url: `${process.env.NEXT_PUBLIC_APP_URL}/bookings?success=true`,
           cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}`,
-          metadata: {
-            serviceId: service.id,
-            barbershopId: service.barbershopId,
-            userId: user.id,
-            date: date.toISOString(),
-            professionalId: professional.id,
-            priceInCents: service.priceInCents.toString(),
-            applicationFeeInCents: applicationFeeAmount.toString(),
-          },
+          metadata,
           line_items: [
             {
               price_data: {
@@ -166,7 +197,6 @@ export const createBookingCheckoutSession = protectedActionClient
                 product_data: {
                   name: `${service.barbershop.name} - ${service.name}`,
                   description: service.description,
-                  /* images: [service.imageUrl], */
                 },
               },
               quantity: 1,
@@ -199,29 +229,34 @@ export const createBookingCheckoutSession = protectedActionClient
       let pixFallback = false;
       try {
         checkoutSession = await stripe.checkout.sessions.create(
-          buildSessionParams(paymentMethods)
+          buildSessionParams(paymentMethods),
         );
       } catch (error) {
         console.error("Error creating checkout session:", error);
 
-        const errorMessage = error instanceof Error ? error.message.toLowerCase() : "";
+        const errorMessage =
+          error instanceof Error ? error.message.toLowerCase() : "";
         const isPixError =
           errorMessage.includes("pix") ||
           errorMessage.includes("payment_method") ||
           errorMessage.includes("payment method");
 
         if (isPixError && paymentMethods.includes("pix")) {
-          console.warn("PIX unavailable for this account, falling back to card-only");
+          console.warn(
+            "PIX unavailable for this account, falling back to card-only",
+          );
           pixFallback = true;
           checkoutSession = await stripe.checkout.sessions.create(
-            buildSessionParams(["card"])
+            buildSessionParams(["card"]),
           );
         } else {
           throw error;
         }
       }
 
-      console.log(`Checkout session created: ${checkoutSession.id}${pixFallback ? " (PIX fallback to card)" : ""}`);
+      console.log(
+        `Checkout session created: ${checkoutSession.id}${pixFallback ? " (PIX fallback to card)" : ""}`,
+      );
 
       return {
         id: checkoutSession.id,
