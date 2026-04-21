@@ -8,6 +8,7 @@ interface BookingSummaryProps {
   servicePrice: number;
   barbershopName: string;
   professionalName?: string;
+  clientName?: string | null;
   date: Date;
   time?: string;
 }
@@ -17,6 +18,7 @@ const BookingSummary = ({
   servicePrice,
   barbershopName,
   professionalName,
+  clientName,
   date,
   time,
 }: BookingSummaryProps) => {
@@ -31,7 +33,7 @@ const BookingSummary = ({
       </div>
       <CardContent className="divide-y divide-border px-0 pb-0">
         <div className="flex items-center justify-between px-5 py-3">
-          <p className="text-sm text-muted-foreground">Servico</p>
+          <p className="text-sm text-muted-foreground">Serviço</p>
           <p className="text-sm font-medium">{serviceName}</p>
         </div>
         <div className="flex items-center justify-between px-5 py-3">
@@ -41,7 +43,7 @@ const BookingSummary = ({
           </p>
         </div>
         <div className="flex items-center justify-between px-5 py-3">
-          <p className="text-sm text-muted-foreground">Horario</p>
+          <p className="text-sm text-muted-foreground">Horário</p>
           <p className="text-sm font-medium">{formattedTime}</p>
         </div>
         <div className="flex items-center justify-between px-5 py-3">
@@ -52,6 +54,12 @@ const BookingSummary = ({
           <div className="flex items-center justify-between px-5 py-3">
             <p className="text-sm text-muted-foreground">Profissional</p>
             <p className="text-sm font-medium">{professionalName}</p>
+          </div>
+        )}
+        {clientName && (
+          <div className="flex items-center justify-between px-5 py-3">
+            <p className="text-sm text-muted-foreground">Cliente</p>
+            <p className="text-sm font-medium">{clientName}</p>
           </div>
         )}
         <div className="flex items-center justify-between bg-muted/50 px-5 py-3">

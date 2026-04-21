@@ -386,7 +386,7 @@ const ServiceItem = ({
           <Sheet open={sheetIsOpen} onOpenChange={setSheetIsOpen}>
             <SheetTrigger asChild>
               <Button className="rounded-full" size="sm">
-                Reservar
+                Agendar
               </Button>
             </SheetTrigger>
 

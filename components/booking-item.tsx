@@ -77,6 +77,14 @@ const BookingItem = ({ booking }: BookingItemProps) => {
                   {booking.barbershop.name}
                 </p>
               </div>
+              {booking.clientName && (
+                <p className="text-sm text-muted-foreground truncate">
+                  Cliente:{" "}
+                  <span className="font-medium text-foreground">
+                    {booking.clientName}
+                  </span>
+                </p>
+              )}
             </div>
           </div>
 

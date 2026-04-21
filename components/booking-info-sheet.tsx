@@ -212,6 +212,11 @@ const BookingInfoSheet = ({ booking, onClose }: BookingInfoSheetProps) => {
             servicePrice={booking.service.priceInCents}
             barbershopName={booking.barbershop.name}
             date={booking.date}
+            professionalName={
+              booking.professional?.displayName ??
+              booking.professional?.user?.name
+            }
+            clientName={booking.clientName}
           />
         </div>
 
@@ -247,8 +252,11 @@ const BookingInfoSheet = ({ booking, onClose }: BookingInfoSheetProps) => {
                 className="text-amber-600 dark:text-amber-400 mt-0.5 shrink-0"
               />
               <p className="text-xs text-amber-700 dark:text-amber-400 leading-relaxed">
-                Cancelamentos realizados com menos de 2 horas de antecedência
-                podem estar sujeitos a política do estabelecimento.
+                Cancelamentos devem ser feitos com no mínimo 1 hora de
+                antecedência. Para pagamentos realizados via cartão, o estorno
+                será solicitado e seguirá os prazos da operadora. Após esse
+                prazo, ou em caso de não comparecimento, o valor não será
+                devolvido.
               </p>
             </div>
           </div>
