@@ -58,15 +58,18 @@ function buildScheduleMessage(
     if (isPast && !booking) continue;
 
     let line: string;
+
     if (isPast && booking) {
+      if (booking.serviceName.endsWith("(cont.)")) continue;
       stats.finishedCount++;
       line = `~✦ ${slot} — ${booking.serviceName} · ${booking.clientName}~`;
     } else if (booking) {
+      if (booking.serviceName.endsWith("(cont.)")) continue;
       stats.bookedCount++;
       line = `🔵 *${slot}* — *${booking.clientName}*\n┗ _${booking.serviceName}_`;
     } else {
       stats.freeCount++;
-      line = `⬜ ${slot}`;
+      line = `○ *${slot}*  _livre_`;
     }
 
     if (hour < 12) morningSlots.push(line);
@@ -104,7 +107,7 @@ function buildScheduleMessage(
     );
   if (stats.freeCount > 0)
     statsParts.push(
-      `⬜ ${stats.freeCount} livre${stats.freeCount !== 1 ? "s" : ""}`,
+      `○ ${stats.freeCount} livre${stats.freeCount !== 1 ? "s" : ""}`,
     );
 
   lines.push(
