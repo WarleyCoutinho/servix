@@ -4,7 +4,11 @@ import { headers } from "next/headers";
 import { Prisma } from "@/generated/prisma/client";
 
 export type BookingWithRelations = Prisma.BookingGetPayload<{
-  include: { barbershop: true; service: true };
+  include: {
+    barbershop: true;
+    service: true;
+    professional: { include: { user: { select: { name: true } } } };
+  };
 }>;
 
 export const getUserBookings = async () => {
@@ -35,6 +39,7 @@ export const getUserBookings = async () => {
           include: {
             barbershop: true,
             service: true,
+            professional: { include: { user: { select: { name: true } } } },
           },
           orderBy: { date: "asc" },
         }),
@@ -46,13 +51,14 @@ export const getUserBookings = async () => {
           include: {
             barbershop: true,
             service: true,
+            professional: { include: { user: { select: { name: true } } } },
           },
           orderBy: { date: "desc" },
         }),
       ]);
       return { confirmedBookings: confirmed, finishedBookings: finished };
     },
-    { confirmedBookings: [], finishedBookings: [] }
+    { confirmedBookings: [], finishedBookings: [] },
   );
 
   return data;
