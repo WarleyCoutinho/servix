@@ -81,6 +81,7 @@ export type PlanConfigCountAggregateOutputType = {
   maxProfessionals: number
   maxServices: number
   features: number
+  idealFor: number
   isActive: number
   createdAt: number
   updatedAt: number
@@ -143,6 +144,7 @@ export type PlanConfigCountAggregateInputType = {
   maxProfessionals?: true
   maxServices?: true
   features?: true
+  idealFor?: true
   isActive?: true
   createdAt?: true
   updatedAt?: true
@@ -246,6 +248,7 @@ export type PlanConfigGroupByOutputType = {
   maxProfessionals: number
   maxServices: number | null
   features: string[]
+  idealFor: string[]
   isActive: boolean
   createdAt: Date
   updatedAt: Date
@@ -285,6 +288,7 @@ export type PlanConfigWhereInput = {
   maxProfessionals?: Prisma.IntFilter<"PlanConfig"> | number
   maxServices?: Prisma.IntNullableFilter<"PlanConfig"> | number | null
   features?: Prisma.StringNullableListFilter<"PlanConfig">
+  idealFor?: Prisma.StringNullableListFilter<"PlanConfig">
   isActive?: Prisma.BoolFilter<"PlanConfig"> | boolean
   createdAt?: Prisma.DateTimeFilter<"PlanConfig"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PlanConfig"> | Date | string
@@ -301,6 +305,7 @@ export type PlanConfigOrderByWithRelationInput = {
   maxProfessionals?: Prisma.SortOrder
   maxServices?: Prisma.SortOrderInput | Prisma.SortOrder
   features?: Prisma.SortOrder
+  idealFor?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -320,6 +325,7 @@ export type PlanConfigWhereUniqueInput = Prisma.AtLeast<{
   maxProfessionals?: Prisma.IntFilter<"PlanConfig"> | number
   maxServices?: Prisma.IntNullableFilter<"PlanConfig"> | number | null
   features?: Prisma.StringNullableListFilter<"PlanConfig">
+  idealFor?: Prisma.StringNullableListFilter<"PlanConfig">
   isActive?: Prisma.BoolFilter<"PlanConfig"> | boolean
   createdAt?: Prisma.DateTimeFilter<"PlanConfig"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PlanConfig"> | Date | string
@@ -336,6 +342,7 @@ export type PlanConfigOrderByWithAggregationInput = {
   maxProfessionals?: Prisma.SortOrder
   maxServices?: Prisma.SortOrderInput | Prisma.SortOrder
   features?: Prisma.SortOrder
+  idealFor?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -360,6 +367,7 @@ export type PlanConfigScalarWhereWithAggregatesInput = {
   maxProfessionals?: Prisma.IntWithAggregatesFilter<"PlanConfig"> | number
   maxServices?: Prisma.IntNullableWithAggregatesFilter<"PlanConfig"> | number | null
   features?: Prisma.StringNullableListFilter<"PlanConfig">
+  idealFor?: Prisma.StringNullableListFilter<"PlanConfig">
   isActive?: Prisma.BoolWithAggregatesFilter<"PlanConfig"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"PlanConfig"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"PlanConfig"> | Date | string
@@ -376,6 +384,7 @@ export type PlanConfigCreateInput = {
   maxProfessionals: number
   maxServices?: number | null
   features?: Prisma.PlanConfigCreatefeaturesInput | string[]
+  idealFor?: Prisma.PlanConfigCreateidealForInput | string[]
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -392,6 +401,7 @@ export type PlanConfigUncheckedCreateInput = {
   maxProfessionals: number
   maxServices?: number | null
   features?: Prisma.PlanConfigCreatefeaturesInput | string[]
+  idealFor?: Prisma.PlanConfigCreateidealForInput | string[]
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -408,6 +418,7 @@ export type PlanConfigUpdateInput = {
   maxProfessionals?: Prisma.IntFieldUpdateOperationsInput | number
   maxServices?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   features?: Prisma.PlanConfigUpdatefeaturesInput | string[]
+  idealFor?: Prisma.PlanConfigUpdateidealForInput | string[]
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -424,6 +435,7 @@ export type PlanConfigUncheckedUpdateInput = {
   maxProfessionals?: Prisma.IntFieldUpdateOperationsInput | number
   maxServices?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   features?: Prisma.PlanConfigUpdatefeaturesInput | string[]
+  idealFor?: Prisma.PlanConfigUpdateidealForInput | string[]
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -440,6 +452,7 @@ export type PlanConfigCreateManyInput = {
   maxProfessionals: number
   maxServices?: number | null
   features?: Prisma.PlanConfigCreatefeaturesInput | string[]
+  idealFor?: Prisma.PlanConfigCreateidealForInput | string[]
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -456,6 +469,7 @@ export type PlanConfigUpdateManyMutationInput = {
   maxProfessionals?: Prisma.IntFieldUpdateOperationsInput | number
   maxServices?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   features?: Prisma.PlanConfigUpdatefeaturesInput | string[]
+  idealFor?: Prisma.PlanConfigUpdateidealForInput | string[]
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -472,6 +486,7 @@ export type PlanConfigUncheckedUpdateManyInput = {
   maxProfessionals?: Prisma.IntFieldUpdateOperationsInput | number
   maxServices?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   features?: Prisma.PlanConfigUpdatefeaturesInput | string[]
+  idealFor?: Prisma.PlanConfigUpdateidealForInput | string[]
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -488,6 +503,7 @@ export type PlanConfigCountOrderByAggregateInput = {
   maxProfessionals?: Prisma.SortOrder
   maxServices?: Prisma.SortOrder
   features?: Prisma.SortOrder
+  idealFor?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -541,6 +557,10 @@ export type PlanConfigCreatefeaturesInput = {
   set: string[]
 }
 
+export type PlanConfigCreateidealForInput = {
+  set: string[]
+}
+
 export type EnumSubscriptionPlanFieldUpdateOperationsInput = {
   set?: $Enums.SubscriptionPlan
 }
@@ -558,6 +578,11 @@ export type PlanConfigUpdatefeaturesInput = {
   push?: string | string[]
 }
 
+export type PlanConfigUpdateidealForInput = {
+  set?: string[]
+  push?: string | string[]
+}
+
 
 
 export type PlanConfigSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -571,6 +596,7 @@ export type PlanConfigSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   maxProfessionals?: boolean
   maxServices?: boolean
   features?: boolean
+  idealFor?: boolean
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -587,6 +613,7 @@ export type PlanConfigSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   maxProfessionals?: boolean
   maxServices?: boolean
   features?: boolean
+  idealFor?: boolean
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -603,6 +630,7 @@ export type PlanConfigSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   maxProfessionals?: boolean
   maxServices?: boolean
   features?: boolean
+  idealFor?: boolean
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -619,12 +647,13 @@ export type PlanConfigSelectScalar = {
   maxProfessionals?: boolean
   maxServices?: boolean
   features?: boolean
+  idealFor?: boolean
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type PlanConfigOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "plan" | "name" | "description" | "priceInCents" | "stripePriceId" | "maxBarbershops" | "maxProfessionals" | "maxServices" | "features" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["planConfig"]>
+export type PlanConfigOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "plan" | "name" | "description" | "priceInCents" | "stripePriceId" | "maxBarbershops" | "maxProfessionals" | "maxServices" | "features" | "idealFor" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["planConfig"]>
 
 export type $PlanConfigPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "PlanConfig"
@@ -640,6 +669,7 @@ export type $PlanConfigPayload<ExtArgs extends runtime.Types.Extensions.Internal
     maxProfessionals: number
     maxServices: number | null
     features: string[]
+    idealFor: string[]
     isActive: boolean
     createdAt: Date
     updatedAt: Date
@@ -1076,6 +1106,7 @@ export interface PlanConfigFieldRefs {
   readonly maxProfessionals: Prisma.FieldRef<"PlanConfig", 'Int'>
   readonly maxServices: Prisma.FieldRef<"PlanConfig", 'Int'>
   readonly features: Prisma.FieldRef<"PlanConfig", 'String[]'>
+  readonly idealFor: Prisma.FieldRef<"PlanConfig", 'String[]'>
   readonly isActive: Prisma.FieldRef<"PlanConfig", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"PlanConfig", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"PlanConfig", 'DateTime'>

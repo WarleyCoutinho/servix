@@ -2211,6 +2211,7 @@ export const PlanConfigScalarFieldEnum = {
   maxProfessionals: 'maxProfessionals',
   maxServices: 'maxServices',
   features: 'features',
+  idealFor: 'idealFor',
   isActive: 'isActive',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

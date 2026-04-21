@@ -15,6 +15,7 @@ const inputSchema = z.object({
   maxProfessionals: z.number().min(1, "Mínimo de 1 profissional"),
   maxServices: z.number().min(1).nullable(),
   features: z.array(z.string()),
+  idealFor: z.array(z.string()),
   isActive: z.boolean(),
 });
 
@@ -32,6 +33,7 @@ export const updatePlan = adminActionClient
         maxProfessionals: parsedInput.maxProfessionals,
         maxServices: parsedInput.maxServices,
         features: parsedInput.features,
+        idealFor: parsedInput.idealFor,
         isActive: parsedInput.isActive,
       },
     });
@@ -47,6 +49,7 @@ export const updatePlan = adminActionClient
       maxProfessionals: updatedPlan.maxProfessionals,
       maxServices: updatedPlan.maxServices,
       features: updatedPlan.features,
+      idealFor: parsedInput.idealFor,
       isActive: updatedPlan.isActive,
     };
   });

@@ -29,6 +29,7 @@ interface PlanData {
   maxProfessionals: number;
   maxServices: number | null;
   features: string[];
+  idealFor: string[];
   isActive: boolean;
 }
 
@@ -52,7 +53,9 @@ export function PlansManager({ initialPlans }: PlansManagerProps) {
         }
       } catch (e) {
         console.error("Error updating local state:", e);
-        toast.success("Plano salvo! Recarregue a página para ver as alterações.");
+        toast.success(
+          "Plano salvo! Recarregue a página para ver as alterações.",
+        );
         setEditingPlan(null);
       }
     },
@@ -73,6 +76,7 @@ export function PlansManager({ initialPlans }: PlansManagerProps) {
       maxProfessionals: plan.maxProfessionals,
       maxServices: plan.maxServices,
       features: plan.features,
+      idealFor: plan.idealFor,
       isActive: plan.isActive,
     });
   };
@@ -199,7 +203,11 @@ export function PlansManager({ initialPlans }: PlansManagerProps) {
                   <Input
                     value={plan.stripePriceId}
                     onChange={(e) => {
-                      updatePlanField(plan.plan, "stripePriceId", e.target.value);
+                      updatePlanField(
+                        plan.plan,
+                        "stripePriceId",
+                        e.target.value,
+                      );
                       setEditingPlan(plan.plan);
                     }}
                     placeholder="price_xxx"
@@ -279,6 +287,44 @@ export function PlansManager({ initialPlans }: PlansManagerProps) {
                     <div key={index} className="flex items-center gap-1">
                       <Input
                         value={feature}
+                        onChange={(e) => {
+                          updateFeature(plan.plan, index, e.target.value);
+                          setEditingPlan(plan.plan);
+                        }}
+                        className="text-sm"
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          removeFeature(plan.plan, index);
+                          setEditingPlan(plan.plan);
+                        }}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label>Ideal </Label>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => addFeature(plan.plan)}
+                  >
+                    <Plus className="h-3 w-3" />
+                  </Button>
+                </div>
+                <div className="max-h-40 space-y-2 overflow-y-auto">
+                  {plan.idealFor.map((ideal, index) => (
+                    <div key={index} className="flex items-center gap-1">
+                      <Input
+                        value={ideal}
                         onChange={(e) => {
                           updateFeature(plan.plan, index, e.target.value);
                           setEditingPlan(plan.plan);
