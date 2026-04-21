@@ -60,13 +60,13 @@ function buildScheduleMessage(
     let line: string;
     if (isPast && booking) {
       stats.finishedCount++;
-      line = `~✦ ${slot}  ${booking.serviceName} · ${booking.clientName}~`;
+      line = `~✦ ${slot} — ${booking.serviceName} · ${booking.clientName}~`;
     } else if (booking) {
       stats.bookedCount++;
-      line = `🔵 *${slot}*  *${booking.clientName}*\n       └ _${booking.serviceName}_`;
+      line = `🔵 *${slot}* — *${booking.clientName}*\n┗ _${booking.serviceName}_`;
     } else {
       stats.freeCount++;
-      line = `⚪ ${slot}  _disponível_`;
+      line = `⬜ ${slot}`;
     }
 
     if (hour < 12) morningSlots.push(line);
@@ -75,10 +75,9 @@ function buildScheduleMessage(
   }
 
   const lines: string[] = [
-    `╔════════════════════════╗`,
-    `  ✂️  *${professionalName}*`,
-    `  📅  ${dayLabel}, ${dateFormatted}`,
-    `╚════════════════════════╝`,
+    `✂️ *${professionalName}*`,
+    `📅 ${dayLabel}, ${dateFormatted}`,
+    `━━━━━━━━━━━━━━━━━━━━━━━`,
     ``,
   ];
 
@@ -94,7 +93,6 @@ function buildScheduleMessage(
     lines.push(`🌙 *NOITE*`, ``, ...eveningSlots, ``);
   }
 
-  // Resumo
   const statsParts: string[] = [];
   if (stats.finishedCount > 0)
     statsParts.push(
@@ -106,13 +104,13 @@ function buildScheduleMessage(
     );
   if (stats.freeCount > 0)
     statsParts.push(
-      `⚪ ${stats.freeCount} livre${stats.freeCount !== 1 ? "s" : ""}`,
+      `⬜ ${stats.freeCount} livre${stats.freeCount !== 1 ? "s" : ""}`,
     );
 
   lines.push(
-    `┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄`,
-    `📊  ${statsParts.join("  ·  ")}`,
-    `┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄`,
+    `━━━━━━━━━━━━━━━━━━━━━━━`,
+    `📊 ${statsParts.join("  ·  ")}`,
+    `━━━━━━━━━━━━━━━━━━━━━━━`,
     ``,
     `🔗 *Agendar:* ${bookingUrl}`,
   );
