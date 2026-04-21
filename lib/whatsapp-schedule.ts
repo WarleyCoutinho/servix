@@ -195,7 +195,9 @@ export async function sendDailyScheduleToGroup(
         lte: endOfDayBrt(date),
       },
     },
-    include: {
+    select: {
+      date: true,
+      clientName: true,
       service: { select: { name: true, durationMinutes: true } },
       user: { select: { name: true } },
     },
@@ -210,7 +212,6 @@ export async function sendDailyScheduleToGroup(
     DEFAULT_INTERVAL_MINUTES,
   );
 
-  // Respeitar intervalo de almoço configurado
   if (schedule.hasLunchBreak) {
     allSlots = allSlots.filter(
       (slot) => slot < schedule.lunchStartTime || slot >= schedule.lunchEndTime,
@@ -256,6 +257,7 @@ export async function sendDailyScheduleToGroup(
 function buildBookedTimesMap(
   bookings: Array<{
     date: Date;
+    clientName: string | null;
     service: { name: string; durationMinutes: number };
     user: { name: string };
   }>,
@@ -267,9 +269,10 @@ function buildBookedTimesMap(
       booking.service.durationMinutes / DEFAULT_INTERVAL_MINUTES,
     );
     const timeKey = formatBrt(booking.date, "HH:mm");
+    const clientName = booking.clientName ?? booking.user.name;
     map.set(timeKey, {
       serviceName: booking.service.name,
-      clientName: booking.user.name,
+      clientName,
     });
 
     for (let i = 1; i < slotsNeeded; i++) {
@@ -280,7 +283,7 @@ function buildBookedTimesMap(
       const nextTimeKey = formatBrt(nextSlotDate, "HH:mm");
       map.set(nextTimeKey, {
         serviceName: `${booking.service.name} (cont.)`,
-        clientName: booking.user.name,
+        clientName,
       });
     }
   }
