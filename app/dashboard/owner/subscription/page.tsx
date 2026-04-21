@@ -40,6 +40,7 @@ export default async function SubscriptionPage() {
     maxProfessionals: plan.maxProfessionals,
     maxServices: plan.maxServices,
     features: plan.features,
+    idealFor: plan.idealFor,
   }));
 
   return (

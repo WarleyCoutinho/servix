@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { updatePlan } from "@/actions/admin/update-plan";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,11 +13,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { SubscriptionPlan } from "@/generated/prisma/enums";
-import { Loader2, Save, Plus, X } from "lucide-react";
+import { Loader2, Plus, Save, X } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
+import { useCallback, useState } from "react";
 import { toast } from "sonner";
 
-interface PlanData {
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+export interface PlanData {
   id: string;
   plan: SubscriptionPlan;
   name: string;
@@ -33,338 +35,313 @@ interface PlanData {
   isActive: boolean;
 }
 
-interface PlansManagerProps {
+export interface PlansManagerProps {
   initialPlans: PlanData[];
 }
 
+// ─── Utils ────────────────────────────────────────────────────────────────────
+
+function centsToPrice(cents: number): string {
+  return (cents / 100).toFixed(2);
+}
+
+function priceToCents(value: string): number {
+  return Math.round(parseFloat(value || "0") * 100);
+}
+
+function updateListItem<T>(list: T[], index: number, value: T): T[] {
+  return list.map((item, i) => (i === index ? value : item));
+}
+
+function removeListItem<T>(list: T[], index: number): T[] {
+  return list.filter((_, i) => i !== index);
+}
+
+// ─── Sub-components ───────────────────────────────────────────────────────────
+
+interface StringListEditorProps {
+  label: string;
+  items: string[];
+  onAdd: () => void;
+  onUpdate: (index: number, value: string) => void;
+  onRemove: (index: number) => void;
+}
+
+function StringListEditor({
+  label,
+  items,
+  onAdd,
+  onUpdate,
+  onRemove,
+}: StringListEditorProps) {
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <Label>{label}</Label>
+        <Button type="button" variant="ghost" size="sm" onClick={onAdd}>
+          <Plus className="h-3 w-3" />
+        </Button>
+      </div>
+      <div className="max-h-40 space-y-2 overflow-y-auto">
+        {items.map((item, index) => (
+          <div key={index} className="flex items-center gap-1">
+            <Input
+              value={item}
+              onChange={(e) => onUpdate(index, e.target.value)}
+              className="text-sm"
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => onRemove(index)}
+            >
+              <X className="h-3 w-3" />
+            </Button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+interface PlanCardProps {
+  plan: PlanData;
+  isSaving: boolean;
+  isDirty: boolean;
+  onChange: (updated: PlanData) => void;
+  onSave: (plan: PlanData) => void;
+}
+
+function PlanCard({
+  plan,
+  isSaving,
+  isDirty,
+  onChange,
+  onSave,
+}: PlanCardProps) {
+  const patch = useCallback(
+    <K extends keyof PlanData>(field: K, value: PlanData[K]) => {
+      onChange({ ...plan, [field]: value });
+    },
+    [plan, onChange],
+  );
+
+  return (
+    <Card className={!plan.isActive ? "opacity-60" : undefined}>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-lg">{plan.name}</CardTitle>
+          <div className="flex items-center gap-2">
+            <Label htmlFor={`active-${plan.plan}`} className="text-xs">
+              Ativo
+            </Label>
+            <Switch
+              id={`active-${plan.plan}`}
+              checked={plan.isActive}
+              onCheckedChange={(checked) => patch("isActive", checked)}
+            />
+          </div>
+        </div>
+        <CardDescription>{plan.plan}</CardDescription>
+      </CardHeader>
+
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <Label>Nome</Label>
+          <Input
+            value={plan.name}
+            onChange={(e) => patch("name", e.target.value)}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label>Descrição</Label>
+          <Input
+            value={plan.description}
+            onChange={(e) => patch("description", e.target.value)}
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label>Preço (R$)</Label>
+            <Input
+              type="number"
+              step="0.01"
+              value={centsToPrice(plan.priceInCents)}
+              onChange={(e) =>
+                patch("priceInCents", priceToCents(e.target.value))
+              }
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Stripe Price ID</Label>
+            <Input
+              value={plan.stripePriceId}
+              onChange={(e) => patch("stripePriceId", e.target.value)}
+              placeholder="price_xxx"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-3 gap-2">
+          <div className="space-y-2">
+            <Label className="text-xs">Max Lojas</Label>
+            <Input
+              type="number"
+              min={1}
+              value={plan.maxBarbershops}
+              onChange={(e) =>
+                patch("maxBarbershops", parseInt(e.target.value) || 1)
+              }
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-xs">Max Prof.</Label>
+            <Input
+              type="number"
+              min={1}
+              value={plan.maxProfessionals}
+              onChange={(e) =>
+                patch("maxProfessionals", parseInt(e.target.value) || 1)
+              }
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-xs">Max Serv.</Label>
+            <Input
+              type="number"
+              min={0}
+              value={plan.maxServices ?? ""}
+              placeholder="Ilimitado"
+              onChange={(e) =>
+                patch(
+                  "maxServices",
+                  e.target.value === "" ? null : parseInt(e.target.value) || 1,
+                )
+              }
+            />
+          </div>
+        </div>
+
+        <StringListEditor
+          label="Features"
+          items={plan.features}
+          onAdd={() => patch("features", [...plan.features, ""])}
+          onUpdate={(i, v) =>
+            patch("features", updateListItem(plan.features, i, v))
+          }
+          onRemove={(i) => patch("features", removeListItem(plan.features, i))}
+        />
+
+        <StringListEditor
+          label="Ideal para"
+          items={plan.idealFor}
+          onAdd={() => patch("idealFor", [...plan.idealFor, ""])}
+          onUpdate={(i, v) =>
+            patch("idealFor", updateListItem(plan.idealFor, i, v))
+          }
+          onRemove={(i) => patch("idealFor", removeListItem(plan.idealFor, i))}
+        />
+
+        {isDirty && (
+          <Button
+            className="w-full"
+            onClick={() => onSave(plan)}
+            disabled={isSaving}
+          >
+            {isSaving ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Save className="mr-2 h-4 w-4" />
+            )}
+            Salvar Alterações
+          </Button>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+// ─── Main component ───────────────────────────────────────────────────────────
+
 export function PlansManager({ initialPlans }: PlansManagerProps) {
   const [plans, setPlans] = useState<PlanData[]>(initialPlans);
-  const [editingPlan, setEditingPlan] = useState<SubscriptionPlan | null>(null);
+  const [dirtyPlans, setDirtyPlans] = useState<Set<SubscriptionPlan>>(
+    new Set(),
+  );
+
+  const markDirty = useCallback((planKey: SubscriptionPlan) => {
+    setDirtyPlans((prev) => new Set(prev).add(planKey));
+  }, []);
+
+  const markClean = useCallback((planKey: SubscriptionPlan) => {
+    setDirtyPlans((prev) => {
+      const next = new Set(prev);
+      next.delete(planKey);
+      return next;
+    });
+  }, []);
 
   const { execute: save, isPending: isSaving } = useAction(updatePlan, {
     onSuccess: ({ data }) => {
-      try {
-        if (data) {
-          setPlans((prev) =>
-            prev.map((p) => (p.plan === data.plan ? { ...p, ...data } : p)),
-          );
-          toast.success("Plano atualizado com sucesso!");
-          setEditingPlan(null);
-        }
-      } catch (e) {
-        console.error("Error updating local state:", e);
-        toast.success(
-          "Plano salvo! Recarregue a página para ver as alterações.",
-        );
-        setEditingPlan(null);
-      }
+      if (!data) return;
+      setPlans((prev) =>
+        prev.map((p) => (p.plan === data.plan ? { ...p, ...data } : p)),
+      );
+      markClean(data.plan);
+      toast.success("Plano atualizado com sucesso!");
     },
     onError: ({ error }) => {
-      console.error("Server action error:", error);
       toast.error(error.serverError ?? "Erro ao atualizar plano");
     },
   });
 
-  const handleSave = (plan: PlanData) => {
-    save({
-      plan: plan.plan,
-      name: plan.name,
-      description: plan.description,
-      priceInCents: plan.priceInCents,
-      stripePriceId: plan.stripePriceId,
-      maxBarbershops: plan.maxBarbershops,
-      maxProfessionals: plan.maxProfessionals,
-      maxServices: plan.maxServices,
-      features: plan.features,
-      idealFor: plan.idealFor,
-      isActive: plan.isActive,
-    });
-  };
+  const handleChange = useCallback(
+    (updated: PlanData) => {
+      setPlans((prev) =>
+        prev.map((p) => (p.plan === updated.plan ? updated : p)),
+      );
+      markDirty(updated.plan);
+    },
+    [markDirty],
+  );
 
-  const updatePlanField = (
-    planKey: SubscriptionPlan,
-    field: keyof PlanData,
-    value: PlanData[keyof PlanData],
-  ) => {
-    setPlans((prev) =>
-      prev.map((p) => (p.plan === planKey ? { ...p, [field]: value } : p)),
-    );
-  };
-
-  const addFeature = (planKey: SubscriptionPlan) => {
-    setPlans((prev) =>
-      prev.map((p) =>
-        p.plan === planKey ? { ...p, features: [...p.features, ""] } : p,
-      ),
-    );
-  };
-
-  const updateFeature = (
-    planKey: SubscriptionPlan,
-    index: number,
-    value: string,
-  ) => {
-    setPlans((prev) =>
-      prev.map((p) =>
-        p.plan === planKey
-          ? {
-              ...p,
-              features: p.features.map((f, i) => (i === index ? value : f)),
-            }
-          : p,
-      ),
-    );
-  };
-
-  const removeFeature = (planKey: SubscriptionPlan, index: number) => {
-    setPlans((prev) =>
-      prev.map((p) =>
-        p.plan === planKey
-          ? { ...p, features: p.features.filter((_, i) => i !== index) }
-          : p,
-      ),
-    );
-  };
-
-  const formatPrice = (cents: number) => {
-    return (cents / 100).toFixed(2).replace(".", ",");
-  };
+  const handleSave = useCallback(
+    (plan: PlanData) => {
+      save({
+        plan: plan.plan,
+        name: plan.name,
+        description: plan.description,
+        priceInCents: plan.priceInCents,
+        stripePriceId: plan.stripePriceId,
+        maxBarbershops: plan.maxBarbershops,
+        maxProfessionals: plan.maxProfessionals,
+        maxServices: plan.maxServices,
+        features: plan.features,
+        idealFor: plan.idealFor,
+        isActive: plan.isActive,
+      });
+    },
+    [save],
+  );
 
   return (
     <div className="grid gap-6 lg:grid-cols-3">
-      {plans.map((plan) => {
-        const isEditing = editingPlan === plan.plan;
-        return (
-          <Card
-            key={plan.plan}
-            className={!plan.isActive ? "opacity-60" : undefined}
-          >
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">{plan.name}</CardTitle>
-                <div className="flex items-center gap-2">
-                  <Label htmlFor={`active-${plan.plan}`} className="text-xs">
-                    Ativo
-                  </Label>
-                  <Switch
-                    id={`active-${plan.plan}`}
-                    checked={plan.isActive}
-                    onCheckedChange={(checked) => {
-                      updatePlanField(plan.plan, "isActive", checked);
-                      setEditingPlan(plan.plan);
-                    }}
-                  />
-                </div>
-              </div>
-              <CardDescription>{plan.plan}</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label>Nome</Label>
-                <Input
-                  value={plan.name}
-                  onChange={(e) => {
-                    updatePlanField(plan.plan, "name", e.target.value);
-                    setEditingPlan(plan.plan);
-                  }}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Descricao</Label>
-                <Input
-                  value={plan.description}
-                  onChange={(e) => {
-                    updatePlanField(plan.plan, "description", e.target.value);
-                    setEditingPlan(plan.plan);
-                  }}
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Preco (R$)</Label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={formatPrice(plan.priceInCents)}
-                    onChange={(e) => {
-                      const cents = Math.round(
-                        parseFloat(e.target.value || "0") * 100,
-                      );
-                      updatePlanField(plan.plan, "priceInCents", cents);
-                      setEditingPlan(plan.plan);
-                    }}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Stripe Price ID</Label>
-                  <Input
-                    value={plan.stripePriceId}
-                    onChange={(e) => {
-                      updatePlanField(
-                        plan.plan,
-                        "stripePriceId",
-                        e.target.value,
-                      );
-                      setEditingPlan(plan.plan);
-                    }}
-                    placeholder="price_xxx"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-2">
-                <div className="space-y-2">
-                  <Label className="text-xs">Max Lojas</Label>
-                  <Input
-                    type="number"
-                    min={1}
-                    value={plan.maxBarbershops}
-                    onChange={(e) => {
-                      updatePlanField(
-                        plan.plan,
-                        "maxBarbershops",
-                        parseInt(e.target.value) || 1,
-                      );
-                      setEditingPlan(plan.plan);
-                    }}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-xs">Max Prof.</Label>
-                  <Input
-                    type="number"
-                    min={1}
-                    value={plan.maxProfessionals}
-                    onChange={(e) => {
-                      updatePlanField(
-                        plan.plan,
-                        "maxProfessionals",
-                        parseInt(e.target.value) || 1,
-                      );
-                      setEditingPlan(plan.plan);
-                    }}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-xs">Max Serv.</Label>
-                  <Input
-                    type="number"
-                    min={0}
-                    value={plan.maxServices ?? ""}
-                    placeholder="Ilimitado"
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      updatePlanField(
-                        plan.plan,
-                        "maxServices",
-                        value === "" ? null : parseInt(value) || 1,
-                      );
-                      setEditingPlan(plan.plan);
-                    }}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label>Features</Label>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => addFeature(plan.plan)}
-                  >
-                    <Plus className="h-3 w-3" />
-                  </Button>
-                </div>
-                <div className="max-h-40 space-y-2 overflow-y-auto">
-                  {plan.features.map((feature, index) => (
-                    <div key={index} className="flex items-center gap-1">
-                      <Input
-                        value={feature}
-                        onChange={(e) => {
-                          updateFeature(plan.plan, index, e.target.value);
-                          setEditingPlan(plan.plan);
-                        }}
-                        className="text-sm"
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          removeFeature(plan.plan, index);
-                          setEditingPlan(plan.plan);
-                        }}
-                      >
-                        <X className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label>Ideal </Label>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => addFeature(plan.plan)}
-                  >
-                    <Plus className="h-3 w-3" />
-                  </Button>
-                </div>
-                <div className="max-h-40 space-y-2 overflow-y-auto">
-                  {plan.idealFor.map((ideal, index) => (
-                    <div key={index} className="flex items-center gap-1">
-                      <Input
-                        value={ideal}
-                        onChange={(e) => {
-                          updateFeature(plan.plan, index, e.target.value);
-                          setEditingPlan(plan.plan);
-                        }}
-                        className="text-sm"
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          removeFeature(plan.plan, index);
-                          setEditingPlan(plan.plan);
-                        }}
-                      >
-                        <X className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {isEditing && (
-                <Button
-                  className="w-full"
-                  onClick={() => handleSave(plan)}
-                  disabled={isSaving}
-                >
-                  {isSaving ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ) : (
-                    <Save className="mr-2 h-4 w-4" />
-                  )}
-                  Salvar Alteracoes
-                </Button>
-              )}
-            </CardContent>
-          </Card>
-        );
-      })}
+      {plans.map((plan) => (
+        <PlanCard
+          key={plan.plan}
+          plan={plan}
+          isSaving={isSaving && dirtyPlans.has(plan.plan)}
+          isDirty={dirtyPlans.has(plan.plan)}
+          onChange={handleChange}
+          onSave={handleSave}
+        />
+      ))}
     </div>
   );
 }
