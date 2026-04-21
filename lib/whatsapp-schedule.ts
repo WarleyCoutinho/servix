@@ -41,8 +41,6 @@ function buildScheduleMessage(
   currentTime: string,
   bookingUrl: string,
 ): string {
-  const separator = "━━━━━━━━━━━━━━━━━━━━━━━";
-
   const morningSlots: string[] = [];
   const afternoonSlots: string[] = [];
   const eveningSlots: string[] = [];
@@ -57,76 +55,66 @@ function buildScheduleMessage(
     const booking = bookedTimesMap.get(slot);
     const isPast = slot < currentTime;
 
-    if (isPast && !booking) {
-      continue;
-    }
+    if (isPast && !booking) continue;
 
     let line: string;
     if (isPast && booking) {
       stats.finishedCount++;
-      line = `  ✓ ${slot}  │ ~${booking.serviceName} - ${booking.clientName}~`;
+      line = `~✦ ${slot}  ${booking.serviceName} · ${booking.clientName}~`;
     } else if (booking) {
       stats.bookedCount++;
-      line = `  *${slot}* │ ${booking.serviceName}\n           │ _${booking.clientName}_`;
+      line = `🔵 *${slot}*  *${booking.clientName}*\n       └ _${booking.serviceName}_`;
     } else {
       stats.freeCount++;
-      line = `  ${slot}  │ ～`;
+      line = `⚪ ${slot}  _disponível_`;
     }
 
-    if (hour < 12) {
-      morningSlots.push(line);
-    } else if (hour < 18) {
-      afternoonSlots.push(line);
-    } else {
-      eveningSlots.push(line);
-    }
+    if (hour < 12) morningSlots.push(line);
+    else if (hour < 18) afternoonSlots.push(line);
+    else eveningSlots.push(line);
   }
 
   const lines: string[] = [
-    separator,
-    `  📋  *AGENDA DO DIA*`,
+    `╔════════════════════════╗`,
+    `  ✂️  *${professionalName}*`,
     `  📅  ${dayLabel}, ${dateFormatted}`,
-    `  💈  ${professionalName}`,
-    separator,
+    `╚════════════════════════╝`,
+    ``,
   ];
 
   if (morningSlots.length > 0) {
-    lines.push("", `  ☀️  *MANHÃ*`, "", ...morningSlots);
+    lines.push(`☀️ *MANHÃ*`, ``, ...morningSlots, ``);
   }
 
   if (afternoonSlots.length > 0) {
-    lines.push("", `  🌤️  *TARDE*`, "", ...afternoonSlots);
+    lines.push(`🌤 *TARDE*`, ``, ...afternoonSlots, ``);
   }
 
   if (eveningSlots.length > 0) {
-    lines.push("", `  🌙  *NOITE*`, "", ...eveningSlots);
+    lines.push(`🌙 *NOITE*`, ``, ...eveningSlots, ``);
   }
 
+  // Resumo
   const statsParts: string[] = [];
-  if (stats.finishedCount > 0) {
+  if (stats.finishedCount > 0)
     statsParts.push(
-      `✓ *${stats.finishedCount}* finalizado${stats.finishedCount !== 1 ? "s" : ""}`,
+      `✅ ${stats.finishedCount} finalizado${stats.finishedCount !== 1 ? "s" : ""}`,
     );
-  }
-  if (stats.bookedCount > 0) {
+  if (stats.bookedCount > 0)
     statsParts.push(
-      `*${stats.bookedCount}* agendado${stats.bookedCount !== 1 ? "s" : ""}`,
+      `🔵 ${stats.bookedCount} agendado${stats.bookedCount !== 1 ? "s" : ""}`,
     );
-  }
-  if (stats.freeCount > 0) {
+  if (stats.freeCount > 0)
     statsParts.push(
-      `*${stats.freeCount}* livre${stats.freeCount !== 1 ? "s" : ""}`,
+      `⚪ ${stats.freeCount} livre${stats.freeCount !== 1 ? "s" : ""}`,
     );
-  }
 
   lines.push(
-    "",
-    separator,
-    `  📊  ${statsParts.join("  •  ")}`,
-    separator,
-    "",
-    `  📲  *Agende agora:*`,
-    `  ${bookingUrl}`,
+    `┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄`,
+    `📊  ${statsParts.join("  ·  ")}`,
+    `┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄`,
+    ``,
+    `🔗 *Agendar:* ${bookingUrl}`,
   );
 
   return lines.join("\n");
@@ -154,9 +142,7 @@ export async function sendDailyScheduleToGroup(
 ): Promise<void> {
   const date = new Date(bookingDate);
 
-  if (isFutureDateBrt(date)) {
-    return;
-  }
+  if (isFutureDateBrt(date)) return;
 
   const professional = await prisma.professional.findUnique({
     where: { id: professionalId },
@@ -167,24 +153,18 @@ export async function sendDailyScheduleToGroup(
     },
   });
 
-  if (!professional?.whatsappGroupName) {
-    return;
-  }
+  if (!professional?.whatsappGroupName) return;
 
   const dayOfWeek = getDayOfWeekFromDate(date);
   const schedule = professional.schedules.find(
     (s) => s.dayOfWeek === dayOfWeek,
   );
 
-  if (!schedule?.isAvailable) {
-    return;
-  }
+  if (!schedule?.isAvailable) return;
 
   const currentTime = getCurrentTimeBrt();
 
-  if (isTodayBrt(date) && currentTime >= schedule.endTime) {
-    return;
-  }
+  if (isTodayBrt(date) && currentTime >= schedule.endTime) return;
 
   const bookings = await prisma.booking.findMany({
     where: {
@@ -222,9 +202,7 @@ export async function sendDailyScheduleToGroup(
     (slot) => slot >= currentTime || bookedTimesMap.has(slot),
   );
 
-  if (!hasVisibleSlots) {
-    return;
-  }
+  if (!hasVisibleSlots) return;
 
   const dayLabel = DAY_OF_WEEK_LABELS[dayOfWeek];
   const dateFormatted = formatBrt(date, "dd/MM/yyyy");
@@ -270,6 +248,7 @@ function buildBookedTimesMap(
     );
     const timeKey = formatBrt(booking.date, "HH:mm");
     const clientName = booking.clientName ?? booking.user.name;
+
     map.set(timeKey, {
       serviceName: booking.service.name,
       clientName,
