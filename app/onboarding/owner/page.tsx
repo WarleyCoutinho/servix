@@ -2,14 +2,6 @@
 
 import { setOwnerRole } from "@/actions/user/set-owner-role";
 import { ImageUpload } from "@/components/image-upload";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -31,7 +23,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { authClient } from "@/lib/auth-client";
 import { formatCPF, formatPhone } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Building2, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -40,9 +32,33 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 const BRAZILIAN_STATES = [
-  "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA",
-  "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN",
-  "RS", "RO", "RR", "SC", "SP", "SE", "TO",
+  "AC",
+  "AL",
+  "AP",
+  "AM",
+  "BA",
+  "CE",
+  "DF",
+  "ES",
+  "GO",
+  "MA",
+  "MT",
+  "MS",
+  "MG",
+  "PA",
+  "PB",
+  "PR",
+  "PE",
+  "PI",
+  "RJ",
+  "RN",
+  "RS",
+  "RO",
+  "RR",
+  "SC",
+  "SP",
+  "SE",
+  "TO",
 ];
 
 const formSchema = z.object({
@@ -67,7 +83,10 @@ export default function OwnerOnboardingPage() {
   const router = useRouter();
   const { data: session, isPending: isSessionLoading } =
     authClient.useSession();
-  const [isChecking, setIsChecking] = useState(true);
+  // ✅ Fix: iniciar como false quando session ainda está carregando,
+  // sem precisar de setState síncrono dentro do efeito
+  const [isChecking, setIsChecking] = useState(false);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -85,14 +104,14 @@ export default function OwnerOnboardingPage() {
 
   const { execute, isPending } = useAction(setOwnerRole, {
     onSuccess: () => {
-      toast.success("Barbearia criada com sucesso!");
+      toast.success("Negócio criado com sucesso!");
       router.push("/dashboard/owner");
     },
     onError: ({ error }) => {
       const errorMessage =
         error.serverError ??
         error.validationErrors?._errors?.[0] ??
-        "Erro ao criar barbearia";
+        "Erro ao criar negócio";
       toast.error(errorMessage);
     },
   });
@@ -104,6 +123,8 @@ export default function OwnerOnboardingPage() {
       router.replace("/");
       return;
     }
+
+    setIsChecking(true);
 
     const checkOwnerStatus = async () => {
       try {
@@ -120,23 +141,19 @@ export default function OwnerOnboardingPage() {
           router.replace("/");
           return;
         }
-
-        setIsChecking(false);
       } catch {
         router.replace("/");
+      } finally {
+        // ✅ setState dentro de callback assíncrono — sem cascata síncrona
+        setIsChecking(false);
       }
     };
 
     checkOwnerStatus();
   }, [session, isSessionLoading, router]);
 
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
-
   const onSubmit = (data: FormData) => {
-    execute({
-      ...data,
-      imageUrl: imageUrl || undefined,
-    });
+    execute({ ...data, imageUrl: imageUrl || undefined });
   };
 
   if (isSessionLoading || isChecking) {
@@ -148,202 +165,314 @@ export default function OwnerOnboardingPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4">
-      <Card className="w-full max-w-lg">
-        <CardHeader className="text-center">
-          <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-primary/10">
-            <Building2 className="size-8 text-primary" />
+    <div
+      className="flex min-h-screen items-center justify-center p-8"
+      style={{ fontFamily: "'Barlow', sans-serif" }}
+    >
+      {/* Decorative circles */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+        <div className="absolute -top-20 -right-20 size-80 rounded-full bg-muted opacity-50" />
+        <div className="absolute -bottom-16 -left-16 size-60 rounded-full bg-muted opacity-40" />
+      </div>
+
+      <div className="relative z-10 w-full max-w-130 rounded-2xl border bg-card p-10 shadow-sm">
+        {/* Brand */}
+        <div className="mb-8 flex items-center gap-3">
+          <div className="flex size-9 items-center justify-center rounded-lg bg-foreground">
+            <svg
+              viewBox="0 0 24 24"
+              className="size-5"
+              fill="none"
+              stroke="white"
+              strokeWidth={2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M12 2L2 7l10 5 10-5-10-5z" />
+              <path d="M2 17l10 5 10-5" />
+              <path d="M2 12l10 5 10-5" />
+            </svg>
           </div>
-          <CardTitle className="text-2xl">Configure seu negócio</CardTitle>
-          <CardDescription>
-            Preencha as informações básicas para começar a usar a plataforma
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="barbershopName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nome do Negócio</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ex: Negocio do Fulano" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+          <span
+            className="text-xl font-semibold tracking-tight"
+            style={{ fontFamily: "var(--font-display)" }}
+          >
+            Servix
+          </span>
+        </div>
 
+        {/* Progress bar */}
+        <div className="mb-8 flex gap-1">
+          <div className="h-0.75 flex-1 rounded-full bg-primary" />
+          <div className="h-0.75 flex-1 rounded-full bg-primary" />
+          <div className="h-0.75 flex-1 rounded-full bg-border" />
+        </div>
+
+        {/* Heading */}
+        <div className="mb-8">
+          <p className="mb-2 text-[11px] font-medium uppercase tracking-widest text-muted-foreground">
+            Passo 2 de 3 — Dados do estabelecimento
+          </p>
+          <h1
+            className="text-[26px] font-semibold leading-tight tracking-tight text-foreground"
+            style={{ fontFamily: "var(--font-display)" }}
+          >
+            Configure{" "}
+            <span className="italic font-light text-muted-foreground">
+              seu negócio
+            </span>
+          </h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Preencha as informações básicas para começar a usar a plataforma.
+          </p>
+        </div>
+
+        {/* Form */}
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+            <FormField
+              control={form.control}
+              name="barbershopName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-[13px] font-medium text-foreground">
+                    Nome do negócio
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Ex: Barbearia do João"
+                      className="h-10 rounded-lg border-border bg-background text-[14px] placeholder:text-muted-foreground/50"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage className="text-[12px]" />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="address"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-[13px] font-medium text-foreground">
+                    Endereço
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Ex: Rua das Flores, 123 - Centro"
+                      className="h-10 rounded-lg border-border bg-background text-[14px] placeholder:text-muted-foreground/50"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage className="text-[12px]" />
+                </FormItem>
+              )}
+            />
+
+            <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="address"
+                name="city"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Endereço</FormLabel>
+                    <FormLabel className="text-[13px] font-medium text-foreground">
+                      Cidade
+                    </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Ex: Rua das Flores, 123 - Centro"
+                        placeholder="Ex: São Paulo"
+                        className="h-10 rounded-lg border-border bg-background text-[14px] placeholder:text-muted-foreground/50"
                         {...field}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-[12px]" />
                   </FormItem>
                 )}
               />
 
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="city"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Cidade</FormLabel>
+              <FormField
+                control={form.control}
+                name="state"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-[13px] font-medium text-foreground">
+                      Estado
+                    </FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
-                        <Input placeholder="Ex: Anápolis" {...field} />
+                        <SelectTrigger className="h-10 rounded-lg border-border bg-background text-[14px]">
+                          <SelectValue placeholder="Selecione" />
+                        </SelectTrigger>
                       </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="state"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Estado</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecione" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {BRAZILIAN_STATES.map((uf) => (
-                            <SelectItem key={uf} value={uf}>
-                              {uf}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <FormField
-                control={form.control}
-                name="phone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Telefone</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="(62) 99999-9999"
-                        value={field.value}
-                        onChange={(e) => field.onChange(formatPhone(e.target.value))}
-                        maxLength={15}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Telefone para contato dos clientes
-                    </FormDescription>
-                    <FormMessage />
+                      <SelectContent>
+                        {BRAZILIAN_STATES.map((uf) => (
+                          <SelectItem
+                            key={uf}
+                            value={uf}
+                            className="text-[14px]"
+                          >
+                            {uf}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage className="text-[12px]" />
                   </FormItem>
                 )}
               />
+            </div>
 
-              <FormField
-                control={form.control}
-                name="ownerCpf"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Seu CPF</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="000.000.000-00"
-                        value={field.value}
-                        onChange={(e) => field.onChange(formatCPF(e.target.value))}
-                        maxLength={14}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Necessário para seu cadastro como profissional
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <FormField
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-[13px] font-medium text-foreground">
+                    Telefone
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="(11) 99999-9999"
+                      className="h-10 rounded-lg border-border bg-background text-[14px] placeholder:text-muted-foreground/50"
+                      value={field.value}
+                      onChange={(e) =>
+                        field.onChange(formatPhone(e.target.value))
+                      }
+                      maxLength={15}
+                    />
+                  </FormControl>
+                  <FormDescription className="text-[12px] text-muted-foreground">
+                    Telefone para contato dos clientes
+                  </FormDescription>
+                  <FormMessage className="text-[12px]" />
+                </FormItem>
+              )}
+            />
 
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Descrição</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Descreva seu negócio, serviços oferecidos, diferenciais..."
-                        rows={4}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <FormField
+              control={form.control}
+              name="ownerCpf"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-[13px] font-medium text-foreground">
+                    Seu CPF
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="000.000.000-00"
+                      className="h-10 rounded-lg border-border bg-background text-[14px] placeholder:text-muted-foreground/50"
+                      value={field.value}
+                      onChange={(e) =>
+                        field.onChange(formatCPF(e.target.value))
+                      }
+                      maxLength={14}
+                    />
+                  </FormControl>
+                  <FormDescription className="text-[12px] text-muted-foreground">
+                    Necessário para seu cadastro como proprietário
+                  </FormDescription>
+                  <FormMessage className="text-[12px]" />
+                </FormItem>
+              )}
+            />
 
-              <FormField
-                control={form.control}
-                name="imageUrl"
-                render={() => (
-                  <FormItem>
-                    <FormLabel>Imagem do Negócio (opcional)</FormLabel>
-                    <FormControl>
-                      <ImageUpload
-                        value={imageUrl}
-                        onChange={(url) => {
-                          form.setValue("imageUrl", url);
-                          setImageUrl(url);
-                        }}
-                        onRemove={() => {
-                          form.setValue("imageUrl", "");
-                          setImageUrl(null);
-                        }}
-                        disabled={isPending}
-                        folder="barbershop"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-[13px] font-medium text-foreground">
+                    Descrição
+                  </FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Descreva seu negócio, serviços oferecidos, diferenciais..."
+                      rows={4}
+                      className="rounded-lg border-border bg-background text-[14px] placeholder:text-muted-foreground/50 resize-none"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage className="text-[12px]" />
+                </FormItem>
+              )}
+            />
 
-              <Button
-                type="submit"
-                className="w-full"
-                size="lg"
-                disabled={isPending}
-              >
-                {isPending ? (
-                  <>
-                    <Loader2 className="mr-2 size-4 animate-spin" />
-                    Criando...
-                  </>
-                ) : (
-                  "Criar Negócio"
-                )}
-              </Button>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
+            <FormField
+              control={form.control}
+              name="imageUrl"
+              render={() => (
+                <FormItem>
+                  <FormLabel className="text-[13px] font-medium text-foreground">
+                    Imagem do negócio{" "}
+                    <span className="font-normal text-muted-foreground">
+                      (opcional)
+                    </span>
+                  </FormLabel>
+                  <FormControl>
+                    <ImageUpload
+                      value={imageUrl}
+                      onChange={(url) => {
+                        form.setValue("imageUrl", url);
+                        setImageUrl(url);
+                      }}
+                      onRemove={() => {
+                        form.setValue("imageUrl", "");
+                        setImageUrl(null);
+                      }}
+                      disabled={isPending}
+                      folder="barbershop"
+                    />
+                  </FormControl>
+                  <FormMessage className="text-[12px]" />
+                </FormItem>
+              )}
+            />
+
+            <button
+              type="submit"
+              disabled={isPending}
+              className={[
+                "btn-lime w-full rounded-lg py-3.5 text-[15px] tracking-tight transition-opacity",
+                isPending
+                  ? "cursor-not-allowed opacity-50"
+                  : "hover:opacity-85",
+              ].join(" ")}
+            >
+              {isPending ? (
+                <span className="flex items-center justify-center gap-2">
+                  <Loader2 className="size-4 animate-spin" />
+                  Criar...
+                </span>
+              ) : (
+                "Criar negócio"
+              )}
+            </button>
+          </form>
+        </Form>
+
+        {/* Footer */}
+        <p className="mt-5 text-center text-xs leading-relaxed text-muted-foreground">
+          Ao continuar, você concorda com os{" "}
+          <a
+            href="#"
+            className="text-foreground/60 underline-offset-2 hover:underline"
+          >
+            Termos de Uso
+          </a>{" "}
+          e a{" "}
+          <a
+            href="#"
+            className="text-foreground/60 underline-offset-2 hover:underline"
+          >
+            Política de Privacidade
+          </a>{" "}
+          do Servix.
+        </p>
+      </div>
     </div>
   );
 }

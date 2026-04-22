@@ -8,10 +8,8 @@ import {
 } from "@/components/ui/page";
 import { getBarbershopBySlug } from "@/data/barbershops";
 import { getServiceCategories } from "@/data/services";
-import { auth } from "@/lib/auth";
 import { MapPin, Phone } from "lucide-react";
 import Image from "next/image";
-import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 
 interface SlugPageProps {
@@ -21,25 +19,15 @@ interface SlugPageProps {
 const SlugPage = async ({ params }: SlugPageProps) => {
   const { slug } = await params;
 
-  const [barbershop, categories, session] = await Promise.all([
+  const [barbershop, categories] = await Promise.all([
     getBarbershopBySlug(slug),
     getServiceCategories(),
-    auth.api.getSession({ headers: await headers() }),
   ]);
 
   if (!barbershop) {
     notFound();
   }
 
-  const isOwner =
-    !!session?.user && !!barbershop.ownerId
-      ? session.user.id === barbershop.ownerId
-      : false;
-  console.log("DEBUG isOwner:", {
-    sessionUserId: session?.user?.id,
-    barbershopOwnerId: barbershop.ownerId,
-    match: session?.user?.id === barbershop.ownerId,
-  });
   return (
     <div>
       <Header categories={categories} />
@@ -90,7 +78,6 @@ const SlugPage = async ({ params }: SlugPageProps) => {
                   key={service.id}
                   service={service}
                   barbershop={barbershop}
-                  isOwner={isOwner}
                 />
               ))}
             </div>

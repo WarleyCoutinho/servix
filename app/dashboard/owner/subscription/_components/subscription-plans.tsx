@@ -64,7 +64,7 @@ export interface SubscriptionPlansProps {
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const RECOMMENDED_PLAN = SubscriptionPlan.PROFESSIONAL;
+const RECOMMENDED_PLAN = SubscriptionPlan.STANDARD;
 
 const PLAN_ORDER: Record<SubscriptionPlan, number> = {
   [SubscriptionPlan.BASIC]: 1,
@@ -146,11 +146,12 @@ function UniversalPlansBanner() {
           </div>
 
           <p className="text-sm text-muted-foreground">
-            Comece pelo plano que couber no seu momento —{" "}
+            Comece simples —{" "}
             <span className="font-medium text-foreground">
-              a diferença está apenas nos limites de uso.
+              seu negócio evolui e seu plano acompanha.
             </span>{" "}
-            Quando seu negócio crescer, é só fazer upgrade.
+            Mais serviços, mais profissionais e mais capacidade conforme você
+            cresce.
           </p>
         </div>
       </div>

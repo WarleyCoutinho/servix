@@ -1,10 +1,4 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { prisma } from "@/lib/prisma";
 import { SubscriptionStatus, SubscriptionPlan } from "@/generated/prisma/enums";
 import {
@@ -18,7 +12,8 @@ import {
   PieChart,
 } from "lucide-react";
 import { subDays } from "date-fns";
-import { startOfMonthBrt, endOfMonthBrt } from "@/lib/timezone";
+import { ptBR } from "date-fns/locale";
+import { startOfMonthBrt, endOfMonthBrt, formatBrt } from "@/lib/timezone";
 
 export default async function AdminSettingsPage() {
   const now = new Date();
@@ -111,11 +106,9 @@ export default async function AdminSettingsPage() {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card className="relative overflow-hidden transition-shadow hover:shadow-md">
-          <div className="absolute top-0 left-0 right-0 h-0.5 bg-linear-to-r from-primary/60 to-transparent" />
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/60 to-transparent" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              MRR (Receita Mensal)
-            </CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">MRR (Receita Mensal)</CardTitle>
             <div className="rounded-lg bg-primary/10 p-2">
               <DollarSign className="h-4 w-4 text-primary" />
             </div>
@@ -134,37 +127,29 @@ export default async function AdminSettingsPage() {
         </Card>
 
         <Card className="relative overflow-hidden transition-shadow hover:shadow-md">
-          <div className="absolute top-0 left-0 right-0 h-0.5 bg-linear-to-r from-primary/60 to-transparent" />
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/60 to-transparent" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Novos este mes
-            </CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Novos este mes</CardTitle>
             <div className="rounded-lg bg-primary/10 p-2">
               <TrendingUp className="h-4 w-4 text-primary" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold tabular-nums">
-              {monthlyRevenue}
-            </div>
+            <div className="text-2xl font-bold tabular-nums">{monthlyRevenue}</div>
             <p className="text-muted-foreground mt-1 text-xs">assinaturas</p>
           </CardContent>
         </Card>
 
         <Card className="relative overflow-hidden transition-shadow hover:shadow-md">
-          <div className="absolute top-0 left-0 right-0 h-0.5 bg-linear-to-r from-primary/60 to-transparent" />
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/60 to-transparent" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Agendamentos (mes)
-            </CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Agendamentos (mes)</CardTitle>
             <div className="rounded-lg bg-primary/10 p-2">
               <Calendar className="h-4 w-4 text-primary" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold tabular-nums">
-              {bookingsThisMonth}
-            </div>
+            <div className="text-2xl font-bold tabular-nums">{bookingsThisMonth}</div>
             <p className="text-muted-foreground mt-1 text-xs">
               {activeBookings} total ativos
             </p>
@@ -172,11 +157,9 @@ export default async function AdminSettingsPage() {
         </Card>
 
         <Card className="relative overflow-hidden transition-shadow hover:shadow-md">
-          <div className="absolute top-0 left-0 right-0 h-0.5 bg-linear-to-r from-primary/60 to-transparent" />
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/60 to-transparent" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Crescimento (30d)
-            </CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Crescimento (30d)</CardTitle>
             <div className="rounded-lg bg-primary/10 p-2">
               <Activity className="h-4 w-4 text-primary" />
             </div>
@@ -184,15 +167,11 @@ export default async function AdminSettingsPage() {
           <CardContent>
             <div className="flex gap-4">
               <div>
-                <div className="text-xl font-bold tabular-nums">
-                  {recentUsers}
-                </div>
+                <div className="text-xl font-bold tabular-nums">{recentUsers}</div>
                 <p className="text-muted-foreground text-xs">usuarios</p>
               </div>
               <div>
-                <div className="text-xl font-bold tabular-nums">
-                  {recentBarbershops}
-                </div>
+                <div className="text-xl font-bold tabular-nums">{recentBarbershops}</div>
                 <p className="text-muted-foreground text-xs">barbearias</p>
               </div>
             </div>
@@ -207,9 +186,7 @@ export default async function AdminSettingsPage() {
               <PieChart className="h-5 w-5" />
               Assinaturas por Plano
             </CardTitle>
-            <CardDescription>
-              Distribuição de assinaturas ativas
-            </CardDescription>
+            <CardDescription>Distribuição de assinaturas ativas</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -252,9 +229,7 @@ export default async function AdminSettingsPage() {
               <CreditCard className="h-5 w-5" />
               Status das Assinaturas
             </CardTitle>
-            <CardDescription>
-              Visão geral de todas as assinaturas
-            </CardDescription>
+            <CardDescription>Visão geral de todas as assinaturas</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -275,9 +250,7 @@ export default async function AdminSettingsPage() {
                       <div
                         className={`h-3 w-3 rounded-full ${colors[item.status]}`}
                       />
-                      <span className="text-sm">
-                        {statusLabels[item.status]}
-                      </span>
+                      <span className="text-sm">{statusLabels[item.status]}</span>
                     </div>
                     <span className="font-medium">{item._count}</span>
                   </div>
@@ -336,9 +309,7 @@ export default async function AdminSettingsPage() {
                 <li>• Todas permissões de proprietário</li>
                 <li>• Gerenciar própria agenda</li>
                 <li>• Receber pagamentos via Stripe</li>
-                <li className="text-red-600">
-                  • Não pode adicionar profissionais
-                </li>
+                <li className="text-red-600">• Não pode adicionar profissionais</li>
               </ul>
             </div>
 

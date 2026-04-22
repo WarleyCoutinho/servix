@@ -73,7 +73,7 @@ export function LocationFilter({
             }
           }}
         >
-          <SelectTrigger className="w-40">
+          <SelectTrigger className="w-[10rem]">
             <SelectValue placeholder="Estado" />
           </SelectTrigger>
           <SelectContent>
@@ -97,7 +97,7 @@ export function LocationFilter({
               }
             }}
           >
-            <SelectTrigger className="w-48">
+            <SelectTrigger className="w-[12rem]">
               <SelectValue placeholder="Cidade" />
             </SelectTrigger>
             <SelectContent>

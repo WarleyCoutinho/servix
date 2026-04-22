@@ -41,14 +41,14 @@ const BarbershopDetailPage = async ({ params }: BarbershopDetailPageProps) => {
     <div>
       <Header categories={categories} />
 
-      <div className="relative h-[220px] w-full sm:h-[320px]">
+      <div className="relative h-55 w-full sm:h-80">
         <Image
           src={barbershop.imageUrl}
           alt={barbershop.name}
           fill
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/80 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-5">
           <h1 className="text-2xl font-bold text-white">{barbershop.name}</h1>
           <div className="mt-2 flex items-center gap-2 text-sm text-white/80">

@@ -6,6 +6,17 @@ import { Button } from "./ui/button";
 
 // ─── DADOS ────────────────────────────────────────────────────────────────────
 
+const BUSINESS_SEGMENTS = [
+  "Barbearia/ ",
+  "Salão de beleza/ ",
+  "Studio de sobrancelhas / Lash/ ",
+  "Esmalteria / Nail studio/ ",
+  "Escovaria/ ",
+  "Depilação/ ",
+  "Clínica de estética/ ",
+  "Maquiagem/ ",
+] as const;
+
 const PLANS = [
   {
     name: "Solo",
@@ -13,14 +24,18 @@ const PLANS = [
     cents: ",90",
     highlight: false,
     badge: null,
-    note: "Barbeiro autônomo ou dono que também corta",
+    note: "Organize sua agenda, reduza faltas e aceite pagamentos online — sem complicação",
     features: [
-      "1 profissional",
-      "Até 4 serviços",
-      "Agenda online 24/7",
-      "Pagamento online",
-      "Suporte via chat",
+      "1 loja · 1 profissional",
+      "Até 10 serviços",
+      "Agenda online 24h",
+      "Página pública com link de agendamento",
+      "Cadastro de clientes",
+      "Lembretes automáticos (redução de faltas)",
+      "Confirmação de agendamento",
+      "Pagamento online (cartão)",
     ],
+    idealFor: ["Nail designer", "Lash / Sobrancelha", "Depilação", "Maquiagem"],
   },
   {
     name: "Equipe",
@@ -28,14 +43,21 @@ const PLANS = [
     cents: ",90",
     highlight: true,
     badge: "★ Mais popular",
-    note: "Barbearia ou salão com equipe de até 5 pessoas",
+    note: "Gerencie sua equipe, controle atendimentos e acompanhe seu faturamento em um só lugar",
     features: [
-      "Até 5 profissionais",
-      "Até 20 serviços",
-      "Tudo do Solo",
-      "Comissão automática",
+      "1 loja · Até 5 profissionais",
+      "Até 30 serviços",
+      "Agenda por profissional",
+      "Página pública com link de agendamento",
+      "Cadastro e histórico de clientes",
+      "Lembretes automáticos (redução de faltas)",
+      "Confirmação de agendamento",
+      "Pagamento online (cartão)",
       "Relatórios de faturamento",
+      "Controle de caixa",
+      "Comissão automática por profissional",
     ],
+    idealFor: ["Barbearia", "Salão de beleza", "Escovaria", "Studio de beleza"],
   },
   {
     name: "Profissional",
@@ -43,13 +65,26 @@ const PLANS = [
     cents: ",90",
     highlight: false,
     badge: null,
-    note: "Grandes barbearias, redes e salões",
+    note: "Gestão completa com dados, performance e controle total da operação",
     features: [
-      "Até 20 profissionais",
-      "Até 50 serviços",
-      "Tudo do Equipe",
-      "Ranking de desempenho",
-      "Suporte prioritário",
+      "1 loja · Até 20 profissionais",
+      "Até 100 serviços",
+      "Agenda por profissional",
+      "Página pública por estabelecimento",
+      "Cadastro e histórico completo de clientes",
+      "Lembretes automáticos (redução de faltas)",
+      "Confirmação de agendamento",
+      "Pagamento online (cartão)",
+      "Controle financeiro completo",
+      "Relatórios avançados",
+      "Ranking de desempenho da equipe",
+      "Comissão automática por profissional",
+    ],
+    idealFor: [
+      "Estética facial e corporal",
+      "Salões completos",
+      "Espaços multi-serviços",
+      "Hair spa",
     ],
   },
 ] as const;
@@ -99,18 +134,21 @@ const PAINS = [
     title: "Cliente não aparece",
     desc: "Você reservou o horário, bloqueou o espaço, e o cliente simplesmente sumiu. Sem aviso. Sem satisfação.",
     cost: "⚠ Horário perdido = dinheiro perdido",
+    isPositive: false,
   },
   {
     icon: "📱",
     title: "Confirmação manual",
     desc: "Você fica no celular confirmando o dia inteiro. Isso não é gestão — é trabalho que o sistema deveria fazer por você.",
     cost: "⚠ Tempo é dinheiro",
+    isPositive: false,
   },
   {
     icon: "💸",
     title: "Sem pagamento antecipado",
     desc: "Quando não há compromisso financeiro, o cliente não sente obrigação de aparecer. O dinheiro garante a cadeira cheia.",
     cost: "⚠ Sem pagamento = risco total",
+    isPositive: false,
   },
   {
     icon: "✅",
@@ -196,6 +234,38 @@ const PROBLEM_ITEMS = [
   "Agenda bagunçada",
 ];
 
+const WA_APPOINTMENTS = [
+  { time: "09:00", name: "Carlos H." },
+  { time: "10:30", name: "Bruno A." },
+  { time: "11:00", name: "Diego S." },
+  { time: "13:00", name: "Mateus R." },
+];
+
+const WA_CONFIG_ITEMS = [
+  {
+    title: "Conexão por QR Code",
+    desc: "Escaneia uma vez no WhatsApp → Dispositivos Conectados → pronto.",
+    highlight: false,
+  },
+  {
+    title: "Ou por número",
+    desc: "Digita o número, recebe o código de pareamento e conecta.",
+    highlight: false,
+  },
+  {
+    title: "Nome exato do grupo",
+    desc: "O nome no sistema precisa ser idêntico ao do grupo no WhatsApp — letra por letra.",
+    highlight: true,
+  },
+];
+
+const HERO_STATS = [
+  { num: "10min", label: "Sua loja no ar" },
+  { num: "90d", label: "Sem taxa" },
+  { num: "24/7", label: "Agenda online" },
+  { num: "R$0", label: "Taxa nos 90 dias" },
+];
+
 // ─── HOOKS ────────────────────────────────────────────────────────────────────
 
 function useReveal() {
@@ -258,6 +328,23 @@ function SectionTitle({
   return <h2 className={`sx-section-title ${className}`}>{children}</h2>;
 }
 
+function ArrowIcon({ size = 18 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      viewBox="0 0 24 24"
+    >
+      <path d="M5 12h14M12 5l7 7-7 7" />
+    </svg>
+  );
+}
+
 // ─── COMPONENTE PRINCIPAL ────────────────────────────────────────────────────
 
 export default function ServixLanding() {
@@ -273,7 +360,7 @@ export default function ServixLanding() {
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", onScroll);
-    return () => removeEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   return (
@@ -295,11 +382,9 @@ export default function ServixLanding() {
       {/* ─── HERO ─── */}
       <section className="sx-hero">
         <div className="sx-hero-glow" aria-hidden />
-
         <p className="sx-hero-eyebrow">
           O problema de todo barbeiro e dono de salão
         </p>
-
         <h1 className="sx-hero-h1">
           AGENDA
           <br />
@@ -307,7 +392,6 @@ export default function ServixLanding() {
           <br />
           <span className="sx-accent">WHATSAPP?</span>
         </h1>
-
         <p className="sx-hero-sub">
           <strong>&ldquo;Oi, tem horário?&rdquo;</strong> →{" "}
           <strong>&ldquo;Depois confirmo...&rdquo;</strong> →{" "}
@@ -316,35 +400,17 @@ export default function ServixLanding() {
           Isso custa dinheiro. Todo dia. O Servix resolve isso em menos de 10
           minutos.
         </p>
-
         <div className="sx-hero-actions">
           <Button onClick={handleCtaClick} className="sx-btn-primary">
             Testar 90 dias sem taxa
-            <svg
-              width="18"
-              height="18"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              viewBox="0 0 24 24"
-            >
-              <path d="M5 12h14M12 5l7 7-7 7" />
-            </svg>
+            <ArrowIcon size={18} />
           </Button>
           <p className="sx-hero-note">
             A partir de <strong>R$39,90/mês</strong> · Cancele quando quiser
           </p>
         </div>
-
         <div className="sx-hero-stats">
-          {[
-            { num: "10min", label: "Sua loja no ar" },
-            { num: "90d", label: "Sem taxa" },
-            { num: "24/7", label: "Agenda online" },
-            { num: "R$0", label: "Taxa nos 90 dias" },
-          ].map(({ num, label }) => (
+          {HERO_STATS.map(({ num, label }) => (
             <div key={label}>
               <div className="sx-stat-num">{num}</div>
               <div className="sx-stat-label">{label}</div>
@@ -374,27 +440,18 @@ export default function ServixLanding() {
             <span className="sx-accent">CUSTA DINHEIRO</span>
           </SectionTitle>
         </RevealSection>
-
         <RevealSection delay={100}>
           <div className="sx-pain-grid">
             {PAINS.map((pain) => (
               <div
                 key={pain.title}
-                className={`sx-pain-card ${
-                  (pain as { isPositive?: boolean }).isPositive
-                    ? "sx-pain-card--positive"
-                    : ""
-                }`}
+                className={`sx-pain-card ${pain.isPositive ? "sx-pain-card--positive" : ""}`}
               >
                 <div className="sx-pain-icon">{pain.icon}</div>
                 <div className="sx-pain-title">{pain.title}</div>
                 <div className="sx-pain-desc">{pain.desc}</div>
                 <div
-                  className={`sx-pain-cost ${
-                    (pain as { isPositive?: boolean }).isPositive
-                      ? "sx-pain-cost--positive"
-                      : ""
-                  }`}
+                  className={`sx-pain-cost ${pain.isPositive ? "sx-pain-cost--positive" : ""}`}
                 >
                   {pain.cost}
                 </div>
@@ -416,7 +473,6 @@ export default function ServixLanding() {
             <span className="sx-accent">ZERO TÉCNICO.</span>
           </SectionTitle>
         </RevealSection>
-
         <RevealSection delay={100}>
           <div className="sx-steps-grid">
             {STEPS.map((step) => (
@@ -450,7 +506,6 @@ export default function ServixLanding() {
             no que realmente importa: atender bem.
           </p>
         </RevealSection>
-
         <div className="sx-features-grid">
           {FEATURES.map((feat, i) => (
             <RevealSection key={feat.title} delay={i * 60}>
@@ -479,7 +534,6 @@ export default function ServixLanding() {
             <span className="sx-dim">VOCÊ DECIDE.</span>
           </SectionTitle>
         </RevealSection>
-
         <RevealSection delay={100}>
           <div className="sx-payment-split">
             <div className="sx-pay-card">
@@ -533,7 +587,6 @@ export default function ServixLanding() {
             pro seu grupo automaticamente. Você não faz nada.
           </p>
         </RevealSection>
-
         <RevealSection delay={100}>
           <div className="sx-wa-layout">
             {/* Mock WhatsApp */}
@@ -551,12 +604,7 @@ export default function ServixLanding() {
                 <br />
                 Hoje às 09:00 · Pago ✓
                 <div className="sx-wa-grid">
-                  {[
-                    { time: "09:00", name: "Carlos H." },
-                    { time: "10:30", name: "Bruno A." },
-                    { time: "11:00", name: "Diego S." },
-                    { time: "13:00", name: "Mateus R." },
-                  ].map(({ time, name }) => (
+                  {WA_APPOINTMENTS.map(({ time, name }) => (
                     <div key={time} className="sx-wa-info">
                       <div className="sx-wa-info-key">{time}</div>
                       <div className="sx-wa-info-val">{name}</div>
@@ -576,23 +624,7 @@ export default function ServixLanding() {
 
             {/* Configuração */}
             <div className="sx-wa-config">
-              {[
-                {
-                  title: "Conexão por QR Code",
-                  desc: "Escaneia uma vez no WhatsApp → Dispositivos Conectados → pronto.",
-                  highlight: false,
-                },
-                {
-                  title: "Ou por número",
-                  desc: "Digita o número, recebe o código de pareamento e conecta.",
-                  highlight: false,
-                },
-                {
-                  title: "Nome exato do grupo",
-                  desc: "O nome no sistema precisa ser idêntico ao do grupo no WhatsApp — letra por letra.",
-                  highlight: true,
-                },
-              ].map(({ title, desc, highlight }) => (
+              {WA_CONFIG_ITEMS.map(({ title, desc, highlight }) => (
                 <div
                   key={title}
                   className={`sx-wa-config-item ${highlight ? "sx-wa-config-item--highlight" : ""}`}
@@ -636,20 +668,15 @@ export default function ServixLanding() {
             acessa apenas o que é dele. Simples e seguro.
           </p>
         </RevealSection>
-
         <RevealSection delay={100}>
           <div className="sx-profiles-grid">
             {PROFILES.map((profile) => (
               <div
                 key={profile.role}
-                className={`sx-profile-card ${
-                  profile.highlight ? "sx-profile-card--highlight" : ""
-                }`}
+                className={`sx-profile-card ${profile.highlight ? "sx-profile-card--highlight" : ""}`}
               >
                 <div
-                  className={`sx-profile-avatar ${
-                    profile.highlight ? "sx-profile-avatar--highlight" : ""
-                  }`}
+                  className={`sx-profile-avatar ${profile.highlight ? "sx-profile-avatar--highlight" : ""}`}
                 >
                   {profile.emoji}
                 </div>
@@ -682,6 +709,39 @@ export default function ServixLanding() {
           </p>
         </RevealSection>
 
+        {/* ─── UNIVERSAL BANNER ─── */}
+        <RevealSection delay={60}>
+          <div className="sx-universal-banner">
+            <div className="sx-universal-banner-glow" aria-hidden />
+            <div className="sx-universal-banner-inner">
+              <div className="sx-universal-banner-icon">✦</div>
+              <div className="sx-universal-banner-content">
+                <p className="sx-universal-banner-title">
+                  Todos os planos funcionam para qualquer tipo de negócio
+                </p>
+                <div className="sx-universal-banner-tags">
+                  {BUSINESS_SEGMENTS.map((segment) => (
+                    <span key={segment} className="sx-universal-tag">
+                      {segment}
+                    </span>
+                  ))}
+                  <span className="sx-universal-tag sx-universal-tag--muted">
+                    e muito mais...
+                  </span>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Comece simples —{" "}
+                  <span className="font-medium text-foreground">
+                    seu negócio evolui e seu plano acompanha.
+                  </span>{" "}
+                  Mais serviços, mais profissionais e mais capacidade conforme
+                  você cresce.
+                </p>
+              </div>
+            </div>
+          </div>
+        </RevealSection>
+
         <RevealSection delay={80}>
           <div className="sx-pricing-grid">
             {PLANS.map((plan) => (
@@ -709,8 +769,18 @@ export default function ServixLanding() {
                     {feat}
                   </div>
                 ))}
+                {/* ─── IDEAL PARA ─── */}
+                <div className="sx-price-ideal">
+                  <span className="sx-price-ideal-label">Ideal para</span>
+                  <div className="sx-price-ideal-tags">
+                    {plan.idealFor.map((tag) => (
+                      <span key={tag} className="sx-price-ideal-tag">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
                 <p className="sx-price-note">{plan.note}</p>
-
                 <Button
                   onClick={handleCtaClick}
                   className={`sx-price-cta ${plan.highlight ? "sx-price-cta--featured" : ""}`}
@@ -726,10 +796,7 @@ export default function ServixLanding() {
               Todos os planos: <strong>90 dias sem taxa</strong> de transação.
               Cancele quando quiser.
             </p>
-            <Button
-              onClick={handleCtaClick}
-              className="sx-btn-primary sx-btn-primary--sm"
-            >
+            <Button onClick={handleCtaClick} className="sx-btn-sm">
               Acessar servix.app.br →
             </Button>
           </div>
@@ -750,18 +817,7 @@ export default function ServixLanding() {
           </p>
           <Button onClick={handleCtaClick} className="sx-btn-dark">
             Começar agora
-            <svg
-              width="20"
-              height="20"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              viewBox="0 0 24 24"
-            >
-              <path d="M5 12h14M12 5l7 7-7 7" />
-            </svg>
+            <ArrowIcon size={20} />
           </Button>
           <p className="sx-final-note">
             servix.app.br · Barbearia &amp; Salão de Beleza
