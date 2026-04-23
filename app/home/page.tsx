@@ -128,11 +128,11 @@ export default async function Home({ searchParams }: HomeProps) {
     );
   }
 
-  // --- 2. Cliente logado com cookie de barbearia: vê só aquela barbearia ---
+  // --- 2. Qualquer pessoa que entrou pelo link da barbearia: vê só aquela ---
   const cookieStore = await cookies();
   const linkedSlug = cookieStore.get("barbershop_slug")?.value;
 
-  if (userId && linkedSlug) {
+  if (linkedSlug) {
     const [linkedBarbershop, { confirmedBookings }, categories] =
       await Promise.all([
         getBarbershopBySlug(linkedSlug),
@@ -181,7 +181,7 @@ export default async function Home({ searchParams }: HomeProps) {
     );
   }
 
-  // --- 3. Visitante não logado (ou logado sem cookie): vê tudo normalmente ---
+  // --- 3. Sem cookie: vê tudo normalmente ---
   const [
     barbershops,
     popularBarbershops,
