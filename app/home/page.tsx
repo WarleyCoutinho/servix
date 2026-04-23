@@ -72,7 +72,7 @@ export default async function Home({ searchParams }: HomeProps) {
   const userId = session?.user?.id;
   const isRestricted = role === "owner" || role === "professional";
 
-  // --- Owners e professionals: veem apenas seus estabelecimentos ---
+  // --- 1. Owners e professionals: veem apenas seus estabelecimentos ---
   if (isRestricted && userId) {
     const [myBarbershops, { confirmedBookings }, categories] =
       await Promise.all([
@@ -128,12 +128,11 @@ export default async function Home({ searchParams }: HomeProps) {
     );
   }
 
-  // --- Lê o cookie de barbearia vinculada ---
+  // --- 2. Cliente logado com cookie de barbearia: vê só aquela barbearia ---
   const cookieStore = await cookies();
   const linkedSlug = cookieStore.get("barbershop_slug")?.value;
 
-  // --- Client com barbearia vinculada: vê só aquela barbearia ---
-  if (linkedSlug) {
+  if (userId && linkedSlug) {
     const [linkedBarbershop, { confirmedBookings }, categories] =
       await Promise.all([
         getBarbershopBySlug(linkedSlug),
@@ -182,7 +181,7 @@ export default async function Home({ searchParams }: HomeProps) {
     );
   }
 
-  // --- Visitante sem cookie: vê tudo normalmente ---
+  // --- 3. Visitante não logado (ou logado sem cookie): vê tudo normalmente ---
   const [
     barbershops,
     popularBarbershops,
