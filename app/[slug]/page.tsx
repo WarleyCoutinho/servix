@@ -1,207 +1,104 @@
-import { notFound } from "next/navigation";
-import Image from "next/image";
-import { getBarbershopBySlug } from "@/data/barbershops";
-import { getServiceCategories } from "@/data/services";
-import Header from "@/components/header";
 import Footer from "@/components/footer";
+import Header from "@/components/header";
 import ServiceItem from "@/components/service-item";
-import { PageContainer } from "@/components/ui/page";
-import { MapPin, Phone, Scissors, Info } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  PageContainer,
+  PageSectionContent,
+  PageSectionTitle,
+} from "@/components/ui/page";
+import { getBarbershopById, getBarbershopBySlug } from "@/data/barbershops";
+import { getServiceCategories } from "@/data/services";
+import { MapPin, Phone } from "lucide-react";
+import { cookies } from "next/headers";
+import Image from "next/image";
+import { notFound } from "next/navigation";
 
 interface SlugPageProps {
   params: Promise<{ slug: string }>;
 }
 
+const UUID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 const SlugPage = async ({ params }: SlugPageProps) => {
   const { slug } = await params;
+  const isUUID = UUID_REGEX.test(slug);
 
   const [barbershop, categories] = await Promise.all([
-    getBarbershopBySlug(slug),
+    isUUID ? getBarbershopById(slug) : getBarbershopBySlug(slug),
     getServiceCategories(),
   ]);
 
-  if (!barbershop) notFound();
+  if (!barbershop) {
+    notFound();
+  }
+
+  // Salva o slug da barbearia no cookie para filtrar a home
+  const cookieStore = await cookies();
+  cookieStore.set("barbershop_slug", barbershop.slug ?? slug, {
+    path: "/",
+    maxAge: 60 * 60 * 24 * 30, // 30 dias
+    sameSite: "lax",
+  });
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div>
       <Header categories={categories} />
 
-      {/* ── Hero ── */}
-      <div className="relative h-85 w-full overflow-hidden sm:h-105 md:h-125">
+      <div className="relative h-55 w-full sm:h-80">
         <Image
           src={barbershop.imageUrl}
           alt={barbershop.name}
           fill
           className="object-cover"
-          priority
-          sizes="100vw"
         />
-        <div className="absolute inset-0 bg-linear-to-t from-black/85 via-black/40 to-black/5" />
-
-        {barbershop.isActive && (
-          <div className="absolute left-4 top-4 sm:left-6 sm:top-6">
-            <Badge className="gap-1.5 border-0 bg-emerald-500/20 px-3 py-1 text-xs font-medium text-emerald-400 backdrop-blur-sm">
-              <span className="size-1.5 animate-pulse rounded-full bg-emerald-400" />
-              Aberto
-            </Badge>
+        <div className="absolute inset-0 bg-linear-to-t from-black/80 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 p-5">
+          <h1 className="text-2xl font-bold text-white">{barbershop.name}</h1>
+          <div className="mt-2 flex items-center gap-2 text-sm text-white/80">
+            <MapPin className="size-4" />
+            <p>{barbershop.address}</p>
           </div>
-        )}
-
-        <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-8">
-          <p className="mb-1 text-xs font-medium uppercase tracking-widest text-white/50">
-            {[barbershop.city, barbershop.state].filter(Boolean).join(", ")}
-          </p>
-          <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl">
-            {barbershop.name}
-          </h1>
-          <p className="mt-2 max-w-xl line-clamp-2 text-sm text-white/60">
-            {barbershop.description}
-          </p>
+          {barbershop.phones.length > 0 && (
+            <div className="mt-1 flex items-center gap-2 text-sm text-white/80">
+              <Phone className="size-4" />
+              <p>{barbershop.phones.join(" | ")}</p>
+            </div>
+          )}
         </div>
       </div>
 
       <PageContainer>
-        <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
-          {/* ── Conteúdo principal ── */}
-          <div className="space-y-8">
-            {/* Sobre nós */}
-            {barbershop.description && (
-              <section className="space-y-3">
-                <h2 className="text-lg font-semibold tracking-tight">
-                  Sobre nós
-                </h2>
-                <p className="text-sm leading-relaxed text-muted-foreground">
-                  {barbershop.description}
-                </p>
-              </section>
-            )}
+        {barbershop.description && (
+          <PageSectionContent>
+            <PageSectionTitle>Sobre nós</PageSectionTitle>
+            <p className="text-muted-foreground text-sm">
+              {barbershop.description}
+            </p>
+          </PageSectionContent>
+        )}
 
-            {/* Serviços */}
-            <section className="space-y-3">
-              <h2 className="text-lg font-semibold tracking-tight">Serviços</h2>
-              {barbershop.services.length === 0 ? (
-                <p className="text-sm text-muted-foreground">
-                  Nenhum serviço disponível.
-                </p>
-              ) : (
-                <div className="grid grid-cols-1 gap-3">
-                  {barbershop.services.map((service) => (
-                    <ServiceItem
-                      key={service.id}
-                      service={service}
-                      barbershop={barbershop}
-                    />
-                  ))}
-                </div>
-              )}
-            </section>
-          </div>
-
-          {/* ── Sidebar ── */}
-          <aside className="space-y-4 lg:sticky lg:top-6 lg:self-start">
-            <Card className="border border-border/60 bg-card/60">
-              <CardContent className="space-y-5 p-5">
-                {/* Endereço */}
-                <div className="flex gap-3">
-                  <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                    <MapPin className="size-4 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      Endereço
-                    </p>
-                    <p className="mt-0.5 text-sm font-medium leading-snug">
-                      {barbershop.address}
-                    </p>
-                    {(barbershop.city || barbershop.state) && (
-                      <p className="text-xs text-muted-foreground">
-                        {[barbershop.city, barbershop.state]
-                          .filter(Boolean)
-                          .join(", ")}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Telefones */}
-                {barbershop.phones.length > 0 && (
-                  <>
-                    <Separator />
-                    <div className="flex gap-3">
-                      <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                        <Phone className="size-4 text-primary" />
-                      </div>
-                      <div className="space-y-0.5">
-                        <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                          Contato
-                        </p>
-                        {barbershop.phones.map((phone, i) => (
-                          <p key={i} className="text-sm font-medium">
-                            {phone}
-                          </p>
-                        ))}
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                <Separator />
-
-                {/* Contagem de serviços */}
-                <div className="flex gap-3">
-                  <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                    <Scissors className="size-4 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      Serviços
-                    </p>
-                    <p className="mt-0.5 text-sm font-medium">
-                      {barbershop.services.length}{" "}
-                      {barbershop.services.length === 1
-                        ? "disponível"
-                        : "disponíveis"}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Sobre (resumo) — só aparece se tiver descrição */}
-                {barbershop.description && (
-                  <>
-                    <Separator />
-                    <div className="flex gap-3">
-                      <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                        <Info className="size-4 text-primary" />
-                      </div>
-                      <div>
-                        <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                          Sobre
-                        </p>
-                        <p className="mt-0.5 line-clamp-3 text-xs leading-relaxed text-muted-foreground">
-                          {barbershop.description}
-                        </p>
-                      </div>
-                    </div>
-                  </>
-                )}
-              </CardContent>
-            </Card>
-
-            <Button className="w-full gap-2" size="lg">
-              <Scissors className="size-4" />
-              Agendar horário
-            </Button>
-          </aside>
-        </div>
+        <PageSectionContent>
+          <PageSectionTitle>Serviços</PageSectionTitle>
+          {barbershop.services.length === 0 ? (
+            <p className="text-muted-foreground text-sm">
+              Nenhum serviço disponível.
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 gap-3">
+              {barbershop.services.map((service) => (
+                <ServiceItem
+                  key={service.id}
+                  service={service}
+                  barbershop={barbershop}
+                />
+              ))}
+            </div>
+          )}
+        </PageSectionContent>
       </PageContainer>
 
-      <div className="mt-auto">
-        <Footer />
-      </div>
+      <Footer />
     </div>
   );
 };
