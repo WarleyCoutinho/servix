@@ -1,30 +1,42 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import { getBarbershopBySlug } from "@/data/barbershops";
+import { headers } from "next/headers";
+import { getBarbershopBySlug, getBarbershopById } from "@/data/barbershops";
 import { getServiceCategories } from "@/data/services";
+import { auth } from "@/lib/auth";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
-import ServiceItem from "@/components/service-item";
 import { PageContainer } from "@/components/ui/page";
-import { MapPin, Phone, Scissors, Info } from "lucide-react";
+import { MapPin, Phone, Scissors } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent } from "@/components/ui/card";
+import { ServicesSection } from "@/components/services-section";
 
-interface SlugPageProps {
+interface BarbershopPageProps {
   params: Promise<{ slug: string }>;
 }
 
-const SlugPage = async ({ params }: SlugPageProps) => {
-  const { slug } = await params;
+const UUID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-  const [barbershop, categories] = await Promise.all([
-    getBarbershopBySlug(slug),
+export default async function BarbershopPage({ params }: BarbershopPageProps) {
+  const { slug } = await params;
+  const isUUID = UUID_REGEX.test(slug);
+
+  const [barbershop, categories, session] = await Promise.all([
+    isUUID ? getBarbershopById(slug) : getBarbershopBySlug(slug),
     getServiceCategories(),
+    auth.api.getSession({ headers: await headers() }),
   ]);
 
   if (!barbershop) notFound();
+
+  const isOwner =
+    !!session?.user && !!barbershop.ownerId
+      ? session.user.id === barbershop.ownerId
+      : false;
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -66,46 +78,17 @@ const SlugPage = async ({ params }: SlugPageProps) => {
 
       <PageContainer>
         <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
-          {/* ── Conteúdo principal ── */}
-          <div className="space-y-8">
-            {/* Sobre nós */}
-            {barbershop.description && (
-              <section className="space-y-3">
-                <h2 className="text-lg font-semibold tracking-tight">
-                  Sobre nós
-                </h2>
-                <p className="text-sm leading-relaxed text-muted-foreground">
-                  {barbershop.description}
-                </p>
-              </section>
-            )}
-
-            {/* Serviços */}
-            <section className="space-y-3">
-              <h2 className="text-lg font-semibold tracking-tight">Serviços</h2>
-              {barbershop.services.length === 0 ? (
-                <p className="text-sm text-muted-foreground">
-                  Nenhum serviço disponível.
-                </p>
-              ) : (
-                <div className="grid grid-cols-1 gap-3">
-                  {barbershop.services.map((service) => (
-                    <ServiceItem
-                      key={service.id}
-                      service={service}
-                      barbershop={barbershop}
-                    />
-                  ))}
-                </div>
-              )}
-            </section>
-          </div>
+          {/* ── Serviços ── */}
+          <ServicesSection
+            services={barbershop.services}
+            barbershop={barbershop}
+            isOwner={isOwner}
+          />
 
           {/* ── Sidebar ── */}
           <aside className="space-y-4 lg:sticky lg:top-6 lg:self-start">
             <Card className="border border-border/60 bg-card/60">
               <CardContent className="space-y-5 p-5">
-                {/* Endereço */}
                 <div className="flex gap-3">
                   <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10">
                     <MapPin className="size-4 text-primary" />
@@ -127,7 +110,6 @@ const SlugPage = async ({ params }: SlugPageProps) => {
                   </div>
                 </div>
 
-                {/* Telefones */}
                 {barbershop.phones.length > 0 && (
                   <>
                     <Separator />
@@ -151,7 +133,6 @@ const SlugPage = async ({ params }: SlugPageProps) => {
 
                 <Separator />
 
-                {/* Contagem de serviços */}
                 <div className="flex gap-3">
                   <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10">
                     <Scissors className="size-4 text-primary" />
@@ -168,26 +149,6 @@ const SlugPage = async ({ params }: SlugPageProps) => {
                     </p>
                   </div>
                 </div>
-
-                {/* Sobre (resumo) — só aparece se tiver descrição */}
-                {barbershop.description && (
-                  <>
-                    <Separator />
-                    <div className="flex gap-3">
-                      <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                        <Info className="size-4 text-primary" />
-                      </div>
-                      <div>
-                        <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                          Sobre
-                        </p>
-                        <p className="mt-0.5 line-clamp-3 text-xs leading-relaxed text-muted-foreground">
-                          {barbershop.description}
-                        </p>
-                      </div>
-                    </div>
-                  </>
-                )}
               </CardContent>
             </Card>
 
@@ -204,6 +165,4 @@ const SlugPage = async ({ params }: SlugPageProps) => {
       </div>
     </div>
   );
-};
-
-export default SlugPage;
+}

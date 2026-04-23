@@ -18,7 +18,7 @@ export const getBarbershops = async (filters?: BarbershopFilters) => {
 
   const { data } = await safeQuery(
     () => prisma.barbershop.findMany({ where }),
-    []
+    [],
   );
   return data;
 };
@@ -41,7 +41,7 @@ export const getPopularBarbershops = async (filters?: BarbershopFilters) => {
           name: "desc",
         },
       }),
-    []
+    [],
   );
   return data;
 };

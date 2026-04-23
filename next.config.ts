@@ -17,6 +17,24 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async rewrites() {
+    return [
+      {
+        source: "/:path*",
+        has: [{ type: "query", key: "slug", value: "(.*)" }],
+        destination: "/?slug=:path*",
+      },
+      {
+        source: "/:path*",
+        has: [{ type: "query", key: "id", value: "(.*)" }],
+        destination: "/?id=:path*",
+      },
+      {
+        source: "/:slug",
+        destination: "/?slug=:slug",
+      },
+    ];
+  },
 
   async headers() {
     return [

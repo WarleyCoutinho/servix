@@ -165,7 +165,6 @@ const ServiceItem = ({
   const slots = availableTimeSlots?.data?.slots;
   const slotMsg = availableTimeSlots?.data?.message;
 
-  // ── Auto-scroll suave para próxima etapa ──
   const scrollTo = (ref: MutableRefObject<HTMLDivElement | null>) => {
     setTimeout(
       () => ref.current?.scrollIntoView({ behavior: "smooth", block: "start" }),
@@ -195,7 +194,6 @@ const ServiceItem = ({
     setSelectedPaymentMethod(undefined);
     setClientName("");
     if (isOwner) {
-      // Owner sempre paga no local — pula passo de pagamento
       scrollTo(clientNameSectionRef);
     } else if (hasPayAfterService) {
       scrollTo(paySectionRef);
@@ -237,7 +235,6 @@ const ServiceItem = ({
     const date = new Date(selectedDate);
     date.setHours(Number(splittedTime[0]), Number(splittedTime[1]));
 
-    // ── Fluxo owner: sempre pagar no local, com nome do cliente ──
     if (isOwner) {
       if (clientName.trim().length < 2) {
         return toast.error("Digite o nome do cliente.");
@@ -266,7 +263,6 @@ const ServiceItem = ({
       return;
     }
 
-    // ── Fluxo normal (cliente) ──
     const effectivePaymentMethod =
       hasPayAfterService && !hasStripePayment
         ? "pay_after_service"
@@ -331,7 +327,6 @@ const ServiceItem = ({
     reset();
   };
 
-  // ── Progresso das etapas ──
   const step1Done = !!selectedDate;
   const step2Done = !!selectedProfessional;
   const step3Done = !!selectedTime;
@@ -348,8 +343,6 @@ const ServiceItem = ({
       step3Done &&
       (!hasPayAfterService || !hasStripePayment || !!selectedPaymentMethod);
 
-  // Owner: 4 passos (data, prof, horário, nome cliente)
-  // Cliente: 4 passos (data, prof, horário, pagamento — se aplicável)
   const progressSegments = isOwner
     ? [step1Done, step2Done, step3Done, stepOwnerDone]
     : [step1Done, step2Done, step3Done, !hasPayAfterService || step4Done];
@@ -362,7 +355,8 @@ const ServiceItem = ({
     }).format(d);
 
   return (
-    <div className="border-border bg-card flex gap-3 rounded-2xl border p-3 transition-shadow hover:shadow-sm">
+    // ✅ FIX 1: items-start evita que o card estique na célula do grid
+    <div className="border-border bg-card flex items-start gap-3 rounded-2xl border p-3 transition-shadow hover:shadow-sm">
       <div className="relative h-27.5 w-27.5 shrink-0">
         <Image
           src={service.imageUrl}
@@ -372,10 +366,13 @@ const ServiceItem = ({
         />
       </div>
 
-      <div className="flex flex-1 flex-col justify-between">
+      {/* ✅ FIX 2: min-h-[110px] garante altura mínima igual à imagem */}
+      <div className="flex min-h-27.5 flex-1 flex-col justify-between">
         <div className="space-y-1">
-          <p className="text-sm font-bold">{service.name}</p>
-          <p className="text-muted-foreground text-sm">{service.description}</p>
+          <p className="truncate text-sm font-bold">{service.name}</p>
+          <p className="line-clamp-2 text-muted-foreground text-sm">
+            {service.description}
+          </p>
         </div>
 
         <div className="flex items-center justify-between">
@@ -417,7 +414,6 @@ const ServiceItem = ({
                   </div>
                 </div>
 
-                {/* Barra de progresso */}
                 <div className="mt-4 flex gap-1.5">
                   {progressSegments.map((done, i) => (
                     <div
@@ -432,7 +428,6 @@ const ServiceItem = ({
               </div>
 
               {!session?.user ? (
-                /* ── Não logado ── */
                 <div className="flex flex-col items-center justify-center gap-4 px-5 py-16 text-center">
                   <div className="rounded-2xl bg-muted p-5">
                     <LogIn className="size-8 text-muted-foreground" />
@@ -548,7 +543,6 @@ const ServiceItem = ({
                           </p>
                         )}
 
-                        {/* Aviso profissional diferente */}
                         {refProfessionalId &&
                           selectedProfessional &&
                           selectedProfessional !== refProfessionalId && (

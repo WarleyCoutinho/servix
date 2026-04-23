@@ -29,9 +29,11 @@ export default async function LandingPage() {
     if (user) {
       if (user.role === "admin") redirect("/dashboard/admin");
       if (user.role === "support") redirect("/dashboard/support");
-      if (user.role === "owner" && user.ownedBarbershops.length > 0) redirect("/dashboard/owner");
+      if (user.role === "owner" && user.ownedBarbershops.length > 0)
+        redirect("/dashboard/owner");
       if (user.role === "owner") redirect("/onboarding/owner");
-      if (user.role === "professional" && user.professional) redirect("/dashboard/professional");
+      if (user.role === "professional" && user.professional)
+        redirect("/dashboard/professional");
       if (user.role === "professional") redirect("/onboarding/professional");
       if (user.role === "client") redirect("/dashboard/client");
     }
