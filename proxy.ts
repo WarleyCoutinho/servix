@@ -68,17 +68,31 @@ async function getUserRole(request: NextRequest): Promise<string | null> {
   }
 }
 
+// Detecta a rota de barbearia — ajuste o padrão se sua rota for diferente
+// Ex: /barbershops/minha-barbearia ou /minha-barbearia diretamente
+const BARBERSHOP_ROUTE_REGEX = /^\/barbershops\/([^/]+)$/;
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // --- Seta o cookie de barbearia vinculada ao acessar o link da barbearia ---
+  const barbershopMatch = pathname.match(BARBERSHOP_ROUTE_REGEX);
+  if (barbershopMatch) {
+    const slug = barbershopMatch[1];
+    const response = NextResponse.next();
+    response.cookies.set("barbershop_slug", slug, {
+      path: "/",
+      maxAge: 60 * 60 * 24 * 30, // 30 dias
+      sameSite: "lax",
+    });
+    return response;
+  }
 
   if (pathname.startsWith("/api/auth")) {
     return NextResponse.next();
   }
 
-  if (
-    pathname.startsWith("/api/stripe") ||
-    pathname.startsWith("/api/cron")
-  ) {
+  if (pathname.startsWith("/api/stripe") || pathname.startsWith("/api/cron")) {
     return NextResponse.next();
   }
 
@@ -111,10 +125,7 @@ export async function proxy(request: NextRequest) {
 
   if (isProtectedRoute(pathname) && !sessionCookie) {
     if (pathname.startsWith("/api/")) {
-      return NextResponse.json(
-        { error: "Não autenticado" },
-        { status: 401 },
-      );
+      return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
     }
     const loginUrl = new URL("/", request.url);
     loginUrl.searchParams.set("redirect", pathname);

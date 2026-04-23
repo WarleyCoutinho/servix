@@ -16,17 +16,17 @@ import {
   PageSectionScroller,
   PageSectionTitle,
 } from "@/components/ui/page";
+
 import {
   getAvailableLocations,
   getBarbershops,
-  getBarbershopBySlug,
   getPopularBarbershops,
   getUserBarbershops,
 } from "@/data/barbershops";
 import { getUserBookings } from "@/data/bookings";
 import { getServiceCategories } from "@/data/services";
 import { auth } from "@/lib/auth";
-import { cookies, headers } from "next/headers";
+import { headers } from "next/headers";
 
 interface HomeProps {
   searchParams: Promise<{ city?: string; state?: string }>;
@@ -37,28 +37,25 @@ const Banner = ({ children }: { children?: React.ReactNode }) => (
     <Image
       src={bannerDark}
       alt="Agende nos melhores com a Servix"
-      sizes="(max-width: 768px) 100vw, 1024px"
-      className="hidden h-auto w-full rounded-2xl dark:block"
+      className="hidden w-full rounded-2xl dark:block"
       priority
     />
     <Image
       src={bannerLight}
       alt="Agende nos melhores com a Servix"
-      sizes="(max-width: 768px) 100vw, 1024px"
-      className="block h-auto w-full rounded-2xl dark:hidden"
+      className="block w-full rounded-2xl dark:hidden"
       priority
     />
-    <div className="absolute inset-0 rounded-2xl bg-linear-to-r from-black/60 via-black/30 to-transparent" />
+    <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
     {children && (
-      <div className="absolute bottom-[8%] left-4 right-4 sm:bottom-[10%] sm:left-8 md:bottom-[12%]">
-        {children}
-      </div>
+      <div className="absolute bottom-[10%] left-6 right-6">{children}</div>
     )}
   </div>
 );
 
 export default async function Home({ searchParams }: HomeProps) {
   const params = await searchParams;
+
   const filters = {
     city: params.city,
     state: params.state,
@@ -72,7 +69,7 @@ export default async function Home({ searchParams }: HomeProps) {
   const userId = session?.user?.id;
   const isRestricted = role === "owner" || role === "professional";
 
-  // --- 1. Owners e professionals: veem apenas seus estabelecimentos ---
+  // 🔒 OWNER / PROFESSIONAL
   if (isRestricted && userId) {
     const [myBarbershops, { confirmedBookings }, categories] =
       await Promise.all([
@@ -84,6 +81,7 @@ export default async function Home({ searchParams }: HomeProps) {
     return (
       <div className="flex min-h-screen flex-col">
         <Header categories={categories} />
+
         <PageContainer>
           <Suspense fallback={null}>
             <AuthErrorAlert />
@@ -108,6 +106,7 @@ export default async function Home({ searchParams }: HomeProps) {
                 ? "Meus Estabelecimentos"
                 : "Meu Estabelecimento"}
             </PageSectionTitle>
+
             {myBarbershops.length > 0 ? (
               <PageSectionScroller>
                 {myBarbershops.map((barbershop) => (
@@ -121,67 +120,13 @@ export default async function Home({ searchParams }: HomeProps) {
             )}
           </PageSectionContent>
         </PageContainer>
-        <div className="mt-auto">
-          <Footer />
-        </div>
+
+        <Footer />
       </div>
     );
   }
 
-  // --- 2. Qualquer pessoa que entrou pelo link da barbearia: vê só aquela ---
-  const cookieStore = await cookies();
-  const linkedSlug = cookieStore.get("barbershop_slug")?.value;
-
-  if (linkedSlug) {
-    const [linkedBarbershop, { confirmedBookings }, categories] =
-      await Promise.all([
-        getBarbershopBySlug(linkedSlug),
-        getUserBookings(),
-        getServiceCategories(),
-      ]);
-
-    return (
-      <div className="flex min-h-screen flex-col">
-        <Header categories={categories} />
-        <PageContainer>
-          <Suspense fallback={null}>
-            <AuthErrorAlert />
-          </Suspense>
-
-          <Banner />
-
-          {confirmedBookings.length > 0 && (
-            <PageSectionContent>
-              <PageSectionTitle>Agendamentos</PageSectionTitle>
-              <PageSectionScroller>
-                {confirmedBookings.map((booking) => (
-                  <BookingItem key={booking.id} booking={booking} />
-                ))}
-              </PageSectionScroller>
-            </PageSectionContent>
-          )}
-
-          <PageSectionContent>
-            <PageSectionTitle>Estabelecimento</PageSectionTitle>
-            {linkedBarbershop ? (
-              <PageSectionScroller>
-                <BarbershopItem barbershop={linkedBarbershop} />
-              </PageSectionScroller>
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                Estabelecimento não encontrado.
-              </p>
-            )}
-          </PageSectionContent>
-        </PageContainer>
-        <div className="mt-auto">
-          <Footer />
-        </div>
-      </div>
-    );
-  }
-
-  // --- 3. Sem cookie: vê tudo normalmente ---
+  // 🌍 USUÁRIO NORMAL (SEM COOKIE)
   const [
     barbershops,
     popularBarbershops,
@@ -199,10 +144,12 @@ export default async function Home({ searchParams }: HomeProps) {
   return (
     <div className="flex min-h-screen flex-col">
       <Header categories={categories} />
+
       <PageContainer>
         <Suspense fallback={null}>
           <AuthErrorAlert />
         </Suspense>
+
         <QuickSearch categories={categories} />
 
         <Banner />
@@ -230,6 +177,7 @@ export default async function Home({ searchParams }: HomeProps) {
 
         <PageSectionContent>
           <PageSectionTitle>Barbearias e Salões</PageSectionTitle>
+
           {barbershops.length > 0 ? (
             <PageSectionScroller>
               {barbershops.map((barbershop) => (
@@ -238,13 +186,14 @@ export default async function Home({ searchParams }: HomeProps) {
             </PageSectionScroller>
           ) : (
             <p className="text-sm text-muted-foreground">
-              Nenhum estabelecimento encontrado para a localização selecionada.
+              Nenhum estabelecimento encontrado.
             </p>
           )}
         </PageSectionContent>
 
         <PageSectionContent>
-          <PageSectionTitle>Barbearias e Salões populares</PageSectionTitle>
+          <PageSectionTitle>Populares</PageSectionTitle>
+
           {popularBarbershops.length > 0 ? (
             <PageSectionScroller>
               {popularBarbershops.map((barbershop) => (
@@ -253,15 +202,13 @@ export default async function Home({ searchParams }: HomeProps) {
             </PageSectionScroller>
           ) : (
             <p className="text-sm text-muted-foreground">
-              Nenhum estabelecimento popular encontrado para a localização
-              selecionada.
+              Nenhum estabelecimento popular encontrado.
             </p>
           )}
         </PageSectionContent>
       </PageContainer>
-      <div className="mt-auto">
-        <Footer />
-      </div>
+
+      <Footer />
     </div>
   );
 }
