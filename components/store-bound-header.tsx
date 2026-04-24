@@ -79,7 +79,7 @@ export function StoreBoundHeader({
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => exitStore("/home")}>
+                <DropdownMenuItem onClick={() => exitStore("/home-page")}>
                   <Globe className="mr-2 size-4" />
                   Ver todas as lojas
                 </DropdownMenuItem>
@@ -114,7 +114,7 @@ export function StoreBoundHeader({
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => exitStore("/home")}
+                    onClick={() => exitStore("/home-page")}
                     className="text-muted-foreground"
                   >
                     <Globe className="mr-2 size-4" />

@@ -5,7 +5,7 @@ export const STORE_CONTEXT_COOKIE = "barbershop_slug";
 
 const publicRoutes = [
   "/",
-  "/home", // ← adicionar
+  "/home-page", // ← adicionar
   "/barbershops",
   "/api/auth",
   "/api/stripe/webhook",
