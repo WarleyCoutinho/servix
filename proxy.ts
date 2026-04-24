@@ -1,11 +1,8 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-export const STORE_CONTEXT_COOKIE = "barbershop_slug";
-
 const publicRoutes = [
   "/",
-  "/home-page", // ← adicionar
   "/barbershops",
   "/api/auth",
   "/api/stripe/webhook",
@@ -74,45 +71,17 @@ async function getUserRole(request: NextRequest): Promise<string | null> {
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  console.log("[proxy] pathname:", pathname);
-  console.log("[proxy] cookies:", request.cookies.getAll());
-
-  // ── Store context: /b/[slug] → seta cookie e deixa passar ─────────────────
-  // Feito ANTES de qualquer outra checagem para garantir que o cookie
-  // seja setado mesmo em rotas públicas/protegidas dentro de /b/
-  const storeMatch = pathname.match(/^\/b\/([^/]+)/);
-  if (storeMatch) {
-    const slug = storeMatch[1];
-    const response = NextResponse.next();
-    response.cookies.set(STORE_CONTEXT_COOKIE, slug, {
-      path: "/",
-      maxAge: 60 * 60 * 24 * 30, // 30 dias
-      sameSite: "lax",
-      httpOnly: false, // false para exitStore() limpar via document.cookie no client
-    });
-    return response;
-  }
-
-  // ── Store context: "/" com cookie → redireciona para /b/[slug] ────────────
-  if (pathname === "/") {
-    const storeSlug = request.cookies.get(STORE_CONTEXT_COOKIE)?.value;
-    if (storeSlug) {
-      const url = request.nextUrl.clone();
-      url.pathname = `/b/${storeSlug}`;
-      return NextResponse.redirect(url, { status: 302 });
-    }
-  }
-
-  // ── Auth: passa direto ────────────────────────────────────────────────────
   if (pathname.startsWith("/api/auth")) {
     return NextResponse.next();
   }
 
-  if (pathname.startsWith("/api/stripe") || pathname.startsWith("/api/cron")) {
+  if (
+    pathname.startsWith("/api/stripe") ||
+    pathname.startsWith("/api/cron")
+  ) {
     return NextResponse.next();
   }
 
-  // ── CSRF: bloqueia mutações cross-origin ──────────────────────────────────
   if (
     request.method !== "GET" &&
     request.method !== "HEAD" &&
@@ -132,19 +101,20 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  // ── Rotas públicas ────────────────────────────────────────────────────────
   if (isPublicRoute(pathname)) {
     return NextResponse.next();
   }
 
-  // ── Autenticação obrigatória ──────────────────────────────────────────────
   const sessionCookie =
     request.cookies.get("better-auth.session_token") ||
     request.cookies.get("__Secure-better-auth.session_token");
 
   if (isProtectedRoute(pathname) && !sessionCookie) {
     if (pathname.startsWith("/api/")) {
-      return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Não autenticado" },
+        { status: 401 },
+      );
     }
     const loginUrl = new URL("/", request.url);
     loginUrl.searchParams.set("redirect", pathname);
@@ -155,7 +125,6 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // ── RBAC ──────────────────────────────────────────────────────────────────
   const userRole = await getUserRole(request);
 
   if (isOwnerRoute(pathname)) {

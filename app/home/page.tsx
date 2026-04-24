@@ -1,37 +1,35 @@
-import Footer from "@/components/footer";
+import BookingItem from "@/components/booking-item";
 import Header from "@/components/header";
 import bannerDark from "@/public/servix_dark.png";
 import bannerLight from "@/public/servix_light.png";
-import { getServiceCategories } from "@/data/services";
 import Image from "next/image";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
-import { getUserBarbershops } from "@/data/barbershops";
+import { Suspense } from "react";
+
+import { AuthErrorAlert } from "@/components/auth-error-alert";
+import BarbershopItem from "@/components/barbershop-item";
+import Footer from "@/components/footer";
+import { LocationFilter } from "@/components/location-filter";
+import QuickSearch from "@/components/quick-search";
 import {
   PageContainer,
   PageSectionContent,
+  PageSectionScroller,
   PageSectionTitle,
 } from "@/components/ui/page";
-import BarbershopItem from "@/components/barbershop-item";
-import { PageSectionScroller } from "@/components/ui/page";
+import {
+  getAvailableLocations,
+  getBarbershops,
+  getPopularBarbershops,
+  getUserBarbershops,
+} from "@/data/barbershops";
 import { getUserBookings } from "@/data/bookings";
-import BookingItem from "@/components/booking-item";
-import { Suspense } from "react";
-import { AuthErrorAlert } from "@/components/auth-error-alert";
+import { getServiceCategories } from "@/data/services";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
-/**
- * Rota "/"
- *
- * - Usuário não logado            → página de marketing (landing page)
- * - Usuário logado como owner/pro → dashboard com seus estabelecimentos
- * - Usuário logado como cliente   → lista de todas as lojas (comportamento original)
- *
- * Quem chegou pelo link /b/[slug] NUNCA vê esta página diretamente:
- * o middleware.ts redireciona "/" → "/b/[slug]" enquanto o cookie existir.
- */
+interface HomeProps {
+  searchParams: Promise<{ city?: string; state?: string }>;
+}
 
 const Banner = ({ children }: { children?: React.ReactNode }) => (
   <div className="relative overflow-hidden rounded-2xl">
@@ -57,15 +55,21 @@ const Banner = ({ children }: { children?: React.ReactNode }) => (
     )}
   </div>
 );
+export default async function Home({ searchParams }: HomeProps) {
+  const params = await searchParams;
+  const filters = {
+    city: params.city,
+    state: params.state,
+  };
 
-export default async function Home() {
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
   const role = session?.user?.role as string | undefined;
   const userId = session?.user?.id;
   const isRestricted = role === "owner" || role === "professional";
 
-  // ── Owner / Professional ──────────────────────────────────────────────────
   if (isRestricted && userId) {
     const [myBarbershops, { confirmedBookings }, categories] =
       await Promise.all([
@@ -81,6 +85,7 @@ export default async function Home() {
           <Suspense fallback={null}>
             <AuthErrorAlert />
           </Suspense>
+
           <Banner />
 
           {confirmedBookings.length > 0 && (
@@ -120,15 +125,19 @@ export default async function Home() {
     );
   }
 
-  // ── Usuário cliente logado ────────────────────────────────────────────────
-  if (session?.user && !isRestricted) {
-    // Cliente logado sem contexto de loja → mostra landing marketing
-    // (ele chegou aqui organicamente, não pelo link de uma loja)
-    redirect("/home-page");
-  }
-
-  // ── Não logado / Marketing ────────────────────────────────────────────────
-  const categories = await getServiceCategories();
+  const [
+    barbershops,
+    popularBarbershops,
+    { confirmedBookings },
+    categories,
+    locations,
+  ] = await Promise.all([
+    getBarbershops(filters),
+    getPopularBarbershops(filters),
+    getUserBookings(),
+    getServiceCategories(),
+    getAvailableLocations(),
+  ]);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -137,35 +146,60 @@ export default async function Home() {
         <Suspense fallback={null}>
           <AuthErrorAlert />
         </Suspense>
+        <QuickSearch categories={categories} />
 
-        {/* Hero / Banner de marketing */}
-        <Banner>
-          <div className="flex flex-col gap-3">
-            <p className="text-sm font-medium text-white/90">
-              Agende serviços nos melhores estabelecimentos
-            </p>
-            <div className="flex gap-2">
-              <Button asChild size="sm" className="w-fit">
-                <Link href="/login">Começar agora</Link>
-              </Button>
-            </div>
-          </div>
-        </Banner>
+        <Banner />
 
-        {/*
-         * Aqui você coloca o conteúdo da landing page de marketing:
-         * seção "como funciona", depoimentos, CTA, etc.
-         *
-         * Não listamos todas as lojas pois a "/" agora é marketing,
-         * não um diretório público de estabelecimentos.
-         */}
+        {locations.length > 0 && (
+          <Suspense fallback={null}>
+            <LocationFilter
+              locations={locations}
+              currentCity={params.city}
+              currentState={params.state}
+            />
+          </Suspense>
+        )}
+
+        {confirmedBookings.length > 0 && (
+          <PageSectionContent>
+            <PageSectionTitle>Agendamentos</PageSectionTitle>
+            <PageSectionScroller>
+              {confirmedBookings.map((booking) => (
+                <BookingItem key={booking.id} booking={booking} />
+              ))}
+            </PageSectionScroller>
+          </PageSectionContent>
+        )}
+
         <PageSectionContent>
-          <PageSectionTitle>
-            Junte-se aos clientes que já confiam na Servix
-          </PageSectionTitle>
-          <p className="text-sm text-muted-foreground">
-            Acesse o link do seu estabelecimento favorito e agende em segundos.
-          </p>
+          <PageSectionTitle>Barbearias e Salões</PageSectionTitle>
+          {barbershops.length > 0 ? (
+            <PageSectionScroller>
+              {barbershops.map((barbershop) => (
+                <BarbershopItem key={barbershop.id} barbershop={barbershop} />
+              ))}
+            </PageSectionScroller>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Nenhum estabelecimento encontrado para a localização selecionada.
+            </p>
+          )}
+        </PageSectionContent>
+
+        <PageSectionContent>
+          <PageSectionTitle>Barbearias e Salões populares</PageSectionTitle>
+          {popularBarbershops.length > 0 ? (
+            <PageSectionScroller>
+              {popularBarbershops.map((barbershop) => (
+                <BarbershopItem key={barbershop.id} barbershop={barbershop} />
+              ))}
+            </PageSectionScroller>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Nenhum estabelecimento popular encontrado para a localização
+              selecionada.
+            </p>
+          )}
         </PageSectionContent>
       </PageContainer>
       <div className="mt-auto">

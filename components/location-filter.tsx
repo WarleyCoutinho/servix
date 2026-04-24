@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/select";
 import { MapPin } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 
 interface Location {
   city: string;
@@ -30,38 +30,26 @@ export function LocationFilter({
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // ✅ estados únicos
-  const states = useMemo(
-    () => [...new Set(locations.map((l) => l.state))].sort(),
-    [locations],
-  );
+  const states = [...new Set(locations.map((l) => l.state))].sort();
 
-  // ✅ cidades únicas por estado
-  const citiesForState = useMemo(() => {
-    if (!currentState) return [];
+  const citiesForState = currentState
+    ? locations
+        .filter((l) => l.state === currentState)
+        .map((l) => l.city)
+        .sort()
+    : [];
 
-    return [
-      ...new Set(
-        locations.filter((l) => l.state === currentState).map((l) => l.city),
-      ),
-    ].sort();
-  }, [locations, currentState]);
-
-  // ✅ atualização segura de params
   const updateParams = useCallback(
     (key: string, value: string | null, clearKeys?: string[]) => {
       const params = new URLSearchParams(searchParams.toString());
-
       if (value) {
-        params.set(key, encodeURIComponent(value));
+        params.set(key, value);
       } else {
         params.delete(key);
       }
-
       if (clearKeys) {
         clearKeys.forEach((k) => params.delete(k));
       }
-
       const query = params.toString();
       router.push(query ? `/?${query}` : "/");
     },
@@ -74,11 +62,9 @@ export function LocationFilter({
         <MapPin className="h-4 w-4" />
         <span>Filtrar por localização:</span>
       </div>
-
       <div className="flex gap-2">
-        {/* ESTADO */}
         <Select
-          value={states.includes(currentState || "") ? currentState : ""}
+          value={currentState || ""}
           onValueChange={(value) => {
             if (value === "all") {
               updateParams("state", null, ["city"]);
@@ -87,10 +73,9 @@ export function LocationFilter({
             }
           }}
         >
-          <SelectTrigger className="w-40">
+          <SelectTrigger className="w-[10rem]">
             <SelectValue placeholder="Estado" />
           </SelectTrigger>
-
           <SelectContent>
             <SelectItem value="all">Todos os estados</SelectItem>
             {states.map((state) => (
@@ -101,12 +86,9 @@ export function LocationFilter({
           </SelectContent>
         </Select>
 
-        {/* CIDADE */}
         {currentState && citiesForState.length > 0 && (
           <Select
-            value={
-              citiesForState.includes(currentCity || "") ? currentCity : ""
-            }
+            value={currentCity || ""}
             onValueChange={(value) => {
               if (value === "all") {
                 updateParams("city", null);
@@ -115,10 +97,9 @@ export function LocationFilter({
               }
             }}
           >
-            <SelectTrigger className="w-48">
+            <SelectTrigger className="w-[12rem]">
               <SelectValue placeholder="Cidade" />
             </SelectTrigger>
-
             <SelectContent>
               <SelectItem value="all">Todas as cidades</SelectItem>
               {citiesForState.map((city) => (

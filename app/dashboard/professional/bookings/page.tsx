@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ptBR } from "date-fns/locale";
 import { formatCurrency } from "@/lib/utils";
 import { formatBrt } from "@/lib/timezone";
-import { Calendar, Clock } from "lucide-react";
+import { Calendar, Clock, User } from "lucide-react";
 import { PaymentStatus } from "@/generated/prisma/enums";
 import MarkReceivedButton from "./_components/mark-received-button";
 
@@ -77,14 +77,9 @@ export default async function ProfessionalBookingsPage() {
           {bookings.map((booking) => {
             const isPast = booking.date < now;
             const isCancelled = !!booking.cancelledAt;
-            const isPayAfterService =
-              booking.payment?.paymentMethod === "pay_after_service";
-            const isPaymentPending =
-              isPayAfterService &&
-              booking.payment?.status === PaymentStatus.PENDING;
-            const isPaymentReceived =
-              isPayAfterService &&
-              booking.payment?.status === PaymentStatus.SUCCEEDED;
+            const isPayAfterService = booking.payment?.paymentMethod === "pay_after_service";
+            const isPaymentPending = isPayAfterService && booking.payment?.status === PaymentStatus.PENDING;
+            const isPaymentReceived = isPayAfterService && booking.payment?.status === PaymentStatus.SUCCEEDED;
 
             return (
               <Card key={booking.id}>
@@ -112,18 +107,12 @@ export default async function ProfessionalBookingsPage() {
                         <Badge variant="default">Agendado</Badge>
                       )}
                       {!isCancelled && isPaymentPending && (
-                        <Badge
-                          variant="outline"
-                          className="border-yellow-500/50 text-yellow-700 dark:text-yellow-400"
-                        >
+                        <Badge variant="outline" className="border-yellow-500/50 text-yellow-700 dark:text-yellow-400">
                           Não pago
                         </Badge>
                       )}
                       {!isCancelled && isPaymentReceived && (
-                        <Badge
-                          variant="outline"
-                          className="border-green-500/50 text-green-700 dark:text-green-400"
-                        >
+                        <Badge variant="outline" className="border-green-500/50 text-green-700 dark:text-green-400">
                           Recebido
                         </Badge>
                       )}

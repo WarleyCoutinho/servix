@@ -18,30 +18,6 @@ const nextConfig: NextConfig = {
     ],
   },
 
-  async rewrites() {
-    return [
-      // Mantém rewrites antigos MAS exclui /b/* para não conflitar com a rota do App Router
-      {
-        source: "/:path*",
-        has: [
-          { type: "query", key: "slug", value: "(.*)" },
-          // Garante que /b/... não seja capturado aqui
-        ],
-        destination: "/?slug=:path*",
-      },
-      {
-        source: "/:path*",
-        has: [{ type: "query", key: "id", value: "(.*)" }],
-        destination: "/?id=:path*",
-      },
-      // Rewrite genérico de slug — exclui explicitamente /b e outras rotas do app
-      {
-        source: "/:slug((?!b(?:/|$)|login|api|_next|favicon).*)",
-        destination: "/?slug=:slug",
-      },
-    ];
-  },
-
   async headers() {
     return [
       {
