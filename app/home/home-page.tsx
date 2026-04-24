@@ -124,6 +124,7 @@ export default async function Home() {
   if (session?.user && !isRestricted) {
     // Cliente logado sem contexto de loja → mostra landing marketing
     // (ele chegou aqui organicamente, não pelo link de uma loja)
+    redirect("/home");
   }
 
   // ── Não logado / Marketing ────────────────────────────────────────────────

@@ -3,6 +3,7 @@
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,7 +13,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useStoreContext } from "@/hooks/use-store-context";
-// better-auth@1.4.6: useSession e signOut ficam no authClient criado com createAuthClient()
 import { authClient } from "@/lib/auth-client";
 import { Calendar, Globe, LogIn, LogOut, Menu } from "lucide-react";
 import Link from "next/link";
@@ -43,13 +43,13 @@ export function StoreBoundHeader({
           className="flex items-center gap-2 font-semibold"
         >
           {storeLogoUrl && (
-            <img
+            <Image
               src={storeLogoUrl}
               alt={storeName}
               className="size-7 rounded-full object-cover"
             />
           )}
-          <span className="max-w-[160px] truncate text-sm">{storeName}</span>
+          <span className="max-w-40 truncate text-sm">{storeName}</span>
         </Link>
 
         <div className="flex items-center gap-2">
@@ -79,7 +79,7 @@ export function StoreBoundHeader({
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => exitStore("/")}>
+                <DropdownMenuItem onClick={() => exitStore("/home")}>
                   <Globe className="mr-2 size-4" />
                   Ver todas as lojas
                 </DropdownMenuItem>
@@ -114,7 +114,7 @@ export function StoreBoundHeader({
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => exitStore("/")}
+                    onClick={() => exitStore("/home")}
                     className="text-muted-foreground"
                   >
                     <Globe className="mr-2 size-4" />

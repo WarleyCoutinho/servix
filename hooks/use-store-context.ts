@@ -6,7 +6,8 @@ import { useCallback } from "react";
 
 /**
  * Hook para sair do contexto isolado de uma loja.
- * Limpa o cookie antes de navegar para que "/" volte a mostrar a home global.
+ * Deleta o cookie via API (server-side) antes de navegar,
+ * garantindo que o middleware não redirecione de volta para /b/[slug].
  *
  * Uso:
  *   const { exitStore } = useStoreContext();
@@ -16,8 +17,14 @@ export function useStoreContext() {
   const router = useRouter();
 
   const exitStore = useCallback(
-    (redirectTo = "/") => {
-      document.cookie = `${STORE_CONTEXT_COOKIE}=; path=/; max-age=0; samesite=lax`;
+    async (redirectTo = "/") => {
+      // Deleta o cookie server-side antes de navegar.
+      // Se a chamada falhar, limpa também client-side como fallback.
+      try {
+        await fetch("/api/store/exit", { method: "POST" });
+      } catch {
+        document.cookie = `${STORE_CONTEXT_COOKIE}=; path=/; max-age=0; samesite=lax`;
+      }
       router.push(redirectTo);
     },
     [router],

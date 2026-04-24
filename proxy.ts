@@ -1,10 +1,11 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-export const STORE_CONTEXT_COOKIE = "store-context";
+export const STORE_CONTEXT_COOKIE = "barbershop_slug";
 
 const publicRoutes = [
   "/",
+  "/home", // ← adicionar
   "/barbershops",
   "/api/auth",
   "/api/stripe/webhook",
@@ -72,6 +73,9 @@ async function getUserRole(request: NextRequest): Promise<string | null> {
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  console.log("[proxy] pathname:", pathname);
+  console.log("[proxy] cookies:", request.cookies.getAll());
 
   // ── Store context: /b/[slug] → seta cookie e deixa passar ─────────────────
   // Feito ANTES de qualquer outra checagem para garantir que o cookie
