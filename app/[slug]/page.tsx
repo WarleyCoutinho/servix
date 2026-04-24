@@ -6,10 +6,9 @@ import {
   PageSectionContent,
   PageSectionTitle,
 } from "@/components/ui/page";
-import { getBarbershopById, getBarbershopBySlug } from "@/data/barbershops";
+import { getBarbershopBySlug } from "@/data/barbershops";
 import { getServiceCategories } from "@/data/services";
 import { MapPin, Phone } from "lucide-react";
-import { cookies } from "next/headers";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
@@ -17,29 +16,17 @@ interface SlugPageProps {
   params: Promise<{ slug: string }>;
 }
 
-const UUID_REGEX =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
 const SlugPage = async ({ params }: SlugPageProps) => {
   const { slug } = await params;
-  const isUUID = UUID_REGEX.test(slug);
 
   const [barbershop, categories] = await Promise.all([
-    isUUID ? getBarbershopById(slug) : getBarbershopBySlug(slug),
+    getBarbershopBySlug(slug),
     getServiceCategories(),
   ]);
 
   if (!barbershop) {
     notFound();
   }
-
-  // Salva o slug da barbearia no cookie para filtrar a home
-  const cookieStore = await cookies();
-  cookieStore.set("barbershop_slug", barbershop.slug ?? slug, {
-    path: "/",
-    maxAge: 60 * 60 * 24 * 30, // 30 dias
-    sameSite: "lax",
-  });
 
   return (
     <div>
