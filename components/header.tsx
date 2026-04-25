@@ -41,7 +41,7 @@ const Header = () => {
 
   const { data: session } = authClient.useSession();
   const isLoggedIn = !!session?.user;
-  const { storeUrl, storeSlug } = useStoreContext();
+  const { storeUrl } = useStoreContext();
   const handleLogout = async () => {
     // FIX 2: guard contra chamadas duplicadas
     if (isLoggingOut) return;
@@ -58,7 +58,7 @@ const Header = () => {
     <header className="bg-background border-border sticky top-0 z-40 border-b">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-6">
-          <Link href={isLoggedIn ? "/home" : "/"} className="shrink-0">
+          <Link href={storeUrl ?? "/"} className="shrink-0">
             {/*
               Logo — escala por breakpoint para todos os iPhones:
               SE (320px)          → h-7  (28px) — cabe com folga no header h-16
@@ -94,13 +94,24 @@ const Header = () => {
                 </Link>
               </Button>
             )}
-            <div className="bg-red-500">
-              {storeUrl && (
+
+            {/* {storeUrl && (
                 <Button asChild variant="ghost">
                   <Link href={storeUrl}>{storeSlug}</Link>
                 </Button>
-              )}
-            </div>
+              )} */}
+            {storeUrl && (
+              <Button asChild variant="ghost" size="sm">
+                <Link href={storeUrl}>
+                  <Home className="mr-2 size-4" />
+                  {session?.user?.role === "owner" ||
+                  session?.user?.role === "professional"
+                    ? "Voltar à loja"
+                    : "Página inicial"}
+                </Link>
+              </Button>
+            )}
+
             {session?.user?.role === "client" && (
               <Button variant="ghost" size="sm" asChild>
                 <Link href="/bookings">

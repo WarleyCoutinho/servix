@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-export const STORE_CONTEXT_COOKIE = "store-context";
+export const STORE_CONTEXT_COOKIE = "barbershop_slug";
 const publicRoutes = [
   "/",
   "/barbershops",
@@ -91,7 +91,7 @@ export async function proxy(request: NextRequest) {
 
   // ── Store context: /{slug} → seta cookie e deixa passar ─────────────────────
   if (isStoreRoute(pathname)) {
-    const slug = pathname.slice(1); // remove a barra inicial
+    const slug = decodeURIComponent(pathname.slice(1)).trim(); // remove a barra inicial
     const response = NextResponse.next();
     response.cookies.set(STORE_CONTEXT_COOKIE, slug, {
       path: "/",

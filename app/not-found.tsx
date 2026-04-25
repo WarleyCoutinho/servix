@@ -7,10 +7,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { FileQuestion, Home, ArrowLeft } from "lucide-react";
-import Link from "next/link";
+/* import { useStoreContext } from "@/hooks/use-store-context"; */
+import { ArrowLeft, FileQuestion } from "lucide-react";
+/* import Link from "next/link"; */
 
 export default function NotFound() {
+  /* const { storeSlug } = useStoreContext(); */
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
@@ -27,24 +30,27 @@ export default function NotFound() {
         <CardContent>
           <div className="rounded-lg bg-muted p-4 text-sm text-muted-foreground">
             <p>
-              Verifique se o endereço está correto ou volte para a página inicial.
+              Verifique se o endereço está correto ou volte para a página
+              inicial.
             </p>
           </div>
         </CardContent>
 
         <CardFooter className="flex gap-3">
-          <Button variant="outline" className="flex-1" asChild>
-            <Link href="javascript:history.back()">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Voltar
-            </Link>
+          <Button
+            variant="outline"
+            className="flex-1"
+            onClick={() => history.back()}
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Voltar
           </Button>
-          <Button className="flex-1" asChild>
-            <Link href="/">
+          {/*  <Button className="flex-1" asChild>
+            <Link href={storeSlug ? `/${storeSlug}` : "/"}>
               <Home className="mr-2 h-4 w-4" />
               Página inicial
             </Link>
-          </Button>
+          </Button> */}
         </CardFooter>
       </Card>
     </div>

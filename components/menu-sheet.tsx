@@ -23,8 +23,9 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
-
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "./ui/sheet";
+import { useStoreContext } from "@/hooks/use-store-context";
+import { VisuallyHidden } from "radix-ui";
 interface MenuSheetProps {
   onLoginClick: () => void;
 }
@@ -58,7 +59,7 @@ const MenuSheet = ({ onLoginClick }: MenuSheetProps) => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const router = useRouter();
   const { data: session } = authClient.useSession();
-
+  const { storeUrl } = useStoreContext();
   const handleNavigation = (href: string) => {
     setOpen(false);
     setTimeout(() => router.push(href), 150);
@@ -102,6 +103,9 @@ const MenuSheet = ({ onLoginClick }: MenuSheetProps) => {
         side="right"
         className="flex w-[85vw] max-w-sm flex-col overflow-hidden p-0 will-change-transform"
       >
+        <VisuallyHidden.Root>
+          <SheetTitle>Menu de navegação</SheetTitle>
+        </VisuallyHidden.Root>
         {/* Logo no topo */}
         <div className="border-b border-border px-5 py-4">
           <Image
@@ -179,11 +183,25 @@ const MenuSheet = ({ onLoginClick }: MenuSheetProps) => {
             <p className="px-5 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/60">
               Navegação
             </p>
-            <NavItem
-              icon={Home}
-              label="Início"
-              onClick={() => handleNavigation("/home")}
-            />
+            {session?.user?.role === "admin" && (
+              <NavItem
+                icon={Home}
+                label="Início"
+                onClick={() => handleNavigation("/home")}
+              />
+            )}
+            {storeUrl && (
+              <NavItem
+                icon={Home}
+                label={
+                  session?.user?.role === "owner" ||
+                  session?.user?.role === "professional"
+                    ? "Voltar à loja"
+                    : "Página inicial"
+                }
+                onClick={() => handleNavigation(storeUrl)}
+              />
+            )}
             {!isLoggedIn && (
               <NavItem
                 icon={Megaphone}

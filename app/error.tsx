@@ -11,13 +11,11 @@ import {
 } from "@/components/ui/card";
 import {
   AlertCircle,
+  ArrowLeft,
   Clock,
   DatabaseZap,
-  Home,
-  RefreshCw,
   WifiOff,
 } from "lucide-react";
-import Link from "next/link";
 import { useEffect } from "react";
 
 interface ErrorProps {
@@ -118,7 +116,7 @@ const errorConfig: Record<
   },
 };
 
-export default function ErrorPage({ error, reset }: ErrorProps) {
+export default function ErrorPage({ error }: ErrorProps) {
   const errorType = getConnectionErrorType(error);
   const config = errorConfig[errorType];
   const Icon = config.icon;
@@ -150,16 +148,24 @@ export default function ErrorPage({ error, reset }: ErrorProps) {
         </CardContent>
 
         <CardFooter className="flex gap-3">
-          <Button variant="outline" className="flex-1" asChild>
+          {/* <Button variant="outline" className="flex-1" asChild>
             <Link href="/">
               <Home className="mr-2 h-4 w-4" />
               Início
             </Link>
+          </Button> */}
+          <Button
+            variant="outline"
+            className="flex-1"
+            onClick={() => history.back()}
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Voltar
           </Button>
-          <Button className="flex-1" onClick={reset}>
+          {/* <Button className="flex-1" onClick={reset}>
             <RefreshCw className="mr-2 h-4 w-4" />
             Tentar novamente
-          </Button>
+          </Button> */}
         </CardFooter>
       </Card>
     </div>
