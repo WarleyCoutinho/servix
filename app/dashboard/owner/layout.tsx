@@ -81,20 +81,28 @@ export default async function OwnerDashboardLayout({
   if (planInfo?.canHaveMultipleBarbershops) {
     navItems.push({
       href: "/dashboard/owner/establishments",
-      label: "Estabelecimentos",
+      label: "Minhas Lojas",
       icon: Store,
     });
   }
 
   navItems.push({
     href: "/dashboard/owner/professionals",
-    label: "Profissionais",
+    label: "Minha Equipe",
     icon: Users,
   });
 
   navItems.push(
-    { href: "/dashboard/owner/services", label: "Serviços", icon: Scissors },
-    { href: "/dashboard/owner/subscription", label: "Assinatura", icon: CreditCard },
+    {
+      href: "/dashboard/owner/services",
+      label: "Meus Serviços",
+      icon: Scissors,
+    },
+    {
+      href: "/dashboard/owner/subscription",
+      label: "Assinatura",
+      icon: CreditCard,
+    },
   );
 
   const showSelector = activeBarbershops.length > 1;
@@ -130,10 +138,7 @@ export default async function OwnerDashboardLayout({
           {children}
         </div>
       </main>
-      <SupportChat
-        userPlan={planInfo?.plan ?? "BASIC"}
-        userName={user.name}
-      />
+      <SupportChat userPlan={planInfo?.plan ?? "BASIC"} userName={user.name} />
     </div>
   );
 }

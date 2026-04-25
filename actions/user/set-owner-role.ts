@@ -15,7 +15,9 @@ const inputSchema = z.object({
   address: z.string().min(5, "Endereço deve ter pelo menos 5 caracteres"),
   city: z.string().min(2, "Cidade é obrigatória"),
   state: z.string().min(2, "Estado é obrigatório"),
-  description: z.string().min(10, "Descrição deve ter pelo menos 10 caracteres"),
+  description: z
+    .string()
+    .min(10, "Descrição deve ter pelo menos 10 caracteres"),
   phone: z.string().min(10, "Telefone inválido"),
   imageUrl: z.string().optional(),
   ownerCpf: z
@@ -38,13 +40,16 @@ export const setOwnerRole = protectedActionClient
       throw new Error("Usuário não encontrado.");
     }
 
-    if (existingUser.role === UserRole.owner && existingUser.ownedBarbershops.length > 0) {
+    if (
+      existingUser.role === UserRole.owner &&
+      existingUser.ownedBarbershops.length > 0
+    ) {
       throw new Error("Você já possui uma barbearia cadastrada.");
     }
 
     if (existingUser.role === UserRole.professional) {
       throw new Error(
-        "Você já está cadastrado como profissional. Não é possível ser proprietário ao mesmo tempo."
+        "Você já está cadastrado como profissional. Não é possível ser proprietário ao mesmo tempo.",
       );
     }
 
@@ -63,7 +68,9 @@ export const setOwnerRole = protectedActionClient
       });
 
       const baseSlug = slugify(parsedInput.barbershopName);
-      const existingSlug = await tx.barbershop.findUnique({ where: { slug: baseSlug } });
+      const existingSlug = await tx.barbershop.findUnique({
+        where: { slug: baseSlug },
+      });
       const slug = existingSlug ? `${baseSlug}-${Date.now()}` : baseSlug;
 
       const barbershop = await tx.barbershop.create({
@@ -75,7 +82,9 @@ export const setOwnerRole = protectedActionClient
           state: parsedInput.state,
           description: parsedInput.description,
           phones: [parsedInput.phone],
-          imageUrl: parsedInput.imageUrl || "/banner.png",
+          imageUrl:
+            parsedInput.imageUrl ||
+            "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=800&q=80",
           ownerId: user.id,
         },
       });
@@ -98,8 +107,7 @@ export const setOwnerRole = protectedActionClient
           dayOfWeek: day,
           startTime: "09:00",
           endTime: "18:00",
-          isAvailable:
-            day !== DayOfWeek.SATURDAY && day !== DayOfWeek.SUNDAY,
+          isAvailable: day !== DayOfWeek.SATURDAY && day !== DayOfWeek.SUNDAY,
         })),
       });
 

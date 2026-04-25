@@ -10,12 +10,14 @@ import {
 } from "@/components/ui/page";
 
 const BookingsPage = async () => {
-  const [{ confirmedBookings, finishedBookings }, categories] =
-    await Promise.all([getUserBookings(), getServiceCategories()]);
+  const [{ confirmedBookings, finishedBookings }] = await Promise.all([
+    getUserBookings(),
+    getServiceCategories(),
+  ]);
 
   return (
     <div>
-      <Header categories={categories} />
+      <Header />
       <PageContainer>
         <div className="space-y-1">
           <h1 className="text-2xl font-bold sm:text-3xl">Meus Agendamentos</h1>

@@ -19,7 +19,7 @@ interface SlugPageProps {
 const SlugPage = async ({ params }: SlugPageProps) => {
   const { slug } = await params;
 
-  const [barbershop, categories] = await Promise.all([
+  const [barbershop] = await Promise.all([
     getBarbershopBySlug(slug),
     getServiceCategories(),
   ]);
@@ -30,7 +30,7 @@ const SlugPage = async ({ params }: SlugPageProps) => {
 
   return (
     <div>
-      <Header categories={categories} />
+      <Header />
 
       <div className="relative h-55 w-full sm:h-80">
         <Image

@@ -5,7 +5,6 @@ import logoDark from "@/public/servix_logo_horizontal.svg";
 import logoLight from "@/public/servix_logo_light.svg";
 import {
   CalendarDays,
-  ChevronDown,
   FileText,
   Home,
   LayoutDashboard,
@@ -34,25 +33,24 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 
-interface Category {
-  label: string;
-  search: string;
-}
-
-interface HeaderProps {
-  categories?: Category[];
-}
-
-const Header = ({ categories = [] }: HeaderProps) => {
+const Header = () => {
   const [loginModalOpen, setLoginModalOpen] = useState(false);
+  // FIX 2: estado de loading no logout — evita double-tap no iOS
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
   const { data: session } = authClient.useSession();
   const isLoggedIn = !!session?.user;
 
   const handleLogout = async () => {
+    // FIX 2: guard contra chamadas duplicadas
+    if (isLoggingOut) return;
+    setIsLoggingOut(true);
     const { error } = await authClient.signOut();
     if (error) {
       toast.error(error.message);
+      setIsLoggingOut(false);
     }
+    // não reseta em sucesso — a página vai redirecionar/re-renderizar
   };
 
   return (
@@ -60,21 +58,29 @@ const Header = ({ categories = [] }: HeaderProps) => {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-6">
           <Link href={isLoggedIn ? "/home" : "/"} className="shrink-0">
+            {/*
+              Logo — escala por breakpoint para todos os iPhones:
+              SE (320px)          → h-7  (28px) — cabe com folga no header h-16
+              mini/12/13 (375px)  → h-8  (32px)
+              14/15/Pro (390-430) → h-8  (32px)
+              desktop md+         → h-9  (36px)
+              w-auto mantém proporção exata do SVG sem distorção
+            */}
             <Image
               src={logoLight}
               alt="Servix"
-              width={200}
               height={54}
+              width={200}
               priority
-              className="block dark:hidden"
+              className="block h-7 w-auto min-[375px]:h-8 md:h-9 dark:hidden"
             />
             <Image
               src={logoDark}
               alt="Servix"
-              width={200}
               height={54}
+              width={200}
               priority
-              className="hidden dark:block"
+              className="hidden h-7 w-auto min-[375px]:h-8 md:h-9 dark:block"
             />
           </Link>
 
@@ -85,28 +91,6 @@ const Header = ({ categories = [] }: HeaderProps) => {
                 Início
               </Link>
             </Button>
-
-            {categories.length > 0 && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm">
-                    Categorias
-                    <ChevronDown className="ml-1 size-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-48">
-                  {categories.map((category) => (
-                    <DropdownMenuItem key={category.search} asChild>
-                      <Link
-                        href={`/barbershops?search=${encodeURIComponent(category.search)}`}
-                      >
-                        {category.label}
-                      </Link>
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
 
             {session?.user?.role === "client" && (
               <Button variant="ghost" size="sm" asChild>
@@ -176,10 +160,6 @@ const Header = ({ categories = [] }: HeaderProps) => {
 
         <div className="flex items-center gap-2">
           <ThemeToggle />
-          {/* Ativar quando tiver cliente e pagar um IA profissional
-          {/* {session?.user?.role === "client" && (
-            <ChatSheet triggerClassName="hidden sm:flex" iconOnly />
-          )} */}
 
           <div className="hidden md:block">
             {isLoggedIn ? (
@@ -190,10 +170,14 @@ const Header = ({ categories = [] }: HeaderProps) => {
                     className="relative h-9 w-9 rounded-full"
                   >
                     <Avatar className="size-9">
-                      <AvatarImage
-                        src={session.user.image ?? ""}
-                        alt={session.user.name}
-                      />
+                      {/* FIX 3: só renderiza AvatarImage se houver URL válida —
+                          evita GET / desnecessário quando image é null       */}
+                      {session.user.image && (
+                        <AvatarImage
+                          src={session.user.image}
+                          alt={session.user.name}
+                        />
+                      )}
                       <AvatarFallback>
                         {session.user.name.charAt(0).toUpperCase()}
                       </AvatarFallback>
@@ -210,6 +194,7 @@ const Header = ({ categories = [] }: HeaderProps) => {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
+
                   {session.user.role === "client" && (
                     <DropdownMenuItem asChild>
                       <Link href="/bookings">
@@ -271,10 +256,16 @@ const Header = ({ categories = [] }: HeaderProps) => {
                       </DropdownMenuItem>
                     </>
                   )}
+
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout}>
+                  {/* FIX 2: disabled durante logout — sem double-tap */}
+                  <DropdownMenuItem
+                    onClick={handleLogout}
+                    disabled={isLoggingOut}
+                    className="text-destructive focus:text-destructive"
+                  >
                     <LogOut className="mr-2 size-4" />
-                    Sair da conta
+                    {isLoggingOut ? "Saindo..." : "Sair da conta"}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -287,12 +278,7 @@ const Header = ({ categories = [] }: HeaderProps) => {
           </div>
 
           <div className="flex items-center gap-2 md:hidden">
-            {/* Ativar quando tiver cliente e pagar um IA profissional */}
-            {/* {session?.user?.role === "client" && <ChatSheet iconOnly />} */}
-            <MenuSheet
-              categories={categories}
-              onLoginClick={() => setLoginModalOpen(true)}
-            />
+            <MenuSheet onLoginClick={() => setLoginModalOpen(true)} />
           </div>
         </div>
       </div>

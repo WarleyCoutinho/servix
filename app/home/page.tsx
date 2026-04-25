@@ -71,16 +71,15 @@ export default async function Home({ searchParams }: HomeProps) {
   const isRestricted = role === "owner" || role === "professional";
 
   if (isRestricted && userId) {
-    const [myBarbershops, { confirmedBookings }, categories] =
-      await Promise.all([
-        getUserBarbershops(userId, role!),
-        getUserBookings(),
-        getServiceCategories(),
-      ]);
+    const [myBarbershops, { confirmedBookings }] = await Promise.all([
+      getUserBarbershops(userId, role!),
+      getUserBookings(),
+      getServiceCategories(),
+    ]);
 
     return (
       <div className="flex min-h-screen flex-col">
-        <Header categories={categories} />
+        <Header />
         <PageContainer>
           <Suspense fallback={null}>
             <AuthErrorAlert />
@@ -141,7 +140,7 @@ export default async function Home({ searchParams }: HomeProps) {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Header categories={categories} />
+      <Header />
       <PageContainer>
         <Suspense fallback={null}>
           <AuthErrorAlert />

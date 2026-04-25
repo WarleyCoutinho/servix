@@ -17,14 +17,14 @@ interface BarbershopsPageProps {
 
 const BarbershopsPage = async ({ searchParams }: BarbershopsPageProps) => {
   const { search } = await searchParams;
-  const [barbershops, categories] = await Promise.all([
+  const [barbershops] = await Promise.all([
     search ? getBarbershopsByServiceName(search) : Promise.resolve([]),
     getServiceCategories(),
   ]);
 
   return (
     <div>
-      <Header categories={categories} />
+      <Header />
       <PageContainer>
         <PageSectionContent>
           <PageSectionTitle>

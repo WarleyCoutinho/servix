@@ -46,9 +46,7 @@ export const createBarbershop = subscribedOwnerActionClient
     if (needsCreateProfessional && !parsedInput.cpf) {
       returnValidationErrors(inputSchema, {
         cpf: {
-          _errors: [
-            "CPF é obrigatório para criar seu perfil profissional.",
-          ],
+          _errors: ["CPF é obrigatório para criar seu perfil profissional."],
         },
       });
     }
@@ -68,7 +66,9 @@ export const createBarbershop = subscribedOwnerActionClient
 
     const result = await prisma.$transaction(async (tx) => {
       const baseSlug = slugify(parsedInput.name);
-      const existingSlug = await tx.barbershop.findUnique({ where: { slug: baseSlug } });
+      const existingSlug = await tx.barbershop.findUnique({
+        where: { slug: baseSlug },
+      });
       const slug = existingSlug ? `${baseSlug}-${Date.now()}` : baseSlug;
 
       const barbershop = await tx.barbershop.create({
@@ -80,7 +80,9 @@ export const createBarbershop = subscribedOwnerActionClient
           state: parsedInput.state,
           description: parsedInput.description || "",
           phones: [parsedInput.phone],
-          imageUrl: parsedInput.imageUrl || "/banner.png",
+          imageUrl:
+            parsedInput.imageUrl ||
+            "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=800&q=80",
           ownerId: user.id,
         },
       });
@@ -103,8 +105,7 @@ export const createBarbershop = subscribedOwnerActionClient
             dayOfWeek: day,
             startTime: "09:00",
             endTime: "18:00",
-            isAvailable:
-              day !== DayOfWeek.SATURDAY && day !== DayOfWeek.SUNDAY,
+            isAvailable: day !== DayOfWeek.SATURDAY && day !== DayOfWeek.SUNDAY,
           })),
         });
       }

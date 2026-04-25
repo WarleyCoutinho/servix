@@ -73,13 +73,21 @@ function Section({
   children: React.ReactNode;
   locked?: boolean;
 }) {
+  if (locked) {
+    return (
+      <div className="border-border border-b">
+        <div className="flex items-center gap-2.5 px-5 py-4 opacity-35">
+          <StepBadge n={step} done={done} active={active} />
+          <span className="text-sm font-semibold text-muted-foreground">
+            {label}
+          </span>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div
-      className={[
-        "border-border border-b transition-all duration-300",
-        locked ? "pointer-events-none opacity-40" : "",
-      ].join(" ")}
-    >
+    <div className="border-border border-b transition-all duration-300">
       <div className="flex items-center gap-2.5 px-5 pb-3 pt-5">
         <StepBadge n={step} done={done} active={active} />
         <span
@@ -130,6 +138,8 @@ const ServiceItem = ({
   const timeSectionRef = useRef<HTMLDivElement | null>(null);
   const paySectionRef = useRef<HTMLDivElement | null>(null);
   const clientNameSectionRef = useRef<HTMLDivElement | null>(null);
+  // ── FIX 2: referência ao container scrollável para scrollTo correto no iOS ──
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
   const { data: session } = authClient.useSession();
 
@@ -165,12 +175,18 @@ const ServiceItem = ({
   const slots = availableTimeSlots?.data?.slots;
   const slotMsg = availableTimeSlots?.data?.message;
 
-  // ── Auto-scroll suave para próxima etapa ──
+  // ── FIX 2: scroll no container pai em vez de scrollIntoView no iOS ──
   const scrollTo = (ref: MutableRefObject<HTMLDivElement | null>) => {
-    setTimeout(
-      () => ref.current?.scrollIntoView({ behavior: "smooth", block: "start" }),
-      120,
-    );
+    setTimeout(() => {
+      const el = ref.current;
+      if (!el) return;
+      const container = scrollContainerRef.current;
+      if (container) {
+        container.scrollTo({ top: el.offsetTop - 16, behavior: "smooth" });
+      } else {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }, 150);
   };
 
   const handleDateSelect = (date: Date | undefined) => {
@@ -195,7 +211,6 @@ const ServiceItem = ({
     setSelectedPaymentMethod(undefined);
     setClientName("");
     if (isOwner) {
-      // Owner sempre paga no local — pula passo de pagamento
       scrollTo(clientNameSectionRef);
     } else if (hasPayAfterService) {
       scrollTo(paySectionRef);
@@ -233,16 +248,14 @@ const ServiceItem = ({
   const handleConfirmBooking = async () => {
     if (!selectedDate || !selectedTime || !selectedProfessional) return;
 
-    const splittedTime = selectedTime.split(":");
+    const [h, m] = selectedTime.split(":").map(Number);
     const date = new Date(selectedDate);
-    date.setHours(Number(splittedTime[0]), Number(splittedTime[1]));
+    date.setHours(h, m, 0, 0);
 
-    // ── Fluxo owner: sempre pagar no local, com nome do cliente ──
     if (isOwner) {
       if (clientName.trim().length < 2) {
         return toast.error("Digite o nome do cliente.");
       }
-
       const result = await executeDirectBooking({
         date,
         serviceId: service.id,
@@ -250,7 +263,6 @@ const ServiceItem = ({
         payAfterService: true,
         clientName: clientName.trim(),
       });
-
       if (!result || result.serverError)
         return toast.error("Erro ao criar agendamento. Tente novamente.");
       if (result.validationErrors)
@@ -258,7 +270,6 @@ const ServiceItem = ({
           getFirstError(result.validationErrors) ||
             "Erro ao criar agendamento.",
         );
-
       toast.success("Agendamento confirmado! 🎉");
       setSheetIsOpen(false);
       reset();
@@ -266,7 +277,6 @@ const ServiceItem = ({
       return;
     }
 
-    // ── Fluxo normal (cliente) ──
     const effectivePaymentMethod =
       hasPayAfterService && !hasStripePayment
         ? "pay_after_service"
@@ -283,7 +293,6 @@ const ServiceItem = ({
         professionalId: selectedProfessional,
         payAfterService: true,
       });
-
       if (!result || result.serverError)
         return toast.error("Erro ao criar agendamento. Tente novamente.");
       if (result.validationErrors)
@@ -291,7 +300,6 @@ const ServiceItem = ({
           getFirstError(result.validationErrors) ||
             "Erro ao criar agendamento.",
         );
-
       toast.success("Agendamento confirmado! 🎉");
       setSheetIsOpen(false);
       reset();
@@ -304,7 +312,6 @@ const ServiceItem = ({
       serviceId: service.id,
       professionalId: selectedProfessional,
     });
-
     if (!result || result.serverError)
       return toast.error("Erro ao criar agendamento. Tente novamente.");
     if (result.validationErrors)
@@ -331,7 +338,6 @@ const ServiceItem = ({
     reset();
   };
 
-  // ── Progresso das etapas ──
   const step1Done = !!selectedDate;
   const step2Done = !!selectedProfessional;
   const step3Done = !!selectedTime;
@@ -348,11 +354,13 @@ const ServiceItem = ({
       step3Done &&
       (!hasPayAfterService || !hasStripePayment || !!selectedPaymentMethod);
 
-  // Owner: 4 passos (data, prof, horário, nome cliente)
-  // Cliente: 4 passos (data, prof, horário, pagamento — se aplicável)
+  // ── FIX 1: progress bar não mostra 4º segmento já preenchido quando
+  //    o profissional não tem pagamento online (hasPayAfterService only) ──
   const progressSegments = isOwner
     ? [step1Done, step2Done, step3Done, stepOwnerDone]
-    : [step1Done, step2Done, step3Done, !hasPayAfterService || step4Done];
+    : hasPayAfterService
+      ? [step1Done, step2Done, step3Done, step4Done]
+      : [step1Done, step2Done, step3Done];
 
   const formatDate = (d: Date) =>
     new Intl.DateTimeFormat("pt-BR", {
@@ -383,18 +391,30 @@ const ServiceItem = ({
             {formatCurrency(service.priceInCents)}
           </p>
 
-          <Sheet open={sheetIsOpen} onOpenChange={setSheetIsOpen}>
+          <Sheet
+            open={sheetIsOpen}
+            onOpenChange={(open) => {
+              setSheetIsOpen(open);
+              if (!open) reset();
+            }}
+          >
             <SheetTrigger asChild>
-              <Button className="rounded-full" size="sm">
+              <Button className="h-11 rounded-full px-5 text-sm" size="default">
                 Agendar
               </Button>
             </SheetTrigger>
 
-            <SheetContent className="flex flex-col gap-0 overflow-y-auto p-0 sm:max-w-md">
+            <SheetContent
+              className={[
+                "flex flex-col gap-0 p-0 sm:max-w-md",
+                "overflow-hidden",
+                "will-change-transform",
+              ].join(" ")}
+            >
               <SheetTitle className="sr-only">Fazer Reserva</SheetTitle>
 
               {/* ── Cabeçalho sticky ── */}
-              <div className="bg-card border-border sticky top-0 z-10 border-b px-5 py-4 shadow-sm">
+              <div className="bg-card border-border shrink-0 border-b px-5 py-4 shadow-sm">
                 <div className="flex items-start gap-3">
                   <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl">
                     <Image
@@ -405,10 +425,10 @@ const ServiceItem = ({
                     />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-muted-foreground text-xs">
                       {barbershop.name}
                     </p>
-                    <p className="truncate text-sm font-bold text-foreground">
+                    <p className="text-foreground truncate text-sm font-bold">
                       {service.name}
                     </p>
                     <p className="text-primary text-sm font-semibold">
@@ -417,7 +437,7 @@ const ServiceItem = ({
                   </div>
                 </div>
 
-                {/* Barra de progresso */}
+                {/* Barra de progresso — FIX 1 aplicado */}
                 <div className="mt-4 flex gap-1.5">
                   {progressSegments.map((done, i) => (
                     <div
@@ -434,12 +454,12 @@ const ServiceItem = ({
               {!session?.user ? (
                 /* ── Não logado ── */
                 <div className="flex flex-col items-center justify-center gap-4 px-5 py-16 text-center">
-                  <div className="rounded-2xl bg-muted p-5">
-                    <LogIn className="size-8 text-muted-foreground" />
+                  <div className="bg-muted rounded-2xl p-5">
+                    <LogIn className="text-muted-foreground size-8" />
                   </div>
                   <div>
                     <h3 className="text-base font-bold">Entre para reservar</h3>
-                    <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
+                    <p className="text-muted-foreground mt-1.5 text-sm leading-relaxed">
                       Crie sua conta grátis e agende em segundos.
                     </p>
                   </div>
@@ -448,354 +468,381 @@ const ServiceItem = ({
                       setSheetIsOpen(false);
                       setLoginModalOpen(true);
                     }}
-                    className="w-full rounded-xl"
-                    size="lg"
+                    className="h-11 w-full rounded-xl"
                   >
                     <LogIn className="mr-2 size-4" /> Fazer Login
                   </Button>
                 </div>
               ) : (
-                <div className="flex flex-col">
-                  {/* ══ PASSO 1 — Data ══ */}
-                  <Section
-                    step={1}
-                    label="Escolha a data"
-                    done={step1Done}
-                    active={!step1Done}
+                /* ── Logado ── */
+                <div className="flex min-h-0 flex-1 flex-col">
+                  {/* ── FIX 2: ref no container + data-scroll para scrollTo correto ── */}
+                  <div
+                    ref={scrollContainerRef}
+                    data-scroll
+                    className="flex-1 overflow-y-auto overscroll-contain"
+                    style={{ WebkitOverflowScrolling: "touch" }}
                   >
-                    <div className="px-5">
-                      <MiniCalendar
-                        selected={selectedDate}
-                        onSelect={(d) => handleDateSelect(d)}
-                      />
-                      {selectedDate && (
-                        <div className="mt-3 flex items-center gap-2 rounded-xl bg-primary/8 px-3 py-2">
-                          <Check size={14} className="text-primary shrink-0" />
-                          <span className="text-xs font-medium text-primary capitalize">
-                            {formatDate(selectedDate)}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </Section>
-
-                  {/* ══ PASSO 2 — Profissional ══ */}
-                  <div ref={profSectionRef}>
+                    {/* ══ PASSO 1 — Data ══ */}
                     <Section
-                      step={2}
-                      label="Escolha o profissional"
-                      done={step2Done}
-                      active={step1Done && !step2Done}
-                      locked={!step1Done}
+                      step={1}
+                      label="Escolha a data"
+                      done={step1Done}
+                      active={!step1Done}
                     >
                       <div className="px-5">
-                        {isLoadingProfessionals ? (
-                          <div className="flex justify-center py-4">
-                            <Loader2 className="size-5 animate-spin text-muted-foreground" />
+                        <MiniCalendar
+                          selected={selectedDate}
+                          onSelect={handleDateSelect}
+                        />
+                        {selectedDate && (
+                          <div className="bg-primary/8 mt-3 flex items-center gap-2 rounded-xl px-3 py-2">
+                            <Check
+                              size={14}
+                              className="text-primary shrink-0"
+                            />
+                            <span className="text-primary text-xs font-medium capitalize">
+                              {formatDate(selectedDate)}
+                            </span>
                           </div>
-                        ) : professionals?.data &&
-                          professionals.data.length > 0 ? (
-                          <div className="flex gap-2 overflow-x-auto scroll-smooth snap-x pb-1 [&::-webkit-scrollbar]:hidden">
-                            {professionals.data.map((professional) => {
-                              const isSel =
-                                selectedProfessional === professional.id;
-                              return (
-                                <button
-                                  key={professional.id}
-                                  type="button"
-                                  onClick={() =>
-                                    handleProfessionalSelect(professional.id)
-                                  }
-                                  className={[
-                                    "flex shrink-0 snap-start items-center gap-2.5 rounded-xl border px-3 py-2.5 transition-all duration-200",
-                                    isSel
-                                      ? "border-primary bg-primary/8 shadow-sm"
-                                      : "border-border bg-background hover:border-primary/40 hover:bg-muted",
-                                  ].join(" ")}
-                                >
-                                  <Avatar className="size-8">
-                                    <AvatarImage
-                                      src={professional.user.image ?? undefined}
-                                    />
-                                    <AvatarFallback className="text-xs">
-                                      <User size={14} />
-                                    </AvatarFallback>
-                                  </Avatar>
-                                  <span
+                        )}
+                      </div>
+                    </Section>
+
+                    {/* ══ PASSO 2 — Profissional ══ */}
+                    <div ref={profSectionRef}>
+                      <Section
+                        step={2}
+                        label="Escolha o profissional"
+                        done={step2Done}
+                        active={step1Done && !step2Done}
+                        locked={!step1Done}
+                      >
+                        <div className="px-5">
+                          {isLoadingProfessionals ? (
+                            <div className="flex justify-center py-4">
+                              <Loader2 className="text-muted-foreground size-5 animate-spin" />
+                            </div>
+                          ) : professionals?.data &&
+                            professionals.data.length > 0 ? (
+                            <div className="flex gap-2 overflow-x-auto pb-1 [&::-webkit-scrollbar]:hidden">
+                              {professionals.data.map((professional) => {
+                                const isSel =
+                                  selectedProfessional === professional.id;
+                                return (
+                                  <button
+                                    key={professional.id}
+                                    type="button"
+                                    onClick={() =>
+                                      handleProfessionalSelect(professional.id)
+                                    }
                                     className={[
-                                      "text-sm font-medium transition-colors",
+                                      "flex h-11 shrink-0 items-center gap-2.5 rounded-xl border px-3 transition-all duration-200",
                                       isSel
-                                        ? "text-primary"
-                                        : "text-foreground",
+                                        ? "border-primary bg-primary/8 shadow-sm"
+                                        : "border-border bg-background",
                                     ].join(" ")}
                                   >
-                                    {professional.displayName ??
-                                      professional.user.name}
-                                  </span>
-                                  {isSel && (
-                                    <Check
-                                      size={14}
-                                      className="text-primary ml-1"
-                                    />
-                                  )}
-                                </button>
-                              );
-                            })}
-                          </div>
-                        ) : (
-                          <p className="py-3 text-sm text-muted-foreground">
-                            Nenhum profissional disponível
-                          </p>
-                        )}
-
-                        {/* Aviso profissional diferente */}
-                        {refProfessionalId &&
-                          selectedProfessional &&
-                          selectedProfessional !== refProfessionalId && (
-                            <Alert className="mt-3 border-amber-500/50 bg-amber-500/10 text-amber-700 dark:text-amber-400 [&>svg]:text-amber-600">
-                              <AlertTriangle className="size-4" />
-                              <AlertDescription className="text-xs leading-relaxed">
-                                Agende com o profissional do seu grupo para
-                                acompanhar pelo WhatsApp.
-                              </AlertDescription>
-                            </Alert>
+                                    <Avatar className="size-7">
+                                      <AvatarImage
+                                        src={
+                                          professional.user.image ?? undefined
+                                        }
+                                      />
+                                      <AvatarFallback className="text-xs">
+                                        <User size={12} />
+                                      </AvatarFallback>
+                                    </Avatar>
+                                    <span
+                                      className={[
+                                        "text-sm font-medium",
+                                        isSel
+                                          ? "text-primary"
+                                          : "text-foreground",
+                                      ].join(" ")}
+                                    >
+                                      {professional.displayName ??
+                                        professional.user.name}
+                                    </span>
+                                    {isSel && (
+                                      <Check
+                                        size={13}
+                                        className="text-primary ml-0.5"
+                                      />
+                                    )}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          ) : (
+                            <p className="text-muted-foreground py-3 text-sm">
+                              Nenhum profissional disponível
+                            </p>
                           )}
-                      </div>
-                    </Section>
-                  </div>
 
-                  {/* ══ PASSO 3 — Horário ══ */}
-                  <div ref={timeSectionRef}>
-                    <Section
-                      step={3}
-                      label="Escolha o horário"
-                      done={step3Done}
-                      active={step2Done && !step3Done}
-                      locked={!step2Done}
-                    >
-                      <div className="px-5">
-                        {isLoadingSlots ? (
-                          <div className="flex justify-center py-4">
-                            <Loader2 className="size-5 animate-spin text-muted-foreground" />
-                          </div>
-                        ) : slots && slots.length > 0 ? (
-                          <div className="grid grid-cols-4 gap-2">
-                            {slots.map((time) => {
-                              const isSel = selectedTime === time;
-                              return (
+                          {refProfessionalId &&
+                            selectedProfessional &&
+                            selectedProfessional !== refProfessionalId && (
+                              <Alert className="mt-3 border-amber-500/50 bg-amber-500/10 text-amber-700 dark:text-amber-400 [&>svg]:text-amber-600">
+                                <AlertTriangle className="size-4" />
+                                <AlertDescription className="text-xs leading-relaxed">
+                                  Agende com o profissional do seu grupo para
+                                  acompanhar pelo WhatsApp.
+                                </AlertDescription>
+                              </Alert>
+                            )}
+                        </div>
+                      </Section>
+                    </div>
+
+                    {/* ══ PASSO 3 — Horário ══ */}
+                    <div ref={timeSectionRef}>
+                      <Section
+                        step={3}
+                        label="Escolha o horário"
+                        done={step3Done}
+                        active={step2Done && !step3Done}
+                        locked={!step2Done}
+                      >
+                        <div className="px-5">
+                          {isLoadingSlots ? (
+                            <div className="flex justify-center py-4">
+                              <Loader2 className="text-muted-foreground size-5 animate-spin" />
+                            </div>
+                          ) : slots && slots.length > 0 ? (
+                            <div className="grid grid-cols-4 gap-2">
+                              {slots.map((time) => {
+                                const isSel = selectedTime === time;
+                                return (
+                                  <button
+                                    key={time}
+                                    type="button"
+                                    onClick={() => handleTimeSelect(time)}
+                                    className={[
+                                      "h-11 rounded-xl border text-xs font-semibold transition-all duration-150",
+                                      isSel
+                                        ? "border-primary bg-primary text-primary-foreground scale-105 shadow-sm"
+                                        : "border-border bg-background text-foreground",
+                                    ].join(" ")}
+                                  >
+                                    {time}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          ) : (
+                            <div className="bg-muted rounded-xl px-4 py-5 text-center">
+                              <p className="text-muted-foreground text-sm">
+                                {slotMsg ??
+                                  "Nenhum horário disponível nesta data"}
+                              </p>
+                              {step2Done && (
                                 <button
-                                  key={time}
                                   type="button"
-                                  onClick={() => handleTimeSelect(time)}
+                                  onClick={() => scrollTo(profSectionRef)}
+                                  className="text-primary mt-2 text-xs font-medium underline-offset-2 hover:underline"
+                                >
+                                  Tentar outro profissional
+                                </button>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </Section>
+                    </div>
+
+                    {/* ══ PASSO 4 — Pagamento ══ */}
+                    {!isOwner && hasPayAfterService && (
+                      <div ref={paySectionRef}>
+                        <Section
+                          step={4}
+                          label="Como vai pagar?"
+                          done={step4Done}
+                          active={step3Done && !step4Done}
+                          locked={!step3Done}
+                        >
+                          <div className="flex flex-col gap-2 px-5">
+                            {hasStripePayment && (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handlePaymentMethodSelect("online")
+                                }
+                                className={[
+                                  "flex h-auto min-h-15 items-center gap-3 rounded-xl border p-4 text-left transition-all duration-150",
+                                  selectedPaymentMethod === "online"
+                                    ? "border-primary bg-primary/8"
+                                    : "border-border",
+                                ].join(" ")}
+                              >
+                                <div
                                   className={[
-                                    "rounded-xl border py-2.5 text-xs font-semibold transition-all duration-150",
-                                    isSel
-                                      ? "border-primary bg-primary text-primary-foreground shadow-sm scale-105"
-                                      : "border-border bg-background text-foreground hover:border-primary/40 hover:bg-muted",
+                                    "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
+                                    selectedPaymentMethod === "online"
+                                      ? "bg-primary/15"
+                                      : "bg-muted",
                                   ].join(" ")}
                                 >
-                                  {time}
-                                </button>
-                              );
-                            })}
-                          </div>
-                        ) : (
-                          <div className="rounded-xl bg-muted px-4 py-5 text-center">
-                            <p className="text-sm text-muted-foreground">
-                              {slotMsg ??
-                                "Nenhum horário disponível nesta data"}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    </Section>
-                  </div>
+                                  <CreditCard
+                                    size={16}
+                                    className={
+                                      selectedPaymentMethod === "online"
+                                        ? "text-primary"
+                                        : "text-muted-foreground"
+                                    }
+                                  />
+                                </div>
+                                <div className="flex-1">
+                                  <p className="text-sm font-semibold">
+                                    Pagamento Online
+                                  </p>
+                                  <p className="text-muted-foreground text-xs">
+                                    Realize pagamentos no cartão com rapidez e
+                                    total segurança.
+                                  </p>
+                                </div>
+                                {selectedPaymentMethod === "online" && (
+                                  <Check
+                                    size={16}
+                                    className="text-primary shrink-0"
+                                  />
+                                )}
+                              </button>
+                            )}
 
-                  {/* ══ PASSO 4 — Pagamento (apenas clientes normais) ══ */}
-                  {!isOwner && hasPayAfterService && (
-                    <div ref={paySectionRef}>
-                      <Section
-                        step={4}
-                        label="Como vai pagar?"
-                        done={step4Done}
-                        active={step3Done && !step4Done}
-                        locked={!step3Done}
-                      >
-                        <div className="flex flex-col gap-2 px-5">
-                          {hasStripePayment && (
                             <button
                               type="button"
                               onClick={() =>
-                                handlePaymentMethodSelect("online")
+                                handlePaymentMethodSelect("pay_after_service")
                               }
                               className={[
-                                "flex items-center gap-3 rounded-xl border p-4 text-left transition-all duration-150",
-                                selectedPaymentMethod === "online"
+                                "flex h-auto min-h-15 items-center gap-3 rounded-xl border p-4 text-left transition-all duration-150",
+                                selectedPaymentMethod === "pay_after_service" ||
+                                !hasStripePayment
                                   ? "border-primary bg-primary/8"
-                                  : "border-border hover:border-primary/40 hover:bg-muted",
+                                  : "border-border",
                               ].join(" ")}
                             >
                               <div
                                 className={[
                                   "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
-                                  selectedPaymentMethod === "online"
+                                  selectedPaymentMethod ===
+                                    "pay_after_service" || !hasStripePayment
                                     ? "bg-primary/15"
                                     : "bg-muted",
                                 ].join(" ")}
                               >
-                                <CreditCard
+                                <HandCoins
                                   size={16}
                                   className={
-                                    selectedPaymentMethod === "online"
+                                    selectedPaymentMethod ===
+                                      "pay_after_service" || !hasStripePayment
                                       ? "text-primary"
                                       : "text-muted-foreground"
                                   }
                                 />
                               </div>
-                              <div>
+                              <div className="flex-1">
                                 <p className="text-sm font-semibold">
-                                  Pagar agora
+                                  Pagamento no Local
                                 </p>
-                                <p className="text-xs text-muted-foreground">
-                                  PIX ou cartão — rápido e seguro
+                                <p className="text-muted-foreground text-xs">
+                                  Pague presencialmente via dinheiro, PIX ou
+                                  cartão.
                                 </p>
                               </div>
-                              {selectedPaymentMethod === "online" && (
+                              {(selectedPaymentMethod === "pay_after_service" ||
+                                !hasStripePayment) && (
                                 <Check
                                   size={16}
-                                  className="text-primary ml-auto"
+                                  className="text-primary shrink-0"
                                 />
                               )}
                             </button>
-                          )}
 
-                          <button
-                            type="button"
-                            onClick={() =>
-                              handlePaymentMethodSelect("pay_after_service")
-                            }
-                            className={[
-                              "flex items-center gap-3 rounded-xl border p-4 text-left transition-all duration-150",
-                              selectedPaymentMethod === "pay_after_service" ||
-                              !hasStripePayment
-                                ? "border-primary bg-primary/8"
-                                : "border-border hover:border-primary/40 hover:bg-muted",
-                            ].join(" ")}
-                          >
-                            <div
-                              className={[
-                                "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
-                                selectedPaymentMethod === "pay_after_service" ||
-                                !hasStripePayment
-                                  ? "bg-primary/15"
-                                  : "bg-muted",
-                              ].join(" ")}
-                            >
-                              <HandCoins
-                                size={16}
-                                className={
-                                  selectedPaymentMethod ===
-                                    "pay_after_service" || !hasStripePayment
-                                    ? "text-primary"
-                                    : "text-muted-foreground"
-                                }
-                              />
-                            </div>
-                            <div>
-                              <p className="text-sm font-semibold">
-                                Pagar no local
-                              </p>
-                              <p className="text-xs text-muted-foreground">
-                                Dinheiro, PIX ou maquininha
-                              </p>
-                            </div>
                             {(selectedPaymentMethod === "pay_after_service" ||
-                              !hasStripePayment) && (
-                              <Check
-                                size={16}
-                                className="text-primary ml-auto"
-                              />
+                              (!hasStripePayment && hasPayAfterService)) && (
+                              <Alert className="mt-1 border-blue-500/50 bg-blue-500/10 text-blue-700 dark:text-blue-400 [&>svg]:text-blue-600">
+                                <Info className="size-4" />
+                                <AlertDescription className="text-xs leading-relaxed">
+                                  Pagamento via PIX, dinheiro ou maquininha após
+                                  o serviço.
+                                </AlertDescription>
+                              </Alert>
                             )}
-                          </button>
-
-                          {(selectedPaymentMethod === "pay_after_service" ||
-                            (!hasStripePayment && hasPayAfterService)) && (
-                            <Alert className="mt-1 border-blue-500/50 bg-blue-500/10 text-blue-700 dark:text-blue-400 [&>svg]:text-blue-600">
-                              <Info className="size-4" />
-                              <AlertDescription className="text-xs leading-relaxed">
-                                O pagamento poderá ser feito via PIX, dinheiro
-                                ou cartão na maquininha do estabelecimento após
-                                a finalização do serviço.
-                              </AlertDescription>
-                            </Alert>
-                          )}
-                        </div>
-                      </Section>
-                    </div>
-                  )}
-
-                  {/* ══ PASSO 4 — Nome do cliente (apenas owner) ══ */}
-                  {isOwner && (
-                    <div ref={clientNameSectionRef}>
-                      <Section
-                        step={4}
-                        label="Nome do cliente"
-                        done={stepOwnerDone}
-                        active={step3Done && !stepOwnerDone}
-                        locked={!step3Done}
-                      >
-                        <div className="flex flex-col gap-2 px-5">
-                          <div className="relative">
-                            <User
-                              size={14}
-                              className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-                            />
-                            <input
-                              type="text"
-                              value={clientName}
-                              onChange={(e) => setClientName(e.target.value)}
-                              placeholder="Digite o nome do cliente"
-                              maxLength={100}
-                              className="w-full rounded-xl border border-border bg-background py-2.5 pl-9 pr-3 text-sm placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/40 transition-all"
-                            />
                           </div>
-                          <p className="text-xs leading-relaxed text-muted-foreground">
-                            O agendamento será registrado com esse nome, não com
-                            o seu usuário.
-                          </p>
-                        </div>
-                      </Section>
-                    </div>
-                  )}
+                        </Section>
+                      </div>
+                    )}
 
-                  {/* ══ Resumo ══ */}
-                  {step1Done && step2Done && step3Done && (
-                    <div className="px-5 py-5">
-                      <BookingSummary
-                        serviceName={service.name}
-                        servicePrice={service.priceInCents}
-                        barbershopName={barbershop.name}
-                        professionalName={
-                          selectedProfessionalData?.displayName ??
-                          selectedProfessionalData?.user.name ??
-                          undefined
-                        }
-                        date={selectedDate!}
-                        time={selectedTime!}
-                      />
-                    </div>
-                  )}
+                    {/* ══ PASSO 4 — Nome do cliente (owner) ══ */}
+                    {isOwner && (
+                      <div ref={clientNameSectionRef}>
+                        <Section
+                          step={4}
+                          label="Nome do cliente"
+                          done={stepOwnerDone}
+                          active={step3Done && !stepOwnerDone}
+                          locked={!step3Done}
+                        >
+                          <div className="flex flex-col gap-2 px-5">
+                            <div className="relative">
+                              <User
+                                size={14}
+                                className="text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2"
+                              />
+                              <input
+                                type="text"
+                                value={clientName}
+                                onChange={(e) => setClientName(e.target.value)}
+                                placeholder="Nome do cliente"
+                                maxLength={100}
+                                className="border-border bg-background placeholder:text-muted-foreground focus:border-primary focus:ring-primary/40 h-11 w-full rounded-xl border py-2.5 pl-9 pr-3 text-base transition-all focus:outline-none focus:ring-1"
+                              />
+                            </div>
+                            <p className="text-muted-foreground text-xs leading-relaxed">
+                              O agendamento será registrado com esse nome.
+                            </p>
+                          </div>
+                        </Section>
+                      </div>
+                    )}
 
-                  {/* ══ Botão confirmar sticky ══ */}
-                  <div className="border-border bg-card sticky bottom-0 border-t px-5 py-4">
+                    {/* ══ Resumo ══ */}
+                    {step1Done && step2Done && step3Done && (
+                      <div className="px-5 py-5">
+                        <BookingSummary
+                          serviceName={service.name}
+                          servicePrice={service.priceInCents}
+                          barbershopName={barbershop.name}
+                          professionalName={
+                            selectedProfessionalData?.displayName ??
+                            selectedProfessionalData?.user.name ??
+                            undefined
+                          }
+                          date={selectedDate!}
+                          time={selectedTime!}
+                        />
+                      </div>
+                    )}
+
+                    <div className="h-4" />
+                  </div>
+
+                  {/* ══ Botão confirmar — fora do scroll ══ */}
+                  <div
+                    className="border-border bg-card shrink-0 border-t px-5 pt-4"
+                    style={{
+                      paddingBottom: "calc(1rem + env(safe-area-inset-bottom))",
+                    }}
+                  >
                     {!step1Done && (
-                      <p className="mb-2 text-center text-xs text-muted-foreground">
+                      <p className="text-muted-foreground mb-2 text-center text-xs">
                         👆 Selecione uma data para começar
                       </p>
                     )}
                     <Button
-                      className="w-full rounded-xl"
-                      size="lg"
+                      className="h-11 w-full rounded-xl text-sm font-semibold"
                       disabled={!canConfirm || isCreatingBooking}
                       onClick={handleConfirmBooking}
                     >

@@ -12,7 +12,7 @@ import { Avatar, AvatarImage } from "./ui/avatar";
 import { Card } from "./ui/card";
 import { Sheet, SheetTrigger } from "./ui/sheet";
 
-// ─── Status config (mesma lógica do BookingInfoSheet) ─────────────────────────
+// ─── Status config ─────────────────────────────────────────────────────────────
 const STATUS_CONFIG = {
   confirmed: {
     label: "Confirmado",
@@ -50,7 +50,17 @@ const BookingItem = ({ booking }: BookingItemProps) => {
   return (
     <Sheet open={sheetIsOpen} onOpenChange={setSheetIsOpen}>
       <SheetTrigger asChild>
-        <Card className="flex h-full w-full min-w-full cursor-pointer flex-row items-center justify-between overflow-hidden p-0 snap-start transition-all hover:shadow-md active:scale-[0.98]">
+        <Card
+          className={[
+            // layout
+            "flex h-full w-full min-w-full cursor-pointer flex-row items-center justify-between overflow-hidden p-0 snap-start",
+            // FIX: touch-manipulation remove delay 300ms de tap no iOS Safari
+            // sem isso o usuário sente o card "demorar" para reagir ao toque
+            "touch-manipulation",
+            // feedback visual ao toque — active state nativo iOS
+            "transition-all hover:shadow-md active:scale-[0.98] active:shadow-none",
+          ].join(" ")}
+        >
           {/* ── Info principal ── */}
           <div className="flex flex-1 flex-col gap-3 p-4">
             {/* Badge de status */}
@@ -73,22 +83,25 @@ const BookingItem = ({ booking }: BookingItemProps) => {
                 <Avatar className="size-5 rounded-md">
                   <AvatarImage src={booking.barbershop.imageUrl} />
                 </Avatar>
-                <p className="text-sm text-muted-foreground truncate">
+                <p className="text-muted-foreground truncate text-sm">
                   {booking.barbershop.name}
                 </p>
               </div>
             </div>
           </div>
 
-          {/* ── Data / hora ── */}
+          {/* ── Data / hora ──
+               w-22 = 88px — espaço suficiente para 2 dígitos + mês abrev.
+               border-l separa visualmente sem precisar de bg extra             ── */}
           <div className="flex h-full w-22 shrink-0 flex-col items-center justify-center gap-0.5 border-l bg-muted/50 px-3 py-4 text-center">
-            <p className="text-xs font-medium capitalize text-muted-foreground">
+            <p className="text-muted-foreground text-xs font-medium capitalize">
               {format(booking.date, "MMM", { locale: ptBR })}
             </p>
+            {/* tabular-nums: alinha 01, 10, 31 sem layout shift */}
             <p className="text-3xl font-bold leading-none tabular-nums">
               {format(booking.date, "dd")}
             </p>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-muted-foreground text-xs">
               {format(booking.date, "HH:mm")}
             </p>
           </div>

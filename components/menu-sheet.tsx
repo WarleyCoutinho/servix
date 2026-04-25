@@ -3,6 +3,7 @@
 import { authClient } from "@/lib/auth-client";
 import {
   CalendarDays,
+  ChevronRight,
   FileText,
   Home,
   LayoutDashboard,
@@ -13,7 +14,6 @@ import {
   Scissors,
   Shield,
   User,
-  ChevronRight,
 } from "lucide-react";
 import Image from "next/image";
 import logoDark from "@/public/servix_logo_horizontal.svg";
@@ -25,13 +25,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 
-interface Category {
-  label: string;
-  search: string;
-}
-
 interface MenuSheetProps {
-  categories?: Category[];
   onLoginClick: () => void;
 }
 
@@ -45,7 +39,8 @@ const NavItem = ({ icon: Icon, label, onClick }: NavItemProps) => (
   <button
     type="button"
     onClick={onClick}
-    className="group flex w-full items-center justify-between px-5 py-3 text-left transition-colors hover:bg-muted/60"
+    // touch-manipulation remove delay 300ms no iOS Safari
+    className="group flex w-full items-center justify-between px-5 py-3 text-left transition-colors touch-manipulation hover:bg-muted/60"
   >
     <div className="flex items-center gap-3">
       <div className="flex size-8 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-colors group-hover:bg-primary/10 group-hover:text-primary">
@@ -57,8 +52,10 @@ const NavItem = ({ icon: Icon, label, onClick }: NavItemProps) => (
   </button>
 );
 
-const MenuSheet = ({ categories = [], onLoginClick }: MenuSheetProps) => {
+const MenuSheet = ({ onLoginClick }: MenuSheetProps) => {
   const [open, setOpen] = useState(false);
+  // FIX: guard contra double-tap no logout
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const router = useRouter();
   const { data: session } = authClient.useSession();
 
@@ -73,9 +70,15 @@ const MenuSheet = ({ categories = [], onLoginClick }: MenuSheetProps) => {
   };
 
   const handleLogout = async () => {
+    if (isLoggingOut) return;
+    setIsLoggingOut(true);
     const { error } = await authClient.signOut();
-    if (error) toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      setIsLoggingOut(false);
+    }
     setOpen(false);
+    // não reseta isLoggingOut em sucesso — página vai re-renderizar
   };
 
   const isLoggedIn = !!session?.user;
@@ -83,15 +86,23 @@ const MenuSheet = ({ categories = [], onLoginClick }: MenuSheetProps) => {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button variant="outline" size="icon">
+        {/* h-11 = 44pt HIG Apple — touch target mínimo */}
+        <Button
+          variant="outline"
+          size="icon"
+          className="h-11 w-11 touch-manipulation"
+        >
           <MenuIcon className="size-5" />
           <span className="sr-only">Abrir menu</span>
         </Button>
       </SheetTrigger>
+
+      {/* FIX: will-change-transform elimina jank na animação de entrada iOS */}
       <SheetContent
         side="right"
-        className="flex w-[85vw] max-w-sm flex-col overflow-hidden p-0"
+        className="flex w-[85vw] max-w-sm flex-col overflow-hidden p-0 will-change-transform"
       >
+        {/* Logo no topo */}
         <div className="border-b border-border px-5 py-4">
           <Image
             src={logoLight}
@@ -111,15 +122,25 @@ const MenuSheet = ({ categories = [], onLoginClick }: MenuSheetProps) => {
           />
         </div>
 
-        <div className="flex-1 overflow-y-auto">
+        {/* FIX: overscroll-contain + WebkitOverflowScrolling para scroll
+            nativo iOS com momentum e sem propagar ao documento pai      */}
+        <div
+          className="flex-1 overflow-y-auto overscroll-contain"
+          style={{ WebkitOverflowScrolling: "touch" }}
+        >
+          {/* Card de perfil / login */}
           <div className="px-5 py-4">
             {isLoggedIn ? (
               <div className="flex items-center gap-3 rounded-xl border border-border bg-muted/40 p-3">
                 <Avatar className="size-10 ring-2 ring-primary/20">
-                  <AvatarImage
-                    src={session.user.image ?? ""}
-                    alt={session.user.name}
-                  />
+                  {/* FIX: só renderiza AvatarImage se houver URL válida —
+                      evita GET / fantasma quando image é null            */}
+                  {session.user.image && (
+                    <AvatarImage
+                      src={session.user.image}
+                      alt={session.user.name}
+                    />
+                  )}
                   <AvatarFallback className="bg-primary/10 text-primary font-semibold">
                     {session.user.name.charAt(0).toUpperCase()}
                   </AvatarFallback>
@@ -143,7 +164,7 @@ const MenuSheet = ({ categories = [], onLoginClick }: MenuSheetProps) => {
                 </div>
                 <Button
                   size="sm"
-                  className="shrink-0 gap-2"
+                  className="h-9 shrink-0 gap-2 touch-manipulation"
                   onClick={handleLogin}
                 >
                   <LogIn className="size-3.5" />
@@ -153,7 +174,8 @@ const MenuSheet = ({ categories = [], onLoginClick }: MenuSheetProps) => {
             )}
           </div>
 
-          <div className="pb-2">
+          {/* Navegação */}
+          <div className="pb-4">
             <p className="px-5 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/60">
               Navegação
             </p>
@@ -221,39 +243,20 @@ const MenuSheet = ({ categories = [], onLoginClick }: MenuSheetProps) => {
               />
             )}
           </div>
-
-          {categories.length > 0 && (
-            <div className="pb-4">
-              <p className="px-5 pb-1 pt-4 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/60">
-                Categorias
-              </p>
-              <div className="grid grid-cols-2 gap-1.5 px-5 pt-1">
-                {categories.map((category) => (
-                  <button
-                    key={category.search}
-                    type="button"
-                    onClick={() =>
-                      handleNavigation(`/barbershops?search=${category.search}`)
-                    }
-                    className="rounded-lg border border-border bg-muted/40 px-3 py-2.5 text-left text-sm font-medium transition-colors hover:bg-primary/10 hover:border-primary/30 hover:text-primary"
-                  >
-                    {category.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
 
+        {/* Footer com logout — shrink-0 fora do scroll, nunca cortado */}
         {isLoggedIn && (
           <div className="shrink-0 border-t border-border p-4">
             <button
               type="button"
               onClick={handleLogout}
-              className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-destructive transition-colors hover:bg-destructive/10"
+              disabled={isLoggingOut}
+              // touch-manipulation + h-11 (44pt HIG)
+              className="flex h-11 w-full items-center gap-3 rounded-lg px-3 text-sm font-medium text-destructive transition-colors touch-manipulation hover:bg-destructive/10 disabled:opacity-50"
             >
               <LogOut className="size-4" />
-              Sair da conta
+              {isLoggingOut ? "Saindo..." : "Sair da conta"}
             </button>
           </div>
         )}
