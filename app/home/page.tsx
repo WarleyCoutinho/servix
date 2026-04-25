@@ -28,6 +28,7 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 
 interface HomeProps {
+  params: Promise<{ slug?: string }>;
   searchParams: Promise<{ city?: string; state?: string }>;
 }
 
@@ -55,12 +56,12 @@ const Banner = ({ children }: { children?: React.ReactNode }) => (
     )}
   </div>
 );
-export default async function Home({ searchParams }: HomeProps) {
-  const params = await searchParams;
-  const filters = {
-    city: params.city,
-    state: params.state,
-  };
+
+export default async function Home({ params, searchParams }: HomeProps) {
+  const { slug } = await params;
+  const { city, state } = await searchParams;
+
+  const filters = { city, state, slug }; // <-- passa slug pros data fetchers
 
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -84,9 +85,7 @@ export default async function Home({ searchParams }: HomeProps) {
           <Suspense fallback={null}>
             <AuthErrorAlert />
           </Suspense>
-
           <Banner />
-
           {confirmedBookings.length > 0 && (
             <PageSectionContent>
               <PageSectionTitle>Agendamentos</PageSectionTitle>
@@ -97,7 +96,6 @@ export default async function Home({ searchParams }: HomeProps) {
               </PageSectionScroller>
             </PageSectionContent>
           )}
-
           <PageSectionContent>
             <PageSectionTitle>
               {role === "owner"
@@ -131,7 +129,7 @@ export default async function Home({ searchParams }: HomeProps) {
     categories,
     locations,
   ] = await Promise.all([
-    getBarbershops(filters),
+    getBarbershops(filters), // filtra por slug internamente
     getPopularBarbershops(filters),
     getUserBookings(),
     getServiceCategories(),
@@ -146,19 +144,16 @@ export default async function Home({ searchParams }: HomeProps) {
           <AuthErrorAlert />
         </Suspense>
         <QuickSearch categories={categories} />
-
         <Banner />
-
         {locations.length > 0 && (
           <Suspense fallback={null}>
             <LocationFilter
               locations={locations}
-              currentCity={params.city}
-              currentState={params.state}
+              currentCity={city}
+              currentState={state}
             />
           </Suspense>
         )}
-
         {confirmedBookings.length > 0 && (
           <PageSectionContent>
             <PageSectionTitle>Agendamentos</PageSectionTitle>
@@ -169,7 +164,6 @@ export default async function Home({ searchParams }: HomeProps) {
             </PageSectionScroller>
           </PageSectionContent>
         )}
-
         <PageSectionContent>
           <PageSectionTitle>Barbearias e Salões</PageSectionTitle>
           {barbershops.length > 0 ? (
@@ -184,7 +178,6 @@ export default async function Home({ searchParams }: HomeProps) {
             </p>
           )}
         </PageSectionContent>
-
         <PageSectionContent>
           <PageSectionTitle>Barbearias e Salões populares</PageSectionTitle>
           {popularBarbershops.length > 0 ? (

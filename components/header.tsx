@@ -32,6 +32,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import { useStoreContext } from "@/hooks/use-store-context";
 
 const Header = () => {
   const [loginModalOpen, setLoginModalOpen] = useState(false);
@@ -40,7 +41,7 @@ const Header = () => {
 
   const { data: session } = authClient.useSession();
   const isLoggedIn = !!session?.user;
-
+  const { storeUrl, storeSlug } = useStoreContext();
   const handleLogout = async () => {
     // FIX 2: guard contra chamadas duplicadas
     if (isLoggingOut) return;
@@ -85,13 +86,21 @@ const Header = () => {
           </Link>
 
           <nav className="hidden items-center gap-1 md:flex">
-            <Button variant="ghost" size="sm" asChild>
-              <Link href="/home">
-                <Home className="mr-2 size-4" />
-                Início
-              </Link>
-            </Button>
-
+            {session?.user?.role === "admin" && (
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/home">
+                  <Home className="mr-2 size-4" />
+                  Início
+                </Link>
+              </Button>
+            )}
+            <div className="bg-red-500">
+              {storeUrl && (
+                <Button asChild variant="ghost">
+                  <Link href={storeUrl}>{storeSlug}</Link>
+                </Button>
+              )}
+            </div>
             {session?.user?.role === "client" && (
               <Button variant="ghost" size="sm" asChild>
                 <Link href="/bookings">

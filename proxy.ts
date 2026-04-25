@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-
+export const STORE_CONTEXT_COOKIE = "store-context";
 const publicRoutes = [
   "/",
   "/barbershops",
@@ -15,6 +15,16 @@ const professionalRoutes = ["/dashboard/professional"];
 const supportRoutes = ["/dashboard/support"];
 
 const PROTECTED_ROUTES = ["/dashboard", "/bookings", "/api/whatsapp"];
+
+// Rotas fixas do app que não são slug de loja
+const EXCLUDED_SLUG_PATHS = [
+  "/barbershops",
+  "/dashboard",
+  "/bookings",
+  "/api",
+  "/_next",
+  "/favicon.ico",
+];
 
 function isPublicRoute(pathname: string): boolean {
   return publicRoutes.some(
@@ -36,6 +46,11 @@ function isSupportRoute(pathname: string): boolean {
 
 function isProtectedRoute(pathname: string): boolean {
   return PROTECTED_ROUTES.some((route) => pathname.startsWith(route));
+}
+
+function isStoreRoute(pathname: string): boolean {
+  const isExcluded = EXCLUDED_SLUG_PATHS.some((p) => pathname.startsWith(p));
+  return !isExcluded && /^\/([^/]+)$/.test(pathname);
 }
 
 async function getUserRole(request: NextRequest): Promise<string | null> {
@@ -71,14 +86,37 @@ async function getUserRole(request: NextRequest): Promise<string | null> {
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  /*  console.log("[proxy] pathname:", pathname);
+  console.log("[proxy] cookies:", request.cookies.getAll()); */
+
+  // ── Store context: /{slug} → seta cookie e deixa passar ─────────────────────
+  if (isStoreRoute(pathname)) {
+    const slug = pathname.slice(1); // remove a barra inicial
+    const response = NextResponse.next();
+    response.cookies.set(STORE_CONTEXT_COOKIE, slug, {
+      path: "/",
+      maxAge: 60 * 60 * 24 * 30, // 30 dias
+      sameSite: "lax",
+      httpOnly: false,
+    });
+    return response;
+  }
+
+  // ── Store context: "/" com cookie → redireciona para /{slug} ─────────────────
+  if (pathname === "/") {
+    const storeSlug = request.cookies.get(STORE_CONTEXT_COOKIE)?.value;
+    if (storeSlug) {
+      const url = request.nextUrl.clone();
+      url.pathname = `/${storeSlug}`;
+      return NextResponse.redirect(url, { status: 302 });
+    }
+  }
+
   if (pathname.startsWith("/api/auth")) {
     return NextResponse.next();
   }
 
-  if (
-    pathname.startsWith("/api/stripe") ||
-    pathname.startsWith("/api/cron")
-  ) {
+  if (pathname.startsWith("/api/stripe") || pathname.startsWith("/api/cron")) {
     return NextResponse.next();
   }
 
@@ -111,10 +149,7 @@ export async function proxy(request: NextRequest) {
 
   if (isProtectedRoute(pathname) && !sessionCookie) {
     if (pathname.startsWith("/api/")) {
-      return NextResponse.json(
-        { error: "Não autenticado" },
-        { status: 401 },
-      );
+      return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
     }
     const loginUrl = new URL("/", request.url);
     loginUrl.searchParams.set("redirect", pathname);
