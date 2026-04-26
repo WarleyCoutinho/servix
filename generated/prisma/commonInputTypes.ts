@@ -199,6 +199,13 @@ export type EnumStripeAccountStatusFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumStripeAccountStatusFilter<$PrismaModel> | $Enums.StripeAccountStatus
 }
 
+export type EnumScheduleViewTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.ScheduleViewType | Prisma.EnumScheduleViewTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.ScheduleViewType[] | Prisma.ListEnumScheduleViewTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ScheduleViewType[] | Prisma.ListEnumScheduleViewTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumScheduleViewTypeFilter<$PrismaModel> | $Enums.ScheduleViewType
+}
+
 export type EnumStripeAccountStatusWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.StripeAccountStatus | Prisma.EnumStripeAccountStatusFieldRefInput<$PrismaModel>
   in?: $Enums.StripeAccountStatus[] | Prisma.ListEnumStripeAccountStatusFieldRefInput<$PrismaModel>
@@ -207,6 +214,16 @@ export type EnumStripeAccountStatusWithAggregatesFilter<$PrismaModel = never> = 
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumStripeAccountStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumStripeAccountStatusFilter<$PrismaModel>
+}
+
+export type EnumScheduleViewTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ScheduleViewType | Prisma.EnumScheduleViewTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.ScheduleViewType[] | Prisma.ListEnumScheduleViewTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ScheduleViewType[] | Prisma.ListEnumScheduleViewTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumScheduleViewTypeWithAggregatesFilter<$PrismaModel> | $Enums.ScheduleViewType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumScheduleViewTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumScheduleViewTypeFilter<$PrismaModel>
 }
 
 export type EnumSubscriptionPlanFilter<$PrismaModel = never> = {
@@ -621,6 +638,13 @@ export type NestedEnumStripeAccountStatusFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumStripeAccountStatusFilter<$PrismaModel> | $Enums.StripeAccountStatus
 }
 
+export type NestedEnumScheduleViewTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.ScheduleViewType | Prisma.EnumScheduleViewTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.ScheduleViewType[] | Prisma.ListEnumScheduleViewTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ScheduleViewType[] | Prisma.ListEnumScheduleViewTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumScheduleViewTypeFilter<$PrismaModel> | $Enums.ScheduleViewType
+}
+
 export type NestedEnumStripeAccountStatusWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.StripeAccountStatus | Prisma.EnumStripeAccountStatusFieldRefInput<$PrismaModel>
   in?: $Enums.StripeAccountStatus[] | Prisma.ListEnumStripeAccountStatusFieldRefInput<$PrismaModel>
@@ -629,6 +653,16 @@ export type NestedEnumStripeAccountStatusWithAggregatesFilter<$PrismaModel = nev
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumStripeAccountStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumStripeAccountStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumScheduleViewTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ScheduleViewType | Prisma.EnumScheduleViewTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.ScheduleViewType[] | Prisma.ListEnumScheduleViewTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ScheduleViewType[] | Prisma.ListEnumScheduleViewTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumScheduleViewTypeWithAggregatesFilter<$PrismaModel> | $Enums.ScheduleViewType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumScheduleViewTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumScheduleViewTypeFilter<$PrismaModel>
 }
 
 export type NestedEnumSubscriptionPlanFilter<$PrismaModel = never> = {

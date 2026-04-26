@@ -212,6 +212,7 @@ model Professional {
   acceptsPayAfterService   Boolean             @default(false)
   stripeAccountId          String?             @unique
   stripeAccountStatus      StripeAccountStatus @default(PENDING)
+  scheduleViewType         ScheduleViewType    @default(DEFAULT)
   stripeOnboardingComplete Boolean             @default(false)
   whatsappGroupName        String?
   lastScheduleSentAt       DateTime?

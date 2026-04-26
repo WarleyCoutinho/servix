@@ -2188,6 +2188,7 @@ export const ProfessionalScalarFieldEnum = {
   acceptsPayAfterService: 'acceptsPayAfterService',
   stripeAccountId: 'stripeAccountId',
   stripeAccountStatus: 'stripeAccountStatus',
+  scheduleViewType: 'scheduleViewType',
   stripeOnboardingComplete: 'stripeOnboardingComplete',
   whatsappGroupName: 'whatsappGroupName',
   lastScheduleSentAt: 'lastScheduleSentAt',
@@ -2559,6 +2560,20 @@ export type EnumStripeAccountStatusFieldRefInput<$PrismaModel> = FieldRefInputTy
  * Reference to a field of type 'StripeAccountStatus[]'
  */
 export type ListEnumStripeAccountStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StripeAccountStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ScheduleViewType'
+ */
+export type EnumScheduleViewTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ScheduleViewType'>
+    
+
+
+/**
+ * Reference to a field of type 'ScheduleViewType[]'
+ */
+export type ListEnumScheduleViewTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ScheduleViewType[]'>
     
 
 

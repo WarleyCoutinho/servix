@@ -187,6 +187,7 @@ export const ProfessionalScalarFieldEnum = {
   acceptsPayAfterService: 'acceptsPayAfterService',
   stripeAccountId: 'stripeAccountId',
   stripeAccountStatus: 'stripeAccountStatus',
+  scheduleViewType: 'scheduleViewType',
   stripeOnboardingComplete: 'stripeOnboardingComplete',
   whatsappGroupName: 'whatsappGroupName',
   lastScheduleSentAt: 'lastScheduleSentAt',
