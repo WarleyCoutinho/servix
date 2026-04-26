@@ -94,3 +94,12 @@ export const SupportAuditAction = {
 } as const
 
 export type SupportAuditAction = (typeof SupportAuditAction)[keyof typeof SupportAuditAction]
+
+
+export const ScheduleViewType = {
+  DEFAULT: 'DEFAULT',
+  RECENT: 'RECENT',
+  CONTINUOUS: 'CONTINUOUS'
+} as const
+
+export type ScheduleViewType = (typeof ScheduleViewType)[keyof typeof ScheduleViewType]

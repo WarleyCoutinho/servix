@@ -1,12 +1,10 @@
+// app/dashboard/client/layout.tsx
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { UserRole } from "@/generated/prisma/enums";
-import {
-  LayoutDashboard,
-  CalendarDays,
-} from "lucide-react";
+import { LayoutDashboard, CalendarDays } from "lucide-react";
 import { DashboardSidebar, type NavItem } from "@/components/dashboard-sidebar";
 
 const navItems: NavItem[] = [
@@ -23,17 +21,13 @@ export default async function ClientDashboardLayout({
     headers: await headers(),
   });
 
-  if (!session?.user) {
-    redirect("/");
-  }
+  if (!session?.user) redirect("/");
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
   });
 
-  if (user?.role !== UserRole.client) {
-    redirect("/");
-  }
+  if (user?.role !== UserRole.client) redirect("/");
 
   return (
     <div className="flex min-h-screen">

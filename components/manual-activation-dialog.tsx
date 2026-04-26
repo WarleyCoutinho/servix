@@ -55,11 +55,27 @@ interface LogEntry {
 }
 
 const STRIPE_STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  ACTIVE: { label: "Ativo", color: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" },
-  PENDING: { label: "Pendente", color: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200" },
-  ONBOARDING: { label: "Configurando", color: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200" },
-  RESTRICTED: { label: "Restrito", color: "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200" },
-  DISABLED: { label: "Desabilitado", color: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200" },
+  ACTIVE: {
+    label: "Ativo",
+    color: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+  },
+  PENDING: {
+    label: "Pendente",
+    color:
+      "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
+  },
+  ONBOARDING: {
+    label: "Configurando",
+    color: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
+  },
+  RESTRICTED: {
+    label: "Restrito",
+    color: "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200",
+  },
+  DISABLED: {
+    label: "Desabilitado",
+    color: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+  },
 };
 
 export function ManualActivationDialog({
@@ -118,18 +134,17 @@ export function ManualActivationDialog({
     if (open && professionalId) {
       executeLogs({ professionalId });
     }
-  }, [open, professionalId]);
+  }, [executeLogs, open, professionalId]);
 
   if (!professionalId) return null;
 
   const isManualActive = acceptsPayAfterService;
   const isStripeDisabledByChoice =
     isManualActive && stripeAccountStatus === "DISABLED";
-  const isStripeIssue =
-    isManualActive && stripeAccountStatus !== "DISABLED";
+  const isStripeIssue = isManualActive && stripeAccountStatus !== "DISABLED";
 
-  const stripeInfo = STRIPE_STATUS_LABELS[stripeAccountStatus] ??
-    STRIPE_STATUS_LABELS.PENDING;
+  const stripeInfo =
+    STRIPE_STATUS_LABELS[stripeAccountStatus] ?? STRIPE_STATUS_LABELS.PENDING;
 
   const handleConfirmActivate = () => {
     executeToggle({
@@ -277,10 +292,7 @@ export function ManualActivationDialog({
             {showLogs && logs.length > 0 && (
               <div className="max-h-48 space-y-2 overflow-y-auto">
                 {logs.map((log) => (
-                  <div
-                    key={log.id}
-                    className="rounded-md border p-2 text-xs"
-                  >
+                  <div key={log.id} className="rounded-md border p-2 text-xs">
                     <div className="flex items-center justify-between">
                       <span className="font-medium">
                         {log.action === "MANUAL_ACTIVATION_ENABLED"
@@ -351,9 +363,7 @@ export function ManualActivationDialog({
                 handleConfirmActivate();
               }}
             >
-              {isToggling && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              )}
+              {isToggling && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Confirmar
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -396,9 +406,7 @@ export function ManualActivationDialog({
                 handleConfirmDeactivate();
               }}
             >
-              {isToggling && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              )}
+              {isToggling && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Confirmar
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -428,9 +436,7 @@ export function ManualActivationDialog({
                 handleConfirmDeactivate();
               }}
             >
-              {isToggling && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              )}
+              {isToggling && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Confirmar
             </AlertDialogAction>
           </AlertDialogFooter>

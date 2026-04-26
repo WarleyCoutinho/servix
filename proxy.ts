@@ -5,6 +5,7 @@ const publicRoutes = [
   "/",
   "/barbershops",
   "/api/auth",
+  "/api/uploads",
   "/api/stripe/webhook",
   "/api/stripe/connect/webhook",
   "/api/cron",
@@ -113,6 +114,10 @@ export async function proxy(request: NextRequest) {
   }
 
   if (pathname.startsWith("/api/auth")) {
+    return NextResponse.next();
+  }
+
+  if (pathname.startsWith("/api/uploads")) {
     return NextResponse.next();
   }
 

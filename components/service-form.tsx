@@ -7,6 +7,7 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import {
   Form,
   FormControl,
@@ -23,17 +24,39 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2, Users } from "lucide-react";
 import Link from "next/link";
 import { ImageUpload } from "./image-upload";
 
-const formSchema = z.object({
-  name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
-  description: z.string().min(10, "Descrição deve ter pelo menos 10 caracteres"),
-  price: z.string().min(1, "Preço é obrigatório"),
-  durationMinutes: z.string().min(1, "Duração é obrigatória"),
-  imageUrl: z.string().optional().or(z.literal("")),
-});
+// ─────────────────────────────────────────────────────────────────────
+// SCHEMA
+// ─────────────────────────────────────────────────────────────────────
+
+const formSchema = z
+  .object({
+    name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
+    description: z
+      .string()
+      .min(10, "Descrição deve ter pelo menos 10 caracteres"),
+    price: z.string().min(1, "Preço é obrigatório"),
+    durationMinutes: z.string().min(1, "Duração é obrigatória"),
+    imageUrl: z.string().optional().or(z.literal("")),
+    // ▼ OPCIONAIS — horário corrido
+    continuousSchedule: z.boolean().optional(),
+    maxSimultaneous: z.string().optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.continuousSchedule) {
+      const val = parseInt(data.maxSimultaneous ?? "");
+      if (isNaN(val) || val < 2) {
+        ctx.addIssue({
+          path: ["maxSimultaneous"],
+          code: z.ZodIssueCode.custom,
+          message: "Informe ao menos 2 vagas para horário corrido.",
+        });
+      }
+    }
+  });
 
 export type ServiceFormValues = z.infer<typeof formSchema>;
 
@@ -43,6 +66,8 @@ export interface ServiceFormData {
   priceInCents: number;
   durationMinutes: number;
   imageUrl?: string;
+  continuousSchedule?: boolean;
+  maxSimultaneous?: number;
 }
 
 export interface ServiceFormRef {
@@ -59,6 +84,10 @@ interface ServiceFormProps {
   headerActions?: React.ReactNode;
 }
 
+// ─────────────────────────────────────────────────────────────────────
+// COMPONENTE
+// ─────────────────────────────────────────────────────────────────────
+
 export const ServiceForm = forwardRef<ServiceFormRef, ServiceFormProps>(
   function ServiceForm(
     {
@@ -69,7 +98,7 @@ export const ServiceForm = forwardRef<ServiceFormRef, ServiceFormProps>(
       backUrl = "/dashboard/owner/services",
       headerActions,
     },
-    ref
+    ref,
   ) {
     const form = useForm<ServiceFormValues>({
       resolver: zodResolver(formSchema),
@@ -79,12 +108,16 @@ export const ServiceForm = forwardRef<ServiceFormRef, ServiceFormProps>(
         price: "",
         durationMinutes: "30",
         imageUrl: "",
+        continuousSchedule: false,
+        maxSimultaneous: "2",
       },
     });
 
     const [imageUrl, setImageUrl] = useState<string | null>(
       defaultValues?.imageUrl || null,
     );
+
+    const isContinuous = form.watch("continuousSchedule");
 
     useImperativeHandle(ref, () => ({
       setFieldError: (field: keyof ServiceFormValues, message: string) => {
@@ -98,7 +131,7 @@ export const ServiceForm = forwardRef<ServiceFormRef, ServiceFormProps>(
 
     const handleSubmit = (data: ServiceFormValues) => {
       const priceInCents = Math.round(
-        parseFloat(data.price.replace(",", ".")) * 100
+        parseFloat(data.price.replace(",", ".")) * 100,
       );
 
       onSubmit({
@@ -107,6 +140,11 @@ export const ServiceForm = forwardRef<ServiceFormRef, ServiceFormProps>(
         priceInCents,
         durationMinutes: parseInt(data.durationMinutes),
         imageUrl: data.imageUrl || undefined,
+        // Só envia os campos corridos se estiver ativado
+        continuousSchedule: data.continuousSchedule ?? false,
+        maxSimultaneous: data.continuousSchedule
+          ? parseInt(data.maxSimultaneous ?? "2")
+          : 1,
       });
     };
 
@@ -115,11 +153,6 @@ export const ServiceForm = forwardRef<ServiceFormRef, ServiceFormProps>(
     const subtitle = isEditMode
       ? "Atualize as informações do serviço"
       : "Adicione um novo serviço à sua barbearia";
-    const cardTitle = "Informações do Serviço";
-    const cardSubtitle = isEditMode
-      ? "Atualize os dados do serviço"
-      : "Preencha os dados do serviço que deseja oferecer";
-    const submitLabel = isEditMode ? "Salvar Alterações" : "Criar Serviço";
 
     return (
       <div className="space-y-6">
@@ -138,12 +171,20 @@ export const ServiceForm = forwardRef<ServiceFormRef, ServiceFormProps>(
 
         <Card className="max-w-2xl">
           <CardHeader>
-            <CardTitle>{cardTitle}</CardTitle>
-            <CardDescription>{cardSubtitle}</CardDescription>
+            <CardTitle>Informações do Serviço</CardTitle>
+            <CardDescription>
+              {isEditMode
+                ? "Atualize os dados do serviço"
+                : "Preencha os dados do serviço que deseja oferecer"}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+              <form
+                onSubmit={form.handleSubmit(handleSubmit)}
+                className="space-y-6"
+              >
+                {/* Nome */}
                 <FormField
                   control={form.control}
                   name="name"
@@ -158,6 +199,7 @@ export const ServiceForm = forwardRef<ServiceFormRef, ServiceFormProps>(
                   )}
                 />
 
+                {/* Descrição */}
                 <FormField
                   control={form.control}
                   name="description"
@@ -176,6 +218,7 @@ export const ServiceForm = forwardRef<ServiceFormRef, ServiceFormProps>(
                   )}
                 />
 
+                {/* Preço + Duração */}
                 <div className="grid gap-4 sm:grid-cols-2">
                   <FormField
                     control={form.control}
@@ -186,7 +229,9 @@ export const ServiceForm = forwardRef<ServiceFormRef, ServiceFormProps>(
                         <FormControl>
                           <Input type="text" placeholder="45,00" {...field} />
                         </FormControl>
-                        <FormDescription>Valor em reais (ex: 45,00)</FormDescription>
+                        <FormDescription>
+                          Valor em reais (ex: 45,00)
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -201,13 +246,16 @@ export const ServiceForm = forwardRef<ServiceFormRef, ServiceFormProps>(
                         <FormControl>
                           <Input type="number" min={5} max={480} {...field} />
                         </FormControl>
-                        <FormDescription>Tempo estimado do serviço</FormDescription>
+                        <FormDescription>
+                          Tempo estimado do serviço
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                 </div>
 
+                {/* Imagem */}
                 <FormField
                   control={form.control}
                   name="imageUrl"
@@ -234,10 +282,70 @@ export const ServiceForm = forwardRef<ServiceFormRef, ServiceFormProps>(
                   )}
                 />
 
+                {/* ── HORÁRIO CORRIDO ─────────────────────────────── */}
+                <div className="rounded-lg border p-4 space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="continuousSchedule"
+                    render={({ field }) => (
+                      <FormItem className="flex items-center justify-between gap-4">
+                        <div className="space-y-0.5">
+                          <FormLabel className="flex items-center gap-2 text-base">
+                            <Users className="size-4 text-muted-foreground" />
+                            Horário Corrido (opcional)
+                          </FormLabel>
+                          <FormDescription>
+                            Permite múltiplos clientes no mesmo slot de horário.
+                            Ideal para serviços em grupo ou cadeiras
+                            simultâneas.
+                          </FormDescription>
+                        </div>
+                        <FormControl>
+                          <Switch
+                            checked={field.value ?? false}
+                            onCheckedChange={field.onChange}
+                            disabled={isPending}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Vagas — só aparece quando continuousSchedule=true */}
+                  {isContinuous && (
+                    <FormField
+                      control={form.control}
+                      name="maxSimultaneous"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Vagas simultâneas</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              min={2}
+                              max={50}
+                              placeholder="Ex: 3"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            Quantos clientes podem agendar o mesmo horário. O
+                            slot some quando todas as vagas estiverem ocupadas.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
+                </div>
+
+                {/* Ações */}
                 <div className="flex gap-4">
                   <Button type="submit" disabled={isPending}>
-                    {isPending && <Loader2 className="mr-2 size-4 animate-spin" />}
-                    {submitLabel}
+                    {isPending && (
+                      <Loader2 className="mr-2 size-4 animate-spin" />
+                    )}
+                    {isEditMode ? "Salvar Alterações" : "Criar Serviço"}
                   </Button>
                   <Button type="button" variant="outline" asChild>
                     <Link href={backUrl}>Cancelar</Link>
@@ -249,18 +357,22 @@ export const ServiceForm = forwardRef<ServiceFormRef, ServiceFormProps>(
         </Card>
       </div>
     );
-  }
+  },
 );
+
+// ─────────────────────────────────────────────────────────────────────
+// HELPER DE ERROS
+// ─────────────────────────────────────────────────────────────────────
 
 export function handleServiceValidationErrors(
   formRef: React.RefObject<ServiceFormRef | null>,
-  validationErrors: Record<string, unknown>
+  validationErrors: Record<string, unknown>,
 ) {
   Object.entries(validationErrors).forEach(([field, errors]) => {
     if (errors && typeof errors === "object" && "_errors" in errors) {
       formRef.current?.setFieldError(
         field as keyof ServiceFormValues,
-        ((errors as { _errors: string[] })._errors)[0]
+        (errors as { _errors: string[] })._errors[0],
       );
     }
   });

@@ -18,14 +18,12 @@ export const GET = async (
         { status: 404 },
       );
     }
+    const raw = upload.dados as Uint8Array;
+    const base64 = Buffer.from(raw).toString("base64");
+    const dataUrl = `data:${upload.tipoArquivo};base64,${base64}`;
 
-    return new Response(upload.dados, {
-      headers: {
-        "Content-Type": upload.tipoArquivo,
-        "Content-Disposition": `inline; filename="${upload.nomeArquivo}"`,
-        "Cache-Control": "public, max-age=86400, immutable",
-      },
-    });
+    // Redireciona para a data URL
+    return NextResponse.redirect(dataUrl);
   } catch (error) {
     console.error("Error serving upload:", error);
     return NextResponse.json(

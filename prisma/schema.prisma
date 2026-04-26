@@ -74,6 +74,12 @@ enum SupportAuditAction {
   STATUS_CHANGE
 }
 
+enum ScheduleViewType {
+  DEFAULT // Agenda padrão — todos os slots do dia
+  RECENT // Agenda recente — a partir de 30 min antes do horário atual
+  CONTINUOUS // Agenda corrida — slots com vagas simultâneas
+}
+
 // =====================
 // USER & AUTH
 // =====================
@@ -296,16 +302,18 @@ model ProfessionalSchedule {
 // =====================
 
 model BarbershopService {
-  id              String     @id @default(uuid())
-  name            String
-  description     String
-  imageUrl        String
-  priceInCents    Int
-  durationMinutes Int        @default(30)
-  barbershopId    String
-  barbershop      Barbershop @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
-  bookings        Booking[]
-  deletedAt       DateTime?
+  id                 String     @id @default(uuid())
+  name               String
+  description        String
+  imageUrl           String
+  priceInCents       Int
+  durationMinutes    Int        @default(30)
+  continuousSchedule Boolean    @default(false)
+  maxSimultaneous    Int        @default(1)
+  barbershopId       String
+  barbershop         Barbershop @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
+  bookings           Booking[]
+  deletedAt          DateTime?
 }
 
 // =====================

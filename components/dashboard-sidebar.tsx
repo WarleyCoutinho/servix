@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ChevronLeft, type LucideIcon } from "lucide-react";
 import { SidebarNavLink } from "@/components/sidebar-nav-link";
-import { MobileSidebarSheet } from "@/components/mobile-sidebar-sheet";
+import { DashboardMobileHeader } from "./dashboard-mobile-header";
 
 export interface NavItem {
   href: string;
@@ -26,7 +26,7 @@ function SidebarContent({
     <>
       <div className="flex h-16 items-center border-b px-4">
         <Link
-          href="/home"
+          href="/bookings"
           className="text-muted-foreground hover:text-foreground flex items-center gap-2 text-sm transition-colors"
         >
           <ChevronLeft className="h-4 w-4" />
@@ -54,7 +54,7 @@ export function DashboardSidebar(props: DashboardSidebarProps) {
   return (
     <>
       {/* Mobile: header com hamburger */}
-      <div className="bg-card fixed top-0 right-0 left-0 z-40 flex h-14 items-center justify-between border-b px-4 md:hidden">
+      {/*  <div className="bg-card fixed top-0 right-0 left-0 z-40 flex h-14 items-center justify-between border-b px-4 md:hidden">
         <div className="min-w-0 flex-1">
           <h2 className="truncate text-sm font-semibold">{props.title}</h2>
           <p className="text-muted-foreground truncate text-xs">
@@ -64,7 +64,10 @@ export function DashboardSidebar(props: DashboardSidebarProps) {
         <MobileSidebarSheet>
           <SidebarContent {...props} />
         </MobileSidebarSheet>
-      </div>
+      </div> */}
+
+      {/* Mobile: agora usa MenuSheet global */}
+      <DashboardMobileHeader title={props.title} subtitle={props.subtitle} />
 
       {/* Desktop: sidebar fixa */}
       <aside className="bg-card hidden w-64 shrink-0 border-r md:sticky md:top-0 md:block md:h-screen md:overflow-y-auto">

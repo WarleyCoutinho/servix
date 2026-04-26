@@ -80,18 +80,28 @@ export const createBooking = protectedActionClient
           const dayStart = startOfDayBrt(date);
           const dayEnd = endOfDayBrt(date);
 
+          // Busca todos os agendamentos do dia para esse profissional,
+          // trazendo os dados do serviço para checar continuousSchedule
           const existingBookings = await tx.booking.findMany({
             where: {
               professionalId,
               date: { gte: dayStart, lte: dayEnd },
               cancelledAt: null,
             },
-            include: { service: { select: { durationMinutes: true } } },
+            include: {
+              service: {
+                select: {
+                  durationMinutes: true,
+                  continuousSchedule: true,
+                  maxSimultaneous: true,
+                },
+              },
+            },
           });
 
-          const newDuration = service.durationMinutes;
+          // Intervalo do novo agendamento (em ms)
           const newSlotsNeeded = Math.ceil(
-            newDuration / DEFAULT_INTERVAL_MINUTES,
+            service.durationMinutes / DEFAULT_INTERVAL_MINUTES,
           );
           const newStart = date.getTime();
           const newEnd = addMinutes(
@@ -100,9 +110,8 @@ export const createBooking = protectedActionClient
           ).getTime();
 
           for (const existing of existingBookings) {
-            const existingDuration = existing.service.durationMinutes;
             const existingSlotsNeeded = Math.ceil(
-              existingDuration / DEFAULT_INTERVAL_MINUTES,
+              existing.service.durationMinutes / DEFAULT_INTERVAL_MINUTES,
             );
             const existingStart = existing.date.getTime();
             const existingEnd = addMinutes(
@@ -110,11 +119,59 @@ export const createBooking = protectedActionClient
               existingSlotsNeeded * DEFAULT_INTERVAL_MINUTES,
             ).getTime();
 
-            if (newStart < existingEnd && newEnd > existingStart) {
-              throw new Error(
-                "Este profissional já possui agendamento neste horário.",
-              );
+            // Sem sobreposição de intervalo → sem conflito, pula
+            const overlaps = newStart < existingEnd && newEnd > existingStart;
+            if (!overlaps) continue;
+
+            // ── Caso 1: serviço EXISTENTE é corrido ──────────────────
+            // O novo booking entra no mesmo slot se ainda há vagas
+            if (existing.service.continuousSchedule) {
+              const maxSlots = existing.service.maxSimultaneous ?? 1;
+
+              // Conta quantos bookings já existem nesse slot exato
+              const bookingsAtSameSlot = existingBookings.filter((b) => {
+                return (
+                  b.service.continuousSchedule &&
+                  b.serviceId === existing.serviceId &&
+                  b.date.getTime() === existing.date.getTime()
+                );
+              });
+
+              if (bookingsAtSameSlot.length >= maxSlots) {
+                throw new Error(
+                  "Este horário já atingiu o limite de vagas disponíveis.",
+                );
+              }
+              // Ainda há vagas → permite continuar (não lança erro)
+              continue;
             }
+
+            // ── Caso 2: serviço NOVO é corrido ───────────────────────
+            // Verifica se o novo serviço ainda tem vagas no slot solicitado
+            if (service.continuousSchedule) {
+              const maxSlots = service.maxSimultaneous ?? 1;
+
+              const bookingsAtNewSlot = existingBookings.filter((b) => {
+                return (
+                  b.serviceId === serviceId &&
+                  b.date.getTime() === date.getTime()
+                );
+              });
+
+              if (bookingsAtNewSlot.length >= maxSlots) {
+                throw new Error(
+                  "Este horário já atingiu o limite de vagas disponíveis.",
+                );
+              }
+              // Ainda há vagas → ok
+              continue;
+            }
+
+            // ── Caso 3: nenhum dos dois é corrido ────────────────────
+            // Conflito normal de agenda
+            throw new Error(
+              "Este profissional já possui agendamento neste horário.",
+            );
           }
 
           const newBooking = await tx.booking.create({

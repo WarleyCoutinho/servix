@@ -1,16 +1,13 @@
 import Footer from "@/components/footer";
 import Header from "@/components/header";
-import ServiceItem from "@/components/service-item";
-import {
-  PageContainer,
-  PageSectionContent,
-  PageSectionTitle,
-} from "@/components/ui/page";
+import { PageContainer } from "@/components/ui/page";
 import { getBarbershopBySlug } from "@/data/barbershops";
 import { getServiceCategories } from "@/data/services";
-import { MapPin, Phone } from "lucide-react";
-import Image from "next/image";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
+import { ServicesSection } from "@/components/services-section";
+import { BarbershopCover } from "@/components/barbershop-cover";
 
 interface SlugPageProps {
   params: Promise<{ slug: string }>;
@@ -19,70 +16,35 @@ interface SlugPageProps {
 const SlugPage = async ({ params }: SlugPageProps) => {
   const { slug } = await params;
 
-  const [barbershop] = await Promise.all([
+  const [barbershop, , session] = await Promise.all([
     getBarbershopBySlug(slug),
     getServiceCategories(),
+    auth.api.getSession({ headers: await headers() }),
   ]);
 
   if (!barbershop) {
     notFound();
   }
 
+  const isOwner =
+    !!session?.user && !!barbershop.ownerId
+      ? session.user.id === barbershop.ownerId
+      : false;
+
   return (
     <div>
       <Header />
 
-      <div className="relative h-55 w-full sm:h-80">
-        <Image
-          src={barbershop.imageUrl}
-          alt={barbershop.name}
-          fill
-          className="object-cover"
-        />
-        <div className="absolute inset-0 bg-linear-to-t from-black/80 to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 p-5">
-          <h1 className="text-2xl font-bold text-white">{barbershop.name}</h1>
-          <div className="mt-2 flex items-center gap-2 text-sm text-white/80">
-            <MapPin className="size-4" />
-            <p>{barbershop.address}</p>
-          </div>
-          {barbershop.phones.length > 0 && (
-            <div className="mt-1 flex items-center gap-2 text-sm text-white/80">
-              <Phone className="size-4" />
-              <p>{barbershop.phones.join(" | ")}</p>
-            </div>
-          )}
-        </div>
-      </div>
+      <BarbershopCover barbershop={barbershop} isOwner={isOwner} />
 
       <PageContainer>
-        {barbershop.description && (
-          <PageSectionContent>
-            <PageSectionTitle>Sobre nós</PageSectionTitle>
-            <p className="text-muted-foreground text-sm">
-              {barbershop.description}
-            </p>
-          </PageSectionContent>
-        )}
-
-        <PageSectionContent>
-          <PageSectionTitle>Serviços</PageSectionTitle>
-          {barbershop.services.length === 0 ? (
-            <p className="text-muted-foreground text-sm">
-              Nenhum serviço disponível.
-            </p>
-          ) : (
-            <div className="grid grid-cols-1 gap-3">
-              {barbershop.services.map((service) => (
-                <ServiceItem
-                  key={service.id}
-                  service={service}
-                  barbershop={barbershop}
-                />
-              ))}
-            </div>
-          )}
-        </PageSectionContent>
+        <div className="grid gap-4">
+          <ServicesSection
+            services={barbershop.services}
+            barbershop={barbershop}
+            isOwner={isOwner}
+          />
+        </div>
       </PageContainer>
 
       <Footer />

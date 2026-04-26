@@ -260,6 +260,8 @@ export const BarbershopServiceScalarFieldEnum = {
   imageUrl: 'imageUrl',
   priceInCents: 'priceInCents',
   durationMinutes: 'durationMinutes',
+  continuousSchedule: 'continuousSchedule',
+  maxSimultaneous: 'maxSimultaneous',
   barbershopId: 'barbershopId',
   deletedAt: 'deletedAt'
 } as const

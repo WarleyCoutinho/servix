@@ -29,11 +29,13 @@ export type AggregateBarbershopService = {
 export type BarbershopServiceAvgAggregateOutputType = {
   priceInCents: number | null
   durationMinutes: number | null
+  maxSimultaneous: number | null
 }
 
 export type BarbershopServiceSumAggregateOutputType = {
   priceInCents: number | null
   durationMinutes: number | null
+  maxSimultaneous: number | null
 }
 
 export type BarbershopServiceMinAggregateOutputType = {
@@ -43,6 +45,8 @@ export type BarbershopServiceMinAggregateOutputType = {
   imageUrl: string | null
   priceInCents: number | null
   durationMinutes: number | null
+  continuousSchedule: boolean | null
+  maxSimultaneous: number | null
   barbershopId: string | null
   deletedAt: Date | null
 }
@@ -54,6 +58,8 @@ export type BarbershopServiceMaxAggregateOutputType = {
   imageUrl: string | null
   priceInCents: number | null
   durationMinutes: number | null
+  continuousSchedule: boolean | null
+  maxSimultaneous: number | null
   barbershopId: string | null
   deletedAt: Date | null
 }
@@ -65,6 +71,8 @@ export type BarbershopServiceCountAggregateOutputType = {
   imageUrl: number
   priceInCents: number
   durationMinutes: number
+  continuousSchedule: number
+  maxSimultaneous: number
   barbershopId: number
   deletedAt: number
   _all: number
@@ -74,11 +82,13 @@ export type BarbershopServiceCountAggregateOutputType = {
 export type BarbershopServiceAvgAggregateInputType = {
   priceInCents?: true
   durationMinutes?: true
+  maxSimultaneous?: true
 }
 
 export type BarbershopServiceSumAggregateInputType = {
   priceInCents?: true
   durationMinutes?: true
+  maxSimultaneous?: true
 }
 
 export type BarbershopServiceMinAggregateInputType = {
@@ -88,6 +98,8 @@ export type BarbershopServiceMinAggregateInputType = {
   imageUrl?: true
   priceInCents?: true
   durationMinutes?: true
+  continuousSchedule?: true
+  maxSimultaneous?: true
   barbershopId?: true
   deletedAt?: true
 }
@@ -99,6 +111,8 @@ export type BarbershopServiceMaxAggregateInputType = {
   imageUrl?: true
   priceInCents?: true
   durationMinutes?: true
+  continuousSchedule?: true
+  maxSimultaneous?: true
   barbershopId?: true
   deletedAt?: true
 }
@@ -110,6 +124,8 @@ export type BarbershopServiceCountAggregateInputType = {
   imageUrl?: true
   priceInCents?: true
   durationMinutes?: true
+  continuousSchedule?: true
+  maxSimultaneous?: true
   barbershopId?: true
   deletedAt?: true
   _all?: true
@@ -208,6 +224,8 @@ export type BarbershopServiceGroupByOutputType = {
   imageUrl: string
   priceInCents: number
   durationMinutes: number
+  continuousSchedule: boolean
+  maxSimultaneous: number
   barbershopId: string
   deletedAt: Date | null
   _count: BarbershopServiceCountAggregateOutputType | null
@@ -242,6 +260,8 @@ export type BarbershopServiceWhereInput = {
   imageUrl?: Prisma.StringFilter<"BarbershopService"> | string
   priceInCents?: Prisma.IntFilter<"BarbershopService"> | number
   durationMinutes?: Prisma.IntFilter<"BarbershopService"> | number
+  continuousSchedule?: Prisma.BoolFilter<"BarbershopService"> | boolean
+  maxSimultaneous?: Prisma.IntFilter<"BarbershopService"> | number
   barbershopId?: Prisma.StringFilter<"BarbershopService"> | string
   deletedAt?: Prisma.DateTimeNullableFilter<"BarbershopService"> | Date | string | null
   barbershop?: Prisma.XOR<Prisma.BarbershopScalarRelationFilter, Prisma.BarbershopWhereInput>
@@ -255,6 +275,8 @@ export type BarbershopServiceOrderByWithRelationInput = {
   imageUrl?: Prisma.SortOrder
   priceInCents?: Prisma.SortOrder
   durationMinutes?: Prisma.SortOrder
+  continuousSchedule?: Prisma.SortOrder
+  maxSimultaneous?: Prisma.SortOrder
   barbershopId?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   barbershop?: Prisma.BarbershopOrderByWithRelationInput
@@ -271,6 +293,8 @@ export type BarbershopServiceWhereUniqueInput = Prisma.AtLeast<{
   imageUrl?: Prisma.StringFilter<"BarbershopService"> | string
   priceInCents?: Prisma.IntFilter<"BarbershopService"> | number
   durationMinutes?: Prisma.IntFilter<"BarbershopService"> | number
+  continuousSchedule?: Prisma.BoolFilter<"BarbershopService"> | boolean
+  maxSimultaneous?: Prisma.IntFilter<"BarbershopService"> | number
   barbershopId?: Prisma.StringFilter<"BarbershopService"> | string
   deletedAt?: Prisma.DateTimeNullableFilter<"BarbershopService"> | Date | string | null
   barbershop?: Prisma.XOR<Prisma.BarbershopScalarRelationFilter, Prisma.BarbershopWhereInput>
@@ -284,6 +308,8 @@ export type BarbershopServiceOrderByWithAggregationInput = {
   imageUrl?: Prisma.SortOrder
   priceInCents?: Prisma.SortOrder
   durationMinutes?: Prisma.SortOrder
+  continuousSchedule?: Prisma.SortOrder
+  maxSimultaneous?: Prisma.SortOrder
   barbershopId?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.BarbershopServiceCountOrderByAggregateInput
@@ -303,6 +329,8 @@ export type BarbershopServiceScalarWhereWithAggregatesInput = {
   imageUrl?: Prisma.StringWithAggregatesFilter<"BarbershopService"> | string
   priceInCents?: Prisma.IntWithAggregatesFilter<"BarbershopService"> | number
   durationMinutes?: Prisma.IntWithAggregatesFilter<"BarbershopService"> | number
+  continuousSchedule?: Prisma.BoolWithAggregatesFilter<"BarbershopService"> | boolean
+  maxSimultaneous?: Prisma.IntWithAggregatesFilter<"BarbershopService"> | number
   barbershopId?: Prisma.StringWithAggregatesFilter<"BarbershopService"> | string
   deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"BarbershopService"> | Date | string | null
 }
@@ -314,6 +342,8 @@ export type BarbershopServiceCreateInput = {
   imageUrl: string
   priceInCents: number
   durationMinutes?: number
+  continuousSchedule?: boolean
+  maxSimultaneous?: number
   deletedAt?: Date | string | null
   barbershop: Prisma.BarbershopCreateNestedOneWithoutServicesInput
   bookings?: Prisma.BookingCreateNestedManyWithoutServiceInput
@@ -326,6 +356,8 @@ export type BarbershopServiceUncheckedCreateInput = {
   imageUrl: string
   priceInCents: number
   durationMinutes?: number
+  continuousSchedule?: boolean
+  maxSimultaneous?: number
   barbershopId: string
   deletedAt?: Date | string | null
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutServiceInput
@@ -338,6 +370,8 @@ export type BarbershopServiceUpdateInput = {
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   priceInCents?: Prisma.IntFieldUpdateOperationsInput | number
   durationMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  continuousSchedule?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  maxSimultaneous?: Prisma.IntFieldUpdateOperationsInput | number
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   barbershop?: Prisma.BarbershopUpdateOneRequiredWithoutServicesNestedInput
   bookings?: Prisma.BookingUpdateManyWithoutServiceNestedInput
@@ -350,6 +384,8 @@ export type BarbershopServiceUncheckedUpdateInput = {
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   priceInCents?: Prisma.IntFieldUpdateOperationsInput | number
   durationMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  continuousSchedule?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  maxSimultaneous?: Prisma.IntFieldUpdateOperationsInput | number
   barbershopId?: Prisma.StringFieldUpdateOperationsInput | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutServiceNestedInput
@@ -362,6 +398,8 @@ export type BarbershopServiceCreateManyInput = {
   imageUrl: string
   priceInCents: number
   durationMinutes?: number
+  continuousSchedule?: boolean
+  maxSimultaneous?: number
   barbershopId: string
   deletedAt?: Date | string | null
 }
@@ -373,6 +411,8 @@ export type BarbershopServiceUpdateManyMutationInput = {
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   priceInCents?: Prisma.IntFieldUpdateOperationsInput | number
   durationMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  continuousSchedule?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  maxSimultaneous?: Prisma.IntFieldUpdateOperationsInput | number
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
@@ -383,6 +423,8 @@ export type BarbershopServiceUncheckedUpdateManyInput = {
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   priceInCents?: Prisma.IntFieldUpdateOperationsInput | number
   durationMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  continuousSchedule?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  maxSimultaneous?: Prisma.IntFieldUpdateOperationsInput | number
   barbershopId?: Prisma.StringFieldUpdateOperationsInput | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
@@ -404,6 +446,8 @@ export type BarbershopServiceCountOrderByAggregateInput = {
   imageUrl?: Prisma.SortOrder
   priceInCents?: Prisma.SortOrder
   durationMinutes?: Prisma.SortOrder
+  continuousSchedule?: Prisma.SortOrder
+  maxSimultaneous?: Prisma.SortOrder
   barbershopId?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
 }
@@ -411,6 +455,7 @@ export type BarbershopServiceCountOrderByAggregateInput = {
 export type BarbershopServiceAvgOrderByAggregateInput = {
   priceInCents?: Prisma.SortOrder
   durationMinutes?: Prisma.SortOrder
+  maxSimultaneous?: Prisma.SortOrder
 }
 
 export type BarbershopServiceMaxOrderByAggregateInput = {
@@ -420,6 +465,8 @@ export type BarbershopServiceMaxOrderByAggregateInput = {
   imageUrl?: Prisma.SortOrder
   priceInCents?: Prisma.SortOrder
   durationMinutes?: Prisma.SortOrder
+  continuousSchedule?: Prisma.SortOrder
+  maxSimultaneous?: Prisma.SortOrder
   barbershopId?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
 }
@@ -431,6 +478,8 @@ export type BarbershopServiceMinOrderByAggregateInput = {
   imageUrl?: Prisma.SortOrder
   priceInCents?: Prisma.SortOrder
   durationMinutes?: Prisma.SortOrder
+  continuousSchedule?: Prisma.SortOrder
+  maxSimultaneous?: Prisma.SortOrder
   barbershopId?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
 }
@@ -438,6 +487,7 @@ export type BarbershopServiceMinOrderByAggregateInput = {
 export type BarbershopServiceSumOrderByAggregateInput = {
   priceInCents?: Prisma.SortOrder
   durationMinutes?: Prisma.SortOrder
+  maxSimultaneous?: Prisma.SortOrder
 }
 
 export type BarbershopServiceScalarRelationFilter = {
@@ -508,6 +558,8 @@ export type BarbershopServiceCreateWithoutBarbershopInput = {
   imageUrl: string
   priceInCents: number
   durationMinutes?: number
+  continuousSchedule?: boolean
+  maxSimultaneous?: number
   deletedAt?: Date | string | null
   bookings?: Prisma.BookingCreateNestedManyWithoutServiceInput
 }
@@ -519,6 +571,8 @@ export type BarbershopServiceUncheckedCreateWithoutBarbershopInput = {
   imageUrl: string
   priceInCents: number
   durationMinutes?: number
+  continuousSchedule?: boolean
+  maxSimultaneous?: number
   deletedAt?: Date | string | null
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutServiceInput
 }
@@ -559,6 +613,8 @@ export type BarbershopServiceScalarWhereInput = {
   imageUrl?: Prisma.StringFilter<"BarbershopService"> | string
   priceInCents?: Prisma.IntFilter<"BarbershopService"> | number
   durationMinutes?: Prisma.IntFilter<"BarbershopService"> | number
+  continuousSchedule?: Prisma.BoolFilter<"BarbershopService"> | boolean
+  maxSimultaneous?: Prisma.IntFilter<"BarbershopService"> | number
   barbershopId?: Prisma.StringFilter<"BarbershopService"> | string
   deletedAt?: Prisma.DateTimeNullableFilter<"BarbershopService"> | Date | string | null
 }
@@ -570,6 +626,8 @@ export type BarbershopServiceCreateWithoutBookingsInput = {
   imageUrl: string
   priceInCents: number
   durationMinutes?: number
+  continuousSchedule?: boolean
+  maxSimultaneous?: number
   deletedAt?: Date | string | null
   barbershop: Prisma.BarbershopCreateNestedOneWithoutServicesInput
 }
@@ -581,6 +639,8 @@ export type BarbershopServiceUncheckedCreateWithoutBookingsInput = {
   imageUrl: string
   priceInCents: number
   durationMinutes?: number
+  continuousSchedule?: boolean
+  maxSimultaneous?: number
   barbershopId: string
   deletedAt?: Date | string | null
 }
@@ -608,6 +668,8 @@ export type BarbershopServiceUpdateWithoutBookingsInput = {
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   priceInCents?: Prisma.IntFieldUpdateOperationsInput | number
   durationMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  continuousSchedule?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  maxSimultaneous?: Prisma.IntFieldUpdateOperationsInput | number
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   barbershop?: Prisma.BarbershopUpdateOneRequiredWithoutServicesNestedInput
 }
@@ -619,6 +681,8 @@ export type BarbershopServiceUncheckedUpdateWithoutBookingsInput = {
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   priceInCents?: Prisma.IntFieldUpdateOperationsInput | number
   durationMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  continuousSchedule?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  maxSimultaneous?: Prisma.IntFieldUpdateOperationsInput | number
   barbershopId?: Prisma.StringFieldUpdateOperationsInput | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
@@ -630,6 +694,8 @@ export type BarbershopServiceCreateManyBarbershopInput = {
   imageUrl: string
   priceInCents: number
   durationMinutes?: number
+  continuousSchedule?: boolean
+  maxSimultaneous?: number
   deletedAt?: Date | string | null
 }
 
@@ -640,6 +706,8 @@ export type BarbershopServiceUpdateWithoutBarbershopInput = {
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   priceInCents?: Prisma.IntFieldUpdateOperationsInput | number
   durationMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  continuousSchedule?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  maxSimultaneous?: Prisma.IntFieldUpdateOperationsInput | number
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookings?: Prisma.BookingUpdateManyWithoutServiceNestedInput
 }
@@ -651,6 +719,8 @@ export type BarbershopServiceUncheckedUpdateWithoutBarbershopInput = {
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   priceInCents?: Prisma.IntFieldUpdateOperationsInput | number
   durationMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  continuousSchedule?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  maxSimultaneous?: Prisma.IntFieldUpdateOperationsInput | number
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutServiceNestedInput
 }
@@ -662,6 +732,8 @@ export type BarbershopServiceUncheckedUpdateManyWithoutBarbershopInput = {
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   priceInCents?: Prisma.IntFieldUpdateOperationsInput | number
   durationMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  continuousSchedule?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  maxSimultaneous?: Prisma.IntFieldUpdateOperationsInput | number
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
@@ -703,6 +775,8 @@ export type BarbershopServiceSelect<ExtArgs extends runtime.Types.Extensions.Int
   imageUrl?: boolean
   priceInCents?: boolean
   durationMinutes?: boolean
+  continuousSchedule?: boolean
+  maxSimultaneous?: boolean
   barbershopId?: boolean
   deletedAt?: boolean
   barbershop?: boolean | Prisma.BarbershopDefaultArgs<ExtArgs>
@@ -717,6 +791,8 @@ export type BarbershopServiceSelectCreateManyAndReturn<ExtArgs extends runtime.T
   imageUrl?: boolean
   priceInCents?: boolean
   durationMinutes?: boolean
+  continuousSchedule?: boolean
+  maxSimultaneous?: boolean
   barbershopId?: boolean
   deletedAt?: boolean
   barbershop?: boolean | Prisma.BarbershopDefaultArgs<ExtArgs>
@@ -729,6 +805,8 @@ export type BarbershopServiceSelectUpdateManyAndReturn<ExtArgs extends runtime.T
   imageUrl?: boolean
   priceInCents?: boolean
   durationMinutes?: boolean
+  continuousSchedule?: boolean
+  maxSimultaneous?: boolean
   barbershopId?: boolean
   deletedAt?: boolean
   barbershop?: boolean | Prisma.BarbershopDefaultArgs<ExtArgs>
@@ -741,11 +819,13 @@ export type BarbershopServiceSelectScalar = {
   imageUrl?: boolean
   priceInCents?: boolean
   durationMinutes?: boolean
+  continuousSchedule?: boolean
+  maxSimultaneous?: boolean
   barbershopId?: boolean
   deletedAt?: boolean
 }
 
-export type BarbershopServiceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "imageUrl" | "priceInCents" | "durationMinutes" | "barbershopId" | "deletedAt", ExtArgs["result"]["barbershopService"]>
+export type BarbershopServiceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "imageUrl" | "priceInCents" | "durationMinutes" | "continuousSchedule" | "maxSimultaneous" | "barbershopId" | "deletedAt", ExtArgs["result"]["barbershopService"]>
 export type BarbershopServiceInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   barbershop?: boolean | Prisma.BarbershopDefaultArgs<ExtArgs>
   bookings?: boolean | Prisma.BarbershopService$bookingsArgs<ExtArgs>
@@ -771,6 +851,8 @@ export type $BarbershopServicePayload<ExtArgs extends runtime.Types.Extensions.I
     imageUrl: string
     priceInCents: number
     durationMinutes: number
+    continuousSchedule: boolean
+    maxSimultaneous: number
     barbershopId: string
     deletedAt: Date | null
   }, ExtArgs["result"]["barbershopService"]>
@@ -1204,6 +1286,8 @@ export interface BarbershopServiceFieldRefs {
   readonly imageUrl: Prisma.FieldRef<"BarbershopService", 'String'>
   readonly priceInCents: Prisma.FieldRef<"BarbershopService", 'Int'>
   readonly durationMinutes: Prisma.FieldRef<"BarbershopService", 'Int'>
+  readonly continuousSchedule: Prisma.FieldRef<"BarbershopService", 'Boolean'>
+  readonly maxSimultaneous: Prisma.FieldRef<"BarbershopService", 'Int'>
   readonly barbershopId: Prisma.FieldRef<"BarbershopService", 'String'>
   readonly deletedAt: Prisma.FieldRef<"BarbershopService", 'DateTime'>
 }

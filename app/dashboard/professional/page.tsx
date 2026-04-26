@@ -5,7 +5,12 @@ import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, DollarSign, TrendingUp, CreditCard } from "lucide-react";
-import { startOfMonthBrt, endOfMonthBrt, startOfDayBrt, endOfDayBrt } from "@/lib/timezone";
+import {
+  startOfMonthBrt,
+  endOfMonthBrt,
+  startOfDayBrt,
+  endOfDayBrt,
+} from "@/lib/timezone";
 import { formatCurrency } from "@/lib/utils";
 import { StripeAccountStatus, PaymentStatus } from "@/generated/prisma/enums";
 
@@ -100,15 +105,19 @@ export default async function ProfessionalDashboardPage() {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card className="relative overflow-hidden transition-shadow hover:shadow-md">
-          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/60 to-transparent" />
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-linear-to-r from-primary/60 to-transparent" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Hoje</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Hoje
+            </CardTitle>
             <div className="rounded-lg bg-primary/10 p-2">
               <Calendar className="h-4 w-4 text-primary" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold tabular-nums">{todayBookings}</div>
+            <div className="text-2xl font-bold tabular-nums">
+              {todayBookings}
+            </div>
             <p className="mt-1 text-xs text-muted-foreground">
               agendamentos para hoje
             </p>
@@ -116,15 +125,19 @@ export default async function ProfessionalDashboardPage() {
         </Card>
 
         <Card className="relative overflow-hidden transition-shadow hover:shadow-md">
-          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/60 to-transparent" />
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-linear-to-r from-primary/60 to-transparent" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Este Mes</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Este Mes
+            </CardTitle>
             <div className="rounded-lg bg-primary/10 p-2">
               <TrendingUp className="h-4 w-4 text-primary" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold tabular-nums">{monthlyBookings}</div>
+            <div className="text-2xl font-bold tabular-nums">
+              {monthlyBookings}
+            </div>
             <p className="mt-1 text-xs text-muted-foreground">
               agendamentos no mes
             </p>
@@ -132,9 +145,11 @@ export default async function ProfessionalDashboardPage() {
         </Card>
 
         <Card className="relative overflow-hidden transition-shadow hover:shadow-md">
-          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/60 to-transparent" />
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-linear-to-r from-primary/60 to-transparent" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Ganhos (Mes)</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Ganhos (Mes)
+            </CardTitle>
             <div className="rounded-lg bg-primary/10 p-2">
               <DollarSign className="h-4 w-4 text-primary" />
             </div>
@@ -150,9 +165,11 @@ export default async function ProfessionalDashboardPage() {
         </Card>
 
         <Card className="relative overflow-hidden transition-shadow hover:shadow-md">
-          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/60 to-transparent" />
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-linear-to-r from-primary/60 to-transparent" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Status Stripe</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Status Stripe
+            </CardTitle>
             <div className="rounded-lg bg-primary/10 p-2">
               <CreditCard className="h-4 w-4 text-primary" />
             </div>
