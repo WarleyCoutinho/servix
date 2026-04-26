@@ -34,6 +34,9 @@ interface Service {
   priceInCents: number;
   durationMinutes: number;
   imageUrl: string | null;
+  // ▼ campos novos opcionais
+  continuousSchedule?: boolean;
+  maxSimultaneous?: number;
 }
 
 export default function EditServicePage({
@@ -45,7 +48,9 @@ export default function EditServicePage({
   const formRef = useRef<ServiceFormRef>(null);
   const [serviceId, setServiceId] = useState<string>("");
   const [loading, setLoading] = useState(true);
-  const [initialValues, setInitialValues] = useState<ServiceFormValues | null>(null);
+  const [initialValues, setInitialValues] = useState<ServiceFormValues | null>(
+    null,
+  );
 
   useEffect(() => {
     async function loadService() {
@@ -66,6 +71,9 @@ export default function EditServicePage({
           price: (data.priceInCents / 100).toFixed(2).replace(".", ","),
           durationMinutes: data.durationMinutes.toString(),
           imageUrl: data.imageUrl || "",
+          // ▼ campos novos — usa os valores do banco ou defaults
+          continuousSchedule: data.continuousSchedule ?? false,
+          maxSimultaneous: (data.maxSimultaneous ?? 2).toString(),
         });
       } catch {
         toast.error("Erro ao carregar serviço");
@@ -77,29 +85,35 @@ export default function EditServicePage({
     loadService();
   }, [params, router]);
 
-  const { execute: executeUpdate, isPending: isUpdating } = useAction(updateService, {
-    onSuccess: () => {
-      toast.success("Serviço atualizado com sucesso!");
-      router.push("/dashboard/owner/services");
+  const { execute: executeUpdate, isPending: isUpdating } = useAction(
+    updateService,
+    {
+      onSuccess: () => {
+        toast.success("Serviço atualizado com sucesso!");
+        router.push("/dashboard/owner/services");
+      },
+      onError: ({ error }) => {
+        if (error.validationErrors) {
+          handleServiceValidationErrors(formRef, error.validationErrors);
+        } else {
+          toast.error(error.serverError || "Erro ao atualizar serviço");
+        }
+      },
     },
-    onError: ({ error }) => {
-      if (error.validationErrors) {
-        handleServiceValidationErrors(formRef, error.validationErrors);
-      } else {
-        toast.error(error.serverError || "Erro ao atualizar serviço");
-      }
-    },
-  });
+  );
 
-  const { execute: executeDelete, isPending: isDeleting } = useAction(deleteService, {
-    onSuccess: () => {
-      toast.success("Serviço excluído com sucesso!");
-      router.push("/dashboard/owner/services");
+  const { execute: executeDelete, isPending: isDeleting } = useAction(
+    deleteService,
+    {
+      onSuccess: () => {
+        toast.success("Serviço excluído com sucesso!");
+        router.push("/dashboard/owner/services");
+      },
+      onError: ({ error }) => {
+        toast.error(error.serverError || "Erro ao excluir serviço");
+      },
     },
-    onError: ({ error }) => {
-      toast.error(error.serverError || "Erro ao excluir serviço");
-    },
-  });
+  );
 
   function handleSubmit(data: ServiceFormData) {
     executeUpdate({ id: serviceId, ...data });
