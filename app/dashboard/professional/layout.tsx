@@ -7,15 +7,7 @@ import { auth } from "@/lib/auth";
 import { getUserPlanInfo } from "@/lib/plan-limits";
 import { prisma } from "@/lib/prisma";
 import { getAccountRestrictionInfo } from "@/lib/stripe-connect";
-import {
-  AlertTriangle,
-  Calendar,
-  Clock,
-  CreditCard,
-  DollarSign,
-  LayoutDashboard,
-  Settings,
-} from "lucide-react";
+import { AlertTriangle, Clock, CreditCard } from "lucide-react";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -24,27 +16,27 @@ const navItems: NavItem[] = [
   {
     href: "/dashboard/professional",
     label: "Visão Geral",
-    icon: LayoutDashboard,
+    icon: "LayoutDashboard",
   },
   {
     href: "/dashboard/professional/schedule",
     label: "Minha Agenda",
-    icon: Clock,
+    icon: "Clock",
   },
   {
     href: "/dashboard/professional/bookings",
     label: "Agendamentos",
-    icon: Calendar,
+    icon: "Calendar",
   },
   {
     href: "/dashboard/professional/payments",
     label: "Pagamentos",
-    icon: DollarSign,
+    icon: "DollarSign",
   },
   {
     href: "/dashboard/professional/settings",
     label: "Configurações",
-    icon: Settings,
+    icon: "Settings",
   },
 ];
 
@@ -121,39 +113,43 @@ export default async function ProfessionalDashboardLayout({
         )}
         {professional.stripeOnboardingComplete &&
           professional.stripeAccountStatus === "RESTRICTED" &&
-          restrictionInfo && (
-            restrictionInfo.isPendingVerification ? (
-              <div className="m-4 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950">
-                <div className="mb-2 flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-                  <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
-                    Documentos em analise
-                  </p>
-                </div>
-                <p className="text-xs text-amber-600 dark:text-amber-400">
-                  {restrictionInfo.message}
+          restrictionInfo &&
+          (restrictionInfo.isPendingVerification ? (
+            <div className="m-4 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950">
+              <div className="mb-2 flex items-center gap-2">
+                <Clock className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                  Documentos em analise
                 </p>
               </div>
-            ) : (
-              <div className="m-4 rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-950">
-                <div className="mb-2 flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
-                  <p className="text-sm font-medium text-red-800 dark:text-red-200">
-                    Conta restrita
-                  </p>
-                </div>
-                <p className="mb-3 text-xs text-red-600 dark:text-red-400">
-                  {restrictionInfo.message}
+              <p className="text-xs text-amber-600 dark:text-amber-400">
+                {restrictionInfo.message}
+              </p>
+            </div>
+          ) : (
+            <div className="m-4 rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-950">
+              <div className="mb-2 flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
+                <p className="text-sm font-medium text-red-800 dark:text-red-200">
+                  Conta restrita
                 </p>
-                <Button size="sm" asChild className="w-full" variant="destructive">
-                  <Link href="/onboarding/professional">
-                    <CreditCard className="mr-2 h-4 w-4" />
-                    Completar verificação
-                  </Link>
-                </Button>
               </div>
-            )
-          )}
+              <p className="mb-3 text-xs text-red-600 dark:text-red-400">
+                {restrictionInfo.message}
+              </p>
+              <Button
+                size="sm"
+                asChild
+                className="w-full"
+                variant="destructive"
+              >
+                <Link href="/onboarding/professional">
+                  <CreditCard className="mr-2 h-4 w-4" />
+                  Completar verificação
+                </Link>
+              </Button>
+            </div>
+          ))}
         {professional.stripeOnboardingComplete &&
           professional.stripeAccountStatus === "PENDING" && (
             <div className="m-4 rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-950">

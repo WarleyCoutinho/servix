@@ -1,12 +1,48 @@
 import Link from "next/link";
-import { ChevronLeft, type LucideIcon } from "lucide-react";
+import {
+  ChevronLeft,
+  LayoutDashboard,
+  Clock,
+  Calendar,
+  DollarSign,
+  Settings,
+  Store,
+  Users,
+  Scissors,
+  CreditCard,
+  type LucideIcon,
+} from "lucide-react";
 import { SidebarNavLink } from "@/components/sidebar-nav-link";
 import { DashboardMobileHeader } from "./dashboard-mobile-header";
+
+export type NavIconKey =
+  | "LayoutDashboard"
+  | "Clock"
+  | "Calendar"
+  | "DollarSign"
+  | "Settings"
+  | "Store"
+  | "Users"
+  | "Scissors"
+  | "CreditCard";
+
+export const navIconMap: Record<NavIconKey, LucideIcon> = {
+  LayoutDashboard,
+  Clock,
+  Calendar,
+  DollarSign,
+  Settings,
+  Store,
+  Users,
+  Scissors,
+  CreditCard,
+};
 
 export interface NavItem {
   href: string;
   label: string;
-  icon: LucideIcon;
+  icon: NavIconKey;
+  onNavigate?: () => void;
 }
 
 interface DashboardSidebarProps {
@@ -16,7 +52,7 @@ interface DashboardSidebarProps {
   children?: React.ReactNode;
 }
 
-function SidebarContent({
+export function SidebarContent({
   title,
   subtitle,
   navItems,
@@ -38,12 +74,19 @@ function SidebarContent({
         <p className="text-muted-foreground text-sm">{subtitle}</p>
       </div>
       <nav className="space-y-1 px-2">
-        {navItems.map((item) => (
-          <SidebarNavLink key={item.href} href={item.href}>
-            <item.icon className="mr-2 h-4 w-4" />
-            {item.label}
-          </SidebarNavLink>
-        ))}
+        {navItems.map((item) => {
+          const Icon = navIconMap[item.icon];
+          return (
+            <SidebarNavLink
+              key={item.href}
+              href={item.href}
+              onClick={item.onNavigate}
+            >
+              <Icon className="mr-2 h-4 w-4" />
+              {item.label}
+            </SidebarNavLink>
+          );
+        })}
       </nav>
       {children}
     </>
@@ -53,23 +96,14 @@ function SidebarContent({
 export function DashboardSidebar(props: DashboardSidebarProps) {
   return (
     <>
-      {/* Mobile: header com hamburger */}
-      {/*  <div className="bg-card fixed top-0 right-0 left-0 z-40 flex h-14 items-center justify-between border-b px-4 md:hidden">
-        <div className="min-w-0 flex-1">
-          <h2 className="truncate text-sm font-semibold">{props.title}</h2>
-          <p className="text-muted-foreground truncate text-xs">
-            {props.subtitle}
-          </p>
-        </div>
-        <MobileSidebarSheet>
-          <SidebarContent {...props} />
-        </MobileSidebarSheet>
-      </div> */}
+      <DashboardMobileHeader
+        title={props.title}
+        subtitle={props.subtitle}
+        navItems={props.navItems}
+      >
+        {props.children}
+      </DashboardMobileHeader>
 
-      {/* Mobile: agora usa MenuSheet global */}
-      <DashboardMobileHeader title={props.title} subtitle={props.subtitle} />
-
-      {/* Desktop: sidebar fixa */}
       <aside className="bg-card hidden w-64 shrink-0 border-r md:sticky md:top-0 md:block md:h-screen md:overflow-y-auto">
         <SidebarContent {...props} />
       </aside>

@@ -8,9 +8,14 @@ import { cn } from "@/lib/utils";
 interface SidebarNavLinkProps {
   href: string;
   children: React.ReactNode;
+  onClick?: () => void;
 }
 
-export function SidebarNavLink({ href, children }: SidebarNavLinkProps) {
+export function SidebarNavLink({
+  href,
+  children,
+  onClick,
+}: SidebarNavLinkProps) {
   const pathname = usePathname();
   const isActive = pathname === href;
 
@@ -25,7 +30,9 @@ export function SidebarNavLink({ href, children }: SidebarNavLinkProps) {
       )}
       asChild
     >
-      <Link href={href}>{children}</Link>
+      <Link href={href} onClick={onClick}>
+        {children}
+      </Link>
     </Button>
   );
 }

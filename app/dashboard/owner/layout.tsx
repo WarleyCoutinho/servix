@@ -3,13 +3,6 @@ import { cookies, headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { UserRole } from "@/generated/prisma/enums";
-import {
-  Users,
-  Scissors,
-  CreditCard,
-  LayoutDashboard,
-  Store,
-} from "lucide-react";
 import { DashboardSidebar, type NavItem } from "@/components/dashboard-sidebar";
 import { BarbershopSelector } from "@/components/barbershop-selector";
 import { StripeWarningBanner } from "@/components/stripe-warning-banner";
@@ -75,33 +68,33 @@ export default async function OwnerDashboardLayout({
   const planInfo = await getUserPlanInfo(user.id, activeBarbershop.id);
 
   const navItems: NavItem[] = [
-    { href: "/dashboard/owner", label: "Visão Geral", icon: LayoutDashboard },
+    { href: "/dashboard/owner", label: "Visão Geral", icon: "LayoutDashboard" },
   ];
 
   if (planInfo?.canHaveMultipleBarbershops) {
     navItems.push({
       href: "/dashboard/owner/establishments",
       label: "Minhas Lojas",
-      icon: Store,
+      icon: "Store",
     });
   }
 
   navItems.push({
     href: "/dashboard/owner/professionals",
     label: "Minha Equipe",
-    icon: Users,
+    icon: "Users",
   });
 
   navItems.push(
     {
       href: "/dashboard/owner/services",
       label: "Meus Serviços",
-      icon: Scissors,
+      icon: "Scissors",
     },
     {
       href: "/dashboard/owner/subscription",
       label: "Assinatura",
-      icon: CreditCard,
+      icon: "CreditCard",
     },
   );
 
