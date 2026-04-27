@@ -1,15 +1,13 @@
-// app/dashboard/client/layout.tsx
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { UserRole } from "@/generated/prisma/enums";
-import { LayoutDashboard, CalendarDays } from "lucide-react";
 import { DashboardSidebar, type NavItem } from "@/components/dashboard-sidebar";
 
 const navItems: NavItem[] = [
-  { href: "/dashboard/client", label: "Visão Geral", icon: LayoutDashboard },
-  { href: "/bookings", label: "Meus Agendamentos", icon: CalendarDays },
+  { href: "/dashboard/client", label: "Visão Geral", icon: "LayoutDashboard" },
+  { href: "/bookings", label: "Meus Agendamentos", icon: "CalendarDays" },
 ];
 
 export default async function ClientDashboardLayout({

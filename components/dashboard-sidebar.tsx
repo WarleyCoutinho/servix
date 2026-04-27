@@ -10,6 +10,10 @@ import {
   Users,
   Scissors,
   CreditCard,
+  Percent,
+  Link2,
+  Headset,
+  CalendarDays,
   type LucideIcon,
 } from "lucide-react";
 import { SidebarNavLink } from "@/components/sidebar-nav-link";
@@ -19,23 +23,31 @@ export type NavIconKey =
   | "LayoutDashboard"
   | "Clock"
   | "Calendar"
+  | "CalendarDays"
   | "DollarSign"
   | "Settings"
   | "Store"
   | "Users"
   | "Scissors"
-  | "CreditCard";
+  | "CreditCard"
+  | "Percent"
+  | "Link2"
+  | "Headset";
 
 export const navIconMap: Record<NavIconKey, LucideIcon> = {
   LayoutDashboard,
   Clock,
   Calendar,
+  CalendarDays,
   DollarSign,
   Settings,
   Store,
   Users,
   Scissors,
   CreditCard,
+  Percent,
+  Link2,
+  Headset,
 };
 
 export interface NavItem {
