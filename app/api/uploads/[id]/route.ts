@@ -18,12 +18,17 @@ export const GET = async (
         { status: 404 },
       );
     }
-    const raw = upload.dados as Uint8Array;
-    const base64 = Buffer.from(raw).toString("base64");
-    const dataUrl = `data:${upload.tipoArquivo};base64,${base64}`;
 
-    // Redireciona para a data URL
-    return NextResponse.redirect(dataUrl);
+    const buffer = Buffer.from(upload.dados as Uint8Array);
+
+    return new NextResponse(buffer, {
+      status: 200,
+      headers: {
+        "Content-Type": upload.tipoArquivo,
+        "Content-Length": buffer.length.toString(),
+        "Cache-Control": "public, max-age=31536000, immutable",
+      },
+    });
   } catch (error) {
     console.error("Error serving upload:", error);
     return NextResponse.json(
