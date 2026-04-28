@@ -4,8 +4,7 @@ import { z } from "zod";
 import { protectedActionClient } from "@/lib/action-client";
 import { returnValidationErrors } from "next-safe-action";
 import { prisma } from "@/lib/prisma";
-import { isPast, addMinutes } from "date-fns";
-import { DEFAULT_INTERVAL_MINUTES } from "@/lib/schedule-utils";
+import { isPast } from "date-fns";
 import { startOfDayBrt, endOfDayBrt } from "@/lib/timezone";
 import { sendDailyScheduleToGroup } from "@/lib/whatsapp-schedule";
 import { PaymentStatus } from "@/generated/prisma/enums";
@@ -17,6 +16,15 @@ const inputSchema = z.object({
   payAfterService: z.boolean().optional(),
   clientName: z.string().min(2).max(100).optional(),
 });
+
+function overlaps(
+  aStart: number,
+  aEnd: number,
+  bStart: number,
+  bEnd: number,
+): boolean {
+  return aStart < bEnd && bStart < aEnd;
+}
 
 export const createBooking = protectedActionClient
   .inputSchema(inputSchema)
@@ -50,9 +58,7 @@ export const createBooking = protectedActionClient
 
       const professional = await prisma.professional.findUnique({
         where: { id: professionalId },
-        include: {
-          barbershop: { select: { ownerId: true } },
-        },
+        include: { barbershop: { select: { ownerId: true } } },
       });
       if (!professional || !professional.isActive) {
         returnValidationErrors(inputSchema, {
@@ -64,7 +70,6 @@ export const createBooking = protectedActionClient
           _errors: ["Profissional não pertence a esta barbearia."],
         });
       }
-
       if (payAfterService && !professional.acceptsPayAfterService) {
         returnValidationErrors(inputSchema, {
           _errors: ["Este profissional não aceita pagamento após o serviço."],
@@ -80,8 +85,6 @@ export const createBooking = protectedActionClient
           const dayStart = startOfDayBrt(date);
           const dayEnd = endOfDayBrt(date);
 
-          // Busca todos os agendamentos do dia para esse profissional,
-          // trazendo os dados do serviço para checar continuousSchedule
           const existingBookings = await tx.booking.findMany({
             where: {
               professionalId,
@@ -99,76 +102,51 @@ export const createBooking = protectedActionClient
             },
           });
 
-          // Intervalo do novo agendamento (em ms)
-          const newSlotsNeeded = Math.ceil(
-            service.durationMinutes / DEFAULT_INTERVAL_MINUTES,
-          );
           const newStart = date.getTime();
-          const newEnd = addMinutes(
-            date,
-            newSlotsNeeded * DEFAULT_INTERVAL_MINUTES,
-          ).getTime();
+          const newEnd = newStart + service.durationMinutes * 60 * 1000;
 
           for (const existing of existingBookings) {
-            const existingSlotsNeeded = Math.ceil(
-              existing.service.durationMinutes / DEFAULT_INTERVAL_MINUTES,
-            );
             const existingStart = existing.date.getTime();
-            const existingEnd = addMinutes(
-              existing.date,
-              existingSlotsNeeded * DEFAULT_INTERVAL_MINUTES,
-            ).getTime();
+            const existingEnd =
+              existingStart + existing.service.durationMinutes * 60 * 1000;
 
-            // Sem sobreposição de intervalo → sem conflito, pula
-            const overlaps = newStart < existingEnd && newEnd > existingStart;
-            if (!overlaps) continue;
+            if (!overlaps(newStart, newEnd, existingStart, existingEnd))
+              continue;
 
-            // ── Caso 1: serviço EXISTENTE é corrido ──────────────────
-            // O novo booking entra no mesmo slot se ainda há vagas
+            // Serviço existente é corrido — verifica vagas
             if (existing.service.continuousSchedule) {
               const maxSlots = existing.service.maxSimultaneous ?? 1;
-
-              // Conta quantos bookings já existem nesse slot exato
-              const bookingsAtSameSlot = existingBookings.filter((b) => {
-                return (
+              const bookingsAtSameSlot = existingBookings.filter(
+                (b) =>
                   b.service.continuousSchedule &&
                   b.serviceId === existing.serviceId &&
-                  b.date.getTime() === existing.date.getTime()
-                );
-              });
-
+                  b.date.getTime() === existing.date.getTime(),
+              );
               if (bookingsAtSameSlot.length >= maxSlots) {
                 throw new Error(
                   "Este horário já atingiu o limite de vagas disponíveis.",
                 );
               }
-              // Ainda há vagas → permite continuar (não lança erro)
               continue;
             }
 
-            // ── Caso 2: serviço NOVO é corrido ───────────────────────
-            // Verifica se o novo serviço ainda tem vagas no slot solicitado
+            // Serviço novo é corrido — verifica vagas
             if (service.continuousSchedule) {
               const maxSlots = service.maxSimultaneous ?? 1;
-
-              const bookingsAtNewSlot = existingBookings.filter((b) => {
-                return (
+              const bookingsAtNewSlot = existingBookings.filter(
+                (b) =>
                   b.serviceId === serviceId &&
-                  b.date.getTime() === date.getTime()
-                );
-              });
-
+                  b.date.getTime() === date.getTime(),
+              );
               if (bookingsAtNewSlot.length >= maxSlots) {
                 throw new Error(
                   "Este horário já atingiu o limite de vagas disponíveis.",
                 );
               }
-              // Ainda há vagas → ok
               continue;
             }
 
-            // ── Caso 3: nenhum dos dois é corrido ────────────────────
-            // Conflito normal de agenda
+            // Nenhum dos dois é corrido — conflito normal
             throw new Error(
               "Este profissional já possui agendamento neste horário.",
             );
