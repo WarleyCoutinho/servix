@@ -4,14 +4,13 @@ import { protectedActionClient } from "@/lib/action-client";
 import z from "zod";
 import { prisma } from "@/lib/prisma";
 import { returnValidationErrors } from "next-safe-action";
-import { isPast, addMinutes } from "date-fns";
+import { isPast } from "date-fns";
 import { stripe } from "@/lib/stripe";
 import {
   getEffectiveFee,
   calculatePlatformFeeAmount,
 } from "@/lib/platform-fee";
 import { isAccountReadyForPayments } from "@/lib/stripe-connect";
-import { DEFAULT_INTERVAL_MINUTES } from "@/lib/schedule-utils";
 import { startOfDayBrt, endOfDayBrt } from "@/lib/timezone";
 import type Stripe from "stripe";
 
@@ -22,6 +21,16 @@ const inputSchema = z.object({
   clientName: z.string().min(2).max(100).optional(),
 });
 
+// Verifica sobreposição entre dois intervalos [aStart, aEnd) e [bStart, bEnd)
+function overlaps(
+  aStart: number,
+  aEnd: number,
+  bStart: number,
+  bEnd: number,
+): boolean {
+  return aStart < bEnd && bStart < aEnd;
+}
+
 export const createBookingCheckoutSession = protectedActionClient
   .inputSchema(inputSchema)
   .action(
@@ -30,9 +39,7 @@ export const createBookingCheckoutSession = protectedActionClient
       ctx: { user },
     }) => {
       const service = await prisma.barbershopService.findUnique({
-        where: {
-          id: serviceId,
-        },
+        where: { id: serviceId },
         include: {
           barbershop: {
             select: {
@@ -107,37 +114,44 @@ export const createBookingCheckoutSession = protectedActionClient
           date: { gte: dayStart, lte: dayEnd },
           cancelledAt: null,
         },
-        include: { service: { select: { durationMinutes: true } } },
+        include: {
+          service: {
+            select: {
+              durationMinutes: true,
+              continuousSchedule: true,
+              maxSimultaneous: true,
+            },
+          },
+        },
       });
 
-      const newDuration = service.durationMinutes;
-      const newSlotsNeeded = Math.ceil(newDuration / DEFAULT_INTERVAL_MINUTES);
+      // Verifica conflito usando sobreposição real de intervalos
       const newStart = date.getTime();
-      const newEnd = addMinutes(
-        date,
-        newSlotsNeeded * DEFAULT_INTERVAL_MINUTES,
-      ).getTime();
+      const newEnd = newStart + service.durationMinutes * 60 * 1000;
 
       for (const existing of existingBookings) {
-        const existingDuration = existing.service.durationMinutes;
-        const existingSlotsNeeded = Math.ceil(
-          existingDuration / DEFAULT_INTERVAL_MINUTES,
-        );
         const existingStart = existing.date.getTime();
-        const existingEnd = addMinutes(
-          existing.date,
-          existingSlotsNeeded * DEFAULT_INTERVAL_MINUTES,
-        ).getTime();
+        const existingEnd =
+          existingStart + existing.service.durationMinutes * 60 * 1000;
 
-        if (newStart < existingEnd && newEnd > existingStart) {
-          returnValidationErrors(inputSchema, {
-            date: {
-              _errors: [
-                "Este profissional já possui agendamento neste horário.",
-              ],
-            },
-          });
+        if (!overlaps(newStart, newEnd, existingStart, existingEnd)) continue;
+
+        // Se o serviço existente é horário corrido, verifica se ainda tem vagas
+        if (existing.service.continuousSchedule) {
+          const concurrent = existingBookings.filter((b) => {
+            const bStart = b.date.getTime();
+            const bEnd = bStart + b.service.durationMinutes * 60 * 1000;
+            return overlaps(newStart, newEnd, bStart, bEnd);
+          }).length;
+
+          if (concurrent < (existing.service.maxSimultaneous ?? 1)) continue;
         }
+
+        returnValidationErrors(inputSchema, {
+          date: {
+            _errors: ["Este profissional já possui agendamento neste horário."],
+          },
+        });
       }
 
       const feeResult = getEffectiveFee(service.barbershop);
@@ -149,12 +163,8 @@ export const createBookingCheckoutSession = protectedActionClient
       const paymentMethods: Stripe.Checkout.SessionCreateParams.PaymentMethodType[] =
         [];
 
-      if (professional.acceptsPix) {
-        paymentMethods.push("pix");
-      }
-      if (professional.acceptsCard) {
-        paymentMethods.push("card");
-      }
+      if (professional.acceptsPix) paymentMethods.push("pix");
+      if (professional.acceptsCard) paymentMethods.push("card");
 
       if (paymentMethods.length === 0) {
         throw new Error(
@@ -207,9 +217,7 @@ export const createBookingCheckoutSession = protectedActionClient
 
         if (methods.includes("pix")) {
           params.payment_method_options = {
-            pix: {
-              expires_after_seconds: 1800,
-            },
+            pix: { expires_after_seconds: 1800 },
           };
         }
 
@@ -227,6 +235,7 @@ export const createBookingCheckoutSession = protectedActionClient
 
       let checkoutSession;
       let pixFallback = false;
+
       try {
         checkoutSession = await stripe.checkout.sessions.create(
           buildSessionParams(paymentMethods),

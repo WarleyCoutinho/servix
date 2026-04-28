@@ -6,16 +6,20 @@ import { getAvailableSlots } from "@/actions/schedules/get-available-slots";
 import { createBooking } from "@/actions/create-booking";
 import { formatBrt, startOfDayBrt, endOfDayBrt } from "@/lib/timezone";
 import { stripe } from "@/lib/stripe";
-import { getEffectiveFee, calculatePlatformFeeAmount } from "@/lib/platform-fee";
+import {
+  getEffectiveFee,
+  calculatePlatformFeeAmount,
+} from "@/lib/platform-fee";
 import { isAccountReadyForPayments } from "@/lib/stripe-connect";
-import { isPast, addMinutes } from "date-fns";
-import { DEFAULT_INTERVAL_MINUTES } from "@/lib/schedule-utils";
+import { isPast } from "date-fns";
 import type Stripe from "stripe";
 
 function levenshtein(a: string, b: string): number {
   const m = a.length;
   const n = b.length;
-  const dp: number[][] = Array.from({ length: m + 1 }, () => Array(n + 1).fill(0));
+  const dp: number[][] = Array.from({ length: m + 1 }, () =>
+    Array(n + 1).fill(0),
+  );
   for (let i = 0; i <= m; i++) dp[i][0] = i;
   for (let j = 0; j <= n; j++) dp[0][j] = j;
   for (let i = 1; i <= m; i++) {
@@ -48,10 +52,13 @@ export const POST = async (request: Request) => {
   }
 
   if (session.user.role !== "client") {
-    return new Response(JSON.stringify({ error: "Acesso restrito a clientes" }), {
-      status: 403,
-      headers: { "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({ error: "Acesso restrito a clientes" }),
+      {
+        status: 403,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
   }
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL;
@@ -59,11 +66,11 @@ export const POST = async (request: Request) => {
   const { messages } = await request.json();
 
   try {
-  const result = streamText({
-    model: getAIModel(),
-    messages: await convertToModelMessages(messages),
-    stopWhen: stepCountIs(10),
-    system: `Você é o Agenda.ai, assistente virtual de agendamento do Servix — plataforma SaaS para barbearias, salões de beleza e estética.
+    const result = streamText({
+      model: getAIModel(),
+      messages: await convertToModelMessages(messages),
+      stopWhen: stepCountIs(10),
+      system: `Você é o Agenda.ai, assistente virtual de agendamento do Servix — plataforma SaaS para barbearias, salões de beleza e estética.
 
     DATA ATUAL: Hoje é ${formatBrt(new Date(), "EEEE, d 'de' MMMM 'de' yyyy")} (${formatBrt(new Date(), "yyyy-MM-dd")})
 
@@ -139,392 +146,475 @@ export const POST = async (request: Request) => {
     - SEMPRE passe pela etapa de seleção de profissional antes de verificar horários
     - SEMPRE pergunte a forma de pagamento antes de criar a reserva - NUNCA pule esta etapa
     - Se o usuário perguntar algo sobre o Servix (planos, como configurar, etc.), responda brevemente e redirecione para o chat de suporte ou o manual do sistema`,
-    tools: {
-      searchBarbershops: tool({
-        description:
-          "Pesquisa barbearias pelo nome. Se nenhum nome é passado, retorna todas as barbearias.",
-        inputSchema: z.object({
-          name: z
-            .string()
-            .optional()
-            .describe(
-              "O nome da barbearia a ser pesquisada. Se nenhum nome é passado, retorna todas as barbearias.",
-            ),
-        }),
-        execute: async ({ name }) => {
-          console.log("searchBarbershops", name);
-          const trimmed = name?.trim();
+      tools: {
+        searchBarbershops: tool({
+          description:
+            "Pesquisa barbearias pelo nome. Se nenhum nome é passado, retorna todas as barbearias.",
+          inputSchema: z.object({
+            name: z
+              .string()
+              .optional()
+              .describe(
+                "O nome da barbearia a ser pesquisada. Se nenhum nome é passado, retorna todas as barbearias.",
+              ),
+          }),
+          execute: async ({ name }) => {
+            console.log("searchBarbershops", name);
+            const trimmed = name?.trim();
 
-          if (!trimmed) {
+            if (!trimmed) {
+              const { data: barbershops, error } = await safeQuery(
+                () =>
+                  prisma.barbershop.findMany({
+                    where: { isActive: true },
+                    include: { services: true },
+                  }),
+                [],
+              );
+              if (error) {
+                return {
+                  error:
+                    "Não foi possível buscar as barbearias. Por favor, tente novamente.",
+                };
+              }
+              return barbershops;
+            }
+
+            const words = trimmed.split(/\s+/);
+            const searchConditions = words.flatMap((word) => [
+              { name: { contains: word, mode: "insensitive" as const } },
+              { name: { startsWith: word, mode: "insensitive" as const } },
+            ]);
+
             const { data: barbershops, error } = await safeQuery(
+              () =>
+                prisma.barbershop.findMany({
+                  where: {
+                    isActive: true,
+                    OR: searchConditions,
+                  },
+                  include: { services: true },
+                }),
+              [],
+            );
+
+            if (error) {
+              return {
+                error:
+                  "Não foi possível buscar as barbearias. Por favor, tente novamente.",
+              };
+            }
+
+            if (barbershops.length > 0) {
+              return barbershops;
+            }
+
+            // Fallback: busca todas e filtra por similaridade (fuzzy)
+            const { data: allBarbershops, error: allError } = await safeQuery(
               () =>
                 prisma.barbershop.findMany({
                   where: { isActive: true },
                   include: { services: true },
                 }),
-              []
+              [],
             );
-            if (error) {
-              return { error: "Não foi possível buscar as barbearias. Por favor, tente novamente." };
+
+            if (allError) {
+              return {
+                error:
+                  "Não foi possível buscar as barbearias. Por favor, tente novamente.",
+              };
             }
-            return barbershops;
-          }
 
-          const words = trimmed.split(/\s+/);
-          const searchConditions = words.flatMap((word) => [
-            { name: { contains: word, mode: "insensitive" as const } },
-            { name: { startsWith: word, mode: "insensitive" as const } },
-          ]);
+            const normalize = (s: string) =>
+              s
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "");
 
-          const { data: barbershops, error } = await safeQuery(
-            () =>
-              prisma.barbershop.findMany({
-                where: {
-                  isActive: true,
-                  OR: searchConditions,
-                },
-                include: { services: true },
-              }),
-            []
-          );
+            const normalizedSearch = normalize(trimmed);
+            const fuzzyResults = allBarbershops.filter((b) => {
+              const normalizedName = normalize(b.name);
+              // Checa se alguma palavra do nome começa com o termo buscado ou vice-versa
+              const nameWords = normalizedName.split(/\s+/);
+              return (
+                normalizedName.includes(normalizedSearch) ||
+                normalizedSearch.includes(normalizedName) ||
+                nameWords.some(
+                  (w) =>
+                    w.startsWith(normalizedSearch) ||
+                    normalizedSearch.startsWith(w),
+                ) ||
+                words.some((searchWord) => {
+                  const nw = normalize(searchWord);
+                  return nameWords.some(
+                    (w) =>
+                      w.startsWith(nw) ||
+                      nw.startsWith(w) ||
+                      levenshtein(w, nw) <= 2,
+                  );
+                })
+              );
+            });
 
-          if (error) {
-            return { error: "Não foi possível buscar as barbearias. Por favor, tente novamente." };
-          }
-
-          if (barbershops.length > 0) {
-            return barbershops;
-          }
-
-          // Fallback: busca todas e filtra por similaridade (fuzzy)
-          const { data: allBarbershops, error: allError } = await safeQuery(
-            () =>
-              prisma.barbershop.findMany({
-                where: { isActive: true },
-                include: { services: true },
-              }),
-            []
-          );
-
-          if (allError) {
-            return { error: "Não foi possível buscar as barbearias. Por favor, tente novamente." };
-          }
-
-          const normalize = (s: string) =>
-            s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-
-          const normalizedSearch = normalize(trimmed);
-          const fuzzyResults = allBarbershops.filter((b) => {
-            const normalizedName = normalize(b.name);
-            // Checa se alguma palavra do nome começa com o termo buscado ou vice-versa
-            const nameWords = normalizedName.split(/\s+/);
-            return (
-              normalizedName.includes(normalizedSearch) ||
-              normalizedSearch.includes(normalizedName) ||
-              nameWords.some(
-                (w) => w.startsWith(normalizedSearch) || normalizedSearch.startsWith(w)
-              ) ||
-              words.some((searchWord) => {
-                const nw = normalize(searchWord);
-                return nameWords.some(
-                  (w) => w.startsWith(nw) || nw.startsWith(w) || levenshtein(w, nw) <= 2
-                );
-              })
-            );
-          });
-
-          return fuzzyResults;
-        },
-      }),
-      getProfessionalsForBarbershop: tool({
-        description:
-          "Lista os profissionais ativos de uma barbearia específica.",
-        inputSchema: z.object({
-          barbershopId: z.string().uuid(),
+            return fuzzyResults;
+          },
         }),
-        execute: async ({ barbershopId }) => {
-          console.log("getProfessionalsForBarbershop", barbershopId);
-          const { data: professionals, error } = await safeQuery(
-            () =>
-              prisma.professional.findMany({
-                where: {
-                  barbershopId,
-                  isActive: true,
-                },
-                include: {
-                  user: {
-                    select: { name: true, image: true },
+        getProfessionalsForBarbershop: tool({
+          description:
+            "Lista os profissionais ativos de uma barbearia específica.",
+          inputSchema: z.object({
+            barbershopId: z.string().uuid(),
+          }),
+          execute: async ({ barbershopId }) => {
+            console.log("getProfessionalsForBarbershop", barbershopId);
+            const { data: professionals, error } = await safeQuery(
+              () =>
+                prisma.professional.findMany({
+                  where: {
+                    barbershopId,
+                    isActive: true,
                   },
-                },
-                orderBy: { displayName: "asc" },
-              }),
-            []
-          );
+                  include: {
+                    user: {
+                      select: { name: true, image: true },
+                    },
+                  },
+                  orderBy: { displayName: "asc" },
+                }),
+              [],
+            );
 
-          if (error) {
-            return { error: "Não foi possível buscar os profissionais." };
-          }
+            if (error) {
+              return { error: "Não foi possível buscar os profissionais." };
+            }
 
-          return professionals.map((p) => ({
-            id: p.id,
-            name: p.displayName ?? p.user.name,
-            acceptsPix: p.acceptsPix,
-            acceptsCard: p.acceptsCard,
-            acceptsPayAfterService: p.acceptsPayAfterService,
-          }));
-        },
-      }),
-      getAvailableTimeSlotsForProfessional: tool({
-        description:
-          "Obtém os horários disponíveis para um profissional específico em uma data.",
-        inputSchema: z.object({
-          barbershopId: z.string().uuid(),
-          professionalId: z.string().uuid(),
-          date: z
-            .string()
-            .describe(
-              "A data no formato ISO (YYYY-MM-DD) para a qual você deseja verificar os horários disponíveis.",
-            ),
+            return professionals.map((p) => ({
+              id: p.id,
+              name: p.displayName ?? p.user.name,
+              acceptsPix: p.acceptsPix,
+              acceptsCard: p.acceptsCard,
+              acceptsPayAfterService: p.acceptsPayAfterService,
+            }));
+          },
         }),
-        execute: async ({ barbershopId, professionalId, date }) => {
-          console.log("getAvailableTimeSlotsForProfessional", barbershopId, professionalId, date);
-          const result = await getAvailableSlots({
-            barbershopId,
-            professionalId,
-            date: new Date(date),
-          });
-          return {
-            barbershopId,
+        getAvailableTimeSlotsForProfessional: tool({
+          description:
+            "Obtém os horários disponíveis para um profissional específico em uma data.",
+          inputSchema: z.object({
+            barbershopId: z.string().uuid(),
+            professionalId: z.string().uuid(),
+            date: z
+              .string()
+              .describe(
+                "A data no formato ISO (YYYY-MM-DD) para a qual você deseja verificar os horários disponíveis.",
+              ),
+          }),
+          execute: async ({ barbershopId, professionalId, date }) => {
+            console.log(
+              "getAvailableTimeSlotsForProfessional",
+              barbershopId,
+              professionalId,
+              date,
+            );
+            const result = await getAvailableSlots({
+              barbershopId,
+              professionalId,
+              date: new Date(date),
+            });
+            return {
+              barbershopId,
+              professionalId,
+              date,
+              availableTimeSlots: result?.data?.slots ?? [],
+              message: result?.data?.message,
+            };
+          },
+        }),
+        createBooking: tool({
+          description:
+            "Cria um novo agendamento para um serviço e profissional específico em uma data. Sempre inclua o paymentMethod escolhido pelo usuário.",
+          inputSchema: z.object({
+            serviceId: z.uuid(),
+            professionalId: z.uuid(),
+            date: z
+              .string()
+              .describe(
+                "A data e hora no formato ISO (YYYY-MM-DDTHH:mm:ss) para o agendamento.",
+              ),
+            paymentMethod: z
+              .enum(["online", "pay_after_service"])
+              .describe(
+                "Forma de pagamento: 'online' para PIX/cartão via Stripe, 'pay_after_service' para pagamento presencial após o serviço.",
+              ),
+          }),
+          execute: async ({
+            serviceId,
             professionalId,
             date,
-            availableTimeSlots: result?.data?.slots ?? [],
-            message: result?.data?.message,
-          };
-        },
-      }),
-      createBooking: tool({
-        description:
-          "Cria um novo agendamento para um serviço e profissional específico em uma data. Sempre inclua o paymentMethod escolhido pelo usuário.",
-        inputSchema: z.object({
-          serviceId: z.uuid(),
-          professionalId: z.uuid(),
-          date: z
-            .string()
-            .describe(
-              "A data e hora no formato ISO (YYYY-MM-DDTHH:mm:ss) para o agendamento.",
-            ),
-          paymentMethod: z
-            .enum(["online", "pay_after_service"])
-            .describe(
-              "Forma de pagamento: 'online' para PIX/cartão via Stripe, 'pay_after_service' para pagamento presencial após o serviço.",
-            ),
-        }),
-        execute: async ({ serviceId, professionalId, date, paymentMethod }) => {
-          console.log("createBooking", serviceId, professionalId, date, paymentMethod);
-          try {
-            const bookingDate = new Date(date);
+            paymentMethod,
+          }) => {
+            console.log(
+              "createBooking",
+              serviceId,
+              professionalId,
+              date,
+              paymentMethod,
+            );
+            try {
+              const bookingDate = new Date(date);
 
-            if (paymentMethod === "pay_after_service") {
-              const result = await createBooking({
-                serviceId,
-                professionalId,
-                date: bookingDate,
-                payAfterService: true,
+              if (paymentMethod === "pay_after_service") {
+                const result = await createBooking({
+                  serviceId,
+                  professionalId,
+                  date: bookingDate,
+                  payAfterService: true,
+                });
+
+                if (!result) {
+                  return {
+                    success: false,
+                    error:
+                      "Erro ao criar agendamento. Por favor, tente novamente.",
+                  };
+                }
+                if (result.validationErrors) {
+                  const errors = result.validationErrors;
+                  const firstError =
+                    errors._errors?.[0] ||
+                    Object.values(errors).find(
+                      (v): v is { _errors: string[] } =>
+                        v != null &&
+                        typeof v === "object" &&
+                        "_errors" in v &&
+                        Array.isArray((v as { _errors?: unknown })._errors),
+                    )?._errors?.[0];
+                  return {
+                    success: false,
+                    error: firstError || "Erro de validação no agendamento.",
+                  };
+                }
+                if (result.serverError) {
+                  return { success: false, error: result.serverError };
+                }
+
+                return {
+                  success: true,
+                  paymentMethod: "pay_after_service",
+                };
+              }
+
+              // Pagamento online — criar sessão Stripe com URL de produção
+              const service = await prisma.barbershopService.findUnique({
+                where: { id: serviceId },
+                include: {
+                  barbershop: {
+                    select: {
+                      id: true,
+                      name: true,
+                      createdAt: true,
+                      platformFeePercentage: true,
+                      feeOverride: true,
+                    },
+                  },
+                },
+              });
+              if (!service) {
+                return { success: false, error: "Serviço não encontrado." };
+              }
+
+              if (isPast(bookingDate)) {
+                return {
+                  success: false,
+                  error: "Data e hora selecionadas já passaram.",
+                };
+              }
+
+              const professional = await prisma.professional.findUnique({
+                where: { id: professionalId },
+              });
+              if (!professional || !professional.isActive) {
+                return {
+                  success: false,
+                  error: "Profissional não encontrado ou indisponível.",
+                };
+              }
+              if (professional.barbershopId !== service.barbershopId) {
+                return {
+                  success: false,
+                  error: "Profissional não pertence a esta barbearia.",
+                };
+              }
+              if (
+                !professional.stripeAccountId ||
+                !isAccountReadyForPayments(professional.stripeAccountStatus)
+              ) {
+                return {
+                  success: false,
+                  error:
+                    "Este profissional ainda não configurou o recebimento de pagamentos. Por favor, escolha outro profissional.",
+                };
+              }
+
+              const dayStart = startOfDayBrt(bookingDate);
+              const dayEnd = endOfDayBrt(bookingDate);
+              const existingBookings = await prisma.booking.findMany({
+                where: {
+                  professionalId,
+                  date: { gte: dayStart, lte: dayEnd },
+                  cancelledAt: null,
+                },
+                include: { service: { select: { durationMinutes: true } } },
               });
 
-              if (!result) {
-                return { success: false, error: "Erro ao criar agendamento. Por favor, tente novamente." };
-              }
-              if (result.validationErrors) {
-                const errors = result.validationErrors;
-                const firstError =
-                  errors._errors?.[0] ||
-                  Object.values(errors).find(
-                    (v): v is { _errors: string[] } =>
-                      v != null && typeof v === "object" && "_errors" in v && Array.isArray((v as { _errors?: unknown })._errors),
-                  )?._errors?.[0];
-                return { success: false, error: firstError || "Erro de validação no agendamento." };
-              }
-              if (result.serverError) {
-                return { success: false, error: result.serverError };
-              }
+              const newStart = bookingDate.getTime();
+              const newEnd = newStart + service.durationMinutes * 60 * 1000;
 
-              return {
-                success: true,
-                paymentMethod: "pay_after_service",
-              };
-            }
-
-            // Pagamento online — criar sessão Stripe com URL de produção
-            const service = await prisma.barbershopService.findUnique({
-              where: { id: serviceId },
-              include: { barbershop: { select: { id: true, name: true, createdAt: true, platformFeePercentage: true, feeOverride: true } } },
-            });
-            if (!service) {
-              return { success: false, error: "Serviço não encontrado." };
-            }
-
-            if (isPast(bookingDate)) {
-              return { success: false, error: "Data e hora selecionadas já passaram." };
-            }
-
-            const professional = await prisma.professional.findUnique({
-              where: { id: professionalId },
-            });
-            if (!professional || !professional.isActive) {
-              return { success: false, error: "Profissional não encontrado ou indisponível." };
-            }
-            if (professional.barbershopId !== service.barbershopId) {
-              return { success: false, error: "Profissional não pertence a esta barbearia." };
-            }
-            if (!professional.stripeAccountId || !isAccountReadyForPayments(professional.stripeAccountStatus)) {
-              return { success: false, error: "Este profissional ainda não configurou o recebimento de pagamentos. Por favor, escolha outro profissional." };
-            }
-
-            const dayStart = startOfDayBrt(bookingDate);
-            const dayEnd = endOfDayBrt(bookingDate);
-            const existingBookings = await prisma.booking.findMany({
-              where: {
-                professionalId,
-                date: { gte: dayStart, lte: dayEnd },
-                cancelledAt: null,
-              },
-              include: { service: { select: { durationMinutes: true } } },
-            });
-
-            const newDuration = service.durationMinutes;
-            const newSlotsNeeded = Math.ceil(newDuration / DEFAULT_INTERVAL_MINUTES);
-            const newStart = bookingDate.getTime();
-            const newEnd = addMinutes(bookingDate, newSlotsNeeded * DEFAULT_INTERVAL_MINUTES).getTime();
-
-            for (const existing of existingBookings) {
-              const existingDuration = existing.service.durationMinutes;
-              const existingSlotsNeeded = Math.ceil(existingDuration / DEFAULT_INTERVAL_MINUTES);
-              const existingStart = existing.date.getTime();
-              const existingEnd = addMinutes(existing.date, existingSlotsNeeded * DEFAULT_INTERVAL_MINUTES).getTime();
-
-              if (newStart < existingEnd && newEnd > existingStart) {
-                return { success: false, error: "Este profissional já possui agendamento neste horário." };
-              }
-            }
-
-            const feeResult = getEffectiveFee(service.barbershop);
-            const applicationFeeAmount = calculatePlatformFeeAmount(
-              service.priceInCents,
-              feeResult.feePercentage,
-            );
-
-            const paymentMethods: Stripe.Checkout.SessionCreateParams.PaymentMethodType[] = [];
-            if (professional.acceptsPix) paymentMethods.push("pix");
-            if (professional.acceptsCard) paymentMethods.push("card");
-
-            if (paymentMethods.length === 0) {
-              return { success: false, error: "Nenhuma forma de pagamento online disponível para este profissional." };
-            }
-
-            const buildSessionParams = (
-              methods: Stripe.Checkout.SessionCreateParams.PaymentMethodType[]
-            ): Stripe.Checkout.SessionCreateParams => {
-              const params: Stripe.Checkout.SessionCreateParams = {
-                payment_method_types: methods,
-                mode: "payment",
-                success_url: `${appUrl}/bookings?success=true`,
-                cancel_url: `${appUrl}`,
-                metadata: {
-                  serviceId: service.id,
-                  barbershopId: service.barbershopId,
-                  userId: session.user.id,
-                  date: bookingDate.toISOString(),
-                  professionalId: professional.id,
-                  priceInCents: service.priceInCents.toString(),
-                  applicationFeeInCents: applicationFeeAmount.toString(),
-                },
-                line_items: [
-                  {
-                    price_data: {
-                      currency: "brl",
-                      unit_amount: service.priceInCents,
-                      product_data: {
-                        name: `${service.barbershop.name} - ${service.name}`,
-                        description: service.description,
-                        images: [service.imageUrl],
-                      },
-                    },
-                    quantity: 1,
-                  },
-                ],
-                payment_intent_data: {},
-              };
-
-              if (methods.includes("pix")) {
-                params.payment_method_options = {
-                  pix: { expires_after_seconds: 1800 },
-                };
+              for (const existing of existingBookings) {
+                const existingStart = existing.date.getTime();
+                const existingEnd =
+                  existingStart + existing.service.durationMinutes * 60 * 1000;
+                if (newStart < existingEnd && newEnd > existingStart) {
+                  return {
+                    success: false,
+                    error:
+                      "Este profissional já possui agendamento neste horário.",
+                  };
+                }
               }
 
-              if (professional.stripeAccountId) {
-                params.payment_intent_data = {
-                  application_fee_amount: applicationFeeAmount,
-                  transfer_data: {
-                    destination: professional.stripeAccountId,
-                  },
-                };
-              }
-
-              return params;
-            };
-
-            let checkoutSession;
-            let pixFallback = false;
-            try {
-              checkoutSession = await stripe.checkout.sessions.create(
-                buildSessionParams(paymentMethods)
+              const feeResult = getEffectiveFee(service.barbershop);
+              const applicationFeeAmount = calculatePlatformFeeAmount(
+                service.priceInCents,
+                feeResult.feePercentage,
               );
-            } catch (stripeError) {
-              console.error("Stripe checkout error:", stripeError);
-              const errorMessage = stripeError instanceof Error ? stripeError.message.toLowerCase() : "";
-              const isPixError =
-                errorMessage.includes("pix") ||
-                errorMessage.includes("payment_method") ||
-                errorMessage.includes("payment method");
 
-              if (isPixError && paymentMethods.includes("pix")) {
-                console.warn("PIX unavailable, falling back to card-only");
-                pixFallback = true;
-                checkoutSession = await stripe.checkout.sessions.create(
-                  buildSessionParams(["card"])
-                );
-              } else {
-                return { success: false, error: "Não foi possível gerar o link de pagamento." };
+              const paymentMethods: Stripe.Checkout.SessionCreateParams.PaymentMethodType[] =
+                [];
+              if (professional.acceptsPix) paymentMethods.push("pix");
+              if (professional.acceptsCard) paymentMethods.push("card");
+
+              if (paymentMethods.length === 0) {
+                return {
+                  success: false,
+                  error:
+                    "Nenhuma forma de pagamento online disponível para este profissional.",
+                };
               }
-            }
 
-            if (checkoutSession?.url) {
+              const buildSessionParams = (
+                methods: Stripe.Checkout.SessionCreateParams.PaymentMethodType[],
+              ): Stripe.Checkout.SessionCreateParams => {
+                const params: Stripe.Checkout.SessionCreateParams = {
+                  payment_method_types: methods,
+                  mode: "payment",
+                  success_url: `${appUrl}/bookings?success=true`,
+                  cancel_url: `${appUrl}`,
+                  metadata: {
+                    serviceId: service.id,
+                    barbershopId: service.barbershopId,
+                    userId: session.user.id,
+                    date: bookingDate.toISOString(),
+                    professionalId: professional.id,
+                    priceInCents: service.priceInCents.toString(),
+                    applicationFeeInCents: applicationFeeAmount.toString(),
+                  },
+                  line_items: [
+                    {
+                      price_data: {
+                        currency: "brl",
+                        unit_amount: service.priceInCents,
+                        product_data: {
+                          name: `${service.barbershop.name} - ${service.name}`,
+                          description: service.description,
+                          images: [service.imageUrl],
+                        },
+                      },
+                      quantity: 1,
+                    },
+                  ],
+                  payment_intent_data: {},
+                };
+
+                if (methods.includes("pix")) {
+                  params.payment_method_options = {
+                    pix: { expires_after_seconds: 1800 },
+                  };
+                }
+
+                if (professional.stripeAccountId) {
+                  params.payment_intent_data = {
+                    application_fee_amount: applicationFeeAmount,
+                    transfer_data: {
+                      destination: professional.stripeAccountId,
+                    },
+                  };
+                }
+
+                return params;
+              };
+
+              let checkoutSession;
+              let pixFallback = false;
+              try {
+                checkoutSession = await stripe.checkout.sessions.create(
+                  buildSessionParams(paymentMethods),
+                );
+              } catch (stripeError) {
+                console.error("Stripe checkout error:", stripeError);
+                const errorMessage =
+                  stripeError instanceof Error
+                    ? stripeError.message.toLowerCase()
+                    : "";
+                const isPixError =
+                  errorMessage.includes("pix") ||
+                  errorMessage.includes("payment_method") ||
+                  errorMessage.includes("payment method");
+
+                if (isPixError && paymentMethods.includes("pix")) {
+                  console.warn("PIX unavailable, falling back to card-only");
+                  pixFallback = true;
+                  checkoutSession = await stripe.checkout.sessions.create(
+                    buildSessionParams(["card"]),
+                  );
+                } else {
+                  return {
+                    success: false,
+                    error: "Não foi possível gerar o link de pagamento.",
+                  };
+                }
+              }
+
+              if (checkoutSession?.url) {
+                return {
+                  success: true,
+                  paymentMethod: "online",
+                  checkoutUrl: checkoutSession.url,
+                  pixFallback,
+                };
+              }
+
               return {
-                success: true,
-                paymentMethod: "online",
-                checkoutUrl: checkoutSession.url,
-                pixFallback,
+                success: false,
+                error: "Não foi possível gerar o link de pagamento.",
+              };
+            } catch (error) {
+              console.error("createBooking error", error);
+              const message =
+                error instanceof Error
+                  ? error.message
+                  : "Erro inesperado ao criar agendamento.";
+              return {
+                success: false,
+                error: message,
               };
             }
-
-            return {
-              success: false,
-              error: "Não foi possível gerar o link de pagamento.",
-            };
-          } catch (error) {
-            console.error("createBooking error", error);
-            const message = error instanceof Error ? error.message : "Erro inesperado ao criar agendamento.";
-            return {
-              success: false,
-              error: message,
-            };
-          }
-        },
-      }),
-    },
-  });
-  return result.toUIMessageStreamResponse();
+          },
+        }),
+      },
+    });
+    return result.toUIMessageStreamResponse();
   } catch (error) {
     console.error("Chat AI error:", error);
 

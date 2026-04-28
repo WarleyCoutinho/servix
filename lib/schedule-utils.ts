@@ -14,3 +14,6 @@ export function getDayOfWeekFromDate(date: Date): DayOfWeek {
   };
   return mapping[day];
 }
+
+// Intervalo fixo de 30min para visualização da agenda no WhatsApp
+export const DISPLAY_INTERVAL_MINUTES = 30;
