@@ -2,15 +2,27 @@
 
 import { actionClient } from "@/lib/action-client";
 import { prisma } from "@/lib/prisma";
+import { getDayOfWeekFromDate } from "@/lib/schedule-utils";
 import {
-  DEFAULT_INTERVAL_MINUTES,
-  generateTimeSlots,
-  getDayOfWeekFromDate,
-} from "@/lib/schedule-utils";
-import { startOfDayBrt, endOfDayBrt, formatBrt, isTodayBrt } from "@/lib/timezone";
-import { addMinutes } from "date-fns";
+  startOfDayBrt,
+  endOfDayBrt,
+  formatBrt,
+  isTodayBrt,
+  TIMEZONE,
+} from "@/lib/timezone";
+import {
+  addMinutes,
+  format,
+  setHours,
+  setMinutes,
+  startOfDay,
+  isBefore,
+} from "date-fns";
+import { toZonedTime } from "date-fns-tz";
 import { returnValidationErrors } from "next-safe-action";
 import { z } from "zod";
+
+const MIN_SERVICE_DURATION = 5;
 
 const inputSchema = z.object({
   barbershopId: z.uuid(),
@@ -19,139 +31,197 @@ const inputSchema = z.object({
   serviceId: z.uuid().optional(),
 });
 
+// Gera slots usando a duração real do serviço como intervalo
+// Ex: 45min → 09:00, 09:45, 10:30 | 20min → 09:00, 09:20, 09:40
+function generateDynamicSlots(
+  date: Date,
+  startTime: string,
+  endTime: string,
+  intervalMinutes: number,
+): string[] {
+  const interval = Math.max(intervalMinutes, MIN_SERVICE_DURATION);
+  const slots: string[] = [];
+
+  const [startH, startM] = startTime.split(":").map(Number);
+  const [endH, endM] = endTime.split(":").map(Number);
+
+  const dayStart = startOfDay(toZonedTime(date, TIMEZONE));
+  let current = setMinutes(setHours(dayStart, startH), startM);
+  const end = setMinutes(setHours(dayStart, endH), endM);
+
+  while (isBefore(current, end)) {
+    const slotEnd = addMinutes(current, interval);
+    // Só adiciona se o serviço termina dentro ou exatamente no fim do expediente
+    if (isBefore(slotEnd, end) || slotEnd.getTime() === end.getTime()) {
+      slots.push(format(current, "HH:mm"));
+    }
+    current = addMinutes(current, interval);
+  }
+
+  return slots;
+}
+
+// Converte "HH:mm" em minutos desde meia-noite
+function toMinutes(time: string): number {
+  const [h, m] = time.split(":").map(Number);
+  return h * 60 + m;
+}
+
+// Verifica sobreposição entre dois intervalos [aStart, aEnd) e [bStart, bEnd)
+function overlaps(
+  aStart: number,
+  aEnd: number,
+  bStart: number,
+  bEnd: number,
+): boolean {
+  return aStart < bEnd && bStart < aEnd;
+}
+
 export const getAvailableSlots = actionClient
   .inputSchema(inputSchema)
-  .action(async ({ parsedInput: { barbershopId, professionalId, date, serviceId } }) => {
-    const now = new Date();
+  .action(
+    async ({
+      parsedInput: { barbershopId, professionalId, date, serviceId },
+    }) => {
+      const now = new Date();
+      const dayStart = startOfDayBrt(date);
+      const dayEnd = endOfDayBrt(date);
 
-    const dayStart = startOfDayBrt(date);
-    const dayEnd = endOfDayBrt(date);
-
-    if (dayEnd < now) {
-      return { slots: [], message: "Data passada." };
-    }
-
-    const dayOfWeek = getDayOfWeekFromDate(date);
-
-    const professional = await prisma.professional.findUnique({
-      where: { id: professionalId },
-      include: {
-        schedules: {
-          where: { dayOfWeek },
-        },
-      },
-    });
-
-    if (!professional) {
-      returnValidationErrors(inputSchema, {
-        professionalId: { _errors: ["Profissional não encontrado."] },
-      });
-    }
-
-    if (!professional.isActive) {
-      return { slots: [], message: "Profissional não disponível." };
-    }
-
-    if (professional.barbershopId !== barbershopId) {
-      returnValidationErrors(inputSchema, {
-        professionalId: {
-          _errors: ["Profissional não pertence a esta barbearia."],
-        },
-      });
-    }
-
-    const professionalSchedule = professional.schedules[0];
-
-    if (!professionalSchedule || !professionalSchedule.isAvailable) {
-      return {
-        slots: [],
-        message: "Profissional não trabalha neste dia.",
-      };
-    }
-
-    let slots = generateTimeSlots(
-      date,
-      professionalSchedule.startTime,
-      professionalSchedule.endTime,
-      DEFAULT_INTERVAL_MINUTES,
-    );
-
-    // Filtrar slots que caem no intervalo de almoço
-    if (professionalSchedule.hasLunchBreak) {
-      slots = slots.filter(
-        (slot) =>
-          slot < professionalSchedule.lunchStartTime ||
-          slot >= professionalSchedule.lunchEndTime,
-      );
-    }
-
-    // Fetch booked bookings WITH service duration
-    const bookedBookings = await prisma.booking.findMany({
-      where: {
-        professionalId,
-        date: {
-          gte: dayStart,
-          lte: dayEnd,
-        },
-        cancelledAt: null,
-      },
-      select: {
-        date: true,
-        service: { select: { durationMinutes: true } },
-      },
-    });
-
-    // Build a set of ALL occupied time slots (considering duration)
-    const occupiedSlots = new Set<string>();
-    for (const booking of bookedBookings) {
-      const duration = booking.service.durationMinutes;
-      const slotsNeeded = Math.ceil(duration / DEFAULT_INTERVAL_MINUTES);
-      const startTime = formatBrt(booking.date, "HH:mm");
-      occupiedSlots.add(startTime);
-
-      // Mark additional slots that the service occupies
-      for (let i = 1; i < slotsNeeded; i++) {
-        const nextSlotDate = addMinutes(booking.date, i * DEFAULT_INTERVAL_MINUTES);
-        occupiedSlots.add(formatBrt(nextSlotDate, "HH:mm"));
+      if (dayEnd < now) {
+        return { slots: [], message: "Data passada." };
       }
-    }
 
-    // Get the service being booked (if provided) for forward-looking check
-    let newServiceDuration = DEFAULT_INTERVAL_MINUTES;
-    if (serviceId) {
-      const service = await prisma.barbershopService.findUnique({
-        where: { id: serviceId },
-        select: { durationMinutes: true },
+      const dayOfWeek = getDayOfWeekFromDate(date);
+
+      const professional = await prisma.professional.findUnique({
+        where: { id: professionalId },
+        include: {
+          schedules: { where: { dayOfWeek } },
+        },
       });
-      if (service) {
-        newServiceDuration = service.durationMinutes;
+
+      if (!professional) {
+        returnValidationErrors(inputSchema, {
+          professionalId: { _errors: ["Profissional não encontrado."] },
+        });
       }
-    }
 
-    const newServiceSlotsNeeded = Math.ceil(newServiceDuration / DEFAULT_INTERVAL_MINUTES);
+      if (!professional.isActive) {
+        return { slots: [], message: "Profissional não disponível." };
+      }
 
-    // Filter slots: a slot is available only if ALL slots it would occupy are free
-    slots = slots.filter((slot) => {
-      // Check if this slot itself is occupied
-      if (occupiedSlots.has(slot)) return false;
+      if (professional.barbershopId !== barbershopId) {
+        returnValidationErrors(inputSchema, {
+          professionalId: {
+            _errors: ["Profissional não pertence a esta barbearia."],
+          },
+        });
+      }
 
-      // For multi-slot services, check if trailing slots are also free
-      if (newServiceSlotsNeeded > 1) {
-        const slotIndex = slots.indexOf(slot);
-        for (let i = 1; i < newServiceSlotsNeeded; i++) {
-          const nextSlot = slots[slotIndex + i];
-          if (!nextSlot || occupiedSlots.has(nextSlot)) return false;
+      const schedule = professional.schedules[0];
+
+      if (!schedule || !schedule.isAvailable) {
+        return { slots: [], message: "Profissional não trabalha neste dia." };
+      }
+
+      // Busca o serviço sendo agendado
+      let serviceDuration = MIN_SERVICE_DURATION;
+      let isContinuous = false;
+      let maxSimultaneous = 1;
+
+      if (serviceId) {
+        const service = await prisma.barbershopService.findUnique({
+          where: { id: serviceId },
+          select: {
+            durationMinutes: true,
+            continuousSchedule: true,
+            maxSimultaneous: true,
+          },
+        });
+        if (service) {
+          serviceDuration = Math.max(
+            service.durationMinutes,
+            MIN_SERVICE_DURATION,
+          );
+          isContinuous = service.continuousSchedule ?? false;
+          maxSimultaneous = service.maxSimultaneous ?? 1;
         }
       }
 
-      return true;
-    });
+      // Gera slots com intervalo = duração real do serviço
+      let slots = generateDynamicSlots(
+        date,
+        schedule.startTime,
+        schedule.endTime,
+        serviceDuration,
+      );
 
-    // Filtrar horários que já passaram se for o dia atual
-    if (isTodayBrt(date)) {
-      const currentTime = formatBrt(now, "HH:mm");
-      slots = slots.filter((slot) => slot > currentTime);
-    }
+      // Remove slots que se sobrepõem ao intervalo de almoço
+      if (schedule.hasLunchBreak) {
+        const lunchStart = toMinutes(schedule.lunchStartTime);
+        const lunchEnd = toMinutes(schedule.lunchEndTime);
 
-    return { slots };
-  });
+        slots = slots.filter((slot) => {
+          const slotStart = toMinutes(slot);
+          const slotEnd = slotStart + serviceDuration;
+          return !overlaps(slotStart, slotEnd, lunchStart, lunchEnd);
+        });
+      }
+
+      // Busca agendamentos do dia com duração dos serviços
+      const bookedBookings = await prisma.booking.findMany({
+        where: {
+          professionalId,
+          date: { gte: dayStart, lte: dayEnd },
+          cancelledAt: null,
+        },
+        select: {
+          date: true,
+          service: {
+            select: {
+              durationMinutes: true,
+              continuousSchedule: true,
+              maxSimultaneous: true,
+            },
+          },
+        },
+      });
+
+      // Monta mapa de ocupação por slot: "HH:mm" → contagem de agendamentos sobrepostos
+      const slotOccupancy = new Map<string, number>();
+
+      for (const booking of bookedBookings) {
+        const bookedStart = toMinutes(formatBrt(booking.date, "HH:mm"));
+        const bookedDuration = Math.max(
+          booking.service.durationMinutes,
+          MIN_SERVICE_DURATION,
+        );
+        const bookedEnd = bookedStart + bookedDuration;
+
+        for (const slot of slots) {
+          const slotStart = toMinutes(slot);
+          const slotEnd = slotStart + serviceDuration;
+
+          if (overlaps(slotStart, slotEnd, bookedStart, bookedEnd)) {
+            slotOccupancy.set(slot, (slotOccupancy.get(slot) ?? 0) + 1);
+          }
+        }
+      }
+
+      // Filtra slots pela ocupação
+      slots = slots.filter((slot) => {
+        const count = slotOccupancy.get(slot) ?? 0;
+        // Horário corrido: bloqueia só quando lotou todas as vagas
+        // Serviço normal: bloqueia com qualquer sobreposição
+        return isContinuous ? count < maxSimultaneous : count === 0;
+      });
+
+      // Remove slots que já passaram no dia atual
+      if (isTodayBrt(date)) {
+        const currentTime = formatBrt(now, "HH:mm");
+        slots = slots.filter((slot) => slot > currentTime);
+      }
+
+      return { slots };
+    },
+  );
