@@ -31,8 +31,6 @@ const inputSchema = z.object({
   serviceId: z.uuid().optional(),
 });
 
-// Gera slots usando a duração real do serviço como intervalo
-// Ex: 45min → 09:00, 09:45, 10:30 | 20min → 09:00, 09:20, 09:40
 function generateDynamicSlots(
   date: Date,
   startTime: string,
@@ -51,7 +49,6 @@ function generateDynamicSlots(
 
   while (isBefore(current, end)) {
     const slotEnd = addMinutes(current, interval);
-    // Só adiciona se o serviço termina dentro ou exatamente no fim do expediente
     if (isBefore(slotEnd, end) || slotEnd.getTime() === end.getTime()) {
       slots.push(format(current, "HH:mm"));
     }
@@ -61,13 +58,11 @@ function generateDynamicSlots(
   return slots;
 }
 
-// Converte "HH:mm" em minutos desde meia-noite
 function toMinutes(time: string): number {
   const [h, m] = time.split(":").map(Number);
   return h * 60 + m;
 }
 
-// Verifica sobreposição entre dois intervalos [aStart, aEnd) e [bStart, bEnd)
 function overlaps(
   aStart: number,
   aEnd: number,
@@ -95,9 +90,7 @@ export const getAvailableSlots = actionClient
 
       const professional = await prisma.professional.findUnique({
         where: { id: professionalId },
-        include: {
-          schedules: { where: { dayOfWeek } },
-        },
+        include: { schedules: { where: { dayOfWeek } } },
       });
 
       if (!professional) {
@@ -124,7 +117,7 @@ export const getAvailableSlots = actionClient
         return { slots: [], message: "Profissional não trabalha neste dia." };
       }
 
-      // Busca o serviço sendo agendado
+      // ── Serviço sendo agendado ───────────────────────────────────────────────
       let serviceDuration = MIN_SERVICE_DURATION;
       let isContinuous = false;
       let maxSimultaneous = 1;
@@ -148,7 +141,7 @@ export const getAvailableSlots = actionClient
         }
       }
 
-      // Gera slots com intervalo = duração real do serviço
+      // ── Gera slots ───────────────────────────────────────────────────────────
       let slots = generateDynamicSlots(
         date,
         schedule.startTime,
@@ -156,11 +149,10 @@ export const getAvailableSlots = actionClient
         serviceDuration,
       );
 
-      // Remove slots que se sobrepõem ao intervalo de almoço
+      // Remove sobreposição com almoço
       if (schedule.hasLunchBreak) {
         const lunchStart = toMinutes(schedule.lunchStartTime);
         const lunchEnd = toMinutes(schedule.lunchEndTime);
-
         slots = slots.filter((slot) => {
           const slotStart = toMinutes(slot);
           const slotEnd = slotStart + serviceDuration;
@@ -168,7 +160,7 @@ export const getAvailableSlots = actionClient
         });
       }
 
-      // Busca agendamentos do dia com duração dos serviços
+      // ── Agendamentos do dia ──────────────────────────────────────────────────
       const bookedBookings = await prisma.booking.findMany({
         where: {
           professionalId,
@@ -177,6 +169,7 @@ export const getAvailableSlots = actionClient
         },
         select: {
           date: true,
+          serviceId: true,
           service: {
             select: {
               durationMinutes: true,
@@ -187,8 +180,21 @@ export const getAvailableSlots = actionClient
         },
       });
 
-      // Monta mapa de ocupação por slot: "HH:mm" → contagem de agendamentos sobrepostos
-      const slotOccupancy = new Map<string, number>();
+      // ── Monta ocupação separando corridos de normais ──────────────────────────
+      //
+      // normalOccupancy: slot → contagem de agendamentos NORMAIS sobrepostos
+      // continuousOccupancy: (serviceId+slot) → contagem de agendamentos CORRIDOS
+      //
+      // Regra:
+      // - Serviço NORMAL sendo agendado:
+      //     bloqueado se normalOccupancy[slot] > 0
+      //     (agendamentos corridos existentes NÃO bloqueiam serviços normais)
+      // - Serviço CORRIDO sendo agendado:
+      //     bloqueado se continuousOccupancy[serviceId+slot] >= maxSimultaneous
+      //     (agendamentos normais existentes NÃO bloqueiam corridos)
+
+      const normalOccupancy = new Map<string, number>();
+      const continuousOccupancy = new Map<string, number>();
 
       for (const booking of bookedBookings) {
         const bookedStart = toMinutes(formatBrt(booking.date, "HH:mm"));
@@ -197,26 +203,43 @@ export const getAvailableSlots = actionClient
           MIN_SERVICE_DURATION,
         );
         const bookedEnd = bookedStart + bookedDuration;
+        const bookedIsContinuous = booking.service.continuousSchedule ?? false;
 
         for (const slot of slots) {
           const slotStart = toMinutes(slot);
           const slotEnd = slotStart + serviceDuration;
 
-          if (overlaps(slotStart, slotEnd, bookedStart, bookedEnd)) {
-            slotOccupancy.set(slot, (slotOccupancy.get(slot) ?? 0) + 1);
+          if (!overlaps(slotStart, slotEnd, bookedStart, bookedEnd)) continue;
+
+          if (bookedIsContinuous) {
+            // Agendamento existente é corrido — só conta para ocupação de corridos
+            const key = `${booking.serviceId}::${slot}`;
+            continuousOccupancy.set(
+              key,
+              (continuousOccupancy.get(key) ?? 0) + 1,
+            );
+          } else {
+            // Agendamento existente é normal — bloqueia serviços normais
+            normalOccupancy.set(slot, (normalOccupancy.get(slot) ?? 0) + 1);
           }
         }
       }
 
-      // Filtra slots pela ocupação
+      // ── Filtra slots ─────────────────────────────────────────────────────────
       slots = slots.filter((slot) => {
-        const count = slotOccupancy.get(slot) ?? 0;
-        // Horário corrido: bloqueia só quando lotou todas as vagas
-        // Serviço normal: bloqueia com qualquer sobreposição
-        return isContinuous ? count < maxSimultaneous : count === 0;
+        if (isContinuous) {
+          // Serviço corrido: verifica apenas ocupação de corridos do mesmo serviço
+          const key = serviceId ? `${serviceId}::${slot}` : slot;
+          const count = continuousOccupancy.get(key) ?? 0;
+          return count < maxSimultaneous;
+        } else {
+          // Serviço normal: verifica apenas ocupação de normais
+          const count = normalOccupancy.get(slot) ?? 0;
+          return count === 0;
+        }
       });
 
-      // Remove slots que já passaram no dia atual
+      // Remove slots passados no dia atual
       if (isTodayBrt(date)) {
         const currentTime = formatBrt(now, "HH:mm");
         slots = slots.filter((slot) => slot > currentTime);
