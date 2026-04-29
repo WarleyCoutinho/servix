@@ -3,40 +3,35 @@
  *
  * Retorna os slots do dia com status de disponibilidade,
  * respeitando continuousSchedule + maxSimultaneous.
- *
- * USO (server component ou server action):
- *   const slots = await getAvailableSlots({ professionalId, serviceId, date })
- *
- * O array retornado já vem filtrado/marcado para renderizar na UI do cliente:
- *   - available: true  → botão habilitado
- *   - available: false → botão desabilitado (motivo em `reason`)
+ * Slots gerados dinamicamente pela duração real do serviço (mínimo 5min).
  */
 
 import { prisma } from "@/lib/prisma";
-import { addMinutes } from "date-fns";
-import {
-  DEFAULT_INTERVAL_MINUTES,
-  generateTimeSlots,
-  getDayOfWeekFromDate,
-} from "@/lib/schedule-utils";
+import { getDayOfWeekFromDate } from "@/lib/schedule-utils";
 import {
   startOfDayBrt,
   endOfDayBrt,
   formatBrt,
   isTodayBrt,
+  TIMEZONE,
 } from "@/lib/timezone";
+import {
+  addMinutes,
+  format,
+  setHours,
+  setMinutes,
+  startOfDay,
+  isBefore,
+} from "date-fns";
 import { toZonedTime } from "date-fns-tz";
-import { format } from "date-fns";
 
-const TIMEZONE = "America/Sao_Paulo";
+const MIN_SERVICE_DURATION = 5;
 
 export interface SlotInfo {
-  time: string; // "HH:mm"
+  time: string;
   available: boolean;
   reason?: "past" | "booked" | "full" | "lunch";
-  /** Para slots corridos: quantas vagas restam */
   remainingSlots?: number;
-  /** Para slots corridos: capacidade total */
   maxSlots?: number;
 }
 
@@ -46,12 +41,55 @@ interface GetAvailableSlotsParams {
   date: Date;
 }
 
+// Gera slots com intervalo = duração real do serviço
+function generateDynamicSlots(
+  date: Date,
+  startTime: string,
+  endTime: string,
+  intervalMinutes: number,
+): string[] {
+  const interval = Math.max(intervalMinutes, MIN_SERVICE_DURATION);
+  const slots: string[] = [];
+
+  const [startH, startM] = startTime.split(":").map(Number);
+  const [endH, endM] = endTime.split(":").map(Number);
+
+  const dayStart = startOfDay(toZonedTime(date, TIMEZONE));
+  let current = setMinutes(setHours(dayStart, startH), startM);
+  const end = setMinutes(setHours(dayStart, endH), endM);
+
+  while (isBefore(current, end)) {
+    const slotEnd = addMinutes(current, interval);
+    if (isBefore(slotEnd, end) || slotEnd.getTime() === end.getTime()) {
+      slots.push(format(current, "HH:mm"));
+    }
+    current = addMinutes(current, interval);
+  }
+
+  return slots;
+}
+
+// Converte "HH:mm" em minutos desde meia-noite
+function toMinutes(time: string): number {
+  const [h, m] = time.split(":").map(Number);
+  return h * 60 + m;
+}
+
+// Verifica sobreposição entre dois intervalos [aStart, aEnd) e [bStart, bEnd)
+function overlaps(
+  aStart: number,
+  aEnd: number,
+  bStart: number,
+  bEnd: number,
+): boolean {
+  return aStart < bEnd && bStart < aEnd;
+}
+
 export async function getAvailableSlots({
   professionalId,
   serviceId,
   date,
 }: GetAvailableSlotsParams): Promise<SlotInfo[]> {
-  // 1. Dados do profissional e serviço
   const [professional, service] = await Promise.all([
     prisma.professional.findUnique({
       where: { id: professionalId },
@@ -70,22 +108,33 @@ export async function getAvailableSlots({
   );
   if (!schedule?.isAvailable) return [];
 
-  // 2. Gera slots brutos do dia
-  let allSlots = generateTimeSlots(
+  const serviceDuration = Math.max(
+    service.durationMinutes,
+    MIN_SERVICE_DURATION,
+  );
+  const isContinuous = service.continuousSchedule ?? false;
+  const maxSimultaneous = service.maxSimultaneous ?? 1;
+
+  // Gera slots com intervalo = duração real do serviço
+  let allSlots = generateDynamicSlots(
     date,
     schedule.startTime,
     schedule.endTime,
-    DEFAULT_INTERVAL_MINUTES,
+    serviceDuration,
   );
 
-  // Remove horário de almoço
+  // Remove intervalo de almoço usando sobreposição real
   if (schedule.hasLunchBreak) {
-    allSlots = allSlots.filter(
-      (slot) => slot < schedule.lunchStartTime || slot >= schedule.lunchEndTime,
-    );
+    const lunchStart = toMinutes(schedule.lunchStartTime);
+    const lunchEnd = toMinutes(schedule.lunchEndTime);
+    allSlots = allSlots.filter((slot) => {
+      const slotStart = toMinutes(slot);
+      const slotEnd = slotStart + serviceDuration;
+      return !overlaps(slotStart, slotEnd, lunchStart, lunchEnd);
+    });
   }
 
-  // 3. Agendamentos já existentes no dia
+  // Agendamentos do dia
   const existingBookings = await prisma.booking.findMany({
     where: {
       professionalId,
@@ -104,128 +153,68 @@ export async function getAvailableSlots({
     orderBy: { date: "asc" },
   });
 
-  // 4. Monta mapa: timeKey → contagem de bookings por serviceId
-  //    Para serviços normais, também marca os slots de "continuação" como bloqueados
-  type BlockedSlot = {
-    reason: "booked" | "full";
-    remainingSlots?: number;
-    maxSlots?: number;
-  };
-  const blockedMap = new Map<string, BlockedSlot>();
-
-  // Contagem de vagas por (serviceId + timeKey) para serviços corridos
-  const continuousCountMap = new Map<string, number>();
+  // Monta mapa de ocupação por slot usando sobreposição real de intervalos
+  const slotOccupancy = new Map<string, number>();
 
   for (const booking of existingBookings) {
-    const timeKey = formatBrt(booking.date, "HH:mm");
+    const bookedStart = toMinutes(formatBrt(booking.date, "HH:mm"));
+    const bookedDuration = Math.max(
+      booking.service.durationMinutes,
+      MIN_SERVICE_DURATION,
+    );
+    const bookedEnd = bookedStart + bookedDuration;
 
-    if (booking.service.continuousSchedule) {
-      // Horário corrido — conta vagas usadas nesse slot
-      const key = `${booking.serviceId}::${timeKey}`;
-      continuousCountMap.set(key, (continuousCountMap.get(key) ?? 0) + 1);
-    } else {
-      // Serviço normal — bloqueia o slot inicial + continuações
-      const slotsNeeded = Math.ceil(
-        booking.service.durationMinutes / DEFAULT_INTERVAL_MINUTES,
-      );
-      for (let i = 0; i < slotsNeeded; i++) {
-        const blockedKey = formatBrt(
-          addMinutes(booking.date, i * DEFAULT_INTERVAL_MINUTES),
-          "HH:mm",
-        );
-        blockedMap.set(blockedKey, { reason: "booked" });
-      }
-    }
-  }
-
-  // Resolve slots corridos: se vagas esgotadas → bloqueia
-  if (service.continuousSchedule) {
     for (const slot of allSlots) {
-      const key = `${serviceId}::${slot}`;
-      const used = continuousCountMap.get(key) ?? 0;
-      const max = service.maxSimultaneous ?? 1;
-      if (used >= max) {
-        blockedMap.set(slot, {
-          reason: "full",
-          remainingSlots: 0,
-          maxSlots: max,
-        });
+      const slotStart = toMinutes(slot);
+      const slotEnd = slotStart + serviceDuration;
+      if (overlaps(slotStart, slotEnd, bookedStart, bookedEnd)) {
+        slotOccupancy.set(slot, (slotOccupancy.get(slot) ?? 0) + 1);
       }
     }
   }
 
-  // 5. Horário atual em BRT para marcar slots passados
+  // Horário atual em BRT
   const nowBrt = toZonedTime(new Date(), TIMEZONE);
   const currentTime = format(nowBrt, "HH:mm");
   const isToday = isTodayBrt(date);
 
-  // 6. Monta o array final
-  const newSlotsNeeded = Math.ceil(
-    service.durationMinutes / DEFAULT_INTERVAL_MINUTES,
-  );
-
+  // Monta resultado final
   const result: SlotInfo[] = [];
 
   for (const slot of allSlots) {
-    // Passado
+    // Slot passado
     if (isToday && slot <= currentTime) {
       result.push({ time: slot, available: false, reason: "past" });
       continue;
     }
 
-    // Verifica se todos os slots necessários para a duração do serviço estão livres
-    // (ex: serviço de 60min precisa de 2 slots consecutivos livres)
-    let blocked: BlockedSlot | undefined;
+    const count = slotOccupancy.get(slot) ?? 0;
 
-    if (!service.continuousSchedule) {
-      // Para serviços normais, verifica os N slots consecutivos necessários
-      for (let i = 0; i < newSlotsNeeded; i++) {
-        const checkSlot = formatBrt(
-          addMinutes(
-            new Date(`${formatBrt(date, "yyyy-MM-dd")}T${slot}:00`),
-            i * DEFAULT_INTERVAL_MINUTES,
-          ),
-          "HH:mm",
-        );
-        if (blockedMap.has(checkSlot)) {
-          blocked = blockedMap.get(checkSlot);
-          break;
-        }
+    if (isContinuous) {
+      // Horário corrido — bloqueia quando lotou
+      if (count >= maxSimultaneous) {
+        result.push({
+          time: slot,
+          available: false,
+          reason: "full",
+          remainingSlots: 0,
+          maxSlots: maxSimultaneous,
+        });
+      } else {
+        result.push({
+          time: slot,
+          available: true,
+          remainingSlots: maxSimultaneous - count,
+          maxSlots: maxSimultaneous,
+        });
       }
     } else {
-      // Para serviços corridos, só verifica o slot exato
-      blocked = blockedMap.get(slot);
-    }
-
-    if (blocked) {
-      const max = service.maxSimultaneous ?? 1;
-      const key = `${serviceId}::${slot}`;
-      const used = continuousCountMap.get(key) ?? 0;
-      result.push({
-        time: slot,
-        available: false,
-        reason: blocked.reason,
-        remainingSlots: service.continuousSchedule
-          ? Math.max(0, max - used)
-          : undefined,
-        maxSlots: service.continuousSchedule ? max : undefined,
-      });
-      continue;
-    }
-
-    // Slot disponível — para corridos, informa vagas restantes
-    if (service.continuousSchedule) {
-      const max = service.maxSimultaneous ?? 1;
-      const key = `${serviceId}::${slot}`;
-      const used = continuousCountMap.get(key) ?? 0;
-      result.push({
-        time: slot,
-        available: true,
-        remainingSlots: max - used,
-        maxSlots: max,
-      });
-    } else {
-      result.push({ time: slot, available: true });
+      // Serviço normal — bloqueia com qualquer sobreposição
+      if (count > 0) {
+        result.push({ time: slot, available: false, reason: "booked" });
+      } else {
+        result.push({ time: slot, available: true });
+      }
     }
   }
 
