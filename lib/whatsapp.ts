@@ -6,12 +6,6 @@ const UUID_REGEX =
 
 type ConnectionStatus = "disconnected" | "connecting" | "qr_code" | "connected";
 
-// Retorno tipado do envio de mensagem — inclui o messageId do Baileys
-export interface SendMessageResult {
-  success: boolean;
-  messageId: string | null;
-}
-
 function validateProfessionalId(professionalId: string): void {
   if (!UUID_REGEX.test(professionalId)) {
     throw new Error("Invalid professionalId format");
@@ -156,65 +150,21 @@ export async function disconnectProfessional(
   }
 }
 
-/**
- * Envia uma mensagem para um grupo do WhatsApp.
- * Retorna o messageId da mensagem enviada (necessário para deletar depois)
- * ou null em caso de falha.
- *
- * O serviço Baileys deve retornar:
- *   { success: true, messageId: "XXXXXXXXXXXXXXXXXX" }
- */
 export async function sendGroupMessage(
   professionalId: string,
   groupName: string,
   message: string,
-): Promise<SendMessageResult> {
-  try {
-    validateProfessionalId(professionalId);
-    const result = await whatsappFetch<SendMessageResult>("/send-message", {
-      method: "POST",
-      body: JSON.stringify({ professionalId, groupName, message }),
-    });
-    return {
-      success: result.success ?? false,
-      messageId: result.messageId ?? null,
-    };
-  } catch (error) {
-    console.error(
-      "[WhatsApp Client] Erro ao enviar mensagem:",
-      error instanceof Error ? error.message : "Unknown error",
-    );
-    return { success: false, messageId: null };
-  }
-}
-
-/**
- * Apaga uma mensagem previamente enviada em um grupo.
- * Chama o endpoint DELETE /delete-message no serviço Baileys.
- *
- * O serviço Baileys deve:
- *   1. Localizar o grupo pelo groupName
- *   2. Chamar sock.sendMessage(groupJid, { delete: { id: messageId, ... } })
- *   3. Retornar { success: true } em caso de sucesso
- */
-export async function deleteGroupMessage(
-  professionalId: string,
-  groupName: string,
-  messageId: string,
 ): Promise<boolean> {
   try {
     validateProfessionalId(professionalId);
-    const result = await whatsappFetch<{ success: boolean }>(
-      "/delete-message",
-      {
-        method: "DELETE",
-        body: JSON.stringify({ professionalId, groupName, messageId }),
-      },
-    );
-    return result.success ?? false;
+    const result = await whatsappFetch<{ success: boolean }>("/send-message", {
+      method: "POST",
+      body: JSON.stringify({ professionalId, groupName, message }),
+    });
+    return result.success;
   } catch (error) {
     console.error(
-      "[WhatsApp Client] Erro ao deletar mensagem:",
+      "[WhatsApp Client] Erro ao enviar mensagem:",
       error instanceof Error ? error.message : "Unknown error",
     );
     return false;
