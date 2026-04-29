@@ -105,9 +105,12 @@ function applyViewTypeFilter(
 
 // ─── Mapa de horários ocupados ────────────────────────────────────────────────
 //
-// Cada cliente aparece com seu próprio serviço no slot.
-// Serviço CORRIDO → marca slots de continuação (somem da visualização).
-// Serviço NORMAL  → não marca continuação (slots seguintes ficam livres).
+// Regras:
+// - Serviço NORMAL: ocupa apenas o slot principal na visualização.
+//   Slots seguintes ficam livres independente da duração.
+// - Serviço CORRIDO: slots de continuação só somem (isContinuation=true)
+//   quando TODAS as vagas (maxSimultaneous) estiverem ocupadas.
+//   Se ainda há vagas, o slot aparece como disponível.
 
 function buildBookedTimesMap(
   bookings: Array<{
@@ -117,12 +120,38 @@ function buildBookedTimesMap(
       name: string;
       durationMinutes: number;
       continuousSchedule: boolean;
+      maxSimultaneous: number | null;
     };
     user: { name: string };
   }>,
 ): Map<string, BookingInfo> {
   const map = new Map<string, BookingInfo>();
 
+  // Passo 1: conta ocupação de cada slot para serviços corridos
+  // chave: "serviceName::HH:mm" → contagem e máximo
+  const continuousOccupancy = new Map<string, { count: number; max: number }>();
+
+  for (const booking of bookings) {
+    if (!booking.service.continuousSchedule) continue;
+
+    const max = booking.service.maxSimultaneous ?? 1;
+    const slotsNeeded = Math.ceil(
+      booking.service.durationMinutes / DISPLAY_INTERVAL_MINUTES,
+    );
+
+    for (let i = 0; i < slotsNeeded; i++) {
+      const slotDate = addMinutes(booking.date, i * DISPLAY_INTERVAL_MINUTES);
+      const key = `${booking.service.name}::${formatBrt(slotDate, "HH:mm")}`;
+      const existing = continuousOccupancy.get(key);
+      if (existing) {
+        existing.count++;
+      } else {
+        continuousOccupancy.set(key, { count: 1, max });
+      }
+    }
+  }
+
+  // Passo 2: monta o mapa de visualização
   for (const booking of bookings) {
     const clientName = booking.clientName ?? booking.user.name;
     const serviceName = booking.service.name;
@@ -144,7 +173,7 @@ function buildBookedTimesMap(
       });
     }
 
-    // ── Slots de continuação — apenas serviços corridos ─────────────────────
+    // ── Slots de continuação — apenas corridos LOTADOS ──────────────────────
     if (booking.service.continuousSchedule) {
       const slotsNeeded = Math.ceil(
         booking.service.durationMinutes / DISPLAY_INTERVAL_MINUTES,
@@ -155,12 +184,19 @@ function buildBookedTimesMap(
           i * DISPLAY_INTERVAL_MINUTES,
         );
         const nextTimeKey = formatBrt(nextSlotDate, "HH:mm");
-        if (!map.has(nextTimeKey)) {
+
+        // Só marca como continuação (some da visualização) se lotado
+        const key = `${serviceName}::${nextTimeKey}`;
+        const occupancy = continuousOccupancy.get(key);
+        const isFull = occupancy ? occupancy.count >= occupancy.max : false;
+
+        if (isFull && !map.has(nextTimeKey)) {
           map.set(nextTimeKey, {
             entries: [{ clientName, serviceName }],
             isContinuation: true,
           });
         }
+        // Se não lotado: slot permanece livre na visualização
       }
     }
   }
@@ -353,6 +389,7 @@ export async function sendDailyScheduleToGroup(
           name: true,
           durationMinutes: true,
           continuousSchedule: true,
+          maxSimultaneous: true,
         },
       },
       user: { select: { name: true } },
