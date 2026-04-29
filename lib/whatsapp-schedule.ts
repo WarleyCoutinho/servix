@@ -11,6 +11,7 @@ import {
   startOfDayBrt,
   TIMEZONE,
 } from "@/lib/timezone";
+/* import { sendGroupMessage, deleteGroupMessage } from "@/lib/whatsapp"; */
 import { sendGroupMessage } from "@/lib/whatsapp";
 import {
   addMinutes,
@@ -28,9 +29,12 @@ const LOG_PREFIX = "[WhatsApp Schedule]";
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
 interface BookingInfo {
-  serviceName: string;
-  clients: string[];
+  services: Array<{
+    serviceName: string;
+    clients: string[];
+  }>;
   isContinuation: boolean;
+  slotsNeeded: number;
 }
 
 interface ScheduleStats {
@@ -118,22 +122,42 @@ function buildBookedTimesMap(
   for (const booking of bookings) {
     const clientName = booking.clientName ?? booking.user.name;
     const timeKey = formatBrt(booking.date, "HH:mm");
+    const slotsNeeded = Math.ceil(
+      booking.service.durationMinutes / DISPLAY_INTERVAL_MINUTES,
+    );
 
+    // ── Slot principal ──────────────────────────────────────────────────────
     const existing = map.get(timeKey);
-    if (existing) {
-      existing.clients.push(clientName);
+
+    if (existing && !existing.isContinuation) {
+      const sameService = existing.services.find(
+        (s) => s.serviceName === booking.service.name,
+      );
+      if (sameService) {
+        sameService.clients.push(clientName);
+      } else {
+        existing.services.push({
+          serviceName: booking.service.name,
+          clients: [clientName],
+        });
+      }
+      if (slotsNeeded > existing.slotsNeeded) {
+        existing.slotsNeeded = slotsNeeded;
+      }
     } else {
       map.set(timeKey, {
-        serviceName: booking.service.name,
-        clients: [clientName],
+        services: [
+          { serviceName: booking.service.name, clients: [clientName] },
+        ],
         isContinuation: false,
+        slotsNeeded,
       });
     }
 
-    if (!booking.service.continuousSchedule) {
-      const slotsNeeded = Math.ceil(
-        booking.service.durationMinutes / DISPLAY_INTERVAL_MINUTES,
-      );
+    // ── Slots de continuação — SOMENTE para serviços corridos ───────────────
+    // continuousSchedule=false → múltiplos atendimentos simultâneos,
+    // os slots seguintes NÃO devem ser bloqueados.
+    if (booking.service.continuousSchedule) {
       for (let i = 1; i < slotsNeeded; i++) {
         const nextSlotDate = addMinutes(
           booking.date,
@@ -142,9 +166,11 @@ function buildBookedTimesMap(
         const nextTimeKey = formatBrt(nextSlotDate, "HH:mm");
         if (!map.has(nextTimeKey)) {
           map.set(nextTimeKey, {
-            serviceName: booking.service.name,
-            clients: [clientName],
+            services: [
+              { serviceName: booking.service.name, clients: [clientName] },
+            ],
             isContinuation: true,
+            slotsNeeded: 1,
           });
         }
       }
@@ -187,12 +213,17 @@ function buildScheduleMessage(
 
     if (isPast && booking) {
       stats.finishedCount++;
-      const clientList = booking.clients.join(", ");
-      line = `~✔ ${slot}  ${booking.serviceName} · ${clientList}~`;
+      const allClientsFlat = booking.services
+        .flatMap((s) => s.clients)
+        .join(", ");
+      const serviceNames = [
+        ...new Set(booking.services.map((s) => s.serviceName)),
+      ].join(" / ");
+      line = `~✔ ${slot}  ${serviceNames} · ${allClientsFlat}~`;
     } else if (booking) {
       stats.bookedCount++;
-      const clientLines = booking.clients
-        .map((c) => `┗ *${c}*  _${booking.serviceName}_`)
+      const clientLines = booking.services
+        .flatMap((s) => s.clients.map((c) => `┗ *${c}*  _${s.serviceName}_`))
         .join("\n");
       line = `🔵 *${slot}*\n${clientLines}`;
     } else {
@@ -263,7 +294,6 @@ export async function sendDailyScheduleToGroup(
   const date = new Date(bookingDate);
   const dateStr = formatBrt(date, "dd/MM/yyyy");
 
-  // Agendamento futuro — não envia ainda
   if (isFutureDateBrt(date)) {
     console.log(
       `${LOG_PREFIX} Agendamento futuro (${dateStr}), envio ignorado — profissional: ${professionalId}`,
@@ -333,11 +363,7 @@ export async function sendDailyScheduleToGroup(
       date: true,
       clientName: true,
       service: {
-        select: {
-          name: true,
-          durationMinutes: true,
-          continuousSchedule: true,
-        },
+        select: { name: true, durationMinutes: true, continuousSchedule: true },
       },
       user: { select: { name: true } },
     },
@@ -397,23 +423,80 @@ export async function sendDailyScheduleToGroup(
     viewType,
   );
 
+  // ── 1. Apagar mensagem anterior ─────────────────────────────────────────────
+  /*   const lastMessage = await prisma.whatsappScheduleMessage.findUnique({
+    where: {
+      professionalId_groupName: {
+        professionalId,
+        groupName: professional.whatsappGroupName,
+      },
+    },
+  }); */
+
+  /*  if (lastMessage?.messageId) {
+    console.log(
+      `${LOG_PREFIX} Apagando mensagem anterior (${lastMessage.messageId}) do grupo "${professional.whatsappGroupName}"`,
+    );
+    const deleted = await deleteGroupMessage(
+      professionalId,
+      professional.whatsappGroupName,
+      lastMessage.messageId,
+    );
+    if (deleted) {
+      console.log(`${LOG_PREFIX} Mensagem anterior apagada com sucesso`);
+    } else {
+      // Não bloqueia o envio — pode já ter expirado ou sessão reiniciada
+      console.warn(
+        `${LOG_PREFIX} Não foi possível apagar mensagem anterior — continuando com o envio`,
+      );
+    }
+  } */
+
+  // ── 2. Enviar nova mensagem ─────────────────────────────────────────────────
   console.log(
     `${LOG_PREFIX} Enviando para grupo "${professional.whatsappGroupName}" — viewType: ${viewType}`,
   );
 
-  const sent = await sendGroupMessage(
+  const result = await sendGroupMessage(
     professionalId,
     professional.whatsappGroupName,
     message,
   );
 
-  if (sent) {
-    console.log(
-      `${LOG_PREFIX} ✅ Agenda enviada com sucesso para "${professional.whatsappGroupName}"`,
-    );
-  } else {
+  if (!result.success) {
     console.error(
       `${LOG_PREFIX} ❌ Falha ao enviar para "${professional.whatsappGroupName}" — sessão WhatsApp pode estar desconectada`,
     );
+    return;
   }
+
+  console.log(
+    `${LOG_PREFIX} ✅ Agenda enviada com sucesso para "${professional.whatsappGroupName}"`,
+  );
+
+  // ── 3. Persistir messageId (upsert) ────────────────────────────────────────
+  /*   if (result.messageId) {
+    await prisma.whatsappScheduleMessage.upsert({
+      where: {
+        professionalId_groupName: {
+          professionalId,
+          groupName: professional.whatsappGroupName,
+        },
+      },
+      update: {
+        messageId: result.messageId,
+        createdAt: new Date(),
+      },
+      create: {
+        professionalId,
+        groupName: professional.whatsappGroupName,
+        messageId: result.messageId,
+      },
+    });
+    console.log(`${LOG_PREFIX} messageId persistido: ${result.messageId}`);
+  } else {
+    console.warn(
+      `${LOG_PREFIX} sendGroupMessage não retornou messageId — mensagem anterior não poderá ser apagada na próxima atualização. Verifique o endpoint /send-message do serviço Baileys.`,
+    );
+  } */
 }
