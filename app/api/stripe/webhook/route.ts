@@ -202,7 +202,11 @@ export const POST = async (request: Request) => {
 
           // Enviar agenda atualizada ao WhatsApp para qualquer data
           sendDailyScheduleToGroup(professionalId, metadata.data.date).catch(
-            (err) => console.error("[WhatsApp] Erro ao enviar agenda:", err),
+            (err) =>
+              console.error(
+                `[WhatsApp Schedule] ❌ Erro crítico (webhook) — professionalId: ${professionalId} | data: ${metadata.data.date}`,
+                err,
+              ),
           );
         }
         break;

@@ -1,6 +1,5 @@
-const WHATSAPP_SERVICE_URL =
-  process.env.WHATSAPP_SERVICE_URL || "http://localhost:3001";
-const WHATSAPP_SERVICE_API_KEY = process.env.WHATSAPP_SERVICE_API_KEY || "";
+const WHATSAPP_SERVICE_URL = process.env.WHATSAPP_SERVICE_URL;
+const WHATSAPP_SERVICE_API_KEY = process.env.WHATSAPP_SERVICE_API_KEY;
 
 const UUID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -14,6 +13,9 @@ function validateProfessionalId(professionalId: string): void {
 }
 
 function buildUrl(path: string): string {
+  if (!WHATSAPP_SERVICE_URL) {
+    throw new Error("[WhatsApp] WHATSAPP_SERVICE_URL não configurado no .env");
+  }
   const url = new URL(path, WHATSAPP_SERVICE_URL);
   const baseOrigin = new URL(WHATSAPP_SERVICE_URL).origin;
   if (url.origin !== baseOrigin) {
@@ -26,8 +28,19 @@ async function whatsappFetch<T>(
   path: string,
   options?: RequestInit,
 ): Promise<T> {
+  if (!WHATSAPP_SERVICE_URL) {
+    throw new Error("[WhatsApp] WHATSAPP_SERVICE_URL não configurado no .env");
+  }
+  if (!WHATSAPP_SERVICE_API_KEY) {
+    throw new Error(
+      "[WhatsApp] WHATSAPP_SERVICE_API_KEY não configurado no .env",
+    );
+  }
+
+  const apiKey: string = WHATSAPP_SERVICE_API_KEY;
+
   const headers: Record<string, string> = {
-    "x-api-key": WHATSAPP_SERVICE_API_KEY,
+    "x-api-key": apiKey,
   };
 
   if (options?.body) {

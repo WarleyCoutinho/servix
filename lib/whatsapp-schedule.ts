@@ -23,6 +23,8 @@ import {
 import { toZonedTime } from "date-fns-tz";
 import { ScheduleViewType } from "@/generated/prisma/enums";
 
+const LOG_PREFIX = "[WhatsApp Schedule]";
+
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
 interface BookingInfo {
@@ -81,18 +83,12 @@ function isFutureDateBrt(date: Date): boolean {
   return targetDateOnly > nowDateOnly;
 }
 
-// Aplica filtro de slots conforme o ScheduleViewType do profissional
-//
-// DEFAULT    → todos os slots do expediente
-// RECENT     → apenas slots a partir de 30min antes do horário atual
-// CONTINUOUS → igual ao DEFAULT mas exibe vagas simultâneas (já tratado no buildBookedTimesMap)
 function applyViewTypeFilter(
   slots: string[],
   viewType: ScheduleViewType,
   currentTime: string,
 ): string[] {
   if (viewType === ScheduleViewType.RECENT) {
-    // Calcula o horário de corte: currentTime - 30min
     const [h, m] = currentTime.split(":").map(Number);
     const totalMinutes = h * 60 + m - 30;
     const cutH = Math.floor(Math.max(totalMinutes, 0) / 60);
@@ -100,18 +96,10 @@ function applyViewTypeFilter(
     const cutTime = `${String(cutH).padStart(2, "0")}:${String(cutM).padStart(2, "0")}`;
     return slots.filter((slot) => slot >= cutTime);
   }
-
-  // DEFAULT e CONTINUOUS — todos os slots
   return slots;
 }
 
-// ─── Monta mapa de horários ocupados ─────────────────────────────────────────
-//
-// Serviço normal (continuousSchedule=false):
-//   45min → slot principal (09:00) + cont. (09:30) — cont. some da visualização
-//
-// Horário corrido (continuousSchedule=true):
-//   Múltiplos clientes no mesmo slot — todos listados, sem cont.
+// ─── Mapa de horários ocupados ────────────────────────────────────────────────
 
 function buildBookedTimesMap(
   bookings: Array<{
@@ -131,7 +119,6 @@ function buildBookedTimesMap(
     const clientName = booking.clientName ?? booking.user.name;
     const timeKey = formatBrt(booking.date, "HH:mm");
 
-    // Slot principal
     const existing = map.get(timeKey);
     if (existing) {
       existing.clients.push(clientName);
@@ -143,7 +130,6 @@ function buildBookedTimesMap(
       });
     }
 
-    // Slots de continuação — apenas para serviços normais
     if (!booking.service.continuousSchedule) {
       const slotsNeeded = Math.ceil(
         booking.service.durationMinutes / DISPLAY_INTERVAL_MINUTES,
@@ -168,7 +154,7 @@ function buildBookedTimesMap(
   return map;
 }
 
-// ─── Monta mensagem formatada ─────────────────────────────────────────────────
+// ─── Mensagem formatada ───────────────────────────────────────────────────────
 
 function buildScheduleMessage(
   dayLabel: string,
@@ -194,9 +180,7 @@ function buildScheduleMessage(
     const booking = bookedTimesMap.get(slot);
     const isPast = slot < currentTime;
 
-    // Slots de continuação somem sempre
     if (booking?.isContinuation) continue;
-    // Slots passados sem agendamento somem
     if (isPast && !booking) continue;
 
     let line: string;
@@ -212,9 +196,6 @@ function buildScheduleMessage(
         .join("\n");
       line = `🔵 *${slot}*\n${clientLines}`;
     } else {
-      // CONTINUOUS — mostra quantas vagas têm no slot se for corrido
-      // mas como slots livres não têm info de maxSimultaneous aqui,
-      // exibimos apenas "disponível" (igual ao DEFAULT)
       stats.freeCount++;
       line = `◦ ${slot}  _disponível_`;
     }
@@ -224,7 +205,6 @@ function buildScheduleMessage(
     else eveningSlots.push(line);
   }
 
-  // Label do tipo de visualização no cabeçalho
   const viewLabel: Record<ScheduleViewType, string> = {
     [ScheduleViewType.DEFAULT]: "",
     [ScheduleViewType.RECENT]: "  _(a partir de agora)_",
@@ -281,8 +261,19 @@ export async function sendDailyScheduleToGroup(
   bookingDate: Date | string,
 ): Promise<void> {
   const date = new Date(bookingDate);
+  const dateStr = formatBrt(date, "dd/MM/yyyy");
 
-  if (isFutureDateBrt(date)) return;
+  // Agendamento futuro — não envia ainda
+  if (isFutureDateBrt(date)) {
+    console.log(
+      `${LOG_PREFIX} Agendamento futuro (${dateStr}), envio ignorado — profissional: ${professionalId}`,
+    );
+    return;
+  }
+
+  console.log(
+    `${LOG_PREFIX} Iniciando envio — profissional: ${professionalId} | data: ${dateStr}`,
+  );
 
   const professional = await prisma.professional.findUnique({
     where: { id: professionalId },
@@ -293,18 +284,40 @@ export async function sendDailyScheduleToGroup(
     },
   });
 
-  if (!professional?.whatsappGroupName) return;
+  if (!professional) {
+    console.error(
+      `${LOG_PREFIX} Profissional não encontrado: ${professionalId}`,
+    );
+    return;
+  }
+
+  if (!professional.whatsappGroupName) {
+    console.log(
+      `${LOG_PREFIX} Profissional ${professionalId} sem grupo WhatsApp configurado`,
+    );
+    return;
+  }
 
   const dayOfWeek = getDayOfWeekFromDate(date);
   const schedule = professional.schedules.find(
     (s) => s.dayOfWeek === dayOfWeek,
   );
 
-  if (!schedule?.isAvailable) return;
+  if (!schedule?.isAvailable) {
+    console.log(
+      `${LOG_PREFIX} Profissional ${professionalId} não trabalha em ${dateStr} (${dayOfWeek})`,
+    );
+    return;
+  }
 
   const currentTime = getCurrentTimeBrt();
 
-  if (isTodayBrt(date) && currentTime >= schedule.endTime) return;
+  if (isTodayBrt(date) && currentTime >= schedule.endTime) {
+    console.log(
+      `${LOG_PREFIX} Expediente encerrado (${currentTime} >= ${schedule.endTime}) — envio ignorado`,
+    );
+    return;
+  }
 
   const viewType: ScheduleViewType =
     (professional.scheduleViewType as ScheduleViewType) ??
@@ -331,30 +344,36 @@ export async function sendDailyScheduleToGroup(
     orderBy: { date: "asc" },
   });
 
+  console.log(
+    `${LOG_PREFIX} ${bookings.length} agendamento(s) encontrado(s) para ${dateStr}`,
+  );
+
   const bookedTimesMap = buildBookedTimesMap(bookings);
 
-  // Gera todos os slots do expediente
   let allSlots = generateDisplaySlots(
     date,
     schedule.startTime,
     schedule.endTime,
   );
 
-  // Remove intervalo de almoço
   if (schedule.hasLunchBreak) {
     allSlots = allSlots.filter(
       (slot) => slot < schedule.lunchStartTime || slot >= schedule.lunchEndTime,
     );
   }
 
-  // Aplica filtro conforme o tipo de visualização configurado
   allSlots = applyViewTypeFilter(allSlots, viewType, currentTime);
 
   const hasVisibleSlots = allSlots.some(
     (slot) => slot >= currentTime || bookedTimesMap.has(slot),
   );
 
-  if (!hasVisibleSlots) return;
+  if (!hasVisibleSlots) {
+    console.log(
+      `${LOG_PREFIX} Nenhum slot visível para enviar — envio ignorado`,
+    );
+    return;
+  }
 
   const dayLabel = DAY_OF_WEEK_LABELS[dayOfWeek];
   const dateFormatted = formatBrt(date, "dd/MM/yyyy");
@@ -378,9 +397,23 @@ export async function sendDailyScheduleToGroup(
     viewType,
   );
 
-  await sendGroupMessage(
+  console.log(
+    `${LOG_PREFIX} Enviando para grupo "${professional.whatsappGroupName}" — viewType: ${viewType}`,
+  );
+
+  const sent = await sendGroupMessage(
     professionalId,
     professional.whatsappGroupName,
     message,
   );
+
+  if (sent) {
+    console.log(
+      `${LOG_PREFIX} ✅ Agenda enviada com sucesso para "${professional.whatsappGroupName}"`,
+    );
+  } else {
+    console.error(
+      `${LOG_PREFIX} ❌ Falha ao enviar para "${professional.whatsappGroupName}" — sessão WhatsApp pode estar desconectada`,
+    );
+  }
 }

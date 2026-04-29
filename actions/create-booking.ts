@@ -182,7 +182,10 @@ export const createBooking = protectedActionClient
       );
 
       sendDailyScheduleToGroup(professionalId, date).catch((err) =>
-        console.error("[WhatsApp] Erro ao enviar agenda:", err),
+        console.error(
+          `[WhatsApp Schedule] ❌ Erro crítico — professionalId: ${professionalId} | data: ${date.toISOString()}`,
+          err,
+        ),
       );
 
       return booking;
