@@ -6,24 +6,39 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
 const inputSchema = z.object({
-  displayName: z.string().min(2, "Nome deve ter pelo menos 2 caracteres").optional(),
+  displayName: z
+    .string()
+    .min(2, "Nome deve ter pelo menos 2 caracteres")
+    .optional(),
   bio: z.string().optional(),
   imageUrl: z.string().min(1, "URL inválida").optional().nullable(),
   acceptsPix: z.boolean().optional(),
   acceptsCard: z.boolean().optional(),
   acceptsPayAfterService: z.boolean().optional(),
   whatsappGroupName: z.string().optional(),
+  scheduleViewType: z.enum(["DEFAULT", "RECENT", "CONTINUOUS"]).optional(),
 });
 
 export const updateProfessionalProfile = professionalActionClient
   .inputSchema(inputSchema)
   .action(async ({ parsedInput, ctx: { professional } }) => {
-    const { displayName, bio, imageUrl, acceptsPix, acceptsCard, acceptsPayAfterService, whatsappGroupName } = parsedInput;
+    const {
+      displayName,
+      bio,
+      imageUrl,
+      acceptsPix,
+      acceptsCard,
+      acceptsPayAfterService,
+      whatsappGroupName,
+      scheduleViewType,
+    } = parsedInput;
 
-    if (acceptsPix === false && acceptsCard === false && acceptsPayAfterService === false) {
-      throw new Error(
-        "Você deve aceitar pelo menos uma forma de pagamento.",
-      );
+    if (
+      acceptsPix === false &&
+      acceptsCard === false &&
+      acceptsPayAfterService === false
+    ) {
+      throw new Error("Você deve aceitar pelo menos uma forma de pagamento.");
     }
 
     const updated = await prisma.professional.update({
@@ -35,7 +50,10 @@ export const updateProfessionalProfile = professionalActionClient
         ...(acceptsPix !== undefined && { acceptsPix }),
         ...(acceptsCard !== undefined && { acceptsCard }),
         ...(acceptsPayAfterService !== undefined && { acceptsPayAfterService }),
-        ...(whatsappGroupName !== undefined && { whatsappGroupName: whatsappGroupName || null }),
+        ...(whatsappGroupName !== undefined && {
+          whatsappGroupName: whatsappGroupName || null,
+        }),
+        ...(scheduleViewType !== undefined && { scheduleViewType }),
       },
       include: {
         user: true,

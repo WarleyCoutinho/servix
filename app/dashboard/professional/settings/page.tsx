@@ -36,6 +36,7 @@ export default async function ProfessionalSettingsPage() {
           acceptsCard: professional.acceptsCard,
           acceptsPayAfterService: professional.acceptsPayAfterService,
           whatsappGroupName: professional.whatsappGroupName,
+          scheduleViewType: professional.scheduleViewType ?? "DEFAULT",
         }}
       />
     </div>

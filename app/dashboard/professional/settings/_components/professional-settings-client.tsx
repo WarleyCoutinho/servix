@@ -7,7 +7,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import {
+  ScheduleViewSelector,
+  type ScheduleViewType,
+} from "@/components/schedule-view-selector";
+import {
   Banknote,
+  CalendarDays,
   CreditCard,
   HandCoins,
   Loader2,
@@ -29,6 +34,7 @@ interface ProfessionalSettingsClientProps {
     acceptsCard: boolean;
     acceptsPayAfterService: boolean;
     whatsappGroupName: string | null;
+    scheduleViewType: ScheduleViewType;
   };
 }
 
@@ -40,6 +46,7 @@ export default function ProfessionalSettingsClient({
     acceptsCard: professional.acceptsCard,
     acceptsPayAfterService: professional.acceptsPayAfterService,
     whatsappGroupName: professional.whatsappGroupName ?? "",
+    scheduleViewType: professional.scheduleViewType,
   });
 
   const [waStatus, setWaStatus] = useState<string>("disconnected");
@@ -79,7 +86,6 @@ export default function ProfessionalSettingsClient({
         gotQrOrPairingRef.current = true;
       }
 
-      // Detect authentication phase: QR/pairing was shown, now gone but not connected
       if (
         gotQrOrPairingRef.current &&
         !data.qrCode &&
@@ -197,22 +203,20 @@ export default function ProfessionalSettingsClient({
     const timer = setTimeout(() => {
       pollWhatsAppStatus();
     }, 0);
-
     return () => {
       clearTimeout(timer);
       stopPolling();
     };
   }, [pollWhatsAppStatus, stopPolling]);
 
-  const { execute: executeSavePayment, isPending: isSavingPayment } =
-    useAction(updateProfessionalProfile, {
-      onSuccess: () => {
-        toast.success("Configurações salvas com sucesso!");
-      },
-      onError: ({ error }) => {
-        toast.error(error.serverError ?? "Erro ao salvar configurações.");
-      },
-    });
+  const { execute: executeSavePayment, isPending: isSavingPayment } = useAction(
+    updateProfessionalProfile,
+    {
+      onSuccess: () => toast.success("Configurações salvas com sucesso!"),
+      onError: ({ error }) =>
+        toast.error(error.serverError ?? "Erro ao salvar configurações."),
+    },
+  );
 
   const handleSavePaymentMethods = () => {
     executeSavePayment({
@@ -223,10 +227,17 @@ export default function ProfessionalSettingsClient({
     });
   };
 
+  const handleSaveScheduleView = () => {
+    executeSavePayment({
+      scheduleViewType: formData.scheduleViewType,
+    });
+  };
+
   const isLoading = isSavingPayment;
 
   return (
     <div className="space-y-6">
+      {/* ── Formas de Pagamento ── */}
       <Card>
         <CardHeader>
           <CardTitle>Formas de Pagamento</CardTitle>
@@ -235,6 +246,7 @@ export default function ProfessionalSettingsClient({
           <p className="text-muted-foreground text-sm">
             Configure quais formas de pagamento você aceita.
           </p>
+
           <div className="flex items-center justify-between rounded-lg border p-4">
             <div className="flex items-center gap-3">
               <CreditCard className="text-muted-foreground h-5 w-5" />
@@ -258,6 +270,7 @@ export default function ProfessionalSettingsClient({
               }
             />
           </div>
+
           <div className="flex items-center justify-between rounded-lg border p-4 opacity-60">
             <div className="flex items-center gap-3">
               <Banknote className="text-muted-foreground h-5 w-5" />
@@ -268,11 +281,9 @@ export default function ProfessionalSettingsClient({
                 </p>
               </div>
             </div>
-            <Switch
-              checked={false}
-              disabled
-            />
+            <Switch checked={false} disabled />
           </div>
+
           <div className="flex items-center justify-between rounded-lg border p-4">
             <div className="flex items-center gap-3">
               <HandCoins className="text-muted-foreground h-5 w-5" />
@@ -297,6 +308,7 @@ export default function ProfessionalSettingsClient({
               }
             />
           </div>
+
           {!formData.acceptsCard &&
             !formData.acceptsPix &&
             !formData.acceptsPayAfterService && (
@@ -334,6 +346,41 @@ export default function ProfessionalSettingsClient({
         </CardContent>
       </Card>
 
+      {/* ── Visualização da Agenda ── */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <CalendarDays className="h-5 w-5" />
+            Visualização da Agenda no WhatsApp
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-muted-foreground text-sm">
+            Escolha como a agenda diária será exibida no grupo do WhatsApp.
+          </p>
+
+          <ScheduleViewSelector
+            value={formData.scheduleViewType}
+            onChange={(value) =>
+              setFormData({ ...formData, scheduleViewType: value })
+            }
+            disabled={isLoading}
+          />
+
+          <Button
+            onClick={handleSaveScheduleView}
+            disabled={isLoading}
+            className="w-full"
+          >
+            {isSavingPayment && (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            )}
+            Salvar Visualização
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* ── WhatsApp ── */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -441,7 +488,7 @@ export default function ProfessionalSettingsClient({
               ) : (
                 <div className="space-y-2">
                   <p className="text-muted-foreground text-sm">
-                    Digite o número do celular com o codigo do Páis DDD para
+                    Digite o número do celular com o codigo do País DDD para
                     receber o código de pareamento.
                   </p>
                   <div className="flex gap-2">
@@ -483,7 +530,7 @@ export default function ProfessionalSettingsClient({
                 />
               </div>
               <p className="text-muted-foreground text-center text-xs">
-                Abra o WhatsApp {">"} Dispositivos conectados {">"} Conectar
+                Abra o WhatsApp {`>`} Dispositivos conectados {`>`} Conectar
                 dispositivo
               </p>
             </div>
@@ -501,8 +548,8 @@ export default function ProfessionalSettingsClient({
                 </p>
               </div>
               <p className="text-muted-foreground text-center text-xs">
-                Abra o WhatsApp {">"} Dispositivos conectados {">"} Conectar
-                dispositivo {">"} Conectar com número de telefone
+                Abra o WhatsApp {`>`} Dispositivos conectados {`>`} Conectar
+                dispositivo {`>`} Conectar com número de telefone
               </p>
             </div>
           )}
