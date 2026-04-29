@@ -27,9 +27,13 @@ const LOG_PREFIX = "[WhatsApp Schedule]";
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
-interface BookingInfo {
+interface ClientEntry {
+  clientName: string;
   serviceName: string;
-  clients: string[];
+}
+
+interface BookingInfo {
+  entries: ClientEntry[];
   isContinuation: boolean;
 }
 
@@ -100,6 +104,10 @@ function applyViewTypeFilter(
 }
 
 // ─── Mapa de horários ocupados ────────────────────────────────────────────────
+//
+// Cada cliente aparece com seu próprio serviço no slot.
+// Serviço CORRIDO → marca slots de continuação (somem da visualização).
+// Serviço NORMAL  → não marca continuação (slots seguintes ficam livres).
 
 function buildBookedTimesMap(
   bookings: Array<{
@@ -117,32 +125,26 @@ function buildBookedTimesMap(
 
   for (const booking of bookings) {
     const clientName = booking.clientName ?? booking.user.name;
+    const serviceName = booking.service.name;
     const timeKey = formatBrt(booking.date, "HH:mm");
 
     // ── Slot principal ──────────────────────────────────────────────────────
     const existing = map.get(timeKey);
     if (existing && !existing.isContinuation) {
-      // Mesmo horário — adiciona cliente apenas se não estiver duplicado
-      if (!existing.clients.includes(clientName)) {
-        existing.clients.push(clientName);
-      }
-      // Atualiza serviceName apenas se for serviço diferente
-      if (existing.serviceName !== booking.service.name) {
-        existing.serviceName = `${existing.serviceName} / ${booking.service.name}`;
+      const alreadyExists = existing.entries.some(
+        (e) => e.clientName === clientName && e.serviceName === serviceName,
+      );
+      if (!alreadyExists) {
+        existing.entries.push({ clientName, serviceName });
       }
     } else {
       map.set(timeKey, {
-        serviceName: booking.service.name,
-        clients: [clientName],
+        entries: [{ clientName, serviceName }],
         isContinuation: false,
       });
     }
 
-    // ── Slots de continuação ────────────────────────────────────────────────
-    // Serviço CORRIDO (continuousSchedule=true):
-    //   → marca cont. para bloquear slots seguintes na visualização
-    // Serviço NORMAL (continuousSchedule=false):
-    //   → NÃO marca cont. — cada slot é independente na visualização
+    // ── Slots de continuação — apenas serviços corridos ─────────────────────
     if (booking.service.continuousSchedule) {
       const slotsNeeded = Math.ceil(
         booking.service.durationMinutes / DISPLAY_INTERVAL_MINUTES,
@@ -155,8 +157,7 @@ function buildBookedTimesMap(
         const nextTimeKey = formatBrt(nextSlotDate, "HH:mm");
         if (!map.has(nextTimeKey)) {
           map.set(nextTimeKey, {
-            serviceName: booking.service.name,
-            clients: [clientName],
+            entries: [{ clientName, serviceName }],
             isContinuation: true,
           });
         }
@@ -200,12 +201,15 @@ function buildScheduleMessage(
 
     if (isPast && booking) {
       stats.finishedCount++;
-      const clientList = booking.clients.join(", ");
-      line = `~✔ ${slot}  ${booking.serviceName} · ${clientList}~`;
+      const allClients = booking.entries.map((e) => e.clientName).join(", ");
+      const allServices = [
+        ...new Set(booking.entries.map((e) => e.serviceName)),
+      ].join(" / ");
+      line = `~✔ ${slot}  ${allServices} · ${allClients}~`;
     } else if (booking) {
       stats.bookedCount++;
-      const clientLines = booking.clients
-        .map((c) => `┗ *${c}*  _${booking.serviceName}_`)
+      const clientLines = booking.entries
+        .map((e) => `┗ *${e.clientName}*  _${e.serviceName}_`)
         .join("\n");
       line = `🔵 *${slot}*\n${clientLines}`;
     } else {
@@ -276,7 +280,6 @@ export async function sendDailyScheduleToGroup(
   const date = new Date(bookingDate);
   const dateStr = formatBrt(date, "dd/MM/yyyy");
 
-  // Agendamento futuro — não envia ainda
   if (isFutureDateBrt(date)) {
     console.log(
       `${LOG_PREFIX} Agendamento futuro (${dateStr}), envio ignorado — profissional: ${professionalId}`,
