@@ -225,7 +225,7 @@ export const getAvailableSlots = actionClient
         }
       }
 
-      // ── Filtra slots ─────────────────────────────────────────────────────────
+      /* // ── Filtra slots ─────────────────────────────────────────────────────────
       slots = slots.filter((slot) => {
         if (isContinuous) {
           // Serviço corrido: verifica apenas ocupação de corridos do mesmo serviço
@@ -236,6 +236,28 @@ export const getAvailableSlots = actionClient
           // Serviço normal: verifica apenas ocupação de normais
           const count = normalOccupancy.get(slot) ?? 0;
           return count === 0;
+        }
+      }); */
+      slots = slots.filter((slot) => {
+        const continuousKey = serviceId ? `${serviceId}::${slot}` : slot;
+        const continuousCount = continuousOccupancy.get(continuousKey) ?? 0;
+        const normalCount = normalOccupancy.get(slot) ?? 0;
+        const totalOccupied = continuousCount + normalCount;
+
+        if (isContinuous) {
+          // Corrido: disponível se total < maxSimultaneous
+          return totalOccupied < maxSimultaneous;
+        } else {
+          // Normal: disponível se não há outro normal E total < maxSimultaneous do corrido
+          // Se não há corrido no slot, maxSimultaneous não se aplica — só verifica normalCount
+          const hasContinuous = continuousCount > 0;
+          if (hasContinuous) {
+            // Há corrido — respeita o limite total
+            return normalCount === 0 && totalOccupied < maxSimultaneous;
+          } else {
+            // Sem corrido — regra simples: só 1 normal por slot
+            return normalCount === 0;
+          }
         }
       });
 
