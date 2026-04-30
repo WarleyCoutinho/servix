@@ -77,8 +77,9 @@ export const createBooking = protectedActionClient
       }
 
       const isOwner = professional.barbershop.ownerId === user.id;
+      const isProfessional = professional.userId === user.id;
       const resolvedClientName =
-        isOwner && clientName ? clientName.trim() : null;
+        (isOwner || isProfessional) && clientName ? clientName.trim() : null;
 
       const booking = await prisma.$transaction(
         async (tx) => {
