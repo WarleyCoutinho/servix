@@ -31,7 +31,10 @@ const BarbershopDetailPage = async ({ params }: BarbershopDetailPageProps) => {
     !!session?.user && !!barbershop.ownerId
       ? session.user.id === barbershop.ownerId
       : false;
-
+  const isProfessional =
+    !!session?.user &&
+    barbershop.professionals?.some((p) => p.userId === session.user.id) ===
+      true;
   return (
     <div>
       <Header />
@@ -44,6 +47,7 @@ const BarbershopDetailPage = async ({ params }: BarbershopDetailPageProps) => {
             services={barbershop.services}
             barbershop={barbershop}
             isOwner={isOwner}
+            isProfessional={isProfessional}
           />
         </div>
       </PageContainer>

@@ -18,7 +18,7 @@ export const getBarbershops = async (filters?: BarbershopFilters) => {
 
   const { data } = await safeQuery(
     () => prisma.barbershop.findMany({ where }),
-    []
+    [],
   );
   return data;
 };
@@ -41,7 +41,7 @@ export const getPopularBarbershops = async (filters?: BarbershopFilters) => {
           name: "desc",
         },
       }),
-    []
+    [],
   );
   return data;
 };
@@ -69,6 +69,7 @@ export const getBarbershopById = async (id: string) => {
         where: { deletedAt: null },
         orderBy: { name: "asc" },
       },
+      professionals: true,
     },
   });
   return barbershop;
@@ -82,6 +83,7 @@ export const getBarbershopBySlug = async (slug: string) => {
         where: { deletedAt: null },
         orderBy: { name: "asc" },
       },
+      professionals: true,
     },
   });
   return barbershop;

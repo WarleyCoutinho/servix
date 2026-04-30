@@ -31,6 +31,11 @@ const SlugPage = async ({ params }: SlugPageProps) => {
       ? session.user.id === barbershop.ownerId
       : false;
 
+  const isProfessional =
+    !!session?.user &&
+    barbershop.professionals?.some((p) => p.userId === session.user.id) ===
+      true;
+
   return (
     <div>
       <Header />
@@ -43,6 +48,7 @@ const SlugPage = async ({ params }: SlugPageProps) => {
             services={barbershop.services}
             barbershop={barbershop}
             isOwner={isOwner}
+            isProfessional={isProfessional}
           />
         </div>
       </PageContainer>

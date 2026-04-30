@@ -20,6 +20,7 @@ interface ServicesSectionProps {
   services: BarbershopService[];
   barbershop: Barbershop;
   isOwner: boolean;
+  isProfessional: boolean;
 }
 
 type SortKey =
@@ -58,6 +59,7 @@ export function ServicesSection({
   services,
   barbershop,
   isOwner,
+  isProfessional,
 }: ServicesSectionProps) {
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<SortKey>("name-asc");
@@ -198,6 +200,7 @@ export function ServicesSection({
                     service={service}
                     barbershop={barbershop}
                     isOwner={isOwner}
+                    isProfessional={isProfessional}
                   />
                 ))}
               </div>
