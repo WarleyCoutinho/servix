@@ -109,12 +109,14 @@ interface ServiceItemProps {
   service: BarbershopService;
   barbershop: Barbershop;
   isOwner?: boolean;
+  isProfessional?: boolean;
 }
 
 const ServiceItem = ({
   service,
   barbershop,
   isOwner = false,
+  isProfessional = false,
 }: ServiceItemProps) => {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -210,7 +212,7 @@ const ServiceItem = ({
     setSelectedTime(time);
     setSelectedPaymentMethod(undefined);
     setClientName("");
-    if (isOwner) {
+    if (isOwner || isProfessional) {
       scrollTo(clientNameSectionRef);
     } else if (hasPayAfterService) {
       scrollTo(paySectionRef);
@@ -252,7 +254,7 @@ const ServiceItem = ({
     const date = new Date(selectedDate);
     date.setHours(h, m, 0, 0);
 
-    if (isOwner) {
+    if (isOwner || isProfessional) {
       if (clientName.trim().length < 2) {
         return toast.error("Digite o nome do cliente.");
       }
@@ -347,20 +349,22 @@ const ServiceItem = ({
     (!hasStripePayment && !!hasPayAfterService);
   const stepOwnerDone = clientName.trim().length >= 2;
 
-  const canConfirm = isOwner
-    ? step1Done && step2Done && step3Done && stepOwnerDone
-    : step1Done &&
-      step2Done &&
-      step3Done &&
-      (!hasPayAfterService || !hasStripePayment || !!selectedPaymentMethod);
+  const canConfirm =
+    isOwner || isProfessional
+      ? step1Done && step2Done && step3Done && stepOwnerDone
+      : step1Done &&
+        step2Done &&
+        step3Done &&
+        (!hasPayAfterService || !hasStripePayment || !!selectedPaymentMethod);
 
   // ── FIX 1: progress bar não mostra 4º segmento já preenchido quando
   //    o profissional não tem pagamento online (hasPayAfterService only) ──
-  const progressSegments = isOwner
-    ? [step1Done, step2Done, step3Done, stepOwnerDone]
-    : hasPayAfterService
-      ? [step1Done, step2Done, step3Done, step4Done]
-      : [step1Done, step2Done, step3Done];
+  const progressSegments =
+    isOwner || isProfessional
+      ? [step1Done, step2Done, step3Done, stepOwnerDone]
+      : hasPayAfterService
+        ? [step1Done, step2Done, step3Done, step4Done]
+        : [step1Done, step2Done, step3Done];
 
   const formatDate = (d: Date) =>
     new Intl.DateTimeFormat("pt-BR", {
@@ -652,7 +656,7 @@ const ServiceItem = ({
                     </div>
 
                     {/* ══ PASSO 4 — Pagamento ══ */}
-                    {!isOwner && hasPayAfterService && (
+                    {!isOwner && !isProfessional && hasPayAfterService && (
                       <div ref={paySectionRef}>
                         <Section
                           step={4}
@@ -776,7 +780,7 @@ const ServiceItem = ({
                     )}
 
                     {/* ══ PASSO 4 — Nome do cliente (owner) ══ */}
-                    {isOwner && (
+                    {(isOwner || isProfessional) && (
                       <div ref={clientNameSectionRef}>
                         <Section
                           step={4}
