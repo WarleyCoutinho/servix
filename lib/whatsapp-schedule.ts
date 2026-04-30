@@ -106,8 +106,8 @@ function applyViewTypeFilter(
 // ─── Mapa de horários ocupados ────────────────────────────────────────────────
 //
 // Regras:
-// - Serviço NORMAL: ocupa apenas o slot principal na visualização.
-//   Slots seguintes ficam livres independente da duração.
+// - Serviço NORMAL: ocupa o slot principal + slots de continuação pela duração real.
+//   Ex: combo de 120min às 13:30 → 14:00, 14:30, 15:00 somem da visualização.
 // - Serviço CORRIDO: slots de continuação só somem (isContinuation=true)
 //   quando TODAS as vagas (maxSimultaneous) estiverem ocupadas.
 //   Se ainda há vagas, o slot aparece como disponível.
@@ -173,19 +173,20 @@ function buildBookedTimesMap(
       });
     }
 
-    // ── Slots de continuação — apenas corridos LOTADOS ──────────────────────
-    if (booking.service.continuousSchedule) {
-      const slotsNeeded = Math.ceil(
-        booking.service.durationMinutes / DISPLAY_INTERVAL_MINUTES,
-      );
-      for (let i = 1; i < slotsNeeded; i++) {
-        const nextSlotDate = addMinutes(
-          booking.date,
-          i * DISPLAY_INTERVAL_MINUTES,
-        );
-        const nextTimeKey = formatBrt(nextSlotDate, "HH:mm");
+    // ── Slots de continuação ────────────────────────────────────────────────
+    const slotsNeeded = Math.ceil(
+      booking.service.durationMinutes / DISPLAY_INTERVAL_MINUTES,
+    );
 
-        // Só marca como continuação (some da visualização) se lotado
+    for (let i = 1; i < slotsNeeded; i++) {
+      const nextSlotDate = addMinutes(
+        booking.date,
+        i * DISPLAY_INTERVAL_MINUTES,
+      );
+      const nextTimeKey = formatBrt(nextSlotDate, "HH:mm");
+
+      if (booking.service.continuousSchedule) {
+        // Corrido: some apenas se lotado — vagas restantes mantêm slot visível
         const key = `${serviceName}::${nextTimeKey}`;
         const occupancy = continuousOccupancy.get(key);
         const isFull = occupancy ? occupancy.count >= occupancy.max : false;
@@ -196,7 +197,15 @@ function buildBookedTimesMap(
             isContinuation: true,
           });
         }
-        // Se não lotado: slot permanece livre na visualização
+      } else {
+        // Normal: sempre some — duração real bloqueia os slots seguintes
+        // Ex: combo 120min às 13:30 → 14:00, 14:30, 15:00 somem
+        if (!map.has(nextTimeKey)) {
+          map.set(nextTimeKey, {
+            entries: [{ clientName, serviceName }],
+            isContinuation: true,
+          });
+        }
       }
     }
   }
