@@ -1,202 +1,58 @@
-import BookingItem from "@/components/booking-item";
-import Header from "@/components/header";
-import bannerDark from "@/public/servix_dark.png";
-import bannerLight from "@/public/servix_light.png";
-import Image from "next/image";
-import { Suspense } from "react";
-
-import { AuthErrorAlert } from "@/components/auth-error-alert";
-import BarbershopItem from "@/components/barbershop-item";
-import Footer from "@/components/footer";
-import { LocationFilter } from "@/components/location-filter";
-import QuickSearch from "@/components/quick-search";
-import {
-  PageContainer,
-  PageSectionContent,
-  PageSectionScroller,
-  PageSectionTitle,
-} from "@/components/ui/page";
-import {
-  getAvailableLocations,
-  getBarbershops,
-  getPopularBarbershops,
-  getUserBarbershops,
-} from "@/data/barbershops";
-import { getUserBookings } from "@/data/bookings";
-import { getServiceCategories } from "@/data/services";
-import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
-interface HomeProps {
-  params: Promise<{ slug?: string }>;
-  searchParams: Promise<{ city?: string; state?: string }>;
-}
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
-const Banner = ({ children }: { children?: React.ReactNode }) => (
-  <div className="relative overflow-hidden rounded-2xl">
-    <Image
-      src={bannerDark}
-      alt="Agende nos melhores com a Servix"
-      sizes="(max-width: 768px) 100vw, 1024px"
-      className="hidden h-auto w-full rounded-2xl dark:block"
-      priority
-    />
-    <Image
-      src={bannerLight}
-      alt="Agende nos melhores com a Servix"
-      sizes="(max-width: 768px) 100vw, 1024px"
-      className="block h-auto w-full rounded-2xl dark:hidden"
-      priority
-    />
-    <div className="absolute inset-0 rounded-2xl bg-linear-to-r from-black/60 via-black/30 to-transparent" />
-    {children && (
-      <div className="absolute bottom-[8%] left-4 right-4 sm:bottom-[10%] sm:left-8 md:bottom-[12%]">
-        {children}
-      </div>
-    )}
-  </div>
-);
-
-export default async function Home({ params, searchParams }: HomeProps) {
-  const { slug } = await params;
-  const { city, state } = await searchParams;
-
-  const filters = { city, state, slug }; // <-- passa slug pros data fetchers
-
+export default async function HomePage() {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
 
-  const role = session?.user?.role as string | undefined;
-  const userId = session?.user?.id;
-  const isRestricted = role === "owner" || role === "professional";
-
-  if (isRestricted && userId) {
-    const [myBarbershops, { confirmedBookings }] = await Promise.all([
-      getUserBarbershops(userId, role!),
-      getUserBookings(),
-      getServiceCategories(),
-    ]);
-
-    return (
-      <div className="flex min-h-screen flex-col">
-        <Header />
-        <PageContainer>
-          <Suspense fallback={null}>
-            <AuthErrorAlert />
-          </Suspense>
-          <Banner />
-          {confirmedBookings.length > 0 && (
-            <PageSectionContent>
-              <PageSectionTitle>Agendamentos</PageSectionTitle>
-              <PageSectionScroller>
-                {confirmedBookings.map((booking) => (
-                  <BookingItem key={booking.id} booking={booking} />
-                ))}
-              </PageSectionScroller>
-            </PageSectionContent>
-          )}
-          <PageSectionContent>
-            <PageSectionTitle>
-              {role === "owner"
-                ? "Meus Estabelecimentos"
-                : "Meu Estabelecimento"}
-            </PageSectionTitle>
-            {myBarbershops.length > 0 ? (
-              <PageSectionScroller>
-                {myBarbershops.map((barbershop) => (
-                  <BarbershopItem key={barbershop.id} barbershop={barbershop} />
-                ))}
-              </PageSectionScroller>
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                Nenhum estabelecimento encontrado.
-              </p>
-            )}
-          </PageSectionContent>
-        </PageContainer>
-        <div className="mt-auto">
-          <Footer />
-        </div>
-      </div>
-    );
+  if (!session?.user) {
+    redirect("/marketing");
   }
 
-  const [
-    barbershops,
-    popularBarbershops,
-    { confirmedBookings },
-    categories,
-    locations,
-  ] = await Promise.all([
-    getBarbershops(filters), // filtra por slug internamente
-    getPopularBarbershops(filters),
-    getUserBookings(),
-    getServiceCategories(),
-    getAvailableLocations(),
-  ]);
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: {
+      role: true,
+      ownedBarbershops: { select: { id: true } },
+      professional: { select: { id: true } },
+    },
+  });
 
-  return (
-    <div className="flex min-h-screen flex-col">
-      <Header />
-      <PageContainer>
-        <Suspense fallback={null}>
-          <AuthErrorAlert />
-        </Suspense>
-        <QuickSearch categories={categories} />
-        <Banner />
-        {locations.length > 0 && (
-          <Suspense fallback={null}>
-            <LocationFilter
-              locations={locations}
-              currentCity={city}
-              currentState={state}
-            />
-          </Suspense>
-        )}
-        {confirmedBookings.length > 0 && (
-          <PageSectionContent>
-            <PageSectionTitle>Agendamentos</PageSectionTitle>
-            <PageSectionScroller>
-              {confirmedBookings.map((booking) => (
-                <BookingItem key={booking.id} booking={booking} />
-              ))}
-            </PageSectionScroller>
-          </PageSectionContent>
-        )}
-        <PageSectionContent>
-          <PageSectionTitle>Barbearias e Salões</PageSectionTitle>
-          {barbershops.length > 0 ? (
-            <PageSectionScroller>
-              {barbershops.map((barbershop) => (
-                <BarbershopItem key={barbershop.id} barbershop={barbershop} />
-              ))}
-            </PageSectionScroller>
-          ) : (
-            <p className="text-sm text-muted-foreground">
-              Nenhum estabelecimento encontrado para a localização selecionada.
-            </p>
-          )}
-        </PageSectionContent>
-        <PageSectionContent>
-          <PageSectionTitle>Barbearias e Salões populares</PageSectionTitle>
-          {popularBarbershops.length > 0 ? (
-            <PageSectionScroller>
-              {popularBarbershops.map((barbershop) => (
-                <BarbershopItem key={barbershop.id} barbershop={barbershop} />
-              ))}
-            </PageSectionScroller>
-          ) : (
-            <p className="text-sm text-muted-foreground">
-              Nenhum estabelecimento popular encontrado para a localização
-              selecionada.
-            </p>
-          )}
-        </PageSectionContent>
-      </PageContainer>
-      <div className="mt-auto">
-        <Footer />
-      </div>
-    </div>
-  );
+  if (!user) {
+    redirect("/marketing");
+  }
+
+  if (user.role === "admin") {
+    redirect("/dashboard/admin");
+  }
+
+  if (user.role === "support") {
+    redirect("/dashboard/support");
+  }
+
+  if (user.role === "owner" && user.ownedBarbershops.length > 0) {
+    redirect("/dashboard/owner");
+  }
+
+  if (user.role === "owner") {
+    redirect("/onboarding/owner");
+  }
+
+  if (user.role === "professional" && user.professional) {
+    redirect("/dashboard/professional");
+  }
+
+  if (user.role === "professional") {
+    redirect("/onboarding/professional");
+  }
+
+  if (user.role === "client") {
+    redirect("/dashboard/client");
+  }
+
+  redirect("/marketing");
 }

@@ -23,6 +23,10 @@ export default async function ClientDashboardLayout({
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
+    select: {
+      role: true,
+      name: true,
+    },
   });
 
   if (user?.role !== UserRole.client) redirect("/");

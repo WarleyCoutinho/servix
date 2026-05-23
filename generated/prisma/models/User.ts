@@ -27,6 +27,7 @@ export type AggregateUser = {
 export type UserMinAggregateOutputType = {
   id: string | null
   name: string | null
+  phone: string | null
   email: string | null
   emailVerified: boolean | null
   image: string | null
@@ -37,11 +38,14 @@ export type UserMinAggregateOutputType = {
   stripeCustomerId: string | null
   createdAt: Date | null
   updatedAt: Date | null
+  googleCalendarNeedsReconnect: boolean | null
+  calendarWatchExpiry: Date | null
 }
 
 export type UserMaxAggregateOutputType = {
   id: string | null
   name: string | null
+  phone: string | null
   email: string | null
   emailVerified: boolean | null
   image: string | null
@@ -52,11 +56,14 @@ export type UserMaxAggregateOutputType = {
   stripeCustomerId: string | null
   createdAt: Date | null
   updatedAt: Date | null
+  googleCalendarNeedsReconnect: boolean | null
+  calendarWatchExpiry: Date | null
 }
 
 export type UserCountAggregateOutputType = {
   id: number
   name: number
+  phone: number
   email: number
   emailVerified: number
   image: number
@@ -67,6 +74,8 @@ export type UserCountAggregateOutputType = {
   stripeCustomerId: number
   createdAt: number
   updatedAt: number
+  googleCalendarNeedsReconnect: number
+  calendarWatchExpiry: number
   _all: number
 }
 
@@ -74,6 +83,7 @@ export type UserCountAggregateOutputType = {
 export type UserMinAggregateInputType = {
   id?: true
   name?: true
+  phone?: true
   email?: true
   emailVerified?: true
   image?: true
@@ -84,11 +94,14 @@ export type UserMinAggregateInputType = {
   stripeCustomerId?: true
   createdAt?: true
   updatedAt?: true
+  googleCalendarNeedsReconnect?: true
+  calendarWatchExpiry?: true
 }
 
 export type UserMaxAggregateInputType = {
   id?: true
   name?: true
+  phone?: true
   email?: true
   emailVerified?: true
   image?: true
@@ -99,11 +112,14 @@ export type UserMaxAggregateInputType = {
   stripeCustomerId?: true
   createdAt?: true
   updatedAt?: true
+  googleCalendarNeedsReconnect?: true
+  calendarWatchExpiry?: true
 }
 
 export type UserCountAggregateInputType = {
   id?: true
   name?: true
+  phone?: true
   email?: true
   emailVerified?: true
   image?: true
@@ -114,6 +130,8 @@ export type UserCountAggregateInputType = {
   stripeCustomerId?: true
   createdAt?: true
   updatedAt?: true
+  googleCalendarNeedsReconnect?: true
+  calendarWatchExpiry?: true
   _all?: true
 }
 
@@ -192,6 +210,7 @@ export type UserGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
 export type UserGroupByOutputType = {
   id: string
   name: string
+  phone: string | null
   email: string
   emailVerified: boolean
   image: string | null
@@ -202,6 +221,8 @@ export type UserGroupByOutputType = {
   stripeCustomerId: string | null
   createdAt: Date
   updatedAt: Date
+  googleCalendarNeedsReconnect: boolean
+  calendarWatchExpiry: Date | null
   _count: UserCountAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
@@ -228,6 +249,7 @@ export type UserWhereInput = {
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   id?: Prisma.StringFilter<"User"> | string
   name?: Prisma.StringFilter<"User"> | string
+  phone?: Prisma.StringNullableFilter<"User"> | string | null
   email?: Prisma.StringFilter<"User"> | string
   emailVerified?: Prisma.BoolFilter<"User"> | boolean
   image?: Prisma.StringNullableFilter<"User"> | string | null
@@ -238,6 +260,8 @@ export type UserWhereInput = {
   stripeCustomerId?: Prisma.StringNullableFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
+  googleCalendarNeedsReconnect?: Prisma.BoolFilter<"User"> | boolean
+  calendarWatchExpiry?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   sessions?: Prisma.SessionListRelationFilter
   accounts?: Prisma.AccountListRelationFilter
   bookings?: Prisma.BookingListRelationFilter
@@ -255,6 +279,7 @@ export type UserWhereInput = {
 export type UserOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  phone?: Prisma.SortOrderInput | Prisma.SortOrder
   email?: Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
   image?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -265,6 +290,8 @@ export type UserOrderByWithRelationInput = {
   stripeCustomerId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  googleCalendarNeedsReconnect?: Prisma.SortOrder
+  calendarWatchExpiry?: Prisma.SortOrderInput | Prisma.SortOrder
   sessions?: Prisma.SessionOrderByRelationAggregateInput
   accounts?: Prisma.AccountOrderByRelationAggregateInput
   bookings?: Prisma.BookingOrderByRelationAggregateInput
@@ -286,6 +313,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.UserWhereInput[]
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   name?: Prisma.StringFilter<"User"> | string
+  phone?: Prisma.StringNullableFilter<"User"> | string | null
   emailVerified?: Prisma.BoolFilter<"User"> | boolean
   image?: Prisma.StringNullableFilter<"User"> | string | null
   role?: Prisma.EnumUserRoleFilter<"User"> | $Enums.UserRole
@@ -295,6 +323,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   stripeCustomerId?: Prisma.StringNullableFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
+  googleCalendarNeedsReconnect?: Prisma.BoolFilter<"User"> | boolean
+  calendarWatchExpiry?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   sessions?: Prisma.SessionListRelationFilter
   accounts?: Prisma.AccountListRelationFilter
   bookings?: Prisma.BookingListRelationFilter
@@ -312,6 +342,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
 export type UserOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  phone?: Prisma.SortOrderInput | Prisma.SortOrder
   email?: Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
   image?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -322,6 +353,8 @@ export type UserOrderByWithAggregationInput = {
   stripeCustomerId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  googleCalendarNeedsReconnect?: Prisma.SortOrder
+  calendarWatchExpiry?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
   _min?: Prisma.UserMinOrderByAggregateInput
@@ -333,6 +366,7 @@ export type UserScalarWhereWithAggregatesInput = {
   NOT?: Prisma.UserScalarWhereWithAggregatesInput | Prisma.UserScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"User"> | string
   name?: Prisma.StringWithAggregatesFilter<"User"> | string
+  phone?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   email?: Prisma.StringWithAggregatesFilter<"User"> | string
   emailVerified?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   image?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
@@ -343,11 +377,14 @@ export type UserScalarWhereWithAggregatesInput = {
   stripeCustomerId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
+  googleCalendarNeedsReconnect?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
+  calendarWatchExpiry?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
 }
 
 export type UserCreateInput = {
   id: string
   name: string
+  phone?: string | null
   email: string
   emailVerified?: boolean
   image?: string | null
@@ -358,6 +395,8 @@ export type UserCreateInput = {
   stripeCustomerId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  googleCalendarNeedsReconnect?: boolean
+  calendarWatchExpiry?: Date | string | null
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   bookings?: Prisma.BookingCreateNestedManyWithoutUserInput
@@ -375,6 +414,7 @@ export type UserCreateInput = {
 export type UserUncheckedCreateInput = {
   id: string
   name: string
+  phone?: string | null
   email: string
   emailVerified?: boolean
   image?: string | null
@@ -385,6 +425,8 @@ export type UserUncheckedCreateInput = {
   stripeCustomerId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  googleCalendarNeedsReconnect?: boolean
+  calendarWatchExpiry?: Date | string | null
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutUserInput
@@ -402,6 +444,7 @@ export type UserUncheckedCreateInput = {
 export type UserUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -412,6 +455,8 @@ export type UserUpdateInput = {
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  googleCalendarNeedsReconnect?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarWatchExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   bookings?: Prisma.BookingUpdateManyWithoutUserNestedInput
@@ -429,6 +474,7 @@ export type UserUpdateInput = {
 export type UserUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -439,6 +485,8 @@ export type UserUncheckedUpdateInput = {
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  googleCalendarNeedsReconnect?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarWatchExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutUserNestedInput
@@ -456,6 +504,7 @@ export type UserUncheckedUpdateInput = {
 export type UserCreateManyInput = {
   id: string
   name: string
+  phone?: string | null
   email: string
   emailVerified?: boolean
   image?: string | null
@@ -466,11 +515,14 @@ export type UserCreateManyInput = {
   stripeCustomerId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  googleCalendarNeedsReconnect?: boolean
+  calendarWatchExpiry?: Date | string | null
 }
 
 export type UserUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -481,11 +533,14 @@ export type UserUpdateManyMutationInput = {
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  googleCalendarNeedsReconnect?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarWatchExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type UserUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -496,11 +551,14 @@ export type UserUncheckedUpdateManyInput = {
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  googleCalendarNeedsReconnect?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarWatchExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type UserCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  phone?: Prisma.SortOrder
   email?: Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
   image?: Prisma.SortOrder
@@ -511,11 +569,14 @@ export type UserCountOrderByAggregateInput = {
   stripeCustomerId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  googleCalendarNeedsReconnect?: Prisma.SortOrder
+  calendarWatchExpiry?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  phone?: Prisma.SortOrder
   email?: Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
   image?: Prisma.SortOrder
@@ -526,11 +587,14 @@ export type UserMaxOrderByAggregateInput = {
   stripeCustomerId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  googleCalendarNeedsReconnect?: Prisma.SortOrder
+  calendarWatchExpiry?: Prisma.SortOrder
 }
 
 export type UserMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  phone?: Prisma.SortOrder
   email?: Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
   image?: Prisma.SortOrder
@@ -541,6 +605,8 @@ export type UserMinOrderByAggregateInput = {
   stripeCustomerId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  googleCalendarNeedsReconnect?: Prisma.SortOrder
+  calendarWatchExpiry?: Prisma.SortOrder
 }
 
 export type UserScalarRelationFilter = {
@@ -557,12 +623,12 @@ export type StringFieldUpdateOperationsInput = {
   set?: string
 }
 
-export type BoolFieldUpdateOperationsInput = {
-  set?: boolean
-}
-
 export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
+}
+
+export type BoolFieldUpdateOperationsInput = {
+  set?: boolean
 }
 
 export type EnumUserRoleFieldUpdateOperationsInput = {
@@ -754,6 +820,7 @@ export type UserUpdateOneRequiredWithoutManualActivationLogsNestedInput = {
 export type UserCreateWithoutSessionsInput = {
   id: string
   name: string
+  phone?: string | null
   email: string
   emailVerified?: boolean
   image?: string | null
@@ -764,6 +831,8 @@ export type UserCreateWithoutSessionsInput = {
   stripeCustomerId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  googleCalendarNeedsReconnect?: boolean
+  calendarWatchExpiry?: Date | string | null
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   bookings?: Prisma.BookingCreateNestedManyWithoutUserInput
   ownedBarbershops?: Prisma.BarbershopCreateNestedManyWithoutOwnerInput
@@ -780,6 +849,7 @@ export type UserCreateWithoutSessionsInput = {
 export type UserUncheckedCreateWithoutSessionsInput = {
   id: string
   name: string
+  phone?: string | null
   email: string
   emailVerified?: boolean
   image?: string | null
@@ -790,6 +860,8 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   stripeCustomerId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  googleCalendarNeedsReconnect?: boolean
+  calendarWatchExpiry?: Date | string | null
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutUserInput
   ownedBarbershops?: Prisma.BarbershopUncheckedCreateNestedManyWithoutOwnerInput
@@ -822,6 +894,7 @@ export type UserUpdateToOneWithWhereWithoutSessionsInput = {
 export type UserUpdateWithoutSessionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -832,6 +905,8 @@ export type UserUpdateWithoutSessionsInput = {
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  googleCalendarNeedsReconnect?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarWatchExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   bookings?: Prisma.BookingUpdateManyWithoutUserNestedInput
   ownedBarbershops?: Prisma.BarbershopUpdateManyWithoutOwnerNestedInput
@@ -848,6 +923,7 @@ export type UserUpdateWithoutSessionsInput = {
 export type UserUncheckedUpdateWithoutSessionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -858,6 +934,8 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  googleCalendarNeedsReconnect?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarWatchExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutUserNestedInput
   ownedBarbershops?: Prisma.BarbershopUncheckedUpdateManyWithoutOwnerNestedInput
@@ -874,6 +952,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
 export type UserCreateWithoutAccountsInput = {
   id: string
   name: string
+  phone?: string | null
   email: string
   emailVerified?: boolean
   image?: string | null
@@ -884,6 +963,8 @@ export type UserCreateWithoutAccountsInput = {
   stripeCustomerId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  googleCalendarNeedsReconnect?: boolean
+  calendarWatchExpiry?: Date | string | null
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   bookings?: Prisma.BookingCreateNestedManyWithoutUserInput
   ownedBarbershops?: Prisma.BarbershopCreateNestedManyWithoutOwnerInput
@@ -900,6 +981,7 @@ export type UserCreateWithoutAccountsInput = {
 export type UserUncheckedCreateWithoutAccountsInput = {
   id: string
   name: string
+  phone?: string | null
   email: string
   emailVerified?: boolean
   image?: string | null
@@ -910,6 +992,8 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   stripeCustomerId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  googleCalendarNeedsReconnect?: boolean
+  calendarWatchExpiry?: Date | string | null
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutUserInput
   ownedBarbershops?: Prisma.BarbershopUncheckedCreateNestedManyWithoutOwnerInput
@@ -942,6 +1026,7 @@ export type UserUpdateToOneWithWhereWithoutAccountsInput = {
 export type UserUpdateWithoutAccountsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -952,6 +1037,8 @@ export type UserUpdateWithoutAccountsInput = {
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  googleCalendarNeedsReconnect?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarWatchExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   bookings?: Prisma.BookingUpdateManyWithoutUserNestedInput
   ownedBarbershops?: Prisma.BarbershopUpdateManyWithoutOwnerNestedInput
@@ -968,6 +1055,7 @@ export type UserUpdateWithoutAccountsInput = {
 export type UserUncheckedUpdateWithoutAccountsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -978,6 +1066,8 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  googleCalendarNeedsReconnect?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarWatchExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutUserNestedInput
   ownedBarbershops?: Prisma.BarbershopUncheckedUpdateManyWithoutOwnerNestedInput
@@ -994,6 +1084,7 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
 export type UserCreateWithoutOwnedBarbershopsInput = {
   id: string
   name: string
+  phone?: string | null
   email: string
   emailVerified?: boolean
   image?: string | null
@@ -1004,6 +1095,8 @@ export type UserCreateWithoutOwnedBarbershopsInput = {
   stripeCustomerId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  googleCalendarNeedsReconnect?: boolean
+  calendarWatchExpiry?: Date | string | null
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   bookings?: Prisma.BookingCreateNestedManyWithoutUserInput
@@ -1020,6 +1113,7 @@ export type UserCreateWithoutOwnedBarbershopsInput = {
 export type UserUncheckedCreateWithoutOwnedBarbershopsInput = {
   id: string
   name: string
+  phone?: string | null
   email: string
   emailVerified?: boolean
   image?: string | null
@@ -1030,6 +1124,8 @@ export type UserUncheckedCreateWithoutOwnedBarbershopsInput = {
   stripeCustomerId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  googleCalendarNeedsReconnect?: boolean
+  calendarWatchExpiry?: Date | string | null
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutUserInput
@@ -1062,6 +1158,7 @@ export type UserUpdateToOneWithWhereWithoutOwnedBarbershopsInput = {
 export type UserUpdateWithoutOwnedBarbershopsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1072,6 +1169,8 @@ export type UserUpdateWithoutOwnedBarbershopsInput = {
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  googleCalendarNeedsReconnect?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarWatchExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   bookings?: Prisma.BookingUpdateManyWithoutUserNestedInput
@@ -1088,6 +1187,7 @@ export type UserUpdateWithoutOwnedBarbershopsInput = {
 export type UserUncheckedUpdateWithoutOwnedBarbershopsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1098,6 +1198,8 @@ export type UserUncheckedUpdateWithoutOwnedBarbershopsInput = {
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  googleCalendarNeedsReconnect?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarWatchExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutUserNestedInput
@@ -1114,6 +1216,7 @@ export type UserUncheckedUpdateWithoutOwnedBarbershopsInput = {
 export type UserCreateWithoutProfessionalInput = {
   id: string
   name: string
+  phone?: string | null
   email: string
   emailVerified?: boolean
   image?: string | null
@@ -1124,6 +1227,8 @@ export type UserCreateWithoutProfessionalInput = {
   stripeCustomerId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  googleCalendarNeedsReconnect?: boolean
+  calendarWatchExpiry?: Date | string | null
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   bookings?: Prisma.BookingCreateNestedManyWithoutUserInput
@@ -1140,6 +1245,7 @@ export type UserCreateWithoutProfessionalInput = {
 export type UserUncheckedCreateWithoutProfessionalInput = {
   id: string
   name: string
+  phone?: string | null
   email: string
   emailVerified?: boolean
   image?: string | null
@@ -1150,6 +1256,8 @@ export type UserUncheckedCreateWithoutProfessionalInput = {
   stripeCustomerId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  googleCalendarNeedsReconnect?: boolean
+  calendarWatchExpiry?: Date | string | null
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutUserInput
@@ -1182,6 +1290,7 @@ export type UserUpdateToOneWithWhereWithoutProfessionalInput = {
 export type UserUpdateWithoutProfessionalInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1192,6 +1301,8 @@ export type UserUpdateWithoutProfessionalInput = {
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  googleCalendarNeedsReconnect?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarWatchExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   bookings?: Prisma.BookingUpdateManyWithoutUserNestedInput
@@ -1208,6 +1319,7 @@ export type UserUpdateWithoutProfessionalInput = {
 export type UserUncheckedUpdateWithoutProfessionalInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1218,6 +1330,8 @@ export type UserUncheckedUpdateWithoutProfessionalInput = {
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  googleCalendarNeedsReconnect?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarWatchExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutUserNestedInput
@@ -1234,6 +1348,7 @@ export type UserUncheckedUpdateWithoutProfessionalInput = {
 export type UserCreateWithoutBookingsInput = {
   id: string
   name: string
+  phone?: string | null
   email: string
   emailVerified?: boolean
   image?: string | null
@@ -1244,6 +1359,8 @@ export type UserCreateWithoutBookingsInput = {
   stripeCustomerId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  googleCalendarNeedsReconnect?: boolean
+  calendarWatchExpiry?: Date | string | null
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   ownedBarbershops?: Prisma.BarbershopCreateNestedManyWithoutOwnerInput
@@ -1260,6 +1377,7 @@ export type UserCreateWithoutBookingsInput = {
 export type UserUncheckedCreateWithoutBookingsInput = {
   id: string
   name: string
+  phone?: string | null
   email: string
   emailVerified?: boolean
   image?: string | null
@@ -1270,6 +1388,8 @@ export type UserUncheckedCreateWithoutBookingsInput = {
   stripeCustomerId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  googleCalendarNeedsReconnect?: boolean
+  calendarWatchExpiry?: Date | string | null
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   ownedBarbershops?: Prisma.BarbershopUncheckedCreateNestedManyWithoutOwnerInput
@@ -1302,6 +1422,7 @@ export type UserUpdateToOneWithWhereWithoutBookingsInput = {
 export type UserUpdateWithoutBookingsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1312,6 +1433,8 @@ export type UserUpdateWithoutBookingsInput = {
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  googleCalendarNeedsReconnect?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarWatchExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   ownedBarbershops?: Prisma.BarbershopUpdateManyWithoutOwnerNestedInput
@@ -1328,6 +1451,7 @@ export type UserUpdateWithoutBookingsInput = {
 export type UserUncheckedUpdateWithoutBookingsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1338,6 +1462,8 @@ export type UserUncheckedUpdateWithoutBookingsInput = {
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  googleCalendarNeedsReconnect?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarWatchExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   ownedBarbershops?: Prisma.BarbershopUncheckedUpdateManyWithoutOwnerNestedInput
@@ -1354,6 +1480,7 @@ export type UserUncheckedUpdateWithoutBookingsInput = {
 export type UserCreateWithoutSupportTicketsInput = {
   id: string
   name: string
+  phone?: string | null
   email: string
   emailVerified?: boolean
   image?: string | null
@@ -1364,6 +1491,8 @@ export type UserCreateWithoutSupportTicketsInput = {
   stripeCustomerId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  googleCalendarNeedsReconnect?: boolean
+  calendarWatchExpiry?: Date | string | null
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   bookings?: Prisma.BookingCreateNestedManyWithoutUserInput
@@ -1380,6 +1509,7 @@ export type UserCreateWithoutSupportTicketsInput = {
 export type UserUncheckedCreateWithoutSupportTicketsInput = {
   id: string
   name: string
+  phone?: string | null
   email: string
   emailVerified?: boolean
   image?: string | null
@@ -1390,6 +1520,8 @@ export type UserUncheckedCreateWithoutSupportTicketsInput = {
   stripeCustomerId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  googleCalendarNeedsReconnect?: boolean
+  calendarWatchExpiry?: Date | string | null
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutUserInput
@@ -1411,6 +1543,7 @@ export type UserCreateOrConnectWithoutSupportTicketsInput = {
 export type UserCreateWithoutAssignedTicketsInput = {
   id: string
   name: string
+  phone?: string | null
   email: string
   emailVerified?: boolean
   image?: string | null
@@ -1421,6 +1554,8 @@ export type UserCreateWithoutAssignedTicketsInput = {
   stripeCustomerId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  googleCalendarNeedsReconnect?: boolean
+  calendarWatchExpiry?: Date | string | null
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   bookings?: Prisma.BookingCreateNestedManyWithoutUserInput
@@ -1437,6 +1572,7 @@ export type UserCreateWithoutAssignedTicketsInput = {
 export type UserUncheckedCreateWithoutAssignedTicketsInput = {
   id: string
   name: string
+  phone?: string | null
   email: string
   emailVerified?: boolean
   image?: string | null
@@ -1447,6 +1583,8 @@ export type UserUncheckedCreateWithoutAssignedTicketsInput = {
   stripeCustomerId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  googleCalendarNeedsReconnect?: boolean
+  calendarWatchExpiry?: Date | string | null
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutUserInput
@@ -1479,6 +1617,7 @@ export type UserUpdateToOneWithWhereWithoutSupportTicketsInput = {
 export type UserUpdateWithoutSupportTicketsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1489,6 +1628,8 @@ export type UserUpdateWithoutSupportTicketsInput = {
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  googleCalendarNeedsReconnect?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarWatchExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   bookings?: Prisma.BookingUpdateManyWithoutUserNestedInput
@@ -1505,6 +1646,7 @@ export type UserUpdateWithoutSupportTicketsInput = {
 export type UserUncheckedUpdateWithoutSupportTicketsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1515,6 +1657,8 @@ export type UserUncheckedUpdateWithoutSupportTicketsInput = {
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  googleCalendarNeedsReconnect?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarWatchExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutUserNestedInput
@@ -1542,6 +1686,7 @@ export type UserUpdateToOneWithWhereWithoutAssignedTicketsInput = {
 export type UserUpdateWithoutAssignedTicketsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1552,6 +1697,8 @@ export type UserUpdateWithoutAssignedTicketsInput = {
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  googleCalendarNeedsReconnect?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarWatchExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   bookings?: Prisma.BookingUpdateManyWithoutUserNestedInput
@@ -1568,6 +1715,7 @@ export type UserUpdateWithoutAssignedTicketsInput = {
 export type UserUncheckedUpdateWithoutAssignedTicketsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1578,6 +1726,8 @@ export type UserUncheckedUpdateWithoutAssignedTicketsInput = {
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  googleCalendarNeedsReconnect?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarWatchExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutUserNestedInput
@@ -1594,6 +1744,7 @@ export type UserUncheckedUpdateWithoutAssignedTicketsInput = {
 export type UserCreateWithoutSentSupportMsgsInput = {
   id: string
   name: string
+  phone?: string | null
   email: string
   emailVerified?: boolean
   image?: string | null
@@ -1604,6 +1755,8 @@ export type UserCreateWithoutSentSupportMsgsInput = {
   stripeCustomerId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  googleCalendarNeedsReconnect?: boolean
+  calendarWatchExpiry?: Date | string | null
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   bookings?: Prisma.BookingCreateNestedManyWithoutUserInput
@@ -1620,6 +1773,7 @@ export type UserCreateWithoutSentSupportMsgsInput = {
 export type UserUncheckedCreateWithoutSentSupportMsgsInput = {
   id: string
   name: string
+  phone?: string | null
   email: string
   emailVerified?: boolean
   image?: string | null
@@ -1630,6 +1784,8 @@ export type UserUncheckedCreateWithoutSentSupportMsgsInput = {
   stripeCustomerId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  googleCalendarNeedsReconnect?: boolean
+  calendarWatchExpiry?: Date | string | null
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutUserInput
@@ -1662,6 +1818,7 @@ export type UserUpdateToOneWithWhereWithoutSentSupportMsgsInput = {
 export type UserUpdateWithoutSentSupportMsgsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1672,6 +1829,8 @@ export type UserUpdateWithoutSentSupportMsgsInput = {
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  googleCalendarNeedsReconnect?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarWatchExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   bookings?: Prisma.BookingUpdateManyWithoutUserNestedInput
@@ -1688,6 +1847,7 @@ export type UserUpdateWithoutSentSupportMsgsInput = {
 export type UserUncheckedUpdateWithoutSentSupportMsgsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1698,6 +1858,8 @@ export type UserUncheckedUpdateWithoutSentSupportMsgsInput = {
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  googleCalendarNeedsReconnect?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarWatchExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutUserNestedInput
@@ -1714,6 +1876,7 @@ export type UserUncheckedUpdateWithoutSentSupportMsgsInput = {
 export type UserCreateWithoutSupportAuditLogsInput = {
   id: string
   name: string
+  phone?: string | null
   email: string
   emailVerified?: boolean
   image?: string | null
@@ -1724,6 +1887,8 @@ export type UserCreateWithoutSupportAuditLogsInput = {
   stripeCustomerId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  googleCalendarNeedsReconnect?: boolean
+  calendarWatchExpiry?: Date | string | null
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   bookings?: Prisma.BookingCreateNestedManyWithoutUserInput
@@ -1740,6 +1905,7 @@ export type UserCreateWithoutSupportAuditLogsInput = {
 export type UserUncheckedCreateWithoutSupportAuditLogsInput = {
   id: string
   name: string
+  phone?: string | null
   email: string
   emailVerified?: boolean
   image?: string | null
@@ -1750,6 +1916,8 @@ export type UserUncheckedCreateWithoutSupportAuditLogsInput = {
   stripeCustomerId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  googleCalendarNeedsReconnect?: boolean
+  calendarWatchExpiry?: Date | string | null
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutUserInput
@@ -1782,6 +1950,7 @@ export type UserUpdateToOneWithWhereWithoutSupportAuditLogsInput = {
 export type UserUpdateWithoutSupportAuditLogsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1792,6 +1961,8 @@ export type UserUpdateWithoutSupportAuditLogsInput = {
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  googleCalendarNeedsReconnect?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarWatchExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   bookings?: Prisma.BookingUpdateManyWithoutUserNestedInput
@@ -1808,6 +1979,7 @@ export type UserUpdateWithoutSupportAuditLogsInput = {
 export type UserUncheckedUpdateWithoutSupportAuditLogsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1818,6 +1990,8 @@ export type UserUncheckedUpdateWithoutSupportAuditLogsInput = {
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  googleCalendarNeedsReconnect?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarWatchExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutUserNestedInput
@@ -1834,6 +2008,7 @@ export type UserUncheckedUpdateWithoutSupportAuditLogsInput = {
 export type UserCreateWithoutSentInvitesInput = {
   id: string
   name: string
+  phone?: string | null
   email: string
   emailVerified?: boolean
   image?: string | null
@@ -1844,6 +2019,8 @@ export type UserCreateWithoutSentInvitesInput = {
   stripeCustomerId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  googleCalendarNeedsReconnect?: boolean
+  calendarWatchExpiry?: Date | string | null
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   bookings?: Prisma.BookingCreateNestedManyWithoutUserInput
@@ -1860,6 +2037,7 @@ export type UserCreateWithoutSentInvitesInput = {
 export type UserUncheckedCreateWithoutSentInvitesInput = {
   id: string
   name: string
+  phone?: string | null
   email: string
   emailVerified?: boolean
   image?: string | null
@@ -1870,6 +2048,8 @@ export type UserUncheckedCreateWithoutSentInvitesInput = {
   stripeCustomerId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  googleCalendarNeedsReconnect?: boolean
+  calendarWatchExpiry?: Date | string | null
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutUserInput
@@ -1902,6 +2082,7 @@ export type UserUpdateToOneWithWhereWithoutSentInvitesInput = {
 export type UserUpdateWithoutSentInvitesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1912,6 +2093,8 @@ export type UserUpdateWithoutSentInvitesInput = {
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  googleCalendarNeedsReconnect?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarWatchExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   bookings?: Prisma.BookingUpdateManyWithoutUserNestedInput
@@ -1928,6 +2111,7 @@ export type UserUpdateWithoutSentInvitesInput = {
 export type UserUncheckedUpdateWithoutSentInvitesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1938,6 +2122,8 @@ export type UserUncheckedUpdateWithoutSentInvitesInput = {
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  googleCalendarNeedsReconnect?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarWatchExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutUserNestedInput
@@ -1954,6 +2140,7 @@ export type UserUncheckedUpdateWithoutSentInvitesInput = {
 export type UserCreateWithoutNotificationsInput = {
   id: string
   name: string
+  phone?: string | null
   email: string
   emailVerified?: boolean
   image?: string | null
@@ -1964,6 +2151,8 @@ export type UserCreateWithoutNotificationsInput = {
   stripeCustomerId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  googleCalendarNeedsReconnect?: boolean
+  calendarWatchExpiry?: Date | string | null
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   bookings?: Prisma.BookingCreateNestedManyWithoutUserInput
@@ -1980,6 +2169,7 @@ export type UserCreateWithoutNotificationsInput = {
 export type UserUncheckedCreateWithoutNotificationsInput = {
   id: string
   name: string
+  phone?: string | null
   email: string
   emailVerified?: boolean
   image?: string | null
@@ -1990,6 +2180,8 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   stripeCustomerId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  googleCalendarNeedsReconnect?: boolean
+  calendarWatchExpiry?: Date | string | null
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutUserInput
@@ -2022,6 +2214,7 @@ export type UserUpdateToOneWithWhereWithoutNotificationsInput = {
 export type UserUpdateWithoutNotificationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2032,6 +2225,8 @@ export type UserUpdateWithoutNotificationsInput = {
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  googleCalendarNeedsReconnect?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarWatchExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   bookings?: Prisma.BookingUpdateManyWithoutUserNestedInput
@@ -2048,6 +2243,7 @@ export type UserUpdateWithoutNotificationsInput = {
 export type UserUncheckedUpdateWithoutNotificationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2058,6 +2254,8 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  googleCalendarNeedsReconnect?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarWatchExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutUserNestedInput
@@ -2074,6 +2272,7 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
 export type UserCreateWithoutManualActivationLogsInput = {
   id: string
   name: string
+  phone?: string | null
   email: string
   emailVerified?: boolean
   image?: string | null
@@ -2084,6 +2283,8 @@ export type UserCreateWithoutManualActivationLogsInput = {
   stripeCustomerId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  googleCalendarNeedsReconnect?: boolean
+  calendarWatchExpiry?: Date | string | null
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   bookings?: Prisma.BookingCreateNestedManyWithoutUserInput
@@ -2100,6 +2301,7 @@ export type UserCreateWithoutManualActivationLogsInput = {
 export type UserUncheckedCreateWithoutManualActivationLogsInput = {
   id: string
   name: string
+  phone?: string | null
   email: string
   emailVerified?: boolean
   image?: string | null
@@ -2110,6 +2312,8 @@ export type UserUncheckedCreateWithoutManualActivationLogsInput = {
   stripeCustomerId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  googleCalendarNeedsReconnect?: boolean
+  calendarWatchExpiry?: Date | string | null
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutUserInput
@@ -2142,6 +2346,7 @@ export type UserUpdateToOneWithWhereWithoutManualActivationLogsInput = {
 export type UserUpdateWithoutManualActivationLogsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2152,6 +2357,8 @@ export type UserUpdateWithoutManualActivationLogsInput = {
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  googleCalendarNeedsReconnect?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarWatchExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   bookings?: Prisma.BookingUpdateManyWithoutUserNestedInput
@@ -2168,6 +2375,7 @@ export type UserUpdateWithoutManualActivationLogsInput = {
 export type UserUncheckedUpdateWithoutManualActivationLogsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2178,6 +2386,8 @@ export type UserUncheckedUpdateWithoutManualActivationLogsInput = {
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  googleCalendarNeedsReconnect?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  calendarWatchExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutUserNestedInput
@@ -2315,6 +2525,7 @@ export type UserCountOutputTypeCountManualActivationLogsArgs<ExtArgs extends run
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  phone?: boolean
   email?: boolean
   emailVerified?: boolean
   image?: boolean
@@ -2325,6 +2536,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   stripeCustomerId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  googleCalendarNeedsReconnect?: boolean
+  calendarWatchExpiry?: boolean
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
   bookings?: boolean | Prisma.User$bookingsArgs<ExtArgs>
@@ -2343,6 +2556,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
 export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  phone?: boolean
   email?: boolean
   emailVerified?: boolean
   image?: boolean
@@ -2353,11 +2567,14 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   stripeCustomerId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  googleCalendarNeedsReconnect?: boolean
+  calendarWatchExpiry?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  phone?: boolean
   email?: boolean
   emailVerified?: boolean
   image?: boolean
@@ -2368,11 +2585,14 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   stripeCustomerId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  googleCalendarNeedsReconnect?: boolean
+  calendarWatchExpiry?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectScalar = {
   id?: boolean
   name?: boolean
+  phone?: boolean
   email?: boolean
   emailVerified?: boolean
   image?: boolean
@@ -2383,9 +2603,11 @@ export type UserSelectScalar = {
   stripeCustomerId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  googleCalendarNeedsReconnect?: boolean
+  calendarWatchExpiry?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image" | "role" | "banned" | "banReason" | "banExpires" | "stripeCustomerId" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "phone" | "email" | "emailVerified" | "image" | "role" | "banned" | "banReason" | "banExpires" | "stripeCustomerId" | "createdAt" | "updatedAt" | "googleCalendarNeedsReconnect" | "calendarWatchExpiry", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
@@ -2423,6 +2645,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     name: string
+    phone: string | null
     email: string
     emailVerified: boolean
     image: string | null
@@ -2433,6 +2656,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     stripeCustomerId: string | null
     createdAt: Date
     updatedAt: Date
+    googleCalendarNeedsReconnect: boolean
+    calendarWatchExpiry: Date | null
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -2870,6 +3095,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
 export interface UserFieldRefs {
   readonly id: Prisma.FieldRef<"User", 'String'>
   readonly name: Prisma.FieldRef<"User", 'String'>
+  readonly phone: Prisma.FieldRef<"User", 'String'>
   readonly email: Prisma.FieldRef<"User", 'String'>
   readonly emailVerified: Prisma.FieldRef<"User", 'Boolean'>
   readonly image: Prisma.FieldRef<"User", 'String'>
@@ -2880,6 +3106,8 @@ export interface UserFieldRefs {
   readonly stripeCustomerId: Prisma.FieldRef<"User", 'String'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly googleCalendarNeedsReconnect: Prisma.FieldRef<"User", 'Boolean'>
+  readonly calendarWatchExpiry: Prisma.FieldRef<"User", 'DateTime'>
 }
     
 

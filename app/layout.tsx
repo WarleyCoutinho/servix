@@ -25,6 +25,9 @@ export const metadata: Metadata = {
     apple: "/servix_icon_dark.svg",
     shortcut: "/servix_icon_dark.svg",
   },
+  verification: {
+    google: "746c5f799f8274e5",
+  },
 };
 
 export default function RootLayout({

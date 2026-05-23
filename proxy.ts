@@ -18,10 +18,16 @@ const supportRoutes = ["/dashboard/support"];
 const PROTECTED_ROUTES = ["/dashboard", "/bookings", "/api/whatsapp"];
 
 // Rotas fixas do app que não são slug de loja
+// Rotas fixas do app que NÃO são slug de loja
 const EXCLUDED_SLUG_PATHS = [
+  "/home",
+  "/manual",
+  "/marketing",
   "/barbershops",
   "/dashboard",
   "/bookings",
+  "/termos",
+  "/privacidade",
   "/api",
   "/_next",
   "/favicon.ico",
@@ -50,8 +56,29 @@ function isProtectedRoute(pathname: string): boolean {
 }
 
 function isStoreRoute(pathname: string): boolean {
-  const isExcluded = EXCLUDED_SLUG_PATHS.some((p) => pathname.startsWith(p));
-  return !isExcluded && /^\/([^/]+)$/.test(pathname);
+  // raiz nunca é slug
+  if (pathname === "/") {
+    return false;
+  }
+
+  // impede rotas internas/fixas
+  const isExcluded = EXCLUDED_SLUG_PATHS.some(
+    (p) => pathname === p || pathname.startsWith(`${p}/`),
+  );
+
+  if (isExcluded) {
+    return false;
+  }
+
+  // aceita apenas:
+  // /slug
+  // e rejeita:
+  // /slug/teste
+  // /api/x
+  // /dashboard/x
+  const segments = pathname.split("/").filter(Boolean);
+
+  return segments.length === 1;
 }
 
 async function getUserRole(request: NextRequest): Promise<string | null> {
@@ -92,26 +119,37 @@ export async function proxy(request: NextRequest) {
 
   // ── Store context: /{slug} → seta cookie e deixa passar ─────────────────────
   if (isStoreRoute(pathname)) {
-    const slug = decodeURIComponent(pathname.slice(1)).trim(); // remove a barra inicial
+    const slug = decodeURIComponent(pathname.slice(1)).trim();
+
+    // pega slug atual salvo
+    const currentSlug = request.cookies.get(STORE_CONTEXT_COOKIE)?.value;
+
     const response = NextResponse.next();
-    response.cookies.set(STORE_CONTEXT_COOKIE, slug, {
-      path: "/",
-      maxAge: 60 * 60 * 24 * 30, // 30 dias
-      sameSite: "lax",
-      httpOnly: false,
-    });
+
+    // só salva se:
+    // - não existir cookie
+    // - ou for outro slug diferente
+    if (!currentSlug || currentSlug !== slug) {
+      response.cookies.set(STORE_CONTEXT_COOKIE, slug, {
+        path: "/",
+        maxAge: 60 * 60 * 24 * 30, // 30 dias
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+      });
+    }
+
     return response;
   }
 
   // ── Store context: "/" com cookie → redireciona para /{slug} ─────────────────
-  if (pathname === "/") {
+  /*   if (pathname === "/") {
     const storeSlug = request.cookies.get(STORE_CONTEXT_COOKIE)?.value;
     if (storeSlug) {
       const url = request.nextUrl.clone();
       url.pathname = `/${storeSlug}`;
       return NextResponse.redirect(url, { status: 302 });
     }
-  }
+  } */
 
   if (pathname.startsWith("/api/auth")) {
     return NextResponse.next();

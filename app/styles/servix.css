@@ -877,8 +877,22 @@
   color: var(--white);
 }
 .sx-footer-logo span { color: var(--lime); }
-.sx-footer-text { font-size: 13px; color: var(--gray); }
-.sx-footer-link { color: var(--lime); text-decoration: none; }
+.sx-footer-text {
+  font-size: 13px;
+  color: rgba(245,245,240,0.72);
+}
+
+.sx-footer-link {
+  color: var(--white);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color .2s ease, opacity .2s ease;
+}
+
+.sx-footer-link:hover {
+  color: var(--lime);
+  opacity: 1;
+}
 
 /* ── ANIMATIONS ── */
 @keyframes sxFadeUp {

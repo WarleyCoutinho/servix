@@ -21,6 +21,11 @@ const navItems: NavItem[] = [
     label: "Configuracoes",
     icon: "Settings",
   },
+  {
+    href: "/dashboard/admin/whatsapp",
+    label: "WhatsApp",
+    icon: "MessageCircle",
+  },
 ];
 
 export default async function AdminDashboardLayout({

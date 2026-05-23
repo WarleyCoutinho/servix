@@ -94,6 +94,7 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 export const UserScalarFieldEnum = {
   id: 'id',
   name: 'name',
+  phone: 'phone',
   email: 'email',
   emailVerified: 'emailVerified',
   image: 'image',
@@ -103,7 +104,9 @@ export const UserScalarFieldEnum = {
   banExpires: 'banExpires',
   stripeCustomerId: 'stripeCustomerId',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  googleCalendarNeedsReconnect: 'googleCalendarNeedsReconnect',
+  calendarWatchExpiry: 'calendarWatchExpiry'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -277,10 +280,16 @@ export const BookingScalarFieldEnum = {
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   clientName: 'clientName',
+  clientPhone: 'clientPhone',
   barbershopId: 'barbershopId',
   serviceId: 'serviceId',
   userId: 'userId',
-  professionalId: 'professionalId'
+  professionalId: 'professionalId',
+  googleEventId: 'googleEventId',
+  googleRecurrenceId: 'googleRecurrenceId',
+  isRecurring: 'isRecurring',
+  recurrenceRule: 'recurrenceRule',
+  clientGoogleEventId: 'clientGoogleEventId'
 } as const
 
 export type BookingScalarFieldEnum = (typeof BookingScalarFieldEnum)[keyof typeof BookingScalarFieldEnum]

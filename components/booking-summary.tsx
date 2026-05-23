@@ -58,7 +58,7 @@ const BookingSummary = ({
         </div>
 
         <div className="flex items-center justify-between px-5 py-3">
-          <p className="text-muted-foreground text-sm">Barbearia</p>
+          <p className="text-muted-foreground text-sm">Estabelecimento</p>
           {/* truncate evita overflow em nomes longos em telas pequenas */}
           <p className="max-w-[55%] truncate text-right text-sm font-medium">
             {barbershopName}

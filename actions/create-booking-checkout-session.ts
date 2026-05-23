@@ -19,6 +19,7 @@ const inputSchema = z.object({
   date: z.date(),
   professionalId: z.uuid(),
   clientName: z.string().min(2).max(100).optional(),
+  clientPhone: z.string().optional().nullable(),
 });
 
 // Verifica sobreposição entre dois intervalos [aStart, aEnd) e [bStart, bEnd)
@@ -35,7 +36,7 @@ export const createBookingCheckoutSession = protectedActionClient
   .inputSchema(inputSchema)
   .action(
     async ({
-      parsedInput: { serviceId, date, professionalId, clientName },
+      parsedInput: { serviceId, date, professionalId, clientName, clientPhone },
       ctx: { user },
     }) => {
       const service = await prisma.barbershopService.findUnique({
@@ -173,8 +174,20 @@ export const createBookingCheckoutSession = protectedActionClient
       }
 
       const isOwner = service.barbershop.ownerId === user.id;
+
       const resolvedClientName =
         isOwner && clientName ? clientName.trim() : undefined;
+
+      const normalizedPhone = clientPhone?.trim();
+
+      if (normalizedPhone) {
+        await prisma.user.update({
+          where: { id: user.id },
+          data: {
+            phone: normalizedPhone,
+          },
+        });
+      }
 
       const buildSessionParams = (
         methods: Stripe.Checkout.SessionCreateParams.PaymentMethodType[],
@@ -191,6 +204,10 @@ export const createBookingCheckoutSession = protectedActionClient
 
         if (resolvedClientName) {
           metadata.clientName = resolvedClientName;
+        }
+
+        if (normalizedPhone) {
+          metadata.clientPhone = normalizedPhone;
         }
 
         const params: Stripe.Checkout.SessionCreateParams = {

@@ -87,6 +87,7 @@ enum ScheduleViewType {
 model User {
   id               String    @id
   name             String
+  phone            String?
   email            String
   emailVerified    Boolean   @default(false)
   image            String?
@@ -98,18 +99,20 @@ model User {
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 
-  sessions             Session[]
-  accounts             Account[]
-  bookings             Booking[]
-  ownedBarbershops     Barbershop[]          @relation("BarbershopOwner")
-  professional         Professional?
-  notifications        Notification[]
-  supportTickets       SupportTicket[]
-  assignedTickets      SupportTicket[]       @relation("SupportTicketAgent")
-  sentSupportMsgs      SupportMessage[]      @relation("SupportMessageSender")
-  sentInvites          SupportInvite[]       @relation("SupportInvites")
-  supportAuditLogs     SupportAuditLog[]     @relation("SupportAuditLogs")
-  manualActivationLogs ManualActivationLog[] @relation("ManualActivationPerformer")
+  sessions                     Session[]
+  accounts                     Account[]
+  bookings                     Booking[]
+  ownedBarbershops             Barbershop[]          @relation("BarbershopOwner")
+  professional                 Professional?
+  notifications                Notification[]
+  supportTickets               SupportTicket[]
+  assignedTickets              SupportTicket[]       @relation("SupportTicketAgent")
+  sentSupportMsgs              SupportMessage[]      @relation("SupportMessageSender")
+  sentInvites                  SupportInvite[]       @relation("SupportInvites")
+  supportAuditLogs             SupportAuditLog[]     @relation("SupportAuditLogs")
+  manualActivationLogs         ManualActivationLog[] @relation("ManualActivationPerformer")
+  googleCalendarNeedsReconnect Boolean               @default(false)
+  calendarWatchExpiry          DateTime?
 
   @@unique([email])
   @@map("user")
@@ -201,24 +204,23 @@ model Barbershop {
 // =====================
 
 model Professional {
-  id                       String                    @id @default(uuid())
-  cpf                      String                    @unique
+  id                       String              @id @default(uuid())
+  cpf                      String              @unique
   displayName              String?
   bio                      String?
   imageUrl                 String?
-  isActive                 Boolean                   @default(true)
-  acceptsPix               Boolean                   @default(false)
-  acceptsCard              Boolean                   @default(true)
-  acceptsPayAfterService   Boolean                   @default(false)
-  stripeAccountId          String?                   @unique
-  stripeAccountStatus      StripeAccountStatus       @default(PENDING)
-  scheduleViewType         ScheduleViewType          @default(DEFAULT)
-  stripeOnboardingComplete Boolean                   @default(false)
+  isActive                 Boolean             @default(true)
+  acceptsPix               Boolean             @default(false)
+  acceptsCard              Boolean             @default(true)
+  acceptsPayAfterService   Boolean             @default(false)
+  stripeAccountId          String?             @unique
+  stripeAccountStatus      StripeAccountStatus @default(PENDING)
+  scheduleViewType         ScheduleViewType    @default(DEFAULT)
+  stripeOnboardingComplete Boolean             @default(false)
   whatsappGroupName        String?
-  whatsappScheduleMessages WhatsappScheduleMessage[]
   lastScheduleSentAt       DateTime?
-  createdAt                DateTime                  @default(now())
-  updatedAt                DateTime                  @updatedAt
+  createdAt                DateTime            @default(now())
+  updatedAt                DateTime            @updatedAt
 
   userId       String     @unique
   user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -330,6 +332,7 @@ model Booking {
   updatedAt   DateTime  @updatedAt @db.Timestamptz()
 
   clientName     String?
+  clientPhone    String?
   barbershopId   String
   barbershop     Barbershop        @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
   serviceId      String
@@ -339,7 +342,12 @@ model Booking {
   professionalId String
   professional   Professional      @relation(fields: [professionalId], references: [id], onDelete: Restrict)
 
-  payment Payment?
+  payment             Payment?
+  googleEventId       String? // ID do evento no Google Calendar
+  googleRecurrenceId  String? // ID da recorrência (para eventos repetidos)
+  isRecurring         Boolean  @default(false)
+  recurrenceRule      String? // RRULE string ex: "FREQ=WEEKLY;COUNT=10"
+  clientGoogleEventId String? //
 
   @@index([barbershopId, date])
   @@index([professionalId, date])
@@ -566,25 +574,4 @@ model ManualActivationLog {
 
   @@index([professionalId])
   @@map("manual_activation_log")
-}
-
-// =====================
-// WHATSAPP SCHEDULE MESSAGE
-// =====================
-// Persiste o messageId da última agenda enviada por profissional/grupo,
-// permitindo apagar a mensagem anterior antes de enviar uma nova.
-
-model WhatsappScheduleMessage {
-  id             String   @id @default(uuid())
-  professionalId String
-  groupName      String
-  messageId      String // ID retornado pelo Baileys após o envio
-  createdAt      DateTime @default(now()) @db.Timestamptz()
-
-  professional Professional @relation(fields: [professionalId], references: [id], onDelete: Cascade)
-
-  // Apenas um registro por profissional + grupo (upsert)
-  @@unique([professionalId, groupName])
-  @@index([professionalId])
-  @@map("whatsapp_schedule_message")
 }

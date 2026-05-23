@@ -14,6 +14,7 @@ import {
   Link2,
   Headset,
   CalendarDays,
+  MessageCircle,
   type LucideIcon,
 } from "lucide-react";
 import { SidebarNavLink } from "@/components/sidebar-nav-link";
@@ -32,7 +33,8 @@ export type NavIconKey =
   | "CreditCard"
   | "Percent"
   | "Link2"
-  | "Headset";
+  | "Headset"
+  | "MessageCircle";
 
 export const navIconMap: Record<NavIconKey, LucideIcon> = {
   LayoutDashboard,
@@ -48,6 +50,7 @@ export const navIconMap: Record<NavIconKey, LucideIcon> = {
   Percent,
   Link2,
   Headset,
+  MessageCircle,
 };
 
 export interface NavItem {

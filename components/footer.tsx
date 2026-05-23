@@ -1,8 +1,15 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useSyncExternalStore } from "react";
+
 import logoDark from "@/public/servix_logo_horizontal.svg";
 import logoLight from "@/public/servix_logo_light.svg";
+
 import AdapticodeIcon from "../components/adapticode-icon";
+
+import { useStoreContext } from "@/hooks/use-store-context";
 
 const LinkedInIcon = () => (
   <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
@@ -43,6 +50,17 @@ const socialLinks = [
 ];
 
 const Footer = () => {
+  const { storeUrl } = useStoreContext();
+
+  // evita hydration mismatch no Next 16 / React 19
+  const isClient = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
+
+  const safeStoreUrl = isClient ? storeUrl : null;
+
   return (
     <footer className="border-t border-border/60 bg-background">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -57,6 +75,7 @@ const Footer = () => {
               height={40}
               className="block dark:hidden"
             />
+
             <Image
               src={logoDark}
               alt="Servix"
@@ -64,15 +83,19 @@ const Footer = () => {
               height={40}
               className="hidden dark:block"
             />
+
             <p className="max-w-65 text-sm leading-relaxed text-muted-foreground">
               A plataforma completa para barbearias e salões modernos. Gestão de
               agendamentos, profissionais e pagamentos em um só lugar.
             </p>
+
             <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-muted/30 px-3 py-1.5">
               <span className="relative flex size-1.75">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-40" />
+
                 <span className="relative inline-flex size-1.75 rounded-full bg-emerald-500" />
               </span>
+
               <span className="text-[11px] font-medium tracking-wide text-emerald-600 dark:text-emerald-400">
                 Plataforma ativa
               </span>
@@ -84,12 +107,22 @@ const Footer = () => {
             <h4 className="text-[10px] font-medium uppercase tracking-[0.12em] text-foreground/30">
               Plataforma
             </h4>
+
             <ul className="space-y-3">
               {[
-                { label: "Início", href: "/home" },
-                { label: "Barbearias e salões", href: "/barbershops" },
-                { label: "Meus agendamentos", href: "/bookings" },
-                { label: "Conheça o Servix", href: "/" },
+                ...(safeStoreUrl
+                  ? [{ label: "Início", href: safeStoreUrl }]
+                  : []),
+
+                {
+                  label: "Meus agendamentos",
+                  href: "/bookings",
+                },
+
+                {
+                  label: "Conheça o Servix",
+                  href: "/marketing",
+                },
               ].map(({ label, href }) => (
                 <li key={href}>
                   <Link
@@ -108,7 +141,8 @@ const Footer = () => {
             <h4 className="text-[10px] font-medium uppercase tracking-[0.12em] text-foreground/30">
               Legal
             </h4>
-            <ul className="space-y-3">
+
+            {/* <ul className="space-y-3">
               {["Termos de uso", "Política de privacidade", "Cookies"].map(
                 (item) => (
                   <li key={item}>
@@ -118,6 +152,28 @@ const Footer = () => {
                   </li>
                 ),
               )}
+            </ul> */}
+            <ul className="space-y-3">
+              {[
+                {
+                  label: "Termos de Uso",
+                  href: "/termos",
+                },
+
+                {
+                  label: "Política de Privacidade",
+                  href: "/privacidade",
+                },
+              ].map(({ label, href }) => (
+                <li key={href}>
+                  <Link
+                    href={href}
+                    className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                  >
+                    {label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
@@ -135,6 +191,7 @@ const Footer = () => {
               <span className="text-[11px] text-muted-foreground/60">
                 Desenvolvido por
               </span>
+
               <Link
                 href="https://www.adapticode.com.br"
                 target="_blank"
@@ -142,6 +199,7 @@ const Footer = () => {
                 className="flex items-center gap-2 rounded-lg border border-border/60 bg-background px-2.5 py-1.25 transition-colors hover:border-border"
               >
                 <AdapticodeIcon size={24} />
+
                 <span
                   className="text-[11px] font-bold tracking-[0.08em]"
                   style={{

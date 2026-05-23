@@ -206,7 +206,7 @@ const MenuSheet = ({ onLoginClick }: MenuSheetProps) => {
               <NavItem
                 icon={Megaphone}
                 label="Conheça o Servix"
-                onClick={() => handleNavigation("/")}
+                onClick={() => handleNavigation("/marketing")}
               />
             )}
             {session?.user?.role === "client" && (

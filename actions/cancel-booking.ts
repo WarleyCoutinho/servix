@@ -1,3 +1,4 @@
+// actions/cancel-booking.ts
 "use server";
 
 import { z } from "zod";
@@ -9,6 +10,7 @@ import { revalidatePath } from "next/cache";
 import { stripe } from "@/lib/stripe";
 import { PaymentStatus } from "@/generated/prisma/enums";
 import { sendDailyScheduleToGroup } from "@/lib/whatsapp-schedule";
+import { deleteCalendarEvent } from "@/lib/google-calendar";
 
 const inputSchema = z.object({
   bookingId: z.uuid(),
@@ -18,13 +20,15 @@ export const cancelBooking = protectedActionClient
   .inputSchema(inputSchema)
   .action(async ({ parsedInput: { bookingId }, ctx: { user } }) => {
     const booking = await prisma.booking.findUnique({
-      where: {
-        id: bookingId,
-      },
+      where: { id: bookingId },
       include: {
         payment: true,
+        professional: {
+          include: { user: true },
+        },
       },
     });
+
     if (!booking) {
       returnValidationErrors(inputSchema, {
         _errors: ["Agendamento não encontrado."],
@@ -74,15 +78,33 @@ export const cancelBooking = protectedActionClient
     }
 
     const cancelledBooking = await prisma.booking.update({
-      where: {
-        id: bookingId,
-      },
-      data: {
-        cancelledAt: new Date(),
-      },
+      where: { id: bookingId },
+      data: { cancelledAt: new Date() },
     });
 
-    // Enviar agenda atualizada ao WhatsApp para qualquer data
+    // Deleta da agenda do PROFISSIONAL
+    if (booking.googleEventId) {
+      deleteCalendarEvent(
+        booking.professional.userId,
+        booking.googleEventId,
+        booking.isRecurring,
+      ).catch((err) =>
+        console.error("Google Calendar (profissional) delete failed:", err),
+      );
+    }
+
+    // Deleta da agenda do CLIENTE (se tiver evento criado lá)
+    if (booking.clientGoogleEventId) {
+      deleteCalendarEvent(
+        booking.userId, // token do cliente
+        booking.clientGoogleEventId,
+        booking.isRecurring,
+      ).catch((err) =>
+        console.error("Google Calendar (cliente) delete failed:", err),
+      );
+    }
+
+    // Enviar agenda atualizada ao WhatsApp
     sendDailyScheduleToGroup(booking.professionalId, booking.date).catch(
       (err) => console.error("[WhatsApp] Erro ao enviar agenda:", err),
     );

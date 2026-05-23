@@ -31,10 +31,16 @@ export type BookingMinAggregateOutputType = {
   createdAt: Date | null
   updatedAt: Date | null
   clientName: string | null
+  clientPhone: string | null
   barbershopId: string | null
   serviceId: string | null
   userId: string | null
   professionalId: string | null
+  googleEventId: string | null
+  googleRecurrenceId: string | null
+  isRecurring: boolean | null
+  recurrenceRule: string | null
+  clientGoogleEventId: string | null
 }
 
 export type BookingMaxAggregateOutputType = {
@@ -44,10 +50,16 @@ export type BookingMaxAggregateOutputType = {
   createdAt: Date | null
   updatedAt: Date | null
   clientName: string | null
+  clientPhone: string | null
   barbershopId: string | null
   serviceId: string | null
   userId: string | null
   professionalId: string | null
+  googleEventId: string | null
+  googleRecurrenceId: string | null
+  isRecurring: boolean | null
+  recurrenceRule: string | null
+  clientGoogleEventId: string | null
 }
 
 export type BookingCountAggregateOutputType = {
@@ -57,10 +69,16 @@ export type BookingCountAggregateOutputType = {
   createdAt: number
   updatedAt: number
   clientName: number
+  clientPhone: number
   barbershopId: number
   serviceId: number
   userId: number
   professionalId: number
+  googleEventId: number
+  googleRecurrenceId: number
+  isRecurring: number
+  recurrenceRule: number
+  clientGoogleEventId: number
   _all: number
 }
 
@@ -72,10 +90,16 @@ export type BookingMinAggregateInputType = {
   createdAt?: true
   updatedAt?: true
   clientName?: true
+  clientPhone?: true
   barbershopId?: true
   serviceId?: true
   userId?: true
   professionalId?: true
+  googleEventId?: true
+  googleRecurrenceId?: true
+  isRecurring?: true
+  recurrenceRule?: true
+  clientGoogleEventId?: true
 }
 
 export type BookingMaxAggregateInputType = {
@@ -85,10 +109,16 @@ export type BookingMaxAggregateInputType = {
   createdAt?: true
   updatedAt?: true
   clientName?: true
+  clientPhone?: true
   barbershopId?: true
   serviceId?: true
   userId?: true
   professionalId?: true
+  googleEventId?: true
+  googleRecurrenceId?: true
+  isRecurring?: true
+  recurrenceRule?: true
+  clientGoogleEventId?: true
 }
 
 export type BookingCountAggregateInputType = {
@@ -98,10 +128,16 @@ export type BookingCountAggregateInputType = {
   createdAt?: true
   updatedAt?: true
   clientName?: true
+  clientPhone?: true
   barbershopId?: true
   serviceId?: true
   userId?: true
   professionalId?: true
+  googleEventId?: true
+  googleRecurrenceId?: true
+  isRecurring?: true
+  recurrenceRule?: true
+  clientGoogleEventId?: true
   _all?: true
 }
 
@@ -184,10 +220,16 @@ export type BookingGroupByOutputType = {
   createdAt: Date
   updatedAt: Date
   clientName: string | null
+  clientPhone: string | null
   barbershopId: string
   serviceId: string
   userId: string
   professionalId: string
+  googleEventId: string | null
+  googleRecurrenceId: string | null
+  isRecurring: boolean
+  recurrenceRule: string | null
+  clientGoogleEventId: string | null
   _count: BookingCountAggregateOutputType | null
   _min: BookingMinAggregateOutputType | null
   _max: BookingMaxAggregateOutputType | null
@@ -218,10 +260,16 @@ export type BookingWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Booking"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Booking"> | Date | string
   clientName?: Prisma.StringNullableFilter<"Booking"> | string | null
+  clientPhone?: Prisma.StringNullableFilter<"Booking"> | string | null
   barbershopId?: Prisma.StringFilter<"Booking"> | string
   serviceId?: Prisma.StringFilter<"Booking"> | string
   userId?: Prisma.StringFilter<"Booking"> | string
   professionalId?: Prisma.StringFilter<"Booking"> | string
+  googleEventId?: Prisma.StringNullableFilter<"Booking"> | string | null
+  googleRecurrenceId?: Prisma.StringNullableFilter<"Booking"> | string | null
+  isRecurring?: Prisma.BoolFilter<"Booking"> | boolean
+  recurrenceRule?: Prisma.StringNullableFilter<"Booking"> | string | null
+  clientGoogleEventId?: Prisma.StringNullableFilter<"Booking"> | string | null
   barbershop?: Prisma.XOR<Prisma.BarbershopScalarRelationFilter, Prisma.BarbershopWhereInput>
   service?: Prisma.XOR<Prisma.BarbershopServiceScalarRelationFilter, Prisma.BarbershopServiceWhereInput>
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -236,10 +284,16 @@ export type BookingOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   clientName?: Prisma.SortOrderInput | Prisma.SortOrder
+  clientPhone?: Prisma.SortOrderInput | Prisma.SortOrder
   barbershopId?: Prisma.SortOrder
   serviceId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   professionalId?: Prisma.SortOrder
+  googleEventId?: Prisma.SortOrderInput | Prisma.SortOrder
+  googleRecurrenceId?: Prisma.SortOrderInput | Prisma.SortOrder
+  isRecurring?: Prisma.SortOrder
+  recurrenceRule?: Prisma.SortOrderInput | Prisma.SortOrder
+  clientGoogleEventId?: Prisma.SortOrderInput | Prisma.SortOrder
   barbershop?: Prisma.BarbershopOrderByWithRelationInput
   service?: Prisma.BarbershopServiceOrderByWithRelationInput
   user?: Prisma.UserOrderByWithRelationInput
@@ -257,10 +311,16 @@ export type BookingWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"Booking"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Booking"> | Date | string
   clientName?: Prisma.StringNullableFilter<"Booking"> | string | null
+  clientPhone?: Prisma.StringNullableFilter<"Booking"> | string | null
   barbershopId?: Prisma.StringFilter<"Booking"> | string
   serviceId?: Prisma.StringFilter<"Booking"> | string
   userId?: Prisma.StringFilter<"Booking"> | string
   professionalId?: Prisma.StringFilter<"Booking"> | string
+  googleEventId?: Prisma.StringNullableFilter<"Booking"> | string | null
+  googleRecurrenceId?: Prisma.StringNullableFilter<"Booking"> | string | null
+  isRecurring?: Prisma.BoolFilter<"Booking"> | boolean
+  recurrenceRule?: Prisma.StringNullableFilter<"Booking"> | string | null
+  clientGoogleEventId?: Prisma.StringNullableFilter<"Booking"> | string | null
   barbershop?: Prisma.XOR<Prisma.BarbershopScalarRelationFilter, Prisma.BarbershopWhereInput>
   service?: Prisma.XOR<Prisma.BarbershopServiceScalarRelationFilter, Prisma.BarbershopServiceWhereInput>
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -275,10 +335,16 @@ export type BookingOrderByWithAggregationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   clientName?: Prisma.SortOrderInput | Prisma.SortOrder
+  clientPhone?: Prisma.SortOrderInput | Prisma.SortOrder
   barbershopId?: Prisma.SortOrder
   serviceId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   professionalId?: Prisma.SortOrder
+  googleEventId?: Prisma.SortOrderInput | Prisma.SortOrder
+  googleRecurrenceId?: Prisma.SortOrderInput | Prisma.SortOrder
+  isRecurring?: Prisma.SortOrder
+  recurrenceRule?: Prisma.SortOrderInput | Prisma.SortOrder
+  clientGoogleEventId?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.BookingCountOrderByAggregateInput
   _max?: Prisma.BookingMaxOrderByAggregateInput
   _min?: Prisma.BookingMinOrderByAggregateInput
@@ -294,10 +360,16 @@ export type BookingScalarWhereWithAggregatesInput = {
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Booking"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Booking"> | Date | string
   clientName?: Prisma.StringNullableWithAggregatesFilter<"Booking"> | string | null
+  clientPhone?: Prisma.StringNullableWithAggregatesFilter<"Booking"> | string | null
   barbershopId?: Prisma.StringWithAggregatesFilter<"Booking"> | string
   serviceId?: Prisma.StringWithAggregatesFilter<"Booking"> | string
   userId?: Prisma.StringWithAggregatesFilter<"Booking"> | string
   professionalId?: Prisma.StringWithAggregatesFilter<"Booking"> | string
+  googleEventId?: Prisma.StringNullableWithAggregatesFilter<"Booking"> | string | null
+  googleRecurrenceId?: Prisma.StringNullableWithAggregatesFilter<"Booking"> | string | null
+  isRecurring?: Prisma.BoolWithAggregatesFilter<"Booking"> | boolean
+  recurrenceRule?: Prisma.StringNullableWithAggregatesFilter<"Booking"> | string | null
+  clientGoogleEventId?: Prisma.StringNullableWithAggregatesFilter<"Booking"> | string | null
 }
 
 export type BookingCreateInput = {
@@ -307,6 +379,12 @@ export type BookingCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clientName?: string | null
+  clientPhone?: string | null
+  googleEventId?: string | null
+  googleRecurrenceId?: string | null
+  isRecurring?: boolean
+  recurrenceRule?: string | null
+  clientGoogleEventId?: string | null
   barbershop: Prisma.BarbershopCreateNestedOneWithoutBookingsInput
   service: Prisma.BarbershopServiceCreateNestedOneWithoutBookingsInput
   user: Prisma.UserCreateNestedOneWithoutBookingsInput
@@ -321,10 +399,16 @@ export type BookingUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clientName?: string | null
+  clientPhone?: string | null
   barbershopId: string
   serviceId: string
   userId: string
   professionalId: string
+  googleEventId?: string | null
+  googleRecurrenceId?: string | null
+  isRecurring?: boolean
+  recurrenceRule?: string | null
+  clientGoogleEventId?: string | null
   payment?: Prisma.PaymentUncheckedCreateNestedOneWithoutBookingInput
 }
 
@@ -335,6 +419,12 @@ export type BookingUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clientPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleRecurrenceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRecurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recurrenceRule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clientGoogleEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barbershop?: Prisma.BarbershopUpdateOneRequiredWithoutBookingsNestedInput
   service?: Prisma.BarbershopServiceUpdateOneRequiredWithoutBookingsNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutBookingsNestedInput
@@ -349,10 +439,16 @@ export type BookingUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clientPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barbershopId?: Prisma.StringFieldUpdateOperationsInput | string
   serviceId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   professionalId?: Prisma.StringFieldUpdateOperationsInput | string
+  googleEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleRecurrenceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRecurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recurrenceRule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clientGoogleEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   payment?: Prisma.PaymentUncheckedUpdateOneWithoutBookingNestedInput
 }
 
@@ -363,10 +459,16 @@ export type BookingCreateManyInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clientName?: string | null
+  clientPhone?: string | null
   barbershopId: string
   serviceId: string
   userId: string
   professionalId: string
+  googleEventId?: string | null
+  googleRecurrenceId?: string | null
+  isRecurring?: boolean
+  recurrenceRule?: string | null
+  clientGoogleEventId?: string | null
 }
 
 export type BookingUpdateManyMutationInput = {
@@ -376,6 +478,12 @@ export type BookingUpdateManyMutationInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clientPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleRecurrenceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRecurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recurrenceRule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clientGoogleEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type BookingUncheckedUpdateManyInput = {
@@ -385,10 +493,16 @@ export type BookingUncheckedUpdateManyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clientPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barbershopId?: Prisma.StringFieldUpdateOperationsInput | string
   serviceId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   professionalId?: Prisma.StringFieldUpdateOperationsInput | string
+  googleEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleRecurrenceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRecurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recurrenceRule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clientGoogleEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type BookingListRelationFilter = {
@@ -408,10 +522,16 @@ export type BookingCountOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   clientName?: Prisma.SortOrder
+  clientPhone?: Prisma.SortOrder
   barbershopId?: Prisma.SortOrder
   serviceId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   professionalId?: Prisma.SortOrder
+  googleEventId?: Prisma.SortOrder
+  googleRecurrenceId?: Prisma.SortOrder
+  isRecurring?: Prisma.SortOrder
+  recurrenceRule?: Prisma.SortOrder
+  clientGoogleEventId?: Prisma.SortOrder
 }
 
 export type BookingMaxOrderByAggregateInput = {
@@ -421,10 +541,16 @@ export type BookingMaxOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   clientName?: Prisma.SortOrder
+  clientPhone?: Prisma.SortOrder
   barbershopId?: Prisma.SortOrder
   serviceId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   professionalId?: Prisma.SortOrder
+  googleEventId?: Prisma.SortOrder
+  googleRecurrenceId?: Prisma.SortOrder
+  isRecurring?: Prisma.SortOrder
+  recurrenceRule?: Prisma.SortOrder
+  clientGoogleEventId?: Prisma.SortOrder
 }
 
 export type BookingMinOrderByAggregateInput = {
@@ -434,10 +560,16 @@ export type BookingMinOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   clientName?: Prisma.SortOrder
+  clientPhone?: Prisma.SortOrder
   barbershopId?: Prisma.SortOrder
   serviceId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   professionalId?: Prisma.SortOrder
+  googleEventId?: Prisma.SortOrder
+  googleRecurrenceId?: Prisma.SortOrder
+  isRecurring?: Prisma.SortOrder
+  recurrenceRule?: Prisma.SortOrder
+  clientGoogleEventId?: Prisma.SortOrder
 }
 
 export type BookingScalarRelationFilter = {
@@ -634,6 +766,12 @@ export type BookingCreateWithoutUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clientName?: string | null
+  clientPhone?: string | null
+  googleEventId?: string | null
+  googleRecurrenceId?: string | null
+  isRecurring?: boolean
+  recurrenceRule?: string | null
+  clientGoogleEventId?: string | null
   barbershop: Prisma.BarbershopCreateNestedOneWithoutBookingsInput
   service: Prisma.BarbershopServiceCreateNestedOneWithoutBookingsInput
   professional: Prisma.ProfessionalCreateNestedOneWithoutBookingsInput
@@ -647,9 +785,15 @@ export type BookingUncheckedCreateWithoutUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clientName?: string | null
+  clientPhone?: string | null
   barbershopId: string
   serviceId: string
   professionalId: string
+  googleEventId?: string | null
+  googleRecurrenceId?: string | null
+  isRecurring?: boolean
+  recurrenceRule?: string | null
+  clientGoogleEventId?: string | null
   payment?: Prisma.PaymentUncheckedCreateNestedOneWithoutBookingInput
 }
 
@@ -689,10 +833,16 @@ export type BookingScalarWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Booking"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Booking"> | Date | string
   clientName?: Prisma.StringNullableFilter<"Booking"> | string | null
+  clientPhone?: Prisma.StringNullableFilter<"Booking"> | string | null
   barbershopId?: Prisma.StringFilter<"Booking"> | string
   serviceId?: Prisma.StringFilter<"Booking"> | string
   userId?: Prisma.StringFilter<"Booking"> | string
   professionalId?: Prisma.StringFilter<"Booking"> | string
+  googleEventId?: Prisma.StringNullableFilter<"Booking"> | string | null
+  googleRecurrenceId?: Prisma.StringNullableFilter<"Booking"> | string | null
+  isRecurring?: Prisma.BoolFilter<"Booking"> | boolean
+  recurrenceRule?: Prisma.StringNullableFilter<"Booking"> | string | null
+  clientGoogleEventId?: Prisma.StringNullableFilter<"Booking"> | string | null
 }
 
 export type BookingCreateWithoutBarbershopInput = {
@@ -702,6 +852,12 @@ export type BookingCreateWithoutBarbershopInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clientName?: string | null
+  clientPhone?: string | null
+  googleEventId?: string | null
+  googleRecurrenceId?: string | null
+  isRecurring?: boolean
+  recurrenceRule?: string | null
+  clientGoogleEventId?: string | null
   service: Prisma.BarbershopServiceCreateNestedOneWithoutBookingsInput
   user: Prisma.UserCreateNestedOneWithoutBookingsInput
   professional: Prisma.ProfessionalCreateNestedOneWithoutBookingsInput
@@ -715,9 +871,15 @@ export type BookingUncheckedCreateWithoutBarbershopInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clientName?: string | null
+  clientPhone?: string | null
   serviceId: string
   userId: string
   professionalId: string
+  googleEventId?: string | null
+  googleRecurrenceId?: string | null
+  isRecurring?: boolean
+  recurrenceRule?: string | null
+  clientGoogleEventId?: string | null
   payment?: Prisma.PaymentUncheckedCreateNestedOneWithoutBookingInput
 }
 
@@ -754,6 +916,12 @@ export type BookingCreateWithoutProfessionalInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clientName?: string | null
+  clientPhone?: string | null
+  googleEventId?: string | null
+  googleRecurrenceId?: string | null
+  isRecurring?: boolean
+  recurrenceRule?: string | null
+  clientGoogleEventId?: string | null
   barbershop: Prisma.BarbershopCreateNestedOneWithoutBookingsInput
   service: Prisma.BarbershopServiceCreateNestedOneWithoutBookingsInput
   user: Prisma.UserCreateNestedOneWithoutBookingsInput
@@ -767,9 +935,15 @@ export type BookingUncheckedCreateWithoutProfessionalInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clientName?: string | null
+  clientPhone?: string | null
   barbershopId: string
   serviceId: string
   userId: string
+  googleEventId?: string | null
+  googleRecurrenceId?: string | null
+  isRecurring?: boolean
+  recurrenceRule?: string | null
+  clientGoogleEventId?: string | null
   payment?: Prisma.PaymentUncheckedCreateNestedOneWithoutBookingInput
 }
 
@@ -806,6 +980,12 @@ export type BookingCreateWithoutServiceInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clientName?: string | null
+  clientPhone?: string | null
+  googleEventId?: string | null
+  googleRecurrenceId?: string | null
+  isRecurring?: boolean
+  recurrenceRule?: string | null
+  clientGoogleEventId?: string | null
   barbershop: Prisma.BarbershopCreateNestedOneWithoutBookingsInput
   user: Prisma.UserCreateNestedOneWithoutBookingsInput
   professional: Prisma.ProfessionalCreateNestedOneWithoutBookingsInput
@@ -819,9 +999,15 @@ export type BookingUncheckedCreateWithoutServiceInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clientName?: string | null
+  clientPhone?: string | null
   barbershopId: string
   userId: string
   professionalId: string
+  googleEventId?: string | null
+  googleRecurrenceId?: string | null
+  isRecurring?: boolean
+  recurrenceRule?: string | null
+  clientGoogleEventId?: string | null
   payment?: Prisma.PaymentUncheckedCreateNestedOneWithoutBookingInput
 }
 
@@ -858,6 +1044,12 @@ export type BookingCreateWithoutPaymentInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clientName?: string | null
+  clientPhone?: string | null
+  googleEventId?: string | null
+  googleRecurrenceId?: string | null
+  isRecurring?: boolean
+  recurrenceRule?: string | null
+  clientGoogleEventId?: string | null
   barbershop: Prisma.BarbershopCreateNestedOneWithoutBookingsInput
   service: Prisma.BarbershopServiceCreateNestedOneWithoutBookingsInput
   user: Prisma.UserCreateNestedOneWithoutBookingsInput
@@ -871,10 +1063,16 @@ export type BookingUncheckedCreateWithoutPaymentInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clientName?: string | null
+  clientPhone?: string | null
   barbershopId: string
   serviceId: string
   userId: string
   professionalId: string
+  googleEventId?: string | null
+  googleRecurrenceId?: string | null
+  isRecurring?: boolean
+  recurrenceRule?: string | null
+  clientGoogleEventId?: string | null
 }
 
 export type BookingCreateOrConnectWithoutPaymentInput = {
@@ -900,6 +1098,12 @@ export type BookingUpdateWithoutPaymentInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clientPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleRecurrenceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRecurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recurrenceRule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clientGoogleEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barbershop?: Prisma.BarbershopUpdateOneRequiredWithoutBookingsNestedInput
   service?: Prisma.BarbershopServiceUpdateOneRequiredWithoutBookingsNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutBookingsNestedInput
@@ -913,10 +1117,16 @@ export type BookingUncheckedUpdateWithoutPaymentInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clientPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barbershopId?: Prisma.StringFieldUpdateOperationsInput | string
   serviceId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   professionalId?: Prisma.StringFieldUpdateOperationsInput | string
+  googleEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleRecurrenceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRecurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recurrenceRule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clientGoogleEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type BookingCreateManyUserInput = {
@@ -926,9 +1136,15 @@ export type BookingCreateManyUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clientName?: string | null
+  clientPhone?: string | null
   barbershopId: string
   serviceId: string
   professionalId: string
+  googleEventId?: string | null
+  googleRecurrenceId?: string | null
+  isRecurring?: boolean
+  recurrenceRule?: string | null
+  clientGoogleEventId?: string | null
 }
 
 export type BookingUpdateWithoutUserInput = {
@@ -938,6 +1154,12 @@ export type BookingUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clientPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleRecurrenceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRecurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recurrenceRule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clientGoogleEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barbershop?: Prisma.BarbershopUpdateOneRequiredWithoutBookingsNestedInput
   service?: Prisma.BarbershopServiceUpdateOneRequiredWithoutBookingsNestedInput
   professional?: Prisma.ProfessionalUpdateOneRequiredWithoutBookingsNestedInput
@@ -951,9 +1173,15 @@ export type BookingUncheckedUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clientPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barbershopId?: Prisma.StringFieldUpdateOperationsInput | string
   serviceId?: Prisma.StringFieldUpdateOperationsInput | string
   professionalId?: Prisma.StringFieldUpdateOperationsInput | string
+  googleEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleRecurrenceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRecurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recurrenceRule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clientGoogleEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   payment?: Prisma.PaymentUncheckedUpdateOneWithoutBookingNestedInput
 }
 
@@ -964,9 +1192,15 @@ export type BookingUncheckedUpdateManyWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clientPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barbershopId?: Prisma.StringFieldUpdateOperationsInput | string
   serviceId?: Prisma.StringFieldUpdateOperationsInput | string
   professionalId?: Prisma.StringFieldUpdateOperationsInput | string
+  googleEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleRecurrenceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRecurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recurrenceRule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clientGoogleEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type BookingCreateManyBarbershopInput = {
@@ -976,9 +1210,15 @@ export type BookingCreateManyBarbershopInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clientName?: string | null
+  clientPhone?: string | null
   serviceId: string
   userId: string
   professionalId: string
+  googleEventId?: string | null
+  googleRecurrenceId?: string | null
+  isRecurring?: boolean
+  recurrenceRule?: string | null
+  clientGoogleEventId?: string | null
 }
 
 export type BookingUpdateWithoutBarbershopInput = {
@@ -988,6 +1228,12 @@ export type BookingUpdateWithoutBarbershopInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clientPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleRecurrenceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRecurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recurrenceRule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clientGoogleEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   service?: Prisma.BarbershopServiceUpdateOneRequiredWithoutBookingsNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutBookingsNestedInput
   professional?: Prisma.ProfessionalUpdateOneRequiredWithoutBookingsNestedInput
@@ -1001,9 +1247,15 @@ export type BookingUncheckedUpdateWithoutBarbershopInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clientPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serviceId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   professionalId?: Prisma.StringFieldUpdateOperationsInput | string
+  googleEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleRecurrenceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRecurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recurrenceRule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clientGoogleEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   payment?: Prisma.PaymentUncheckedUpdateOneWithoutBookingNestedInput
 }
 
@@ -1014,9 +1266,15 @@ export type BookingUncheckedUpdateManyWithoutBarbershopInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clientPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serviceId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   professionalId?: Prisma.StringFieldUpdateOperationsInput | string
+  googleEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleRecurrenceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRecurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recurrenceRule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clientGoogleEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type BookingCreateManyProfessionalInput = {
@@ -1026,9 +1284,15 @@ export type BookingCreateManyProfessionalInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clientName?: string | null
+  clientPhone?: string | null
   barbershopId: string
   serviceId: string
   userId: string
+  googleEventId?: string | null
+  googleRecurrenceId?: string | null
+  isRecurring?: boolean
+  recurrenceRule?: string | null
+  clientGoogleEventId?: string | null
 }
 
 export type BookingUpdateWithoutProfessionalInput = {
@@ -1038,6 +1302,12 @@ export type BookingUpdateWithoutProfessionalInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clientPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleRecurrenceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRecurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recurrenceRule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clientGoogleEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barbershop?: Prisma.BarbershopUpdateOneRequiredWithoutBookingsNestedInput
   service?: Prisma.BarbershopServiceUpdateOneRequiredWithoutBookingsNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutBookingsNestedInput
@@ -1051,9 +1321,15 @@ export type BookingUncheckedUpdateWithoutProfessionalInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clientPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barbershopId?: Prisma.StringFieldUpdateOperationsInput | string
   serviceId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  googleEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleRecurrenceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRecurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recurrenceRule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clientGoogleEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   payment?: Prisma.PaymentUncheckedUpdateOneWithoutBookingNestedInput
 }
 
@@ -1064,9 +1340,15 @@ export type BookingUncheckedUpdateManyWithoutProfessionalInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clientPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barbershopId?: Prisma.StringFieldUpdateOperationsInput | string
   serviceId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  googleEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleRecurrenceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRecurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recurrenceRule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clientGoogleEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type BookingCreateManyServiceInput = {
@@ -1076,9 +1358,15 @@ export type BookingCreateManyServiceInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clientName?: string | null
+  clientPhone?: string | null
   barbershopId: string
   userId: string
   professionalId: string
+  googleEventId?: string | null
+  googleRecurrenceId?: string | null
+  isRecurring?: boolean
+  recurrenceRule?: string | null
+  clientGoogleEventId?: string | null
 }
 
 export type BookingUpdateWithoutServiceInput = {
@@ -1088,6 +1376,12 @@ export type BookingUpdateWithoutServiceInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clientPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleRecurrenceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRecurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recurrenceRule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clientGoogleEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barbershop?: Prisma.BarbershopUpdateOneRequiredWithoutBookingsNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutBookingsNestedInput
   professional?: Prisma.ProfessionalUpdateOneRequiredWithoutBookingsNestedInput
@@ -1101,9 +1395,15 @@ export type BookingUncheckedUpdateWithoutServiceInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clientPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barbershopId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   professionalId?: Prisma.StringFieldUpdateOperationsInput | string
+  googleEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleRecurrenceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRecurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recurrenceRule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clientGoogleEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   payment?: Prisma.PaymentUncheckedUpdateOneWithoutBookingNestedInput
 }
 
@@ -1114,9 +1414,15 @@ export type BookingUncheckedUpdateManyWithoutServiceInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clientPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barbershopId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   professionalId?: Prisma.StringFieldUpdateOperationsInput | string
+  googleEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleRecurrenceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isRecurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recurrenceRule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clientGoogleEventId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -1128,10 +1434,16 @@ export type BookingSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   createdAt?: boolean
   updatedAt?: boolean
   clientName?: boolean
+  clientPhone?: boolean
   barbershopId?: boolean
   serviceId?: boolean
   userId?: boolean
   professionalId?: boolean
+  googleEventId?: boolean
+  googleRecurrenceId?: boolean
+  isRecurring?: boolean
+  recurrenceRule?: boolean
+  clientGoogleEventId?: boolean
   barbershop?: boolean | Prisma.BarbershopDefaultArgs<ExtArgs>
   service?: boolean | Prisma.BarbershopServiceDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -1146,10 +1458,16 @@ export type BookingSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   createdAt?: boolean
   updatedAt?: boolean
   clientName?: boolean
+  clientPhone?: boolean
   barbershopId?: boolean
   serviceId?: boolean
   userId?: boolean
   professionalId?: boolean
+  googleEventId?: boolean
+  googleRecurrenceId?: boolean
+  isRecurring?: boolean
+  recurrenceRule?: boolean
+  clientGoogleEventId?: boolean
   barbershop?: boolean | Prisma.BarbershopDefaultArgs<ExtArgs>
   service?: boolean | Prisma.BarbershopServiceDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -1163,10 +1481,16 @@ export type BookingSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   createdAt?: boolean
   updatedAt?: boolean
   clientName?: boolean
+  clientPhone?: boolean
   barbershopId?: boolean
   serviceId?: boolean
   userId?: boolean
   professionalId?: boolean
+  googleEventId?: boolean
+  googleRecurrenceId?: boolean
+  isRecurring?: boolean
+  recurrenceRule?: boolean
+  clientGoogleEventId?: boolean
   barbershop?: boolean | Prisma.BarbershopDefaultArgs<ExtArgs>
   service?: boolean | Prisma.BarbershopServiceDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -1180,13 +1504,19 @@ export type BookingSelectScalar = {
   createdAt?: boolean
   updatedAt?: boolean
   clientName?: boolean
+  clientPhone?: boolean
   barbershopId?: boolean
   serviceId?: boolean
   userId?: boolean
   professionalId?: boolean
+  googleEventId?: boolean
+  googleRecurrenceId?: boolean
+  isRecurring?: boolean
+  recurrenceRule?: boolean
+  clientGoogleEventId?: boolean
 }
 
-export type BookingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "date" | "cancelledAt" | "createdAt" | "updatedAt" | "clientName" | "barbershopId" | "serviceId" | "userId" | "professionalId", ExtArgs["result"]["booking"]>
+export type BookingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "date" | "cancelledAt" | "createdAt" | "updatedAt" | "clientName" | "clientPhone" | "barbershopId" | "serviceId" | "userId" | "professionalId" | "googleEventId" | "googleRecurrenceId" | "isRecurring" | "recurrenceRule" | "clientGoogleEventId", ExtArgs["result"]["booking"]>
 export type BookingInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   barbershop?: boolean | Prisma.BarbershopDefaultArgs<ExtArgs>
   service?: boolean | Prisma.BarbershopServiceDefaultArgs<ExtArgs>
@@ -1223,10 +1553,16 @@ export type $BookingPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     createdAt: Date
     updatedAt: Date
     clientName: string | null
+    clientPhone: string | null
     barbershopId: string
     serviceId: string
     userId: string
     professionalId: string
+    googleEventId: string | null
+    googleRecurrenceId: string | null
+    isRecurring: boolean
+    recurrenceRule: string | null
+    clientGoogleEventId: string | null
   }, ExtArgs["result"]["booking"]>
   composites: {}
 }
@@ -1661,10 +1997,16 @@ export interface BookingFieldRefs {
   readonly createdAt: Prisma.FieldRef<"Booking", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Booking", 'DateTime'>
   readonly clientName: Prisma.FieldRef<"Booking", 'String'>
+  readonly clientPhone: Prisma.FieldRef<"Booking", 'String'>
   readonly barbershopId: Prisma.FieldRef<"Booking", 'String'>
   readonly serviceId: Prisma.FieldRef<"Booking", 'String'>
   readonly userId: Prisma.FieldRef<"Booking", 'String'>
   readonly professionalId: Prisma.FieldRef<"Booking", 'String'>
+  readonly googleEventId: Prisma.FieldRef<"Booking", 'String'>
+  readonly googleRecurrenceId: Prisma.FieldRef<"Booking", 'String'>
+  readonly isRecurring: Prisma.FieldRef<"Booking", 'Boolean'>
+  readonly recurrenceRule: Prisma.FieldRef<"Booking", 'String'>
+  readonly clientGoogleEventId: Prisma.FieldRef<"Booking", 'String'>
 }
     
 

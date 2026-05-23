@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { authClient } from "@/lib/auth-client";
 import { Button } from "./ui/button";
+import Link from "next/link";
 
 // ─── DADOS ────────────────────────────────────────────────────────────────────
 
@@ -27,11 +28,10 @@ const PLANS = [
     note: "Organize sua agenda, reduza faltas e aceite pagamentos online — sem complicação",
     features: [
       "1 loja · 1 profissional",
-      "Até 10 serviços",
+      "Até 15 serviços",
       "Agenda online 24h",
       "Página pública com link de agendamento",
-      "Cadastro de clientes",
-      "Lembretes automáticos (redução de faltas)",
+      "Lembretes automáticos (redução de faltas no WhatsApp do profissional)",
       "Confirmação de agendamento",
       "Pagamento online (cartão)",
     ],
@@ -45,19 +45,25 @@ const PLANS = [
     badge: "★ Mais popular",
     note: "Gerencie sua equipe, controle atendimentos e acompanhe seu faturamento em um só lugar",
     features: [
-      "1 loja · Até 5 profissionais",
+      "1 loja",
+      "Até 3 profissionais",
       "Até 30 serviços",
       "Agenda por profissional",
       "Página pública com link de agendamento",
-      "Cadastro e histórico de clientes",
-      "Lembretes automáticos (redução de faltas)",
+      "Histórico de clientes",
+      "Lembretes automáticos (redução de faltas no WhatsApp do profissional)",
       "Confirmação de agendamento",
       "Pagamento online (cartão)",
-      "Relatórios de faturamento",
+      "Visualização de faturamento",
       "Controle de caixa",
-      "Comissão automática por profissional",
+      "Comissão automática por profissional (via Stripe)",
     ],
-    idealFor: ["Barbearia", "Salão de beleza", "Escovaria", "Studio de beleza"],
+    idealFor: [
+      "Barbearia",
+      "Salão de beleza",
+      "Escova progressiva / Smoothing",
+      "Studio de beleza",
+    ],
   },
   {
     name: "Profissional",
@@ -67,18 +73,18 @@ const PLANS = [
     badge: null,
     note: "Gestão completa com dados, performance e controle total da operação",
     features: [
-      "1 loja · Até 20 profissionais",
+      "1 loja",
+      "Até 10 profissionais",
       "Até 100 serviços",
       "Agenda por profissional",
       "Página pública por estabelecimento",
-      "Cadastro e histórico completo de clientes",
-      "Lembretes automáticos (redução de faltas)",
+      "Histórico completo de clientes",
+      "Lembretes automáticos (redução de faltas no WhatsApp do profissional)",
       "Confirmação de agendamento",
       "Pagamento online (cartão)",
       "Controle financeiro completo",
-      "Relatórios avançados",
       "Ranking de desempenho da equipe",
-      "Comissão automática por profissional",
+      "Comissão automática por profissional (via Stripe)",
     ],
     idealFor: [
       "Estética facial e corporal",
@@ -95,6 +101,12 @@ const FEATURES = [
     title: "Agendamento Online 24/7",
     tag: "Automático",
     desc: "Seu cliente agenda a qualquer hora, mesmo enquanto você dorme. Chega de perder cliente por não atender o telefone.",
+  },
+  {
+    icon: "✂️",
+    title: "Agenda Corrida",
+    tag: "Vagas simultâneas",
+    desc: "Marcou uma cliente pra fazer luzes? Enquanto o produto age, o sistema já libera vaga automática pra você atender outra. Você configura quantas vagas simultâneas consegue tocar — e o Servix cuida do resto. Sem conflito de horário. Sem cadeira parada. Sem surpresa.",
   },
   {
     icon: "💬",
@@ -353,7 +365,8 @@ export default function ServixLanding() {
   const handleCtaClick = () => {
     authClient.signIn.social({
       provider: "google",
-      callbackURL: "/auth/callback",
+      /* callbackURL: "/auth/callback", */
+      callbackURL: "/home",
     });
   };
 
@@ -725,9 +738,9 @@ export default function ServixLanding() {
                       {segment}
                     </span>
                   ))}
-                  <span className="sx-universal-tag sx-universal-tag--muted">
+                  {/* <span className="sx-universal-tag sx-universal-tag--muted">
                     e muito mais...
-                  </span>
+                  </span> */}
                 </div>
                 <p className="text-sm text-muted-foreground">
                   Comece simples —{" "}
@@ -830,13 +843,57 @@ export default function ServixLanding() {
         <div className="sx-footer-logo">
           SERVI<span>X</span>
         </div>
+
         <p className="sx-footer-text">
-          Gestão profissional para barbearias e salões de beleza
+          Gestão profissional para barbearias, salões de beleza, esmalterias,
+          estúdios e clínicas de estética.
         </p>
-        <p className="sx-footer-text">
+
+        <div className="mt-3">
           <Button onClick={handleCtaClick} className="sx-footer-link">
             servix.app.br
           </Button>
+        </div>
+
+        {/* Links legais — exigidos pelo Google OAuth */}
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
+          <Link
+            href="/privacidade"
+            className="
+      text-sm
+      font-medium
+      text-zinc-300
+      underline-offset-4
+      transition-all
+      duration-200
+      hover:text-lime-400
+      hover:underline
+    "
+          >
+            Política de Privacidade
+          </Link>
+
+          <span className="text-zinc-600 text-sm">•</span>
+
+          <Link
+            href="/termos"
+            className="
+      text-sm
+      font-medium
+      text-zinc-300
+      underline-offset-4
+      transition-all
+      duration-200
+      hover:text-lime-400
+      hover:underline
+    "
+          >
+            Termos de Uso
+          </Link>
+        </div>
+
+        <p className="sx-footer-copy">
+          © {new Date().getFullYear()} Servix · Todos os direitos reservados.
         </p>
       </footer>
     </div>

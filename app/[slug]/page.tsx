@@ -4,6 +4,9 @@ import { PageContainer } from "@/components/ui/page";
 import { getBarbershopBySlug } from "@/data/barbershops";
 import { getServiceCategories } from "@/data/services";
 import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { hasGoogleCalendarScope } from "@/lib/google-scopes";
+import { GoogleCalendarReconnectAlert } from "@/components/google-calendar-reconnect-alert";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { ServicesSection } from "@/components/services-section";
@@ -22,9 +25,7 @@ const SlugPage = async ({ params }: SlugPageProps) => {
     auth.api.getSession({ headers: await headers() }),
   ]);
 
-  if (!barbershop) {
-    notFound();
-  }
+  if (!barbershop) notFound();
 
   const isOwner =
     !!session?.user && !!barbershop.ownerId
@@ -36,9 +37,30 @@ const SlugPage = async ({ params }: SlugPageProps) => {
     barbershop.professionals?.some((p) => p.userId === session.user.id) ===
       true;
 
+  let needsCalendarPermission = false;
+
+  if (session?.user) {
+    const [user, account] = await Promise.all([
+      prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { googleCalendarNeedsReconnect: true },
+      }),
+      prisma.account.findFirst({
+        where: { userId: session.user.id, providerId: "google" },
+        select: { scope: true },
+      }),
+    ]);
+
+    needsCalendarPermission =
+      !!user?.googleCalendarNeedsReconnect ||
+      !hasGoogleCalendarScope(account?.scope);
+  }
+
   return (
     <div>
       <Header />
+
+      {needsCalendarPermission && <GoogleCalendarReconnectAlert />}
 
       <BarbershopCover barbershop={barbershop} isOwner={isOwner} />
 

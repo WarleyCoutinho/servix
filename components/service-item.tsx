@@ -16,6 +16,9 @@ import {
   Info,
   Loader2,
   LogIn,
+  Mail,
+  Phone,
+  RefreshCw,
   User,
 } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
@@ -121,7 +124,7 @@ const ServiceItem = ({
   const searchParams = useSearchParams();
   const router = useRouter();
   const refProfessionalId = searchParams.get("ref");
-
+  const { data: session } = authClient.useSession();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedProfessional, setSelectedProfessional] = useState<
     string | undefined
@@ -133,6 +136,9 @@ const ServiceItem = ({
     "online" | "pay_after_service" | undefined
   >(undefined);
   const [clientName, setClientName] = useState("");
+  const [clientPhone, setClientPhone] = useState(
+    (session?.user as { phone?: string })?.phone ?? "",
+  );
   const [sheetIsOpen, setSheetIsOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
 
@@ -140,10 +146,13 @@ const ServiceItem = ({
   const timeSectionRef = useRef<HTMLDivElement | null>(null);
   const paySectionRef = useRef<HTMLDivElement | null>(null);
   const clientNameSectionRef = useRef<HTMLDivElement | null>(null);
+  const [recurrence, setRecurrence] = useState<
+    "none" | "weekly" | "monthly" | "yearly"
+  >("none");
+  const [recurrenceCount, setRecurrenceCount] = useState<number>(4);
+  const [clientEmail, setClientEmail] = useState("");
   // ── FIX 2: referência ao container scrollável para scrollTo correto no iOS ──
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
-
-  const { data: session } = authClient.useSession();
 
   const {
     executeAsync: executeCheckoutBooking,
@@ -231,6 +240,7 @@ const ServiceItem = ({
     setSelectedTime(undefined);
     setSelectedPaymentMethod(undefined);
     setClientName("");
+    setClientPhone("");
   };
 
   const getFirstError = (
@@ -264,6 +274,10 @@ const ServiceItem = ({
         professionalId: selectedProfessional,
         payAfterService: true,
         clientName: clientName.trim(),
+        clientPhone: clientPhone.trim() || undefined,
+        clientEmail: clientEmail.trim() || undefined,
+        recurrence,
+        recurrenceCount: recurrence !== "none" ? recurrenceCount : undefined,
       });
       if (!result || result.serverError)
         return toast.error("Erro ao criar agendamento. Tente novamente.");
@@ -275,6 +289,9 @@ const ServiceItem = ({
       toast.success("Agendamento confirmado! 🎉");
       setSheetIsOpen(false);
       reset();
+      setRecurrence("none");
+      setRecurrenceCount(4);
+      setClientEmail("");
       router.push("/bookings?success=true");
       return;
     }
@@ -294,6 +311,7 @@ const ServiceItem = ({
         serviceId: service.id,
         professionalId: selectedProfessional,
         payAfterService: true,
+        clientPhone: clientPhone.trim() || undefined,
       });
       if (!result || result.serverError)
         return toast.error("Erro ao criar agendamento. Tente novamente.");
@@ -313,6 +331,7 @@ const ServiceItem = ({
       date,
       serviceId: service.id,
       professionalId: selectedProfessional,
+      clientPhone: clientPhone.trim() || undefined,
     });
     if (!result || result.serverError)
       return toast.error("Erro ao criar agendamento. Tente novamente.");
@@ -349,13 +368,14 @@ const ServiceItem = ({
     (!hasStripePayment && !!hasPayAfterService);
   const stepOwnerDone = clientName.trim().length >= 2;
 
-  const canConfirm =
-    isOwner || isProfessional
-      ? step1Done && step2Done && step3Done && stepOwnerDone
-      : step1Done &&
-        step2Done &&
-        step3Done &&
-        (!hasPayAfterService || !hasStripePayment || !!selectedPaymentMethod);
+  const needsClientData = !!session?.user;
+
+  const canConfirm = needsClientData
+    ? step1Done && step2Done && step3Done && clientPhone.trim().length >= 10
+    : step1Done &&
+      step2Done &&
+      step3Done &&
+      (!hasPayAfterService || !hasStripePayment || !!selectedPaymentMethod);
 
   // ── FIX 1: progress bar não mostra 4º segmento já preenchido quando
   //    o profissional não tem pagamento online (hasPayAfterService only) ──
@@ -660,7 +680,7 @@ const ServiceItem = ({
                       <div ref={paySectionRef}>
                         <Section
                           step={4}
-                          label="Como vai pagar?"
+                          label="Escolha como vai pagar?"
                           done={step4Done}
                           active={step3Done && !step4Done}
                           locked={!step3Done}
@@ -780,16 +800,19 @@ const ServiceItem = ({
                     )}
 
                     {/* ══ PASSO 4 — Nome do cliente (owner) ══ */}
-                    {(isOwner || isProfessional) && (
+                    {/* ══ PASSO 4 — Dados do cliente ══ */}
+                    {isOwner || isProfessional ? (
+                      /* ── Owner / Profissional: todos os campos ── */
                       <div ref={clientNameSectionRef}>
                         <Section
                           step={4}
-                          label="Nome do cliente"
+                          label="Dados do cliente"
                           done={stepOwnerDone}
                           active={step3Done && !stepOwnerDone}
                           locked={!step3Done}
                         >
-                          <div className="flex flex-col gap-2 px-5">
+                          <div className="flex flex-col gap-3 px-5">
+                            {/* Nome */}
                             <div className="relative">
                               <User
                                 size={14}
@@ -799,19 +822,161 @@ const ServiceItem = ({
                                 type="text"
                                 value={clientName}
                                 onChange={(e) => setClientName(e.target.value)}
-                                placeholder="Nome do cliente"
+                                placeholder="Nome do cliente *"
                                 maxLength={100}
-                                className="border-border bg-background placeholder:text-muted-foreground focus:border-primary focus:ring-primary/40 h-11 w-full rounded-xl border py-2.5 pl-9 pr-3 text-base transition-all focus:outline-none focus:ring-1"
+                                className="border-border bg-background placeholder:text-muted-foreground focus:border-primary h-11 w-full rounded-xl border py-2.5 pl-9 pr-3 text-base transition-all focus:outline-none focus:ring-1 focus:ring-primary/40"
                               />
                             </div>
-                            <p className="text-muted-foreground text-xs leading-relaxed">
-                              O agendamento será registrado com esse nome.
+
+                            {/* E-mail */}
+                            <div className="relative">
+                              <Mail
+                                size={14}
+                                className="text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2"
+                              />
+                              <input
+                                type="email"
+                                value={clientEmail}
+                                onChange={(e) => setClientEmail(e.target.value)}
+                                placeholder="E-mail (envia convite no Google, lembretes)"
+                                className="border-border bg-background placeholder:text-muted-foreground focus:border-primary h-11 w-full rounded-xl border py-2.5 pl-9 pr-3 text-base transition-all focus:outline-none focus:ring-1 focus:ring-primary/40"
+                              />
+                            </div>
+
+                            {/* WhatsApp */}
+                            <div className="relative">
+                              <Phone
+                                size={14}
+                                className="text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2"
+                              />
+                              <input
+                                type="tel"
+                                value={clientPhone}
+                                onChange={(e) => setClientPhone(e.target.value)}
+                                placeholder="WhatsApp do cliente (lembretes)"
+                                className="border-border bg-background placeholder:text-muted-foreground focus:border-primary h-11 w-full rounded-xl border py-2.5 pl-9 pr-3 text-base transition-all focus:outline-none focus:ring-1 focus:ring-primary/40"
+                              />
+                            </div>
+
+                            {/* Repetição */}
+                            <div className="space-y-2">
+                              <p className="text-muted-foreground text-xs font-medium">
+                                Repetir agendamento
+                              </p>
+                              <div className="grid grid-cols-4 gap-2">
+                                {(
+                                  [
+                                    "none",
+                                    "weekly",
+                                    "monthly",
+                                    "yearly",
+                                  ] as const
+                                ).map((opt) => {
+                                  const labels = {
+                                    none: "Não",
+                                    weekly: "Semanal",
+                                    monthly: "Mensal",
+                                    yearly: "Anual",
+                                  };
+                                  const isSel = recurrence === opt;
+                                  return (
+                                    <button
+                                      key={opt}
+                                      type="button"
+                                      onClick={() => setRecurrence(opt)}
+                                      className={[
+                                        "h-10 rounded-xl border text-xs font-semibold transition-all",
+                                        isSel
+                                          ? "border-primary bg-primary text-primary-foreground scale-105 shadow-sm"
+                                          : "border-border bg-background text-foreground",
+                                      ].join(" ")}
+                                    >
+                                      {labels[opt]}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+
+                              {recurrence !== "none" && (
+                                <div className="bg-muted/50 flex items-center gap-3 rounded-xl p-3">
+                                  <RefreshCw
+                                    size={14}
+                                    className="text-primary shrink-0"
+                                  />
+                                  <span className="text-foreground flex-1 text-xs font-medium">
+                                    Repetir por
+                                  </span>
+                                  <div className="flex items-center gap-2">
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        setRecurrenceCount(
+                                          Math.max(1, recurrenceCount - 1),
+                                        )
+                                      }
+                                      className="border-border bg-background flex h-7 w-7 items-center justify-center rounded-lg border text-sm font-bold"
+                                    >
+                                      −
+                                    </button>
+                                    <span className="w-6 text-center text-sm font-bold">
+                                      {recurrenceCount}
+                                    </span>
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        setRecurrenceCount(
+                                          Math.min(52, recurrenceCount + 1),
+                                        )
+                                      }
+                                      className="border-border bg-background flex h-7 w-7 items-center justify-center rounded-lg border text-sm font-bold"
+                                    >
+                                      +
+                                    </button>
+                                    <span className="text-muted-foreground text-xs">
+                                      {recurrence === "weekly"
+                                        ? "semanas"
+                                        : recurrence === "monthly"
+                                          ? "meses"
+                                          : "anos"}
+                                    </span>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </Section>
+                      </div>
+                    ) : session?.user ? (
+                      /* ── Cliente logado: só WhatsApp ── */
+                      <div ref={clientNameSectionRef}>
+                        <Section
+                          step={hasPayAfterService ? 5 : 4}
+                          label="Seu WhatsApp"
+                          done={clientPhone.trim().length >= 10}
+                          active={step3Done && clientPhone.trim().length < 10}
+                          locked={!step3Done}
+                        >
+                          <div className="px-5">
+                            <div className="relative">
+                              <Phone
+                                size={14}
+                                className="text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2"
+                              />
+                              <input
+                                type="tel"
+                                value={clientPhone}
+                                onChange={(e) => setClientPhone(e.target.value)}
+                                placeholder="Seu WhatsApp (lembretes)"
+                                className="border-border bg-background placeholder:text-muted-foreground focus:border-primary h-11 w-full rounded-xl border py-2.5 pl-9 pr-3 text-base transition-all focus:outline-none focus:ring-1 focus:ring-primary/40"
+                              />
+                            </div>
+                            <p className="text-muted-foreground mt-2 text-xs">
+                              Usado para enviar lembretes do agendamento.
                             </p>
                           </div>
                         </Section>
                       </div>
-                    )}
-
+                    ) : null}
                     {/* ══ Resumo ══ */}
                     {step1Done && step2Done && step3Done && (
                       <div className="px-5 py-5">

@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // OBRIGATORIO para o Dockerfile funcionar
+  output: "standalone",
+
   images: {
     remotePatterns: [
       {
