@@ -327,22 +327,7 @@ Navegador ──▶ /api/whatsapp/[professionalId]/* ──▶ lib/whatsapp.ts �
 
 ---
 
-## ⚠️ Pontos de atenção encontrados no código
 
-Coisas que descobri ao mapear o projeto e que valem correção ou ao menos ciência:
-
-1. **Lembretes por WhatsApp não funcionam com o whatsapp-server atual.** `lib/whatsapp-reminder.ts` chama `POST /send-direct`, e as rotas de admin chamam `/reminders/connect|status|disconnect`. **Nenhuma dessas rotas existe** no whatsapp-server. Como o `fetch` não lança erro em respostas 404, o cron marca o lembrete como enviado mesmo sem ter enviado.
-2. **`/api/whatsapp/booking` fica bloqueada pelo `proxy.ts`.** `/api/whatsapp` está em `PROTECTED_ROUTES`, que exige cookie de sessão; uma chamada server-to-server só com `x-api-key` recebe 401 antes de chegar na rota. Para uso pelo bot, inclua essa rota nas exceções.
-3. **Agendamentos "pagar após o serviço" não disparam a agenda no WhatsApp.** `create-booking.ts` não chama `sendDailyScheduleToGroup` (só o webhook Stripe, o cancelamento e o cron chamam).
-4. **Limites de plano divergem entre fontes.** O seed define Solo com 10 serviços, Equipe com 30 e Profissional com 100. O `docs/Guia configuracao stripe.md` (3/20/50/…) e o prompt do bot no whatsapp-server (4/20/50) estão desatualizados.
-5. **O Guia do Stripe cita coisas que não existem:** o script `scripts/create-stripe-prices.ts` (quem cria os preços é o `prisma/seed.ts`) e a variável `PLATFORM_FEE_PERCENTAGE` (a taxa vem de `lib/platform-fee.ts`). O guia também usa a porta 3000, mas o app roda na **3319**.
-6. **`AI_PROVIDER` só vale para o chat de suporte** (`lib/ai.ts`). O `/api/chat` (Agenda.ai) usa Gemini fixo via `@ai-sdk/google`.
-7. **`next.config.ts` exige `output: "standalone"` "para o Dockerfile"**, mas o repositório não inclui Dockerfile. Na Vercel isso é ignorado sem problemas; para Docker é preciso criar um.
-8. **Scripts `setup-*` têm um e-mail padrão fixo** no código quando você não passa argumento. Sempre informe o e-mail explicitamente ou remova o valor padrão.
-9. **Rate limit em memória** (`lib/rate-limit.ts`): funciona por instância, então não é global em ambientes serverless com várias instâncias.
-10. **Uploads ficam no Postgres** (coluna `Bytes`). Simples para começar, mas pesa no banco em escala; considere S3/R2/UploadThing depois.
-
----
 
 ## 🗄️ Modelo de dados (resumo)
 
